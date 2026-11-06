@@ -30,7 +30,7 @@ const JUMPS: Array[StringName] = [
 const JUMP_NAMES: Dictionary = {
 	&"opening": "OPENING", &"corridor_start": "CORRIDOR START", &"relay_question": "RELAY QUESTION",
 	&"safe_point": "CORRIDOR SAFE POINT", &"records_entry": "RECORDS ENTRY", &"records_mirror": "RECORDS, MIRROR COPIED",
-	&"junction_a": "JUNCTION SAVE A", &"lane": "AFTER THE BLAST / LANE", &"tank_down": "TANK DOWN", &"end_of_slice": "END OF SLICE",
+	&"junction_a": "JUNCTION SAVE A", &"lane": "AFTER THE BLAST / LANE", &"tank_down": "TANK DOWN", &"end_of_slice": "CHAPTER 1 COMPLETE",
 }
 ## Jumps that land on one of the game's checkpoints and so write it, as play does.
 const CHECKPOINT_JUMPS: Array[StringName] = [&"safe_point", &"records_entry", &"records_mirror", &"junction_a", &"lane", &"tank_down", &"end_of_slice"]
@@ -251,8 +251,11 @@ func build_state(id: StringName) -> M0State:
 	if id == &"tank_down":
 		return state
 	state.clear_junction()
-	# At the bolt; WOLF at his spot by the hatch, where he waits once the sentry is down.
-	_set_positions(state, JunctionRoom.BOLT_X, JunctionRoom.WOLF_DOWN_X)
+	state.enter_investigation()
+	for step: int in range(1, 5):
+		state.investigate(step)
+	# The stable debug action ID now lands on the real Chapter 1 endpoint, after the annex sources.
+	_set_positions(state, Main.RECORDS_EXIT_X, 700.0)
 	return state
 
 

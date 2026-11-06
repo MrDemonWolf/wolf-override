@@ -1,11 +1,11 @@
 class_name M0State
 extends RefCounted
-## The slice's progress and the checkpoint file that keeps it: who the engineer is, where both actors
+## Chapter 1's progress and the checkpoint file that keeps it: who the engineer is, where both actors
 ## stand, the relay choice WOLF remembers and every chapter beat. to_dict and from_dict are the save
 ## format (from_dict rejects anything a real run could not produce); save_to_disk and load_from_disk
 ## write and read it without losing newer progress to a failed write.
 
-const SAVE_VERSION: int = 4
+const SAVE_VERSION: int = 5
 const SAVE_PATH: String = "user://m0-save.json"
 ## The save file's write counter, one higher at every save_to_disk. It sits beside to_dict()'s fields
 ## rather than in them, so it is not progress: from_dict ignores it, and older builds load the file too.
@@ -13,11 +13,11 @@ const GENERATION_KEY: String = "generation"
 ## The counter's ceiling: 2^53, the largest whole number JSON's doubles hold exactly. One save a second
 ## would take 285 million years to reach it.
 const MAX_GENERATION: int = 9007199254740992
-## The largest checkpoint file read. A v4 save is under 1 KiB even with the longest choice wording
+## The largest checkpoint file read. A v5 save is under 1 KiB even with the longest choice wording
 ## (MAX_SELECTED_TEXT_LENGTH), so 64 KiB, the settings file's limit (GameSettings.MAX_SETTINGS_BYTES),
 ## leaves room for every future field while a huge or wrong file is turned away before it is read.
 const MAX_CHECKPOINT_BYTES: int = 65536
-const CHAPTER_IDS: Array[String] = ["lockdown", "records", "junction"]
+const CHAPTER_IDS: Array[String] = ["lockdown", "records", "junction", "investigation"]
 const EVENT_ID: String = "relay_disagreement"
 const DISCLOSE: String = "disclose_risk"
 const PRESS: String = "press_without_warning"
@@ -61,7 +61,9 @@ var chapter_complete: bool = false
 var door_blown: bool = false
 var sentry_down: bool = false
 var junction_cleared: bool = false
-## How the sentry came down, for the END OF SLICE recap: "wolf" (he drew it onto the mark), "refused"
+## Ordered annex progress: 0 none, 1 fragment, 2 controller, 3 escort/repair, 4 explicit chapter exit.
+var investigation_step: int = 0
+## How the sentry came down, for the Chapter 1 recap: "wolf" (he drew it onto the mark), "refused"
 ## (he would not, so the engineer timed it), "alone" (he held back by the valve while the engineer timed
 ## it), or empty before the fall. Optional in the file, so v4 saves without it still load.
 var lane_recap: String = ""
@@ -212,6 +214,24 @@ func wolf_will_bait() -> bool:
 	return memory.get("choice_id") == DISCLOSE
 
 
+## Enters the annex only after the junction exit is open; positions are world px in reused Records art.
+func enter_investigation() -> bool:
+	if chapter_id != "junction" or not junction_cleared:
+		return false
+	chapter_id = "investigation"
+	human_position = Vector2(128.0, 410.0)
+	wolf_position = Vector2(216.0, 423.0)
+	return true
+
+
+## Keeps the next beat (1..4), rejecting skipped, repeated or out-of-room reads without changing state.
+func investigate(next_step: int) -> bool:
+	if chapter_id != "investigation" or next_step != investigation_step + 1 or next_step > 4:
+		return false
+	investigation_step = next_step
+	return true
+
+
 ## WOLF's callback at the corridor's safe point: he quotes the answer the engineer gave at the relay and
 ## says what came of it, or "" before the safe point or with no answer saved. The quote is the English the
 ## save keeps ("selected_text", which may be an older wording); his words are built with I18n.format and
@@ -258,6 +278,7 @@ func to_dict() -> Dictionary:
 		"sentry_down": sentry_down,
 		"junction_cleared": junction_cleared,
 		"lane_recap": lane_recap,
+		"investigation_step": investigation_step,
 	}
 
 
@@ -338,7 +359,7 @@ static func from_dict(raw: Variant) -> M0State:
 		for field: String in ["door_blown", "sentry_down", "junction_cleared"]:
 			if typeof(data.get(field)) != TYPE_BOOL:
 				return null
-		if data["chapter_id"] == "junction":
+		if data["chapter_id"] in ["junction", "investigation"]:
 			# The junction opens only from a secured Records exit, and its beats land in order.
 			if not data["chapter_complete"]:
 				return null
@@ -353,6 +374,13 @@ static func from_dict(raw: Variant) -> M0State:
 					return null
 		elif data["door_blown"] or data["sentry_down"] or data["junction_cleared"]:
 			return null
+	if data.get("chapter_id") == "investigation" and (data["version"] < 5 or not data.get("junction_cleared", false)):
+		return null
+	var investigation: Variant = data.get("investigation_step", 0)
+	if not _whole_in_range(investigation, 0, 4) or (data.get("chapter_id") != "investigation" and investigation != 0):
+		return null
+	if data["version"] >= 5 and not data.has("investigation_step"):
+		return null
 	# The lane recap is optional (older v4 saves lack it) and only describes a fallen sentry.
 	var raw_lane_recap: Variant = data.get("lane_recap", "")
 	if typeof(raw_lane_recap) != TYPE_STRING or not (raw_lane_recap in LANE_RECAPS):
@@ -384,6 +412,7 @@ static func from_dict(raw: Variant) -> M0State:
 		state.sentry_down = data["sentry_down"]
 		state.junction_cleared = data["junction_cleared"]
 	state.lane_recap = raw_lane_recap
+	state.investigation_step = int(investigation)
 	return state
 
 

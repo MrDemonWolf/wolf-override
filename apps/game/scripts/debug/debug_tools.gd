@@ -807,6 +807,8 @@ func _read_save_info(path: String, exists: bool) -> Dictionary:
 ## Where a saved state stands, in a few words.
 static func checkpoint_label(saved: M0State) -> String:
 	match saved.chapter_id:
+		"investigation":
+			return "Chapter 1 complete" if saved.investigation_step == 4 else "maintenance annex, source %s of 3" % mini(saved.investigation_step, 3)
 		"records":
 			if saved.chapter_complete:
 				return "Records, first copy secured"

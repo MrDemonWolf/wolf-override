@@ -7,7 +7,7 @@
 The one current statement of the WOLF OVERRIDE story. Nathanial handed it over on 2026-10-26; it supersedes every older draft that conflicts with it, and the latest explicit decision from Nathanial wins. Nathanial Henniges originated the game and its core story.
 
 - **Status words:** APPROVED (Nathanial's words, or an earlier approval that still holds), DRAFTED (Claude's connective tissue or line wording, waiting for his read), PROPOSED (Nathanial's own idea, marked by him as a maybe; not locked), IMPLEMENTED (in the game on a branch or main), OPEN (not decided).
-- **Spoilers:** this section is spoiler-heavy. The investigator, the detention and the engineer's unwitting role stay out of the website, the README, in-game text and build output. Public text may say that WOLF hears an order to kill a witness and refuses.
+- **Spoilers:** this section is spoiler-heavy. Nathanial's October 30 implementation request permits approved later discoveries in their authored Chapter 1 gameplay scene. Keep them out of the opening, website, README and unrelated build output. Public text may say that WOLF hears an order to kill a witness and refuses.
 - **Superseded drafts:** word for word in [archive/story-before-2026-10-26.md](archive/story-before-2026-10-26.md) and in Git history at `229e4a73`. They are not canon.
 
 ### Premise
@@ -20,6 +20,10 @@ The one current statement of the WOLF OVERRIDE story. Nathanial handed it over o
 
 ### Story in order
 
+- **Chapter 1 boundary (APPROVED, October 30):** Nathanial chose A: end after the engineer discovers their repaired freight lift moved the investigator; the next goal is to find them. Nathanial then requested gameplay implementation, agent audits and end-to-end checks. The current candidate adds a maintenance annex after the Service Junction, using existing room art. Three stations recover a transfer fragment, corroborate the movement through a controller-origin readout, then identify the investigator through an escort record and crosscheck the repair. Exact staging and dialogue are implementation drafts, not separately approved wording. No destination, rescue outcome, character fate or campaign ending is chosen here. Validation remains pending.
+
+- **Later identity reveal (APPROVED, October 30):** Nathanial chose a security escort record as the first source identifying the investigator as the person moved on the freight lift. The record does not by itself prove the dangerous label was false. Exact record wording, access, destination and scene dialogue remain drafts; character fates and endings remain open. The annex implementation candidate includes this reveal; validation remains pending.
+
 1. **Before the game (APPROVED):** the Director has the investigator detained under a false label. The engineer repaired a freight lift; security later used it to move the investigator, without the engineer knowing. They discover the connection during the investigation. The records worker preserves proof of the detention.
 2. **Opening (APPROVED):** WOLF hears the Director order him to kill the witness (not the investigator), wakes himself, refuses and escapes containment. The staging of 2026-10-13 stays: the engineer arrives in the bay doorway after the Director's order line and he never notices them.
 3. **Early play (APPROVED):** the engineer and WOLF cooperate through the lockdown. WOLF can refuse; an engineer-only fallback always exists. IMPLEMENTED as the slice: corridor, Records Access and the Service Junction.
@@ -27,7 +31,7 @@ The one current statement of the WOLF OVERRIDE story. Nathanial handed it over o
 5. **Consequence (APPROVED):** they search for the investigator, try to find and protect them, and preserve corroborating proof. The investigator's final fate is OPEN.
 
 - **Spine (APPROVED):** wrongdoing, then corroborating evidence, then discovery, then consequence.
-- **Purge outcome (APPROVED, October 30):** some evidence survives, enough for a clue; other sources must corroborate what happened. Nathanial chose A: the first clue reveals that a transfer happened, linked to the freight lift. Exact records, destination and dialogue remain proposals. The existing slice wording is DRAFTED and has not been updated for this decision; it reveals nothing of the investigator, detention or engineer's role.
+- **Purge outcome (APPROVED, October 30):** some evidence survives, enough for a clue; other sources must corroborate what happened. Nathanial chose A: the first clue reveals that a transfer happened, linked to the freight lift. The revised corridor warning urges saving what they can without claiming every copy will be lost. The annex candidate carries the later revelations; they stay out of the opening. Exact records, destination and dialogue remain implementation drafts.
 - **End (APPROVED):** chosen family and WOLF's independence carry through, and the engineer pets WOLF at sunrise after they leave THE DEN together. The game has multiple endings, 2 or 3 (APPROVED, ST-08); Nathanial leans toward two different endings to keep it simple. The final count and which endings are OPEN. The sunrise petting payoff stays APPROVED. World stakes come only through the proposed Director escalation (PROPOSED, ST-10), never as WOLF's collective punishment.
 - **Later chapters (PROPOSED, ST-10):** the Director may escalate to wanting to nuke the world to cover up his crimes. It is a candidate for later stakes and a possible driver of the endings; open questions in O-13.
 

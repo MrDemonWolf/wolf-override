@@ -211,7 +211,7 @@ func _check_exit_door() -> void:
 	var exit_floor_y: Vector2 = Vector2(human.position.y, wolf.position.y)
 	var exit_off_floor: float = 0.0
 	started = Engine.get_physics_frames()
-	while not bool(game.get("end_card_active")) and Engine.get_physics_frames() - started < BEAT_FRAMES:
+	while state.chapter_id == "junction" and Engine.get_physics_frames() - started < BEAT_FRAMES:
 		exit_off_floor = maxf(exit_off_floor, maxf(absf(human.position.y - exit_floor_y.x), absf(wolf.position.y - exit_floor_y.y)))
 		if wolf_through < 0 and wolf.position.x - M0Actor.WOLF_REACH >= JunctionRoom.EXIT_SPAN.y:
 			wolf_through = Engine.get_physics_frames()
@@ -220,8 +220,8 @@ func _check_exit_door() -> void:
 		nobody_faded = nobody_faded and human.visible and wolf.visible and human.modulate.a == 1.0 and wolf.modulate.a == 1.0 and human.self_modulate.a == 1.0 and wolf.self_modulate.a == 1.0
 		leaf_whole = leaf_whole and _whole(room.exit_leaf)
 		await process_frame
-	_expect(bool(game.get("end_card_active")), "the END OF SLICE card comes at the end of the walk out")
-	_expect(wolf_through >= 0 and human_through >= 0, "both WOLF and the engineer are past the exit's near jamb before the card (WOLF x %.1f, engineer x %.1f)" % [wolf.position.x, human.position.x])
+	_expect(state.chapter_id == "investigation" and not bool(game.get("end_card_active")), "the walk out enters the investigation without ending Chapter 1")
+	_expect(wolf_through >= 0 and human_through >= 0, "both WOLF and the engineer pass the exit's near jamb before the room transition")
 	_expect(wolf_through >= 0 and human_through >= wolf_through, "WOLF goes through first, then the engineer")
 	_expect(nobody_faded, "nobody fades or disappears on the way out")
 	# Fix round 2: WOLF walks on down the passage to x 1100; the floor runs on under it, so he never drops

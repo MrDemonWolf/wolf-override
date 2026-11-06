@@ -22,6 +22,10 @@ fixed_fps_suites=(opening_timing_test opening_early_press_test)
 # Internal: `check-game.sh --suite NAME LOG_DIR WORK_DIR` runs one suite and writes NAME.result.
 if [ "${1:-}" = "--suite" ]; then
   name="$2" logs="$3" work="$4" rc=0 started="$SECONDS"
+  # Two full player-input chapter routes include reading time; keep shorter suites' existing bound.
+  if [ "$name" = "full_slice_test" ]; then
+    limit="${SUITE_TIMEOUT:-600}"
+  fi
   isolate_godot_home "$work/home-$name"
   frame_args=()
   if [[ " ${fixed_fps_suites[*]} " == *" $name "* ]]; then

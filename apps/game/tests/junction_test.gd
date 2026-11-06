@@ -103,7 +103,7 @@ func _check_save_format() -> void:
 	_expect(records.human_position == Vector2(120.0, 410.0) and records.wolf_position == Vector2(208.0, 423.0), "the junction begins with the engineer at its entry hatch and WOLF a follow gap ahead")
 	_expect(not records.door_blown and not records.sentry_down and not records.junction_cleared, "entry sets no junction flags")
 	var entry: Dictionary = records.to_dict()
-	_expect(entry["version"] == 4 and entry["chapter_id"] == "junction", "junction saves are version 4")
+	_expect(entry["version"] == State.SAVE_VERSION and entry["chapter_id"] == "junction", "junction saves use the current version")
 	var entry_loaded: M0State = State.from_dict(JSON.parse_string(JSON.stringify(entry)))
 	_expect(entry_loaded != null and entry_loaded.to_dict() == entry, "a junction entry save round-trips through JSON")
 	_expect(records.blow_door() and not records.blow_door() and records.door_blown, "the door blows once")
@@ -172,7 +172,7 @@ func _check_save_format() -> void:
 		"chapter_id": "records", "purge_trace_preserved": true, "mirror_trace_preserved": true, "mirror_route": "manual", "chapter_complete": true}""")
 	var v3_loaded: M0State = State.from_dict(v3_fixture)
 	_expect(v3_loaded != null and v3_loaded.chapter_id == "records" and v3_loaded.chapter_complete and not v3_loaded.door_blown and not v3_loaded.sentry_down and not v3_loaded.junction_cleared, "a literal v3 save still loads with the junction untouched")
-	_expect(v3_loaded != null and v3_loaded.enter_junction() and v3_loaded.to_dict()["version"] == 4, "a loaded v3 save can enter the junction and saves as v4")
+	_expect(v3_loaded != null and v3_loaded.enter_junction() and v3_loaded.to_dict()["version"] == State.SAVE_VERSION, "a loaded v3 save can enter the junction and saves in the current format")
 
 
 ## The scene: the Records exit leads in, WOLF scouts, the line charges by held USE, the blast

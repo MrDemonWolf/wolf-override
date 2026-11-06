@@ -561,6 +561,19 @@ static func continue_until(game: Node, done: Callable, max_frames: int) -> bool:
 	return bool(done.call())
 
 
+## Times one USE at the tank release against the visible left-moving patrol in [param game]. The
+## engineer must already be in cover at the release. Waits at most [param max_frames] physics frames;
+## returns false if the opportunity never comes, otherwise presses USE without changing game state directly.
+static func drop_on_patrol(game: Node, max_frames: int) -> bool:
+	var brain: SentryBrain = game.get("sentry_brain") as SentryBrain
+	var release_x: float = DropArm.MARK_X + SentryBrain.PATROL_SPEED * DropArm.FALL_SECONDS
+	# Eight world px is below the existing graze allowance and absorbs one input frame of patrol travel.
+	if not await wait_until(func() -> bool: return brain.state == &"patrol" and brain.facing < 0.0 and absf(brain.x - release_x) <= 8.0, max_frames):
+		return false
+	await tap(&"interact", 1)
+	return true
+
+
 ## Plays the rest of the opening that is running in [param game] ([method continue_until], reading
 ## every box) until it hands over to play (Main.intro_active false), at most [constant
 ## OPENING_MAX_FRAMES] physics frames. Returns "" once it has, or a failure note naming the beat and box

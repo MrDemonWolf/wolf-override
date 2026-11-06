@@ -217,14 +217,16 @@ func _check_scene() -> void:
 	var settled_junction_pulsing: bool = await _beacons_pulse(junction)
 	_expect(_beacons_settled(junction) and not settled_junction_pulsing, "the junction's beacons settle once the line is cleared")
 	game.call("_finish_chapter_close")
-	var card_up: bool = false
+	var annex_entered: bool = false
 	# They walk out through the exit door first (WOLF from wherever he stands, then the engineer).
 	for _frame: int in 420:
 		await physics_frame
-		if game.get("end_card_active"):
-			card_up = true
+		if (game.get("state") as M0State).chapter_id == "investigation":
+			annex_entered = true
 			break
-	_expect(card_up and not game.get("title_open"), "the closing beat leads, through the hatch, to the END OF SLICE card")
+	_expect(annex_entered and not game.get("title_open") and not game.get("end_card_active"), "the closing beat leads through the hatch into the investigation")
+	# Card visibility is isolated here; the input-driven full route verifies its real chapter endpoint.
+	game.call("debug_show_end_card")
 	game.call("_close_end_card")
 	_expect(game.get("title_open") and not game.get("end_card_active"), "the END OF SLICE card goes on to the title")
 	# A new game puts the junction back to pulsing; Continue from autosave D settles it again.
@@ -235,14 +237,14 @@ func _check_scene() -> void:
 	game.call("_load_game")
 	var continued_junction_pulsing: bool = await _beacons_pulse(junction)
 	_expect((game.get("state") as M0State).junction_cleared and _beacons_settled(junction) and not continued_junction_pulsing, "Continue from autosave D shows the junction settled")
-	_check_running(depths, "junction", "after Continue into the junction")
+	_check_running(depths, "records", "after Continue into the annex, which reuses Records art")
 	# The effects switch stops every room; turning it back on restarts only the room in play.
 	game.set("effects_enabled", false)
 	for room_name: String in depths:
 		var depth: RoomDepth = depths[room_name]
 		_expect(not depth.is_animating() and not depth.far_dust.emitting and not depth.near_dust.emitting, "%s: effects off stops the light and dust" % room_name)
 	game.set("effects_enabled", true)
-	_check_running(depths, "junction", "with effects back on")
+	_check_running(depths, "records", "with effects back on in the annex")
 	# Reduced Motion reaches every room's flicker.
 	game.call("_on_reduced_motion_changed", true)
 	for room_name: String in depths:

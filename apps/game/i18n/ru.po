@@ -3342,3 +3342,125 @@ msgstr "WOLF отступает, пока {name} рассчитывает сбр
 #: scripts/story_text.gd:268
 msgid "The tank came down on the sentry."
 msgstr "Бак падает на стража."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record."
+msgstr "Технический отсек. Прочитай уцелевший фрагмент о перевозке, затем сравни данные подъёмника с записью сопровождения."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "READ TRANSFER FRAGMENT"
+msgstr "ПРОЧИТАТЬ ФРАГМЕНТ О ПЕРЕВОЗКЕ"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "COMPARE LIFT READOUT"
+msgstr "СРАВНИТЬ ДАННЫЕ ПОДЪЁМНИКА"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "READ ESCORT RECORD"
+msgstr "ПРОЧИТАТЬ ЗАПИСЬ СОПРОВОЖДЕНИЯ"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "FIND THE INVESTIGATOR"
+msgstr "НАЙТИ ЧЕЛОВЕКА, ВЕДУЩЕГО РАССЛЕДОВАНИЕ"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "MAINTENANCE ANNEX"
+msgstr "ТЕХНИЧЕСКИЙ ОТСЕК"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "ESCORT FILE"
+msgstr "ДЕЛО СОПРОВОЖДЕНИЯ"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "TRANSFER FRAGMENT"
+msgstr "ФРАГМЕНТ О ПЕРЕВОЗКЕ"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "LIFT READOUT"
+msgstr "ДАННЫЕ ПОДЪЁМНИКА"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+# gender-ok: Codex 2026-10-30; agreement describes records, equipment or another noun, never the engineer. Machine translation still unreviewed.
+msgid "Freight lift. Transfer completed. The load and destination are missing."
+msgstr "Грузовой подъёмник. Перевозка завершена. Груз и пункт назначения не указаны."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "What was on it?"
+msgstr "Что в нём было?"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+# gender-ok: Codex 2026-10-30; agreement describes records, equipment or another noun, never the engineer. Machine translation still unreviewed.
+msgid "The lift made the trip. This movement came from its controller, not the archive. It doesn't identify the load."
+msgstr "Подъёмник совершил рейс. Эти данные пришли от его контроллера, а не из архива. Груз не указан."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "Then we need the escort record."
+msgstr "Тогда нужна запись сопровождения."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "Security escort. An investigator. Same transfer."
+msgstr "Сопровождение охраной. Человек, ведущий расследование. Та же перевозка."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+# gender-ok: Codex 2026-10-30; agreement describes records, equipment or another noun, never the engineer. Machine translation still unreviewed.
+msgid "The lift was isolated. I signed it back into service. Security used it after that."
+msgstr "Подъёмник был отключён. Моя подпись разрешила вернуть его в работу. После этого им воспользовалась охрана."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=WOLF
+#: scripts/story_text.gd
+msgid "What did they tell you?"
+msgstr "Что тебе сказали?"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "A lift fault. Nothing about an investigator."
+msgstr "Неисправность подъёмника. Ни слова о человеке, ведущем расследование."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#. i18n: story speaker=engineer engineer=self
+#: scripts/story_text.gd
+msgid "We need to find where they took them."
+msgstr "Нужно выяснить, куда увезли этого человека."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/story_text.gd
+msgid "CHAPTER 1 COMPLETE"
+msgstr "ГЛАВА 1 ЗАВЕРШЕНА"
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/story_text.gd
+msgid "Next: find where security took the investigator."
+msgstr "Далее: выяснить, куда охрана увезла человека, ведущего расследование."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "%s: inspect the next source."
+msgstr "%s: изучить следующий источник."
+
+# Machine translation by Codex (OpenAI), unreviewed, 2026-10-30.
+#: scripts/main.gd
+msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
+msgstr "Глава 1 завершена. ИГРАТЬ СНОВА начинает новое прохождение."

@@ -296,10 +296,10 @@ const HATCH_EXIT_SPEED_SCALE: float = 0.55
 ## With WOLF holding the far end of the junction's lane, the sentry's body turns this far short of his
 ## drawn body (SentryBrain.far_x).
 const WOLF_SENTRY_GAP: float = 4.0
-## The end of the built route (decision D): the END OF SLICE card with this run's choices, then the title.
+## The approved Chapter 1 boundary: the completion card with this run's choices, then the title.
 ## The third row's topic is SENTRY, the thing on screen, not the lane (P0-7, approved 2026-10-13).
-const END_CARD_TITLE: String = "END OF SLICE"
-const END_CARD_THANKS: String = "Thank you for playing this early slice."
+const END_CARD_TITLE: String = "CHAPTER 1 COMPLETE"
+const END_CARD_THANKS: String = "Next: find where security took the investigator."
 const END_CARD_RECAP_HEADER: String = "THIS RUN"
 ## Each recap row is its topic, two spaces and what happened ({name} is the engineer's first name). The
 ## topic and the words are kept apart (*_TOPIC, *_WORDS) as the template's messages, as a speaker's tag
@@ -341,14 +341,24 @@ const CONTINUE_TEXT: String = "CONTINUE"
 ## The translation context of the touch USE button's words (msgctxt): its CONTINUE goes on through lines,
 ## which a language may say differently from the title's CONTINUE, which resumes a save (PR L7b).
 const TOUCH_BUTTON_CONTEXT: StringName = &"touch button"
-const FINISHED_NOTE: String = "Slice complete. PLAY AGAIN starts a fresh run."
+const FINISHED_NOTE: String = "Chapter 1 complete. PLAY AGAIN starts a fresh run."
 ## Records' closing lines as the first copy is secured at the exit (formatted with the engineer's tag):
 ## the narration's card, then WOLF's words and the engineer's, each its own message.
 const RECORDS_SECURED_WORDS: String = "FIRST COPY SECURED."
 const RECORDS_CLOSE_WOLF_WORDS: String = "An order and a timestamp: the Director is erasing something. I want the source."
 const RECORDS_CLOSE_ENGINEER_WORDS: String = "Then Archive is next."
 const RECORDS_CLOSE_LINE: String = RECORDS_SECURED_WORDS + " WOLF: " + RECORDS_CLOSE_WOLF_WORDS + "\n%s: " + RECORDS_CLOSE_ENGINEER_WORDS
-## Only a hand-made save can reopen the cleared junction; it says where the line goes, not that it is unbuilt.
+## Draft Chapter 1 annex lines; separate speaker messages preserve localization and the engineer's name.
+const INVESTIGATION_FRAGMENT_WORDS: String = "Freight lift. Transfer completed. The load and destination are missing."
+const INVESTIGATION_FRAGMENT_WOLF_WORDS: String = "What was on it?"
+const INVESTIGATION_CONTROLLER_WORDS: String = "The lift made the trip. This movement came from its controller, not the archive. It doesn't identify the load."
+const INVESTIGATION_CONTROLLER_WOLF_WORDS: String = "Then we need the escort record."
+const INVESTIGATION_ESCORT_WORDS: String = "Security escort. An investigator. Same transfer."
+const INVESTIGATION_REPAIR_WORDS: String = "The lift was isolated. I signed it back into service. Security used it after that."
+const INVESTIGATION_QUESTION_WORDS: String = "What did they tell you?"
+const INVESTIGATION_ANSWER_WORDS: String = "A lift fault. Nothing about an investigator."
+const INVESTIGATION_NEXT_WORDS: String = "We need to find where they took them."
+## A restored cleared junction still points onward; using its open hatch continues into the annex.
 const JUNCTION_CLEARED_LINE: String = "The service line runs on toward Archive."
 ## Said as the door goes, while WOLF is still by the entrance: it says he holds back, not where, so
 ## it holds on every frame, by the entrance and at his spot by the valve short of the rubble (Draft A,
@@ -1136,7 +1146,7 @@ func _ready() -> void:
 func _refresh_continue() -> void:
 	var loaded: M0State = M0State.load_from_disk(save_path)
 	var saved: bool = loaded != null
-	var finished: bool = saved and loaded.junction_cleared
+	var finished: bool = saved and loaded.investigation_step == 4
 	continue_button.disabled = not saved
 	# A finished slice has nothing left to continue: the button offers a fresh run (decision D). NEW GAME
 	# would do the same, so PLAY AGAIN stands alone across both buttons' row.
@@ -1163,7 +1173,7 @@ func _title_first_button() -> Button:
 ## like New Game, keeps the old save until the new run reaches its first SAFE POINT.
 func _on_continue_pressed() -> void:
 	var loaded: M0State = M0State.load_from_disk(save_path)
-	if loaded != null and loaded.junction_cleared:
+	if loaded != null and loaded.investigation_step == 4:
 		_new_game()
 		return
 	_load_game()
@@ -1688,7 +1698,7 @@ func _clear_station_body() -> void:
 func _room_stations() -> Array[Vector4]:
 	if state.chapter_id == "lockdown":
 		return CORRIDOR_STATIONS
-	if state.chapter_id == "records":
+	if state.chapter_id in ["records", "investigation"]:
 		return RECORDS_STATIONS
 	if state.chapter_id == "junction":
 		return JUNCTION_STATIONS
@@ -1764,6 +1774,9 @@ func _say(boxes: Array[String]) -> void:
 ## has moved past them (the trust line after the relay question, "The tank takes a moment to fall."
 ## over a crushed sentry). A knockdown, a load or a new chapter drops them too (_drop_box_queue).
 func _advance_box_queue(delta: float) -> void:
+	# Investigation evidence is read with USE, never advanced by a timer or WOLF's cooperation.
+	if state.chapter_id == "investigation":
+		return
 	# The opening lines wait for the first step (TEACH-7), and so do the boxes after them.
 	if opening_lines_held:
 		return
@@ -2549,6 +2562,13 @@ func _load_game() -> void:
 			status_line = I18n.KEY.tr("Service junction restored. The door is\ndown. The sentry patrols past the rubble.")
 		else:
 			status_line = JUNCTION_RESTORE_A_LINE
+	elif state.chapter_id == "investigation":
+		if state.investigation_step == 4:
+			_show_end_card()
+		elif state.investigation_step in [1, 2, 3]:
+			_say(_investigation_lines(state.investigation_step))
+		else:
+			_say([_investigation_objective()])
 	elif state.chapter_id == "records":
 		if state.chapter_complete:
 			# TRANSLATORS: i18n: story speaker=narrator
@@ -2576,6 +2596,10 @@ func _interact() -> void:
 	# An autosave that failed to write is retried by the next USE anywhere, station or not.
 	if save_pending:
 		_write_beat()
+	if state.chapter_id == "investigation":
+		_step_beside_station(x)
+		_interact_investigation(x)
+		return
 	if state.chapter_id == "records":
 		_step_beside_station(x)
 		_interact_records(x)
@@ -2949,7 +2973,7 @@ func _records_route_hint() -> String:
 
 
 ## CONTINUE on the junction's closing shot, the only one (Records keeps control while its closing
-## lines run): out through the hatch, the END OF SLICE card, then the title (decision D).
+## lines run): out through the hatch and on to the maintenance annex investigation.
 func _finish_chapter_close() -> void:
 	if hatch_exit_walking:
 		# Already on their way out; the card follows on its own.
@@ -2962,7 +2986,7 @@ func _finish_chapter_close() -> void:
 ## The two leave through the open exit door, WOLF first: he walks on from the doorway through the
 ## wall until the near jamb hides all of him, while the engineer waits where they are; then the
 ## engineer walks through after him until it hides them too, the doorway stands empty for a moment,
-## and the END OF SLICE card comes up. One at a time, they are never drawn over each other in it.
+## and the annex begins. One at a time, they are never drawn over each other in the doorway.
 func _walk_out_through_hatch() -> void:
 	hatch_exit_walking = true
 	hatch_exit_engineer_walking = false
@@ -2987,7 +3011,7 @@ func _wait_until_through(body: M0Actor, x: float, then: Callable, waited: float 
 	chapter_tween.tween_callback(_wait_until_through.bind(body, x, then, waited + 0.05))
 
 
-## WOLF is through: the engineer walks through after him, then the END OF SLICE card.
+## WOLF is through: the engineer follows before the annex transition.
 func _engineer_follows_out() -> void:
 	if not hatch_exit_walking:
 		return
@@ -2996,16 +3020,16 @@ func _engineer_follows_out() -> void:
 	_wait_until_through(human, HATCH_EXIT_X, _doorway_empty)
 
 
-## Both are through and out of sight: the empty doorway holds for a moment, then the card.
+## Both are through and out of sight: hold the empty doorway briefly, then enter the annex.
 func _doorway_empty() -> void:
 	if not hatch_exit_walking:
 		return
 	chapter_tween = create_tween()
 	chapter_tween.tween_interval(HATCH_EXIT_EMPTY_SECONDS)
-	chapter_tween.tween_callback(_show_end_card)
+	chapter_tween.tween_callback(_enter_investigation)
 
 
-## The END OF SLICE card over the closing shot: the thanks line, this run's choices and one CONTINUE
+## The Chapter 1 completion card: the next goal, this run's choices and one CONTINUE
 ## (the interact button, a click or tap on it, Back or Pause) on to the title.
 func _build_end_card() -> void:
 	end_card = ColorRect.new()
@@ -3037,7 +3061,10 @@ func _build_end_card() -> void:
 	line.size = Vector2(280.0, 3.0)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	end_card.add_child(line)
-	UILabel.place(end_card, END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 28.0), 18, Color(0.82, 0.89, 0.94, 1)).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# The body font needs 47 px for two 18 px lines; 48 leaves room before the heading at y 212.
+	var next_goal: Label = UILabel.place(end_card, END_CARD_THANKS, Rect2(130.0, 162.0, 700.0, 48.0), 18, Color(0.82, 0.89, 0.94, 1))
+	next_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	next_goal.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var header: Label = UILabel.place(end_card, END_CARD_RECAP_HEADER, Rect2(150.0, 212.0, 660.0, 24.0), 15, END_CARD_ACCENT)
 	header.add_theme_font_override("font", DISPLAY_FONT)
 	end_card_rows = VBoxContainer.new()
@@ -3253,6 +3280,77 @@ func _enter_junction() -> void:
 	junction_entry_hold = box_seconds(status_line)
 	# Autosave A: the start of the junction.
 	_save_progress()
+
+
+## Begins the later investigation in a maintenance records annex, retaining art and the engineer's controls.
+func _enter_investigation() -> void:
+	if not state.enter_investigation():
+		return
+	chapter_close_active = false
+	_drop_box_queue()
+	_sync_scene()
+	_start_gameplay_camera()
+	_say([I18n.KEY.tr("Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record.")])
+	_save_progress()
+
+
+## The current annex read as separate speaker boxes; facts stay limited to the source just inspected.
+func _investigation_lines(step: int) -> Array[String]:
+	var engineer: String = _first_name().to_upper() + ": "
+	match step:
+		1:
+			return [engineer + INVESTIGATION_FRAGMENT_WORDS, "WOLF: " + INVESTIGATION_FRAGMENT_WOLF_WORDS]
+		2:
+			return [engineer + INVESTIGATION_CONTROLLER_WORDS, "WOLF: " + INVESTIGATION_CONTROLLER_WOLF_WORDS]
+		3:
+			return [engineer + INVESTIGATION_ESCORT_WORDS, engineer + INVESTIGATION_REPAIR_WORDS, "WOLF: " + INVESTIGATION_QUESTION_WORDS, engineer + INVESTIGATION_ANSWER_WORDS, engineer + INVESTIGATION_NEXT_WORDS]
+	return []
+
+
+## Annex station USE reads in order, saves the real copied state, and leaves the final reveal player-paced.
+func _interact_investigation(x: float) -> void:
+	if not box_queue.is_empty() or not _dialogue_read():
+		if not _next_box():
+			if box_queue.is_empty():
+				# A fresh USE acknowledges the last box; it never also activates a source or exit.
+				dialogue_cleared = true
+			else:
+				_next_box_now()
+		return
+	var requested: int = 0
+	if absf(x - RecordsRoom.PURGE_X) <= 58.0:
+		requested = 1
+	elif absf(x - RecordsRoom.MIRROR_X) <= 58.0:
+		requested = 2
+	elif absf(x - RecordsRoom.CONTAINER_X) <= 58.0:
+		requested = 3
+	if state.investigation_step == 3 and x >= RecordsRoom.EXIT_DOOR_X - M0Actor.HUMAN_REACH:
+		state.investigate(4)
+		_save_progress()
+		_show_end_card()
+		return
+	if requested > 0 and requested <= state.investigation_step:
+		_say(_investigation_lines(requested))
+	elif state.investigate(requested):
+		_say(_investigation_lines(requested))
+		sfx_bank.play(&"chirp", -8.0)
+		_sync_records_room(true)
+		_update_controls()
+		_save_progress()
+	else:
+		_aside(_investigation_objective())
+
+
+## The annex's next concrete action, based only on reads already completed.
+func _investigation_objective() -> String:
+	match state.investigation_step:
+		0:
+			return I18n.KEY.tr("READ TRANSFER FRAGMENT")
+		1:
+			return I18n.KEY.tr("COMPARE LIFT READOUT")
+		2:
+			return I18n.KEY.tr("READ ESCORT RECORD")
+	return I18n.KEY.tr("FIND THE INVESTIGATOR")
 
 
 func _interact_junction(x: float) -> void:
@@ -3490,7 +3588,11 @@ func _use_exit(x: float) -> void:
 	elif not state.sentry_down:
 		_refuse(REFUSE_EXIT_SENTRY, &"bolt")
 	elif state.junction_cleared:
-		_tell(JUNCTION_CLEARED_LINE)
+		# Older builds saved their final junction here; Continue must still reach the new annex.
+		if x >= JunctionRoom.HATCH_REACH_MIN_X:
+			_enter_investigation()
+		else:
+			_tell(JUNCTION_CLEARED_LINE)
 	else:
 		match bolt_state:
 			&"locked":
@@ -4396,10 +4498,10 @@ func _sync_scene() -> void:
 	human.settle_x = -1.0
 	_clear_station_body()
 	wolf.position = state.wolf_position
-	if state.chapter_id == "records":
+	if state.chapter_id in ["records", "investigation"]:
 		# Records' doors stand across the walkway: a save from before they did (when the room's ends
 		# were open floor) never places anyone inside the shut entry or past the exit before it opens.
-		var exit_open: bool = state.chapter_complete
+		var exit_open: bool = state.investigation_step >= 3 if state.chapter_id == "investigation" else state.chapter_complete
 		human.position.x = clampf(human.position.x, RecordsRoom.ENTRY_DOOR_X + M0State.HUMAN_HALF_WIDTH, M0Actor.MAX_X if exit_open else RecordsRoom.EXIT_DOOR_X - M0State.HUMAN_HALF_WIDTH)
 		wolf.position.x = clampf(wolf.position.x, RecordsRoom.ENTRY_DOOR_X + M0State.WOLF_HALF_WIDTH, M0Actor.MAX_X if exit_open else RecordsRoom.EXIT_DOOR_X - M0State.WOLF_HALF_WIDTH)
 	if state.chapter_id == "junction":
@@ -4499,7 +4601,8 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 
 
 func _sync_records_room(animate_exit: bool = false) -> void:
-	records_room.visible = state.chapter_id == "records"
+	records_room.visible = state.chapter_id in ["records", "investigation"]
+	records_room.investigation = state.chapter_id == "investigation"
 	records_room.set_active(records_room.visible)
 	var in_corridor: bool = state.chapter_id == "lockdown"
 	breaker_status_light.visible = in_corridor
@@ -4510,7 +4613,11 @@ func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.purge_trace_preserved = state.purge_trace_preserved
 	records_room.mirror_trace_preserved = state.mirror_trace_preserved
 	records_room.chapter_complete = state.chapter_complete
-	if animate_exit and state.chapter_complete:
+	if records_room.investigation:
+		records_room.purge_trace_preserved = state.investigation_step >= 1
+		records_room.mirror_trace_preserved = state.investigation_step >= 2
+		records_room.chapter_complete = state.investigation_step >= 3
+	if animate_exit and records_room.chapter_complete:
 		# The secured copy releases the exit: its leaf swings open on its hinges, never vanishing.
 		records_room.open_exit(true)
 	records_room.refresh_state()
@@ -4615,6 +4722,9 @@ func _wolf_target_x() -> float:
 	if _wolf_off_relay():
 		return WOLF_BYPASS_CLEAR_X
 	match state.chapter_id:
+		"investigation":
+			# He checks the second terminal independently, then gives the engineer room at the last source.
+			return WOLF_MIRROR_X if state.investigation_step < 2 else 700.0
 		"records":
 			# After his readout he holds his spot at the port, facing it, while the engineer is still at
 			# its station (RECORDS_STATIONS' mirror row: centre x and use reach): following at once
@@ -4705,7 +4815,7 @@ func _machine_spans() -> Array[Vector2]:
 	match state.chapter_id:
 		"lockdown":
 			halves = [Vector2(350.0, 38.5), Vector2(RELAY_X, RELAY_HALF_WIDTH), Vector2(BYPASS_WHEEL.x, BypassHandle.COLLAR_RADIUS), Vector2(876.0, 35.0)]
-		"records":
+		"records", "investigation":
 			halves = [Vector2(190.0, 57.1), Vector2(520.0, 44.6), Vector2((RecordsRoom.CONTAINER_SPAN.x + RecordsRoom.CONTAINER_SPAN.y) * 0.5, (RecordsRoom.CONTAINER_SPAN.y - RecordsRoom.CONTAINER_SPAN.x) * 0.5)]
 		"junction":
 			halves = [Vector2(JunctionRoom.BREAKER_X, JunctionRoom.BREAKER_HALF_WIDTH), Vector2(JunctionRoom.VALVE_X, JunctionRoom.VALVE_HALF_WIDTH), Vector2(JunctionRoom.ARM_X, JunctionRoom.ARM_PANEL_HALF_WIDTH), Vector2(JunctionRoom.BOLT_PANEL_X, JunctionRoom.BOLT_PANEL_HALF_WIDTH)]
@@ -4728,7 +4838,7 @@ func _wolf_follow_max_x() -> float:
 		return WOLF_FOLLOW_OPEN_MAX_X if state.door_open else CORRIDOR_DOOR_LEFT_X - M0Actor.WOLF_REACH
 	if state.chapter_id == "junction" and not state.door_blown:
 		return M0State.JUNCTION_DOOR_LEFT_X - M0Actor.WOLF_REACH
-	if state.chapter_id == "records":
+	if state.chapter_id in ["records", "investigation"]:
 		# Shut, the exit stops him; open, he still waits in the room for the engineer to go first
 		# rather than standing in its doorway (RECORDS_WOLF_OUT_X when they leave).
 		return RecordsRoom.EXIT_DOOR_X - M0Actor.WOLF_REACH
@@ -4740,7 +4850,7 @@ func _wolf_follow_max_x() -> float:
 func _wolf_follow_min_x() -> float:
 	if state.chapter_id == "lockdown":
 		return DockBay.WOLF_MIN_X
-	if state.chapter_id == "records":
+	if state.chapter_id in ["records", "investigation"]:
 		return RecordsRoom.ENTRY_DOOR_X + M0Actor.WOLF_REACH
 	if state.chapter_id == "junction":
 		return JunctionRoom.ENTRY_DOOR_X + M0Actor.WOLF_REACH
@@ -4841,7 +4951,7 @@ func _refresh_ui() -> void:
 	elif last_top_card_key != card_key and not _opening_lines_playing():
 		# One thing to read at a time (TEACH-7): the location card waits while the opening lines play.
 		last_top_card_key = card_key
-		var location: String = I18n.KEY.tr("SERVICE JUNCTION") if state.chapter_id == "junction" else (I18n.KEY.tr("RECORDS ACCESS / FIRST COPY") if state.chapter_id == "records" else I18n.KEY.tr("MAINTENANCE / LOCKDOWN"))
+		var location: String = I18n.KEY.tr("MAINTENANCE ANNEX") if state.chapter_id == "investigation" else (I18n.KEY.tr("SERVICE JUNCTION") if state.chapter_id == "junction" else (I18n.KEY.tr("RECORDS ACCESS / FIRST COPY") if state.chapter_id == "records" else I18n.KEY.tr("MAINTENANCE / LOCKDOWN")))
 		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
 	var context: String = _context_hint()
 	if context != save_error_context:
@@ -4987,6 +5097,8 @@ func _tick_dialogue(delta: float) -> void:
 	if opening_lines_held or dialogue_boxes.is_empty():
 		return
 	dialogue_age += delta
+	if state.chapter_id == "investigation":
+		return
 	if dialogue_index < dialogue_boxes.size() - 1:
 		if dialogue_age >= _box_seconds():
 			_next_box()
@@ -5387,6 +5499,10 @@ func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CA
 ## template by [method _use_hint] or [method _hold_hint], so it still reads "E: ..." or "HOLD E: ..." here
 ## and the drawn line fills the input in use after translation (localization PR L7b).
 func _context_hint() -> String:
+	if state.chapter_id == "investigation":
+		if not box_queue.is_empty() or not _dialogue_read():
+			return _use_hint(I18n.KEY.tr(BREAKER_STAKES_HINT))
+		return _use_hint(I18n.KEY.tr("%s: leave through the door.")) if state.investigation_step >= 3 else _use_hint(I18n.KEY.tr("%s: inspect the next source."))
 	var x: float = human.position.x
 	if fail_active:
 		# The status line names the cause and the fix; no station hint competes with it.
@@ -5559,6 +5675,8 @@ func _lane_hint(x: float) -> String:
 
 
 func _objective() -> String:
+	if state.chapter_id == "investigation":
+		return _investigation_objective()
 	if state.chapter_id == "junction":
 		if state.junction_cleared:
 			return I18n.KEY.tr("SERVICE LINE CLEARED")
@@ -5821,7 +5939,7 @@ func debug_beat() -> String:
 	if intro_active:
 		return "opening %d/%d" % [intro_step + 1, INTRO_LINES.size()]
 	if end_card_active:
-		return "END OF SLICE card"
+		return "CHAPTER 1 COMPLETE card"
 	if hatch_exit_walking or records_exit_walking:
 		return "walking out"
 	if chapter_close_active:

@@ -61,7 +61,7 @@ const captures = [
 
 /** What a player can do in the current source build, one short line each and spoiler-free. */
 const playableNow = [
-  'Three rooms: a maintenance corridor, Records Access and the Service Junction.',
+  'A maintenance corridor, Records Access, the Service Junction and a maintenance annex.',
   'Steel doors that open as you work through each room.',
   'Knocked down? Press RETRY to go back to the step you were on.',
   'An end card when you finish the current slice.',
@@ -153,7 +153,7 @@ export default function HomePage() {
           <div className="max-w-[760px]">
             <p className="hud-label mb-5">The relationship is the game</p>
             <h2 id="play-title" tabIndex={-1} className={sectionTitle}>Find a way forward. Together.</h2>
-            <p className={sectionCopy}>The current source build includes a maintenance corridor, Records Access and the Service Junction. This is the opening of a larger story.</p>
+            <p className={sectionCopy}>The current source build includes a maintenance corridor, Records Access, the Service Junction and a maintenance annex. This is the opening of a larger story.</p>
           </div>
           <div className="mt-14 grid grid-cols-2 gap-6 phone:mt-10 phone:grid-cols-1 phone:gap-4">
             {captures.map((capture) => (
@@ -202,7 +202,7 @@ export default function HomePage() {
           <div>
             <p className="hud-label mb-5">Follow the build</p>
             <h2 id="progress-title" className={sectionTitle}>A story taking shape.</h2>
-            <p className={sectionCopy}>The source build contains three rooms, an opening scene, puzzles, choices, checkpoints and generated sound effects. Animation, music, the wider campaign and release packages are still in development.</p>
+            <p className={sectionCopy}>The source build contains three puzzle rooms and a maintenance annex, an opening scene, choices, checkpoints and generated sound effects. Animation, music, the wider campaign and release packages are still in development.</p>
           </div>
           <div className="flex flex-col justify-center gap-4">
             {[
