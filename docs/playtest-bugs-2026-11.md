@@ -90,6 +90,25 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
   4. Keep the sounds that are actions: valve turns, the vent burst, the spark, the bolt drop, WOLF's growls.
 - **How to check:** a headless test that no loop is playing in the Junction while the line holds and the player stands still for 10 s, and that the corridor crank fires the klaxon at most once per crank; Nathanial plays the corridor and Junction and says whether the room feels alive but quiet.
 
+## B10. Dialogue and prompt boxes need a redesign
+
+- **Status:** Open (design first)
+- **Seen:** Mac debug build, Records, November 6. Nathanial: "we definitely need to redo this more." The frame shows the station prompt ("E: read the Director's purge display.") as a thin box stacked over the speech box (ROWAN | "Then we get through maintenance…").
+- **What a first-time player sees in that frame:**
+  1. Two unrelated things, a control hint and a line of speech, drawn as two flat boxes on top of each other, so they read as one broken panel rather than a world prompt and a person talking.
+  2. "E:" is a literal key name in the sentence; it reads like a debug line, and on a controller or phone it is wrong.
+  3. "ROWAN" is a name with no face. The box has no portrait, no colour or mark that says who is speaking, and a new player may not know Rowan is the engineer they control.
+  4. The speech appears whole and leaves on a timer. There is no reveal, no cue that it is finished, and no sign that a press would advance or skip it.
+  5. The box is a wide dark slab with a vertical rule; it does not share the terminal look of the menus or the room's lighting.
+- **Cause (confirmed in code):** `dialogue_boxes.gd` splits a message into one-speaker boxes shown for a reading time (`read_seconds`, `reading_cps` per language) with no reveal or advance input; `hud_text.gd` draws the station prompt as its own box; the key prefix is built into the prompt text. The two were built at different times and share no layout, type scale or speaker styling.
+- **Fix (design before code; research first, by the project rule):**
+  1. Research three or four shipped 2D games with strong one-speaker dialogue (timed and press-to-advance) and note, with numbers, box height, portrait size, reveal speed, advance cue and how the control prompt is kept apart from speech. Record it in Notion; decide with Nathanial.
+  2. One dialogue box: speaker mark (small portrait or at least a colour and glyph per speaker: WOLF cyan eye, Rowan amber, Director red), name, text with a reveal at the language's reading speed, press to show all, press again to advance, a small "continue" tick when done, and auto-advance only as an option. Reduced motion shows text at once.
+  3. The station prompt leaves the dialogue area: a small pill near the station or at a fixed HUD corner, with the input glyph (key cap, controller button or touch button) from the HUD's existing prompt picker, never a literal "E:".
+  4. Both use the B5 type scale and B6 control sizes, and the terminal styling of the menus.
+  5. Keep the row limits and CJK balancing that `dialogue_boxes.gd` already does; they are the hard-won part.
+- **How to check:** rendered stills of the same Records moment at 1280×720 and the iPhone size, with keyboard, controller and touch prompts; the existing dialogue wrap and reading-time tests still pass; Nathanial plays Records and the corridor and says whether he knows who is talking and what to press.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
