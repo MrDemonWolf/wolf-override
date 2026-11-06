@@ -133,6 +133,27 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
 - **Fix:** 1. Reproduce with `tools/render/render.sh` at that spot (WOLF on the ramp, engineer at the SAFE POINT), then hide layers one at a time (door front, curb shade, reflections, each depth plate) until the bar goes, which names the owner. 2. Fix the owner: paint the edge into the plate, clip the reflection to the floor, or delete the leftover node. 3. Add the frame to the corridor's rendered regression so the bar cannot come back unseen.
 - **How to check:** the same rendered frame before and after, with no stray edge; Nathanial walks WOLF through the doorway and looks.
 
+## B13. Art: the rooms read as AI slop, not a real place
+
+- **Status:** Open (art direction, the biggest item on this list)
+- **Seen:** Mac debug build, corridor at the COOLANT RELAY, MANUAL BYPASS and SAFE POINT with the Records doorway, November 6. Nathanial: "we definitely need better images and such for this game, not look like AI slop."
+- **What a first-time player sees in that frame (the AI tells, named so they can be checked off):**
+  1. **Props on a stage, not in a building.** The relay, the bypass wheel and the safe point are three separate kit pieces set on the floor. Nothing mounts them: no bolts, no bracket, no conduit running from the relay's pipe stubs to the wall, no cable from the bypass to anything. The relay's pipes end in the air.
+  2. **Floating sans-serif labels.** COOLANT RELAY, MANUAL BYPASS and SAFE POINT hang over each prop in the menu font, like a mock-up's callouts. A real facility paints or rivets a plate on the thing.
+  3. **One texture everywhere.** Wall and floor are the same blue-grey with rust streaks repeated at even spacing. There is no reason behind the grime: no drip from a fitting, no scuff where feet go, no clean patch where a sign was.
+  4. **No lighting key.** The relay is lit from the front, the doorway from inside, the safe point from its own lamp, and the wall from nowhere. Shadows don't agree, so nothing sits.
+  5. **Scale drift.** The relay is as tall as WOLF; the bypass wheel is a hand-sized dial on a post; the safe point is a fridge. Nothing shares a human scale.
+  6. **Clean frame, dirty wall.** The doorway's frame and the lit passage are crisp and new while the wall beside them is weathered, which is the look of two generations pasted together.
+  7. **The floor is a plane.** No curb where wall meets floor, no drain, no painted lane, no wear; actors stand on a flat gradient (B12's stray bar lives here too).
+- **Cause (process, confirmed by the rules in memory and `docs/decisions.md`):** pieces were painted one at a time from prompts, each a "sci-fi prop", then placed. Nobody drew the room first. That is the slop pipeline: paint then arrange, instead of design then paint.
+- **Fix (the project's own rule, applied room by room; the corridor first because it is the first thing anyone sees):**
+  1. **Blueprint before paint.** For each room, one page: what the room is for, where the walls, floor, ceiling and doors are in world px, what is mounted where and why (conduit runs from relay to wall to bypass; the safe point is a wall-mounted cabinet on a plinth; the door's frame is set into the wall with its own grime), the lighting key (one main source, one fill, and what every lamp does), human scale (door 2.1 m, panels at chest height, WOLF's shoulder at knee height), and the dirt logic (drips below fittings, scuffs at feet, clean where sheltered). Exact shapes, measured, with real industrial reference photos (not game art) cited in Notion.
+  2. **Codex only paints the blueprint.** Each piece is painted once as a whole piece (one room background, one prop each) from its exact shape and reference, in Look 2, then cleaned up, and reviewed against a written AI-tell list (floating, melted edges, symmetric grime, text that isn't text, lighting that disagrees). Any tell sends it back.
+  3. **Labels become plates.** The floating callouts go; each station gets a painted or riveted plate in the art, and the B10/B11 prompt pill carries the name when you are close.
+  4. **One piece in game first.** The relay, repainted and mounted, goes in alone; Nathanial judges it in play before the next piece. Then the bypass, the safe point, the door, the walls, the floor, then Records, then the Junction and the annex.
+  5. **Replace, don't add.** Each new piece fully replaces the old one (file, import, manifest entry, references) in the same change, and the manifest records provenance and generation count.
+- **How to check:** rendered stills of the corridor before and after at 1280×720, reviewed with the AI-tell list; the manifest and asset register still complete; Nathanial plays the corridor and says whether it looks like a place.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
