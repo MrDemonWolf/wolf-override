@@ -124,6 +124,15 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
   6. Research three or four shipped 2D side-view games with tap-to-move or click-to-use (what counts as a hit, how they show reach, how they avoid walk-away misclicks) and record it in Notion before the build.
 - **How to check:** a headless test that a tap on each station from across the room walks and uses it with the same outcome as pressing E, including refusals and the engineer-only fallback; rendered stills of the hover and press states; Nathanial plays Records and the Junction on the Mac with the mouse only and on the phone with taps only.
 
+## B12. Corridor: a thin pale-blue bar floats at the door threshold
+
+- **Status:** Open (needs a layer-by-layer render to find)
+- **Seen:** Mac debug build, corridor by the SAFE POINT, November 6. With WOLF on the ramp in the open doorway, a thin, hard-edged, pale-blue horizontal bar (about 70 world px long, 2 px tall) sits at floor level just right of his feet, in front of the threshold. It is not attached to anything; it reads as a stray UI line or an unpainted edge. Nathanial: "that bar needs to be fixed as well."
+- **What it is not (checked in code):** the HUD's hint and prompt accents (`main.tscn` ContextHint and TutorialPrompt `Accent`) are vertical 3-4 px bars; the corridor `Door/Visual` placeholder is fully transparent; the doorway's `Pool` and `Graze` lights (`door_kit.gd` line 94-95) are soft radial glows, not a hard line.
+- **Candidates, in the order to test:** the doorway curb strip `SEAL_FRONT` with its `CorridorSealCurbShade` (`main.gd` lines 1262-1266), whose painted edge could show as a line where the shade ends; the top edge of WOLF's `FloorReflection` strip (a squashed mirrored copy drawn below his feet; its clip edge would move with him); a one-pixel seam between two room plates (`RoomDepth` layers) lit by the door; or a `Line2D` or `ColorRect` left from an earlier door build.
+- **Fix:** 1. Reproduce with `tools/render/render.sh` at that spot (WOLF on the ramp, engineer at the SAFE POINT), then hide layers one at a time (door front, curb shade, reflections, each depth plate) until the bar goes, which names the owner. 2. Fix the owner: paint the edge into the plate, clip the reflection to the floor, or delete the leftover node. 3. Add the frame to the corridor's rendered regression so the bar cannot come back unseen.
+- **How to check:** the same rendered frame before and after, with no stray edge; Nathanial walks WOLF through the doorway and looks.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
