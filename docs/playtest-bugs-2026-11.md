@@ -60,6 +60,24 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
   3. Keep the touch size on iOS and Android, so B1's phone fix and this never fight.
 - **How to check:** rendered stills of Settings at 1280×720 with pointer sizing and at the iPhone size with touch sizing; a headless test that each control's height matches the mode; then Nathanial opens Settings on both.
 
+## B7. Title: CREDITS shows an outline when nothing is happening
+
+- **Status:** Cause found
+- **Seen:** Mac debug build, title screen, November 6. The CREDITS button has a bright outline with no mouse over it and no key pressed.
+- **Cause (confirmed in code):** it is the keyboard focus ring (`Button_focus` style in `game_theme.tres`). `main.gd` line 1135 focuses the title's first button at start, and line 2083 focuses CREDITS when you close the credits. `_grab_menu_focus` (line 2330) only releases focus for touch; with a mouse on a desktop it always calls `grab_focus()`, so the ring stays drawn after a click, which is why CREDITS keeps it once you have been in and out of Credits.
+- **Fix:**
+  1. Show the focus ring only while the last input was a keyboard or controller. Track the last input class in one place (the HUD already does this for prompts) and on a mouse click or move, release focus or swap the focus style for an invisible one; on the first key or stick press, restore focus to `title_focus_return` and draw the ring.
+  2. Keep focus logic for keyboard and controller users exactly as it is; they need the ring.
+- **How to check:** rendered stills of the title after a mouse click on BACK (no ring) and after a key press (ring on the right button); the existing menu navigation test still passes; Nathanial opens and closes Credits with the mouse.
+
+## B8. Title: the main menu has no motion
+
+- **Status:** Cause found
+- **Seen:** Mac debug build, November 6. After the first fade the title screen is still; it feels like a static image.
+- **Cause (confirmed in code):** `main.gd` lines 1136-1142 fade the mark, line and title in once (0.4 s, 0.25 s, 0.35 s) and that is all. Buttons only move on hover, focus and press (`UIMotion`). Nothing idles.
+- **Fix:** add quiet idle motion that reads as a living terminal, not a loop you notice: the logo mark breathing or its cyan eye blinking on a long irregular timer, the title line's scan sweep, slow drift or flicker in the background art, and a short staggered rise of the buttons after the title fade. One shared idle helper so the pause menu and end card can reuse it. Everything respects the REDUCED MOTION setting (off means the current still screen).
+- **How to check:** a short rendered capture of the title (a few seconds of frames) showing the motion, with and without reduced motion; the headless opening timing test still passes; Nathanial watches the title for 30 seconds.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
