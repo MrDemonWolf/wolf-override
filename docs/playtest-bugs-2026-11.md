@@ -78,6 +78,18 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
 - **Fix:** add quiet idle motion that reads as a living terminal, not a loop you notice: the logo mark breathing or its cyan eye blinking on a long irregular timer, the title line's scan sweep, slow drift or flicker in the background art, and a short staggered rise of the buttons after the title fade. One shared idle helper so the pause menu and end card can reuse it. Everything respects the REDUCED MOTION setting (off means the current still screen).
 - **How to check:** a short rendered capture of the title (a few seconds of frames) showing the motion, with and without reduced motion; the headless opening timing test still passes; Nathanial watches the title for 30 seconds.
 
+## B9. Audio: a background sound plays all the time
+
+- **Status:** Cause found
+- **Seen:** Mac debug build, November 6. Something keeps sounding in the background the whole time, with nothing happening. Nathanial asked whether it is an alert and suggested flashing lockdown lights instead, as real facilities do.
+- **Cause (confirmed in code):** rooms carry "state" sounds that never rest. In the Service Junction, `main.gd` lines 3738-3741 play the pump `hum` loop every frame until the door is blown, and lines 3734-3735 play the three-way steam `hiss` blend whenever the pressure line is building, which is most of the time in that room; both only stop when the room's loops are stopped on exit (`_stop_junction_loops`). In the corridor, the bypass crank fires the generated `klaxon` every 1.1 s (`BYPASS_ALARM_SECONDS`, line 1754). None of them is a true alert: the hum and hiss say "the machine is on", and the klaxon says "the bypass is venting".
+- **Fix:**
+  1. Lockdown and alerts become light, not sound: the rooms already have lockdown beacons (`set_lockdown_cleared` per room, `main.gd` line 1316) and the intro's red alarm wash. Use them for the alert state, with at most one short stinger when the state changes (lockdown starts, bypass starts venting), not a repeating klaxon.
+  2. Machine loops become room tone that rests: the pump hum drops to a low bed with a gap (the pump cycles, it does not run flat), and the steam hiss only plays while the gauge is actually climbing or in warning, silent while it holds. Everything ducks under dialogue.
+  3. One rule in `SfxBank` for continuous sounds: a loop needs a reason to be playing (a gauge above a floor, a crank in hand) and stops within a second of the reason ending, so no future room can leave a loop running.
+  4. Keep the sounds that are actions: valve turns, the vent burst, the spark, the bolt drop, WOLF's growls.
+- **How to check:** a headless test that no loop is playing in the Junction while the line holds and the player stands still for 10 s, and that the corridor crank fires the klaxon at most once per crank; Nathanial plays the corridor and Junction and says whether the room feels alive but quiet.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
