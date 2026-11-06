@@ -37,6 +37,18 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
 - **Fix:** one shared row layout for both columns (label left, control right, same row height), used by every DISPLAY row, so EDGE SMOOTHING and TEXT SIZE line up with the rest; or move TEXT SIZE to the left column under FULLSCREEN and give the right column the same label-left rule. Delete the hand-set positions once the helper places them.
 - **How to check:** a rendered still of the DISPLAY tab at 1280×720 and 960×540; the existing settings UI test still passes.
 
+## B5. Menus: font sizes and heading levels don't flow
+
+- **Status:** Cause found
+- **Seen:** Mac debug build, Settings, November 6. The text has no clear order: the title is big, then the tabs, row labels, control text, the note and the BACK button all look the same size, and the breadcrumb is tiny. The eye has nowhere to go.
+- **Cause (confirmed in code):** there is no type scale. `game_settings.gd` sets sizes by hand per label: 27 (title), 13 (breadcrumb), 15, 16 and 17 for everything else; `main.gd` and the end card use 15, 16, 17 and 19; the theme's `default_font_size` is 16. Six nearby sizes with no rule, so there is effectively one heading level (H1) and then flat body text.
+- **Fix:**
+  1. One shared type scale in one file, named by role, not by number: H1 (screen title), H2 (section or tab), H3 (row label), body (control text, dialogue), caption (breadcrumb, notes, hints). Pick sizes with a clear step between levels (for example 32 / 22 / 18 / 16 / 13 at the 960×540 canvas) and weight or colour per level, so every level is visibly different from its neighbours.
+  2. Every menu label, tab, row label, note and button reads its size from that scale; delete the hand-set numbers in `game_settings.gd`, `main.gd` and `ui_label.gd` callers.
+  3. The TEXT SIZE setting multiplies the whole scale, so the order survives at 125% and 150%.
+  4. Apply to Settings first (the page Nathanial saw), then the title, pause, end card and debug menu.
+- **How to check:** rendered stills of each menu at 100% and 150% text size; a headless test that every menu label's size is one of the scale's values; then Nathanial reads them.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
