@@ -109,6 +109,20 @@ Status words: **Open** (not started), **Cause found** (reproduced and understood
   5. Keep the row limits and CJK balancing that `dialogue_boxes.gd` already does; they are the hard-won part.
 - **How to check:** rendered stills of the same Records moment at 1280×720 and the iPhone size, with keyboard, controller and touch prompts; the existing dialogue wrap and reading-time tests still pass; Nathanial plays Records and the corridor and says whether he knows who is talking and what to press.
 
+## B11. Feedback: make things in the world clickable and tappable
+
+- **Status:** Open (feature, design first)
+- **Seen:** November 6. Nathanial: "can we make things click and tappable, maybe to give a better gaming experience." On the Mac the mouse does nothing in the world; on the phone play is hold-an-arrow then press USE, which is a keyboard scheme drawn on glass.
+- **What the code does (confirmed):** `main.gd` line 2108 uses a mouse click only to pick an answer in a question, and line 2478 only to note that the last input was a mouse. Touch is two hold arrows and a USE button (controls page, "Touch"). Stations, doors, WOLF, the dialogue box and the floor take no click or tap.
+- **Fix (design first, research by the project rule; keyboard and controller stay exactly as they are):**
+  1. **Tap or click a station, door or WOLF** to walk there and use it: one press does the walk and the interact, with the same engineer-only rules, the same reach and the same refusals as pressing E there. The prompt pill from B10 becomes the thing you tap.
+  2. **Tap or click the floor** to walk to that point and stop; the arrows stay for players who prefer them.
+  3. **Tap or click the dialogue box** to show the rest of a line and again to advance (B10's press-to-advance, on the box itself).
+  4. **Hover and press feedback** on everything tappable: the station's plate brightens on hover (mouse) and dips on press (both), so a player can find what is live by looking. One shared `Tappable` component on stations, doors and WOLF so there is one hit-test and one highlight, not copies per room.
+  5. **Cranks** keep hold: hold on the station (mouse down or finger down) cranks, the same as holding E.
+  6. Research three or four shipped 2D side-view games with tap-to-move or click-to-use (what counts as a hit, how they show reach, how they avoid walk-away misclicks) and record it in Notion before the build.
+- **How to check:** a headless test that a tap on each station from across the room walks and uses it with the same outcome as pressing E, including refusals and the engineer-only fallback; rendered stills of the hover and press states; Nathanial plays Records and the Junction on the Mac with the mouse only and on the phone with taps only.
+
 ## B4. Mac: Settings tabs may not switch sections
 
 - **Status:** Open, unconfirmed
