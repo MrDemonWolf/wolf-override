@@ -4,16 +4,25 @@
 
 Status words: **Open** (not started), **Cause found** (reproduced and understood), **Fixing** (branch open), **Fixed** (merged, waiting for Nathanial to confirm in play), **Closed** (confirmed by hand).
 
-## Priority (Nathanial, November 6, 2026)
+## Priority (Nathanial, November 6, 2026; updated November 9)
 
 "The story is good, fine for now. It needs better UI/UX and gameplay." So story work pauses at the current canon; the order of work is:
 
-1. **Look and feel of the rooms:** B13 (art direction, corridor first), with B12 (stray bar) fixed along the way.
-2. **Playing with hands:** B11 (click and tap the world and its labels), B1 (iPhone fills the screen).
-3. **Reading and talking:** B10 (dialogue and prompt redesign), B5 (type scale), B9 (loops become lights).
-4. **Menus:** B3, B6 (Settings layout and control size), B7, B8 (title focus ring and idle motion), B2 (FPS, size, fullscreen), B4 (tabs, once confirmed).
+0. **Groundwork, no visible change:** B26 (one UI token file), B31 (one row-length home), B30 (mockup tuning loop). Why: the mockups and the game then read the same numbers from the start.
+1. **Look and feel of the rooms:** B13 (art direction, corridor first), with B12 (stray bar) and B23 (beacons out of view) fixed along the way.
+2. **Playing with hands:** B11 (click and tap the world and its labels), B1 (iPhone fills the screen), B14 to B17 (Xbox pad on the ROG Ally, input mode and glyphs, hot-plug, pad rebinding), B33 (USE timing), B34 (camera), B29 (Android edges, with the Android port).
+3. **Reading and talking:** B10 (dialogue and prompt redesign), B24 (speaker marks), B5 (type scale), B25 (reduced motion in the UI), B27 (bold text), B9 (loops become lights), B36 (mix by loudness).
+4. **Menus:** B18 (settings split by device), B3, B6 (Settings layout and control size), B19 (frame rate), B2 (FPS, size, fullscreen), B7, B8 (title focus ring and idle motion), B20 (quit), B28 (UI sounds), B4 (tabs, once confirmed).
+5. **Starting and moving between rooms:** B21 (boot seam), B22 (transitions and resume card), B32 (timing line), B35 (save on interruption). Why a new step: it touches boot, Continue and every door, not dialogue or menus, and needs the device timings first.
 
-Each step ships as one small branch with a Mac and iPhone build for Nathanial to play before the next starts.
+Each step ships as one small branch with a Mac and iPhone build for Nathanial to play before the next starts. Controller steps also get a ROG Ally build.
+
+### Decisions (Nathanial, November 9, 2026)
+
+1. **Handheld:** his handheld is the ROG Ally (2023). Call it that everywhere.
+2. **Loading:** "better loading screen" means a better boot, door-led room transitions, a Continue resume card, and a loading view only for a slow load (mockup M04). No tips on short loads.
+3. **Speakers:** the default speaker mark is a name tab, a colour and a small mark (WOLF's cyan eye, Rowan's badge). Painted portraits wait until B13's art rules are in place (B24).
+4. **Phone controls:** the default is the left move pad plus tapping a station or WOLF to use it. Tap-to-walk is an option in Settings.
 
 ## B1. iPhone: the game does not fill the screen
 
@@ -25,7 +34,8 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
   2. Anchor the HUD, dialogue box and touch controls to the real viewport edges, and inset them by `DisplayServer.get_display_safe_area()` so nothing sits under the notch or the home bar.
   3. Clamp the camera's horizontal limits to each room's edges so the extra width never shows past the room art.
   4. Make sure a 16:9 Mac window is unchanged (same framing, same positions).
-- **How to check:** `tools/render/render.sh` stills at 2778×1284 (14 Pro Max) and 1280×720; a headless test that the HUD stays inside the safe area at both sizes; then Nathanial plays it on the phone.
+- **Correction (November 9):** plain `expand` is not enough. It shows past the art on 32:9, breaks the iPad and Steam Deck touch framing, and opens a gap at the far plate's edge on every phone. The plan: `expand` only between 4:3 and 2.4:1 (bars outside that), keep zoom 1.35, raise the camera on taller screens, and fix the far plate's offset (`room_depth.gd` 36-38 assumes a 960 px canvas).
+- **How to check:** `tools/render/render.sh` stills at 2796×1290 (14 Pro Max), 2400×1080 (Pixel 8), 2732×2048 (iPad Air 13), 1280×800 (Steam Deck), 1920×1080 (ROG Ally), 2560×1080 (21:9), 5120×1440 (32:9, side bars) and 1280×720; a headless test that the HUD stays inside the safe area at both sizes; then Nathanial plays it on the phone.
 
 ## B2. Mac: FPS LIMIT, WINDOW SIZE and FULLSCREEN do nothing
 
@@ -36,7 +46,8 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
   1. **FPS:** V-sync defaults to on (`game_settings.gd` line 131, `vsync` default `true`), and the menu's own note says "V-sync may limit the FPS cap". With v-sync on, a 60 Hz Mac display shows 60 FPS whatever the cap, and the game has no FPS counter, so a change is invisible. If this is it, the fix is a visible FPS readout in the debug tools and a clearer note, not a code fix.
   2. **Window size:** on macOS, Godot ignores `window.size` while the window is in native fullscreen or maximised; and `item_selected` only fires when the choice changes, so re-picking the current size does nothing. Check whether the window was in the green-button fullscreen.
   3. **Fullscreen toggle:** `MODE_FULLSCREEN` on macOS should work; if it does not, check whether `fullscreen_toggle.disabled` is true because `OS.has_feature("ios")` is somehow set, and whether the macOS export's `display/window/size/mode` conflicts.
-  4. **Signals lost on re-parent:** `game_settings.gd` line 296 moves `FPSOptions`, `ResolutionOptions` and `FullscreenToggle` into the DISPLAY page. Moving a node keeps its signal connections, but if `configure` runs before `_setup_settings` connects them, or runs twice and rebuilds the controls, the connections are gone. Check the call order.
+  4. ~~**Signals lost on re-parent.**~~ Ruled out (November 9): nothing is re-parented.
+- **Main cause for the mouse (found November 9):** the DISPLAY page's `Control` has `mouse_filter` STOP and covers the three controls, so a click never reaches them. V-sync can also hide the FPS cap (cause 1); both can be true.
 - **Fix:** reproduce first with a headless test that selects each option and asserts `Engine.max_fps`, the saved config and the window calls; then fix the real cause. Add a small FPS counter to the debug tools so a cap change can be seen.
 - **How to check:** the new headless test, then Nathanial changes all three on the Mac and sees each one take effect.
 
@@ -66,7 +77,7 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
 - **Seen:** Mac debug build, Settings, November 6. Toggles, dropdowns, tabs and BACK are large for a mouse; the menu looks like a phone screen on a desktop.
 - **Cause (confirmed in code):** every control uses one size for finger and pointer. `game_settings.gd` sets rows and controls at 40 to 48 canvas px tall (lines 306, 310, 323, 361, 373, 537) and 206 to 272 px wide; that is the 44 px touch minimum. The 960×540 canvas is scaled ×1.33 at the default 1280×720 window, so a toggle is 58 to 64 screen px tall on a Mac, and ×2 at 1920×1080.
 - **Fix:**
-  1. Two control sizes in the shared row layout from B3: **pointer** (about 32 canvas px tall, narrower widths) and **touch** (the current 44 to 48). Pick by the last input used (`DisplayServer.is_touchscreen_available()` and the last event class), the same way the HUD already picks keyboard, controller or touch prompts.
+  1. Two control sizes in the shared row layout from B3: **pointer** (about 32 canvas px tall, narrower widths) and **touch** (48 canvas px on the ROG Ally, 58 on the iPhone; corrected November 9, not one 44 px size). Pick by the last input used (`DisplayServer.is_touchscreen_available()` and the last event class), the same way the HUD already picks keyboard, controller or touch prompts.
   2. Tabs, BACK and binding buttons use the same two sizes.
   3. Keep the touch size on iOS and Android, so B1's phone fix and this never fight.
 - **How to check:** rendered stills of Settings at 1280×720 with pointer sizing and at the iPhone size with touch sizing; a headless test that each control's height matches the mode; then Nathanial opens Settings on both.
@@ -76,6 +87,7 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
 - **Status:** Cause found
 - **Seen:** Mac debug build, title screen, November 6. The CREDITS button has a bright outline with no mouse over it and no key pressed.
 - **Cause (confirmed in code):** it is the keyboard focus ring (`Button_focus` style in `game_theme.tres`). `main.gd` line 1135 focuses the title's first button at start, and line 2083 focuses CREDITS when you close the credits. `_grab_menu_focus` (line 2330) only releases focus for touch; with a mouse on a desktop it always calls `grab_focus()`, so the ring stays drawn after a click, which is why CREDITS keeps it once you have been in and out of Credits.
+- **Exact cause (November 9):** `_grab_menu_focus` grabs focus on every non-touch menu open, so the ring shows even after a mouse click. Fix it by calling `grab_focus(true)`, which focuses without drawing the ring, for mouse opens.
 - **Fix:**
   1. Show the focus ring only while the last input was a keyboard or controller. Track the last input class in one place (the HUD already does this for prompts) and on a mouse click or move, release focus or swap the focus style for an invisible one; on the first key or stick press, restore focus to `title_focus_return` and draw the ring.
   2. Keep focus logic for keyboard and controller users exactly as it is; they need the ring.
@@ -169,4 +181,242 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
 
 - **Status:** Open, unconfirmed
 - **Seen:** Nathanial said "the sections don't work" on November 6; later narrowed to the three DISPLAY controls in B2. Whether tapping AUDIO, CONTROLS or GENERAL switches the page is not confirmed either way.
+- **Likely not a bug (November 9):** no page covers the tab bar, so the tabs should take clicks. The "sections don't work" was most likely B2's covered controls.
 - **Fix:** none until confirmed. Next play session: tap each tab and note whether the page changes.
+
+## B14. Controller: every screen must work with an Xbox pad (ROG Ally)
+
+- **Status:** Open (spec ready)
+- **Why:** Nathanial plays on a ROG Ally (2023), so the pad must reach everything, not only play.
+- **Cause (code):** menus were built for mouse and touch first. Pad focus exists on some screens only; `game_settings.gd:864` names pad buttons "BUTTON n".
+- **Fix:**
+  1. Every screen: D-pad or stick to move, A to choose, B to go back.
+  2. Menu pauses; View shows the objective.
+  3. LB/RB switch tabs; LT/RT switch pages; the right stick scrolls.
+  4. Answer cards, the credits scroll and the name entry all work by pad.
+  5. Disabled buttons and touch-only buttons take no focus; the on-screen PAUSE shows for touch only.
+  6. The changelog's ONLINE step asks to confirm on a handheld.
+- **How to check:** a headless menu walk by pad events, then a device test on the ROG Ally.
+
+## B15. One shared input mode and glyph service
+
+- **Status:** Open
+- **Why:** prompts and layouts guess the input in many places and show keyboard text to pad players.
+- **Cause (code):** the "touch layout" test is copied about nine times, for example `main.gd:683`, `main.gd:2160`, `game_settings.gd:99` and `debug/debug_menu.gd:427`. Pad buttons show as "BUTTON n" (`game_settings.gd:864`).
+- **Fix:**
+  1. One `InputMode` service owns the last input class; touch is seen from `InputEventScreenTouch` on any OS.
+  2. Pad family from the vendor ID; Xbox glyphs with Menu (not START) and View.
+  3. Hide keyboard glyphs and the mouse cursor while a pad is used.
+  4. Delete the copies, including the debug menu's, in the same change.
+  5. Log the glyph art in the manifest.
+- **How to check:** a headless test that feeds key, mouse, pad and touch events and reads the mode and glyphs.
+
+## B16. Controller hot-plug, focus loss and vibration
+
+- **Status:** Open
+- **Cause (code):** nothing listens to `Input.joy_connection_changed`; the dead zone lives only in Settings (`game_settings.gd:152`) and does not reach the menus.
+- **Fix:**
+  1. Pause when the pad disconnects; read pad state at start.
+  2. Set `ignore_joypad_on_unfocused_application`.
+  3. Stop rumble on pause; one VIBRATION / HAPTICS slider.
+  4. One dead-zone source for play and menus.
+- **How to check:** a headless test with fake connect and disconnect events; then unplug and replug on the ROG Ally.
+
+## B17. Rebinding on a pad
+
+- **Status:** Open
+- **Cause (code):** the rebind capture was built for keys; its note and labels name keys (`game_settings.gd:864`).
+- **Fix:**
+  1. Cancel a capture from the pad (Menu cancels).
+  2. Note text and labels match the device, with glyphs.
+  3. On a clash, offer swap or cancel.
+  4. Reset needs a hold to confirm.
+- **How to check:** a headless rebind test by pad; then rebind on the ROG Ally.
+
+## B18. Settings split by device
+
+- **Status:** Open (spec ready)
+- **Why:** one Settings page for Mac, ROG Ally and iPhone fits none of them (B3, B6).
+- **Cause (code):** phone detection is copied (`main.gd:683`, `main.gd:2160`, `game_settings.gd:99`, `studio_logo.gd:121`) and there is no handheld profile.
+- **Fix:**
+  1. Three profiles: desktop, handheld, touch; a DEVICE PROFILE override.
+  2. One `classify(facts)` picks the profile; handheld from the model code, the ASUS pad ID 2821:6988 or a Z-series processor.
+  3. One one-column row helper with three densities (also B3).
+  4. A new ACCESSIBILITY tab; each profile has its own defaults and visible rows.
+  5. Settings save per device.
+  6. Delete the four copied phone checks.
+- **How to check:** a headless test of `classify` with each device's facts; rendered stills of Settings per profile.
+
+## B19. Frame rate that tells the truth, per device
+
+- **Status:** Open
+- **Cause (code):** V-sync defaults on (`game_settings.gd:131`) and hides the FPS cap; there is no FPS readout (B2).
+- **Fix:**
+  1. Desktop: match the display by default; grey the caps while V-sync is on; add SHOW FPS.
+  2. Handheld: 30 / 40 / 60 / 120, default 60.
+  3. Phone: 30 / 60, plus 120 when the screen refreshes at 119 Hz or more; default 60.
+  4. BATTERY SAVER on handheld and phone.
+- **How to check:** a headless test of the choices per profile; then SHOW FPS on the Mac and the ROG Ally.
+
+## B20. Quit to desktop
+
+- **Status:** Open
+- **Cause (code):** only Android Back from the bare title quits (`main.gd:2412-2429`); Mac, Windows and the ROG Ally have no QUIT button.
+- **Fix:**
+  1. QUIT on the title and in pause on Mac, Windows and handhelds.
+  2. Never on iOS.
+  3. Android keeps Back from the bare title.
+- **How to check:** a headless test that QUIT shows per platform; then quit on the ROG Ally with the pad.
+
+## B21. Boot seam and launch screen
+
+- **Status:** Open
+- **Cause (code):** `project.godot:18` sets `boot_splash/bg_color` to black, but the studio logo's background is navy (`studio_logo.tscn:37`), so the boot shows a seam. The logo skip listens to keys and buttons (`studio_logo.gd:185`), not a stick push.
+- **Fix:**
+  1. Set `boot_splash/bg_color` to RGB (9, 21, 51); match the iOS launch storyboard.
+  2. A stick push also skips the logo.
+  3. Measure iPhone time to first frame against 400 ms (`xctrace` App Launch), plus the BOOT line (B32) through `devicectl --console`.
+- **How to check:** rendered stills of the first frames; the iPhone timing log.
+
+## B22. Room transitions, resume card and one shared indicator
+
+- **Status:** Open (mockup M04 chosen November 9)
+- **Why:** Nathanial asked for a better loading screen. Real loads are tiny (Continue about 1 ms, a room change about 2 ms, headless), so a card would only add waiting.
+- **Cause (code):** room changes cut; Continue drops you in with no reminder; the logo's sweep lives only in `studio_logo.gd`.
+- **Fix:**
+  1. Door-led room fades.
+  2. The room name on the first visit.
+  3. A Continue resume card.
+  4. A loading view only when a load is slow.
+  5. Move the logo's sweep into one shared indicator.
+  6. The resume and first-visit cards restyle today's top card (`main.gd:632`, `_show_top_card` at `main.gd:5484`); no second card component.
+  7. Reduced motion uses a plain cut or short fade.
+- **How to check:** rendered captures of a door, the first visit and Continue; B32's timing line shows no added wait beyond the fade.
+
+## B23. Corridor alarm beacons sit above the play view
+
+- **Status:** Open (check with a render first)
+- **Cause (code):** the corridor beacons (`room_depth.gd:331`) sit at world y 146-152, just above the play view's top (y 160); in the touch framing none of their glow shows.
+- **Fix:** move the beacons, or their glow, down into the view, so B9's lights-not-sound plan can be seen.
+- **How to check:** rendered stills at keyboard and touch framing showing the beacon glow.
+
+## B24. Dialogue speaker marks have no art
+
+- **Status:** Open (default decided November 9)
+- **Cause (assets):** there is no portrait or bust art; only full-body sprites.
+- **Fix:**
+  1. Ship the default now: a name tab, the speaker's colour and a small mark (WOLF's cyan eye, Rowan's badge).
+  2. Keep a placeholder-portrait variant behind a toggle in the mockup only.
+  3. Paint head portraits only after B13's art rules are in place: whole pieces, in the manifest.
+- **How to check:** rendered stills of a WOLF line and a Rowan line; Nathanial says whether he knows who is talking.
+
+## B25. Reduced motion misses the UI
+
+- **Status:** Open
+- **Cause (code):** `ui_motion.gd` (`_scale_to`, line 34) scales buttons on hover and press, and the pause card slides, whatever REDUCED MOTION says.
+- **Fix:** route all UI motion through the shared motion tokens; `UIMotion` reads them and does nothing under reduced motion.
+- **How to check:** a headless test that hover and pause make no scale or slide with reduced motion on.
+
+## B26. One UI token file
+
+- **Status:** Open (lands first, no visible change)
+- **Cause (code):** three near-identical cyans and four light text colours are written by hand in about 60 places, for example `fx/palette.gd:12`; dead scene font sizes are overridden in code.
+- **Fix:**
+  1. `apps/game/ui/ui.tokens.json` holds colours, type roles, densities, motion and timing; a `UiTokens` loader reads it.
+  2. `scripts/export_ui_tokens.py` generates the theme colours and `default_font_size`; `check-game.sh` fails on drift.
+  3. The colour overrides in `main.tscn` and `studio_logo.tscn` become theme type variations; `Palette.CYAN` reads the WOLF token.
+  4. Delete the dead values.
+- **How to check:** rendered stills before and after are identical, and the regenerated theme is byte-identical.
+
+## B27. Credits and changelog bold may draw at regular weight
+
+- **Status:** Open (confirm with a render)
+- **Cause (code):** `RichTextLabel`'s `bold_font` falls back to Roboto 400 with no embolden; `assets/fonts/game_theme.tres` sets no bold face.
+- **Fix:** set a bold face in the theme.
+- **How to check:** a rendered still of the credits before and after.
+
+## B28. Shared UI sound set
+
+- **Status:** Open
+- **Cause (code):** there is no one UI sound set; menus have no confirm, back or focus sounds of their own and no UI volume.
+- **Fix:**
+  1. Six UI sounds in one set.
+  2. Confirm plays on press; focus ticks are rate-limited.
+  3. A UI volume slider.
+- **How to check:** a headless test that fast focus moves play capped ticks; Nathanial clicks through the menus.
+
+## B29. Android edges (with the Android port)
+
+- **Status:** Open (waits for the Android port)
+- **Cause (code):** Back pauses today, so the back-edge swipe fights the left move pad.
+- **Fix:**
+  1. Keep the back-edge swipe away from the move pad.
+  2. Use cutout insets in immersive mode.
+  3. Use `screen_get_dpi()` for dp, never `screen_get_scale()`.
+  4. Orientation 0 or 4; keep `appCategory="game"`.
+- **How to check:** the device log, then play on an Android phone.
+
+## B30. Mockup tuning loop
+
+- **Status:** Open
+- **Why:** Nathanial tunes sizes and colours in the mockups; the numbers must flow back into the game, not be retyped.
+- **Fix:**
+  1. A Tune panel in the mockups, with its state in the URL.
+  2. Copy JSON gives the change as a diff.
+  3. `export_ui_tokens.py --apply` writes it to the token file (B26); `--check-css` checks the mockup stylesheet.
+  4. The M00 mockup's criteria pass.
+- **How to check:** change one value in the Tune panel, apply it, and see the same value in the game's theme.
+
+## B31. One home for the English row length
+
+- **Status:** Open
+- **Cause (code):** `dialogue_boxes.gd:26` `MAX_ROW_CHARACTERS = 42` repeats the value in `languages.json`.
+- **Fix:** read it from the table and delete the constant.
+- **How to check:** the dialogue wrap tests still pass.
+
+## B32. One timing line for boot, Continue and room changes
+
+- **Status:** Open
+- **Fix:**
+  1. StudioLogo and Main print `BOOT …` and `RESTORE …` lines under `--boot-timing`.
+  2. One `tools/` script runs it headless and prints the numbers (never a timed pass or fail).
+  3. Delete the scratch probes.
+- **How to check:** a headless run; then the iPhone (B21) and the ROG Ally.
+
+## B33. USE timing and forgiveness
+
+- **Status:** Open
+- **Cause (code):** USE is read with `Input.is_action_just_pressed(&"interact")` in several branches of `main.gd` (lines 1432-1503), each with its own rules.
+- **Fix:**
+  1. Pad and key USE act on the press frame, with a test.
+  2. World taps act on release.
+  3. One "pending USE" owner for the 0.1 s buffer, the 0.1 s coyote time and B11's walk-then-use.
+- **How to check:** headless tests for an early press, a late press and a tap from across the room.
+
+## B34. Camera window, look-ahead and screen shake scaling
+
+- **Status:** Open
+- **Cause (code):** the camera follows with fixed smoothing (`main.gd:1411-1412`); shake is a fixed 10 px peak (`impact.gd:9`, applied at `impact.gd:104`) with no setting.
+- **Fix:**
+  1. A ±36 world px dead window, eased look-ahead and turn hysteresis.
+  2. A SCREEN SHAKE % setting scales `impact.gd`'s amplitude.
+  3. The camera clamp uses the half-view helper from B1.
+- **How to check:** a short rendered capture of a walk and a turn; a headless test that 0% shake gives no offset.
+
+## B35. Save on interruption
+
+- **Status:** Open
+- **Cause (code):** `main.gd:2406` pauses on `NOTIFICATION_APPLICATION_PAUSED` only when `auto_pause_on_focus_loss` is on, and writes no save or settings there.
+- **Fix:**
+  1. On `APPLICATION_PAUSED`: pause, then write the pending save and settings.
+  2. Resume into the pause menu.
+- **How to check:** a headless test that sends the notification; then background the game on the iPhone.
+
+## B36. Mix by loudness
+
+- **Status:** Open
+- **Fix:**
+  1. A loudness offset per profile: −24 LKFS desktop, −18 LKFS on portable speakers.
+  2. A limiter on the Master bus.
+  3. Measure a 30-minute capture with a BS.1770 meter.
+- **How to check:** the meter reading for each profile; Nathanial plays with headphones and on the ROG Ally's speakers.
