@@ -76,26 +76,9 @@
         </script>
       </div>
 
-      <!-- 1. Conversation (6.3): WOLF at the breaker (engineer x 404 beside BreakerArt 350; WOLF one
-           M0Actor.FOLLOW_GAP behind). Types in at TEXT SPEED; the triangle shows once it is complete. -->
-      <div class="wo-box has-portrait" data-speaker="wolf" data-wo-scene="talk" data-wo-probe="box">
-        <div class="wo-nametab" data-wo-probe="nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
-        <div class="wo-portrait" data-wo-probe="portrait"><img src="../apps/game/assets/characters/wolf-stand.png" alt=""><span class="wo-portrait-label">placeholder crop</span></div>
-        <div class="wo-box-text" data-wo-reveal data-wo-probe="dialogue">That relay's tagged COOLANT FAULT. What happens if I touch it live?</div>
-        <span class="wo-continue"></span>
-      </div>
-      <!-- The breaker's pill is in the scene but hidden: no pill while a conversation box is open. -->
-      <span class="wo-pill" data-wo-at="breaker" data-wo-scene="talk" data-wo-probe="pill-under-box"><span data-wo-glyph="interact"></span>Arm the breaker</span>
-
-      <!-- 2. Bark (6.3): WOLF heading for the contact while the engineer steps back (RELAY_STEP_BACK_X
-           736). Timed, never takes USE; mark and colour name him. -->
-      <div class="wo-bark" data-speaker="wolf" data-wo-at="wolf" data-wo-scene="bark" data-wo-probe="bark"><span data-wo-glyph="mark:wolf"></span>I've got the contact. Give me a moment.</div>
-
-      <!-- 3. System hint (6.3): the same box, a terminal mark instead of a speaker. -->
-      <div class="wo-box" data-speaker="hint" data-wo-scene="hint" data-wo-probe="hint">
-        <span class="wo-box-mark" data-wo-glyph="mark:hint"></span>
-        <div class="wo-box-text">The breaker is live. Go to the coolant relay.</div>
-      </div>
+      <!-- Order matters: the pills a scene shows come before every dialogue box, and the pill that
+           an open box hides comes right after it (wo.css hides a .wo-pill that follows a .wo-box).
+           The boxes come before the HUD for the same reason (an open box stops the move pad). -->
 
       <!-- 4 and 8. Prompt pill over the relay (engineer at C3's x 655): glyph, verb, object; on touch
            the pill is the button and has no glyph. -->
@@ -113,6 +96,27 @@
 
       <!-- 8, tap to walk: the floor point a tap sends the engineer to (toggle Phone controls). -->
       <span class="wo-walk-mark" data-wo-at="560 440" data-wo-scene="touch" data-wo-probe="walk-mark"></span>
+
+      <!-- 2. Bark (6.3): WOLF heading for the contact while the engineer steps back (RELAY_STEP_BACK_X
+           736). Timed, never takes USE; mark and colour name him. -->
+      <div class="wo-bark" data-speaker="wolf" data-wo-at="wolf" data-wo-scene="bark" data-wo-probe="bark"><span data-wo-glyph="mark:wolf"></span>I've got the contact. Give me a moment.</div>
+
+      <!-- 1. Conversation (6.3): WOLF at the breaker (engineer x 404 beside BreakerArt 350; WOLF one
+           M0Actor.FOLLOW_GAP behind). Types in at TEXT SPEED; the triangle shows once it is complete. -->
+      <div class="wo-box has-portrait" data-speaker="wolf" data-wo-scene="talk" data-wo-probe="box">
+        <div class="wo-nametab" data-wo-probe="nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
+        <div class="wo-portrait" data-wo-probe="portrait"><img src="../apps/game/assets/characters/wolf-stand.png" alt=""><span class="wo-portrait-label">placeholder crop</span></div>
+        <div class="wo-box-text" data-wo-reveal data-wo-probe="dialogue">That relay's tagged COOLANT FAULT. What happens if I touch it live?</div>
+        <span class="wo-continue"></span>
+      </div>
+      <!-- The breaker's pill is in the scene but hidden: no pill while a conversation box is open. -->
+      <span class="wo-pill" data-wo-at="breaker" data-wo-scene="talk" data-wo-probe="pill-under-box"><span data-wo-glyph="interact"></span>Arm the breaker</span>
+
+      <!-- 3. System hint (6.3): the same box, a terminal mark instead of a speaker. -->
+      <div class="wo-box" data-speaker="hint" data-wo-scene="hint" data-wo-probe="hint">
+        <span class="wo-box-mark" data-wo-glyph="mark:hint"></span>
+        <div class="wo-box-text">The breaker is live. Go to the coolant relay.</div>
+      </div>
 
       <!-- 9. Lockdown (6.5): the beacons carry the alarm; one narration box (no name tab). Engineer at
            the MANUAL BYPASS (BYPASS_WHEEL x 700, within BYPASS_REACH). -->
@@ -150,14 +154,18 @@
     <li>Tick "hit areas" to see each tap area, each station's reach (solid) and its 0.1 s USE buffer (light; Proposal, 6.7.2).</li>
     <li>FLASHING LIGHTS reduced turns the beacon pulse into a steady glow.</li>
   </ul>
+  <h3>Not wired yet</h3>
+  <ul class="mk-note">
+    <li>The scenes, world anchors, typing, beacons, reach bands and HUD corners wait for shared pieces in wo.js and wo.css (requested). Until they land, every scene shows at once.</li>
+  </ul>
   <p class="mk-note" data-wo-scene="talk">Conversation: types in at TEXT SPEED Normal; the triangle shows once the line is complete. Click the box to complete it, again to replay. The breaker's pill is hidden while the box is open.</p>
   <p class="mk-note" data-wo-scene="bark">Bark: a walk-and-talk line over WOLF. It never takes USE.</p>
   <p class="mk-note" data-wo-scene="hint">System hint: the same box with a terminal mark, never a second box.</p>
   <p class="mk-note" data-wo-scene="pill">Prompt pill: switch the input to keyboard, pad and touch. No keyboard glyph with a pad, none on touch.</p>
   <p class="mk-note" data-wo-scene="walkto">Pointer hover out of reach: the relay is outlined and the pill says where a click walks to.</p>
-  <p class="mk-note" data-wo-scene="walk">Walking: tick "hit areas" for every tap area and the reach bands.</p>
+  <p class="mk-note" data-wo-scene="walk">Walking: tick "hit areas" for every tap area and the reach bands. Finding: on the iPhone the SEAL's area runs under USE. World taps must keep clear of the touch controls (6.4 step 13).</p>
   <p class="mk-note" data-wo-scene="usable">Hold View (Tab on a keyboard) to outline and name every usable thing.</p>
-  <p class="mk-note" data-wo-scene="touch">Phone: the floor sits above the touch controls; the ring rests clear of the edge strip. Android: add cutout= and edge= (canvas px).</p>
+  <p class="mk-note" data-wo-scene="touch">Phone: the floor sits above the touch controls; the ring rests clear of the edge strip. Android: add cutout= and edge= (canvas px). Open question: the move pad's zone (left 40%) holds the BREAKER on a phone. A touch that starts on a station should use it, not move (6.4 step 3: an object beats the floor).</p>
   <p class="mk-note" data-wo-scene="lockdown">Lockdown: the beacons pulse at alert.beacon-rate (Proposal 1 Hz, hard limit 3). Their drop into the view is B23's Proposal.</p>
 </footer>
 </div>

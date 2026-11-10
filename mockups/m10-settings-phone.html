@@ -11,19 +11,23 @@
   notes. Every frame follows the strip's device (data-wo-device="url"): iphone, android or ipad. The
   strip's "Phone controls" switch (?touch=tapwalk) flips TOUCH SCHEME between its two choices.
 
-  Decisions used (Nathanial, November 9, 2026): the phone default is the left move pad plus a tap on a
-  station or WOLF to use it; tap-to-walk is the other TOUCH SCHEME choice.
+  TOUCH SCHEME is not decided yet (brief Q4). The recommended default is the left move pad plus a tap
+  on a station or WOLF to use it; tap-to-walk is the other choice. The page shows both through the
+  strip's "Phone controls" switch, so Nathanial can compare them.
 
   Markup and per-screen data only: no inline style values and no page script (brief 7.1). The settings
-  shell (wo-settings, -head, -body, wo-rows-head, row states) is the same markup M09 uses, so one shared
-  shell serves both pages; on a phone-profile frame that shell lays the tabs out as a left rail and
-  moves the footer (BACK on touch) into the title row (see this step's shared_requests). These attributes wait for shared support and do nothing until it lands:
-  data-wo-scheme (show one TOUCH SCHEME variant), data-wo-input (pin a frame's input class),
-  data-wo-scroll (open a page scrolled), data-wo-min-refresh (hide a frame-rate choice the screen
-  cannot show).
+  shell (wo-settings, -head, -body, wo-rows-head, row states) is the same markup M09 uses, so one
+  shared shell serves both pages. On a phone-profile frame that shell lays the tabs out as a left rail
+  and moves the footer (BACK on touch) into the title row. Until the Integrate step adds it, the shell
+  draws as plain block flow and these attributes do nothing:
+  - data-wo-scheme: show only the TOUCH SCHEME variant the strip picks;
+  - data-wo-input on .mk-device: pin that one frame's input class (state 4 is always "pad");
+  - data-wo-scroll: open a page part-way down (0..1 of its scroll range);
+  - data-wo-min-refresh: hide a frame-rate choice the screen's refresh rate cannot show.
 
   Words: UI labels from the build (game_settings.gd, main.gd's "30 FPS" items, main.tscn) and from the
-  brief's settings tree (3.2). No story text.
+  brief's settings tree (3.2), in the row-label caps M08 and M09 use. The hold button says HOLD, as on
+  M08 and M09 (one row helper, one label). No story text.
 -->
 <html lang="en">
 <head>
@@ -64,7 +68,7 @@
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SWAP SIDES</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SWAP SIDES" aria-checked="false" data-wo-scheme="pad" data-wo-focus tabindex="0" data-wo-probe="control"></span><span class="wo-toggle" role="switch" aria-label="SWAP SIDES" aria-checked="false" aria-disabled="true" data-wo-scheme="tapwalk"></span></span><span class="wo-row-note" data-wo-probe="note"><span data-wo-scheme="pad">Move pad on the right, USE on the left.</span><span data-wo-scheme="tapwalk">Only with the move pad.</span></span></div>
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">HAPTICS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus data-wo-probe="control"><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note">Also sets controller rumble.</span></div>
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TOGGLE HOLDS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="TOGGLE HOLDS" aria-checked="false" data-wo-focus tabindex="0" data-wo-probe="control"></span></span><span class="wo-row-note" data-wo-probe="note">Tap once to start a crank, again to stop.</span></div>
-            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold data-wo-probe="control"><span data-wo-glyph="ui_accept"></span>HOLD TO RESET</button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold data-wo-probe="control"><span data-wo-glyph="ui_accept"></span>HOLD</button></span></div>
           </div>
         </div>
         <div class="wo-footer" data-wo-probe="footer">
@@ -119,7 +123,9 @@
 
 <!-- State 3: ACCESSIBILITY, a page that scrolls (3.1 step 4: phones scroll instead of shrinking text).
      Eight rows do not fit at phone density, so the page opens part-way down: a row is cut at the top
-     and at the bottom, and the scroll bar shows where the page is. -->
+     and at the bottom, and the scroll bar shows where the page is. 0.15 of the scroll range is about
+     half a row on both phones (iPhone 29 of 193 canvas px, row 58; Pixel 8 36 of 240, row 63, from
+     the M10 probes), so the top row reads as cut, not as a stray line. The iPad fits all eight. -->
 <section class="mk-stage" aria-label="State 3: ACCESSIBILITY, scrolled" data-m10-state="scroll">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
     <div class="wo-frame">
@@ -139,7 +145,7 @@
           <button class="wo-tab" type="button" role="tab" aria-selected="false">GENERAL</button>
           <span data-wo-glyph="tab_next"></span>
         </div>
-        <div class="wo-settings-body" role="tabpanel" data-wo-scroll="0.3" data-wo-probe="scroll-body">
+        <div class="wo-settings-body" role="tabpanel" data-wo-scroll="0.15" data-wo-probe="scroll-body">
           <div class="wo-rows">
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TEXT SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span></div>
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">REDUCED MOTION</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="REDUCED MOTION" aria-checked="false" data-wo-focus tabindex="0"></span></span></div>
@@ -201,7 +207,7 @@
             <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">ALL INPUTS</div>
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">HAPTICS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note">Phone haptics and controller rumble.</span></div>
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TOGGLE HOLDS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="TOGGLE HOLDS" aria-checked="false" data-wo-focus tabindex="0"></span></span></div>
-            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold><span data-wo-glyph="ui_accept"></span>HOLD TO RESET</button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold><span data-wo-glyph="ui_accept"></span>HOLD</button></span></div>
           </div>
         </div>
         <div class="wo-footer">
@@ -277,7 +283,7 @@
           <div class="wo-rows">
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">LANGUAGE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>English</span><span aria-hidden="true">▶</span></button></span></div>
             <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">DEVICE PROFILE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>AUTO (TOUCH)</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note">A change asks first, then resets the defaults.</span></div>
-            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESET ALL SETTINGS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold><span data-wo-glyph="ui_accept"></span>HOLD TO RESET</button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESET ALL SETTINGS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold><span data-wo-glyph="ui_accept"></span>HOLD</button></span></div>
           </div>
         </div>
         <div class="wo-footer">
@@ -309,7 +315,8 @@
       <li>The tabs stand in a column on the left. A phone is short, so a tab row would cost a row of settings.</li>
       <li>BACK sits top right, in the title row. That leaves room for five or six rows.</li>
       <li>Rows stay 44 pt tall or more. Long pages scroll; the last row fades when more lies below.</li>
-      <li>On the iPad every page fits, so nothing scrolls there.</li>
+      <li>On the iPad every touch page fits. Only the longer page with a pad connected scrolls.</li>
+      <li>Switches draw half a row tall. The whole row is the tap target, so the tap stays 44 pt.</li>
     </ul>
   </section>
   <section class="mk-section">
@@ -325,9 +332,17 @@
     <h2>How to use it</h2>
     <ul class="mk-note">
       <li>Set Device to iPhone, Android or iPad in the strip.</li>
-      <li>Set Phone controls to "tap to walk" to see the other TOUCH SCHEME.</li>
+      <li>Set Phone controls to "tap to walk" to see the other TOUCH SCHEME. Neither is decided yet.</li>
       <li>Set Input to pad to see every state with pad prompts and the focus ring.</li>
       <li>Android: add cutout= and edge= (canvas px) to see the unmeasured bands.</li>
+    </ul>
+  </section>
+  <section class="mk-section">
+    <h2>Waiting on shared code</h2>
+    <ul class="mk-note">
+      <li>Until the shared settings shell lands, the tabs sit in a row and long pages run off the panel.</li>
+      <li>Until then, both TOUCH SCHEME texts show at once, and state 4 follows the strip's input.</li>
+      <li>On the iPhone, Body rounds to 21 canvas px (16.7 pt), just under 17 pt. The shared rounding decides this.</li>
     </ul>
   </section>
 </main>

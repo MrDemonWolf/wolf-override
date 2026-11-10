@@ -13,6 +13,13 @@
   the CONTINUE prompt). Two lines are proposals, not build text: "RESTORING ..." (brief 5.6 wording)
   and the tip placeholder (brief 7.3 M04b layout 5). Art: real game files only, placed with C3's
   numbers (code/C3-assets-for-mockups.md sections 4 and 5).
+
+  The room change starts where today's build starts it: the engineer uses the SAFE POINT once it is
+  reached (main.gd _interact_checkpoint, m0_state.gd enter_records), past the open seal, and arrives
+  at the Records entry, which "stands open behind them".
+
+  URL keys this page reads (besides the strip's): at=<moment>:<ms> stops the clock at that moment
+  (the seek buttons set it); press=<moment>:<ms>[,...] presses at those times (for captures).
 -->
 <html lang="en">
 <head>
@@ -53,16 +60,31 @@
 <main class="mk-main">
   <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M04 Continue, room change and first visit</h1>
   <p class="mk-lead">What this page is for: judge the door-led room change, the Continue resume card and the slow-load view on one clock.</p>
+  <p class="mk-lead" data-wo-when="loading=m04b">You are looking at M04b: comparison only. M04 is the chosen path.</p>
   <ul class="mk-note">
     <li>M04 is the chosen path (Nathanial, November 9).</li>
     <li>M04b is a comparison only. Pick it, or both side by side, under Loading in the strip.</li>
     <li>Load (s) pretends the work is slow. The loading view shows only for a slow load.</li>
     <li>Tip and Card art change M04b only.</li>
-    <li>Any key, click, tap or pad button closes a card. A press during the short guard is ignored.</li>
-    <li>Add at=room:1000 to the address to stop the clock at one moment.</li>
+    <li>Any key, or a click, tap or pad button on the screen, closes a card. A press during the short guard is ignored.</li>
+    <li>Press a beat below to stop the clock there. Press Play to let it run.</li>
     <li>"RESTORING …" and the tip line are proposals, not build text.</li>
   </ul>
   <p class="mk-note" data-wo-when="player=missing">Playback needs the shared sequence player in wo.js (requested). Until it lands, every frame shows its first moment.</p>
+
+  <!-- Beats of M04 at the measured load, in ms from each moment's start (the same plan numbers the
+       Added time table states). M04b and slow loads use the same buttons; their beats move. -->
+  <div class="mk-stagger-row">
+    <button class="mk-btn" type="button" data-wo-seq-seek="live">Play</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="continue:0">Continue: pressed</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="continue:250">0.25 s dark</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="continue:1000">1.0 s resume card</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="continue:2680">2.6 s card times out</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="room:0">Room: SAFE POINT used</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="room:300">0.3 s dark hold</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="room:525">0.53 s control back</button>
+    <button class="mk-btn" type="button" data-wo-seq-seek="room:1500">1.5 s first-visit name</button>
+  </div>
 
   <section class="mk-section">
     <h2>Added time</h2>
@@ -97,7 +119,10 @@
   that is playing and sets each one's opacity from the plan; until it runs, only the title shows.
 -->
 <template id="m04-stage">
-  <!-- From: the title with CONTINUE pressed (the title itself is M03). -->
+  <!-- From: the title with CONTINUE pressed. A stand-in, not the title: the title is M03's template
+       (m03-title.html#m03-title), but it shows CONTINUE disabled with its "No checkpoint yet" note.
+       Once includes land and that template has a "save exists" state, this layer becomes
+       data-wo-template="m03-title.html#m03-title" in that state and these lines are deleted. -->
   <div class="wo-layer" data-wo-part="title">
     <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
     <div class="wo-safe wo-split">
@@ -179,7 +204,9 @@
   <div class="wo-fade" data-wo-part="fade"></div>
 
   <!-- The loading view (M04, slow loads only) and the loading card (M04b): one component, the next
-       room dimmed under it. Status words follow brief 5.6 (a proposal, not build text). The tip is
+       room dimmed under it. The plan picks the bits: M04's view is the status line and the sweep
+       (5.6: the name as "RESTORING ..."); M04b's card adds the H1 name, the tip and the prompt
+       (7.3 M04b layout). Status words follow brief 5.6 (a proposal, not build text). The tip is
        broken by hand into rows of at most 40 characters (brief 2.2), as DialogueBoxes would wrap it:
        a ch-wide column lets a proportional row hold about 57. -->
   <div class="wo-layer" data-wo-part="load-continue" hidden>
