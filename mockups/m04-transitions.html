@@ -9,8 +9,8 @@
   the shared sequence player in mockups/shared/wo.js plays it from the data block below on one clock
   (brief 7.1 "Loading compare"). Until that player lands, every frame shows its first moment.
 
-  Words: the build's English strings (main.gd location card rows and objectives, the title's CONTINUE,
-  the CONTINUE prompt). Two lines are proposals, not build text: "RESTORING ..." (brief 5.6 wording)
+  Words: the build's English strings (main.gd location card rows and objectives, the CONTINUE
+  prompt); the title is M03's template, included. Two lines are proposals, not build text: "RESTORING ..." (brief 5.6 wording)
   and the tip placeholder (brief 7.3 M04b layout 5). Art: real game files only, placed with C3's
   numbers (code/C3-assets-for-mockups.md sections 4 and 5).
 
@@ -71,6 +71,8 @@
     <li>Press a beat below to stop the clock there. Press Play to let it run.</li>
     <li>"RESTORING …" and the tip line are proposals, not build text.</li>
   </ul>
+  <!-- Shows only while wo.js has no data-wo-when pass (the player and that pass land together), so
+       today's page says why nothing plays. Delete this line in the same change that adds the player. -->
   <p class="mk-note" data-wo-when="player=missing">Playback needs the shared sequence player in wo.js (requested). Until it lands, every frame shows its first moment.</p>
 
   <!-- Beats of M04 at the measured load, in ms from each moment's start (the same plan numbers the
@@ -120,26 +122,25 @@
   that is playing and sets each one's opacity from the plan; until it runs, only the title shows.
 -->
 <template id="m04-stage">
-  <!-- From: the title with CONTINUE pressed. A stand-in, not the title: the title is M03's template
-       (m03-title.html#m03-title), but it shows CONTINUE disabled with its "No checkpoint yet" note.
-       Once includes land and that template has a "save exists" state, this layer becomes
-       data-wo-template="m03-title.html#m03-title" in that state and these lines are deleted. -->
-  <div class="wo-layer" data-wo-part="title">
-    <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
-    <div class="wo-safe wo-split">
-      <div></div>
-      <div class="wo-stack">
-        <div class="wo-t-display">WOLF OVERRIDE</div>
-        <button class="wo-btn is-pressed" type="button">CONTINUE</button>
-      </div>
-    </div>
+  <!-- From: the title, M03's own template (included, never copied), in the "save exists" state the
+       game shows once a SAFE POINT has saved: CONTINUE enabled and pressed, and no note (main.gd
+       _refresh_continue enables the button and empties the note when a save loads). The title has
+       been open a while when CONTINUE is pressed, so its entrance is already over: the set drops
+       data-wo-enter. The set changes the included copy only (shared request: includes and include
+       sets). -->
+  <div class="wo-layer" data-wo-seq-part="title" data-wo-template="m03-title.html#m03-title">
+    <script type="application/json" data-wo-include-set>
+      {"[data-wo-probe=\"continue\"]": {"disabled": null, "class": "is-pressed"},
+       "[data-wo-probe=\"continue-note\"]": {"hidden": ""},
+       "[data-wo-enter]": {"data-wo-enter": null}}
+    </script>
   </div>
 
   <!-- The corridor past the open seal (C3 section 4, camera at its right clamp). The engineer stands
        at the SAFE POINT's left (x 842: within its 52 px reach of 876, right of the seal's near-end
        column, which ends at x 824, and clear of the iPhone's right inset); WOLF follows through the
        doorway. -->
-  <div class="wo-world-view" data-wo-world data-wo-part="corridor" hidden>
+  <div class="wo-world-view" data-wo-world data-wo-seq-part="corridor" hidden>
     <script type="application/json">
       {"camera": "right", "framing": "auto", "grade": true, "pieces": [
         {"src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
@@ -160,7 +161,7 @@
   </div>
 
   <!-- Records Access at its entry: both actors where m0_state.enter_records() stands them (C3 section 5). -->
-  <div class="wo-world-view" data-wo-world data-wo-part="records" hidden>
+  <div class="wo-world-view" data-wo-world data-wo-seq-part="records" hidden>
     <script type="application/json">
       {"camera": "left", "framing": "auto", "grade": true, "pieces": [
         {"src": "rooms/records-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
@@ -182,7 +183,7 @@
 
   <!-- Today's top card restyled (brief 5.3, 5.5): the resume card after Continue and the first-visit
        name in a new room. Rows are main.gd's location card: location, then _objective(). -->
-  <div class="wo-layer" data-wo-part="card-corridor" hidden>
+  <div class="wo-layer" data-wo-seq-part="card-corridor" hidden>
     <div class="wo-safe wo-stack">
       <div class="wo-card wo-resume" data-wo-probe="card">
         <span class="wo-accent"></span>
@@ -191,7 +192,7 @@
       </div>
     </div>
   </div>
-  <div class="wo-layer" data-wo-part="card-records" hidden>
+  <div class="wo-layer" data-wo-seq-part="card-records" hidden>
     <div class="wo-safe wo-stack">
       <div class="wo-card wo-resume" data-wo-probe="card">
         <span class="wo-accent"></span>
@@ -202,7 +203,7 @@
   </div>
 
   <!-- The screen fade (timing.fade.out / hold / in). -->
-  <div class="wo-fade" data-wo-part="fade"></div>
+  <div class="wo-fade" data-wo-seq-part="fade"></div>
 
   <!-- The loading view (M04, slow loads only) and the loading card (M04b): one component, the next
        room dimmed under it. The plan picks the bits: M04's view is the status line and the sweep
@@ -213,30 +214,30 @@
        The plate and the dim cover the whole screen; the words sit in .wo-safe, so a long name at
        TEXT SIZE 200% wraps inside the safe rect instead of running into the iPhone insets
        (7.3 M04b accept 9). -->
-  <div class="wo-layer" data-wo-part="load-continue" hidden>
-    <div class="wo-loading-plate" data-wo-bit="keyart"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
-    <div class="wo-loading-dim" data-wo-bit="dim"></div>
+  <div class="wo-layer" data-wo-seq-part="load-continue" hidden>
+    <div class="wo-loading-plate" data-wo-seq-bit="keyart"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+    <div class="wo-loading-dim" data-wo-seq-bit="dim"></div>
     <div class="wo-safe">
       <div class="wo-loading">
-        <div class="wo-loading-name" data-wo-bit="name" data-wo-probe="load-name">MAINTENANCE / LOCKDOWN</div>
-        <div class="wo-sweep" data-wo-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-        <div class="wo-loading-status" data-wo-bit="status" data-wo-probe="load-status">RESTORING MAINTENANCE / LOCKDOWN<span data-wo-seq-percent></span></div>
-        <div class="wo-loading-tip" data-wo-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+        <div class="wo-loading-name" data-wo-seq-bit="name" data-wo-probe="load-name">MAINTENANCE / LOCKDOWN</div>
+        <div class="wo-sweep" data-wo-seq-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
+        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING MAINTENANCE / LOCKDOWN<span data-wo-seq-percent></span></div>
+        <div class="wo-loading-tip" data-wo-seq-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
       </div>
     </div>
-    <span class="wo-prompt" data-wo-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
+    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
   </div>
-  <div class="wo-layer" data-wo-part="load-room" hidden>
-    <div class="wo-loading-dim" data-wo-bit="dim"></div>
+  <div class="wo-layer" data-wo-seq-part="load-room" hidden>
+    <div class="wo-loading-dim" data-wo-seq-bit="dim"></div>
     <div class="wo-safe">
       <div class="wo-loading">
-        <div class="wo-loading-name" data-wo-bit="name" data-wo-probe="load-name">RECORDS ACCESS / FIRST COPY</div>
-        <div class="wo-sweep" data-wo-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-        <div class="wo-loading-status" data-wo-bit="status" data-wo-probe="load-status">RESTORING RECORDS ACCESS / FIRST COPY<span data-wo-seq-percent></span></div>
-        <div class="wo-loading-tip" data-wo-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+        <div class="wo-loading-name" data-wo-seq-bit="name" data-wo-probe="load-name">RECORDS ACCESS / FIRST COPY</div>
+        <div class="wo-sweep" data-wo-seq-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
+        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING RECORDS ACCESS / FIRST COPY<span data-wo-seq-percent></span></div>
+        <div class="wo-loading-tip" data-wo-seq-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
       </div>
     </div>
-    <span class="wo-prompt" data-wo-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
+    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
   </div>
 </template>
 </body>
