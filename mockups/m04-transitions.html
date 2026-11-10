@@ -65,6 +65,7 @@
     <li>M04 is the chosen path (Nathanial, November 9).</li>
     <li>M04b is a comparison only. Pick it, or both side by side, under Loading in the strip.</li>
     <li>Load (s) pretends the work is slow. The loading view shows only for a slow load.</li>
+    <li>Set Motion to reduced: the fades keep their timing and the sweep becomes a slow pulse.</li>
     <li>Tip and Card art change M04b only.</li>
     <li>Any key, or a click, tap or pad button on the screen, closes a card. A press during the short guard is ignored.</li>
     <li>Press a beat below to stop the clock there. Press Play to let it run.</li>
@@ -208,25 +209,32 @@
        (5.6: the name as "RESTORING ..."); M04b's card adds the H1 name, the tip and the prompt
        (7.3 M04b layout). Status words follow brief 5.6 (a proposal, not build text). The tip is
        broken by hand into rows of at most 40 characters (brief 2.2), as DialogueBoxes would wrap it:
-       a ch-wide column lets a proportional row hold about 57. -->
+       a ch-wide column lets a proportional row hold about 57.
+       The plate and the dim cover the whole screen; the words sit in .wo-safe, so a long name at
+       TEXT SIZE 200% wraps inside the safe rect instead of running into the iPhone insets
+       (7.3 M04b accept 9). -->
   <div class="wo-layer" data-wo-part="load-continue" hidden>
-    <div class="wo-loading">
-      <div class="wo-loading-plate" data-wo-bit="keyart"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
-      <div class="wo-loading-dim" data-wo-bit="dim"></div>
-      <div class="wo-loading-name" data-wo-bit="name" data-wo-probe="load-name">MAINTENANCE / LOCKDOWN</div>
-      <div class="wo-sweep" data-wo-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-      <div class="wo-loading-status" data-wo-bit="status" data-wo-probe="load-status">RESTORING MAINTENANCE / LOCKDOWN<span data-wo-seq-percent></span></div>
-      <div class="wo-loading-tip" data-wo-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+    <div class="wo-loading-plate" data-wo-bit="keyart"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+    <div class="wo-loading-dim" data-wo-bit="dim"></div>
+    <div class="wo-safe">
+      <div class="wo-loading">
+        <div class="wo-loading-name" data-wo-bit="name" data-wo-probe="load-name">MAINTENANCE / LOCKDOWN</div>
+        <div class="wo-sweep" data-wo-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
+        <div class="wo-loading-status" data-wo-bit="status" data-wo-probe="load-status">RESTORING MAINTENANCE / LOCKDOWN<span data-wo-seq-percent></span></div>
+        <div class="wo-loading-tip" data-wo-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+      </div>
     </div>
     <span class="wo-prompt" data-wo-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
   </div>
   <div class="wo-layer" data-wo-part="load-room" hidden>
-    <div class="wo-loading">
-      <div class="wo-loading-dim" data-wo-bit="dim"></div>
-      <div class="wo-loading-name" data-wo-bit="name" data-wo-probe="load-name">RECORDS ACCESS / FIRST COPY</div>
-      <div class="wo-sweep" data-wo-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-      <div class="wo-loading-status" data-wo-bit="status" data-wo-probe="load-status">RESTORING RECORDS ACCESS / FIRST COPY<span data-wo-seq-percent></span></div>
-      <div class="wo-loading-tip" data-wo-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+    <div class="wo-loading-dim" data-wo-bit="dim"></div>
+    <div class="wo-safe">
+      <div class="wo-loading">
+        <div class="wo-loading-name" data-wo-bit="name" data-wo-probe="load-name">RECORDS ACCESS / FIRST COPY</div>
+        <div class="wo-sweep" data-wo-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
+        <div class="wo-loading-status" data-wo-bit="status" data-wo-probe="load-status">RESTORING RECORDS ACCESS / FIRST COPY<span data-wo-seq-percent></span></div>
+        <div class="wo-loading-tip" data-wo-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+      </div>
     </div>
     <span class="wo-prompt" data-wo-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
   </div>

@@ -50,7 +50,11 @@
     input) and data-wo-glyph-all (every binding, not only the first; the stick is a binding too);
   - the Guide (Xbox button) glyph and the PlayStation, Nintendo and Steam Deck glyph families
     (Q12: Kenney CC0 or painted);
-  - the settings shell with a scrolling body (already asked for by M08, M09 and M10).
+  - the settings shell with a scrolling body (already asked for by M08, M09 and M10);
+  - a tab bar that fits the Ally: at TEXT SIZE 125% the five tabs and the LB / RB glyphs run past
+    the panel, so GENERAL and RB are cut off (M09 shows the same).
+  The map renderer keeps one callout line above the pad in every context, so the pad does not
+  jump when a context (CREDITS) has nothing above it.
 
   Words: no story text. Row names and notes from the build (game_settings.gd, main.tscn) and
   from brief 3.2 and 4.2.
@@ -74,6 +78,7 @@
     <li>Device and input come from the strip. Sizes to judge: ROG Ally (2023) and desktop.</li>
     <li>Waiting on shared: until the map renderer and binding remaps land, frames 1 to 4 and 7 show an empty map, and frame 6 still shows A.</li>
     <li>Also waiting: the controller rows (frames 5 and 6) and the Keyboard column (section 9) follow the last input instead of showing pad buttons and keys.</li>
+    <li>Also waiting: on the Ally the tab bar runs past the panel, so GENERAL and RB are cut off (frames 5 and 6; M09 too).</li>
   </ul>
   <p class="mk-note">Jump to:
     <a href="#map-play">PLAY</a> ·
@@ -223,7 +228,7 @@
         <tr data-wo-row="X / Y">
           <th>X / Y</th>
           <td data-wo-context="play"><span class="wo-callout" data-wo-button="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-button="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span> <span class="wo-callout-note">As today.</span></span></td>
-          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-button="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-button="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-button="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-button="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span> <span class="wo-callout-note">The answer cards are also a focusable pair: D-pad, then A.</span></span></td>
           <td data-wo-context="menus"><span class="wo-callout is-none" data-wo-button="X"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-button="Y"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">—</span> <span class="wo-callout-note">Godot's ui_select is also Y: keep menus free of it.</span></span></td>
           <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-button="X"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-button="Y"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">—</span></span></td>
         </tr>
@@ -432,6 +437,7 @@
       <li>The Steam Deck shoulder and trigger names are not in R3: UNVERIFIED until a Deck capture or Valve's glyph set confirms them.</li>
       <li>Nintendo still confirms with its right-hand A, so a "swap confirm and back" option goes with the Nintendo family (R3 5.4).</li>
       <li>BUTTON PROMPTS in Settings picks Auto, Keyboard, Xbox, PlayStation or Nintendo (3.2). Auto is Xbox on the ROG Ally.</li>
+      <li>ROG Ally Desktop Mode sends Enter for A and Esc for B (4.2). So Enter confirms and Esc goes back on every screen.</li>
     </ul>
   </section>
 
@@ -469,7 +475,9 @@
 
 <!-- Settings > CONTROLS in the settings shell, controller section first (3.2 H: controller
      bindings first). Each binding shows its current pad binding, whatever the last input
-     (data-wo-glyph-input="pad"); Move left and Move right show both of theirs (D-pad and stick). -->
+     (data-wo-glyph-input="pad"); Move left and Move right show both of theirs (D-pad and stick).
+     The footer is M09's (SELECT, BACK): the LB and RB glyphs already sit at the ends of the tab
+     bar, and a footer TABS item would show as a bare word on a keyboard, which has no tab keys. -->
 <template id="m11-controls">
   <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
   <div class="wo-backdrop"></div>
@@ -503,7 +511,6 @@
     <div class="wo-footer">
       <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
       <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
-      <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span> <span data-wo-glyph="tab_next"></span>TABS</span>
     </div>
   </div>
 </template>
