@@ -1,0 +1,3589 @@
+{
+  "$description": "WOLF OVERRIDE UI tokens: the one home for UI colour, type, density, motion and timing (brief 2.7). The game (UiTokens, apps/game/scripts/ui_tokens.gd) and the HTML mockups (mockups/shared/wo.js) read this file; scripts/export_ui_tokens.py writes each token's theme slots, and default_font_size from type.body.size, into assets/fonts/game_theme.tres. Format: Design Tokens Format Module 2025.10. An alias is {group.token}. Units: a dimension's px is a canvas px of the 960x540 canvas; durations are in ms; min, max, step, hard_min, hard_max and band use the unit of the token's value; hard limits are inclusive. A number token with options is a choice: its $value is the index into options. For colour, font family and font weight tokens, options lists the allowed values. status: sourced (a cited number), computed (arithmetic from cited numbers; read-only), today (the game's current value) or proposal (a design choice to tune). Entry rule: a value enters only in the change that deletes its last other copy, or as a new proposal nothing else holds. Kept out, one home each: reading_cps and row_characters (i18n/languages.json), box metrics and gradients (game_theme.tres), the canvas size (project.godot), world colours (scripts/fx/palette.gd), scene and script colour literals until B26, and in-play feel constants (impact.gd, main.gd).",
+  "color": {
+    "$description": "UI colours: base colours (what exists) and roles (what each theme slot means).",
+    "base": {
+      "$description": "Every colour the theme draws today, each written once (C2 Table B). Only theme-bound colours live here; scene and script colour literals stay in their files until B26 moves them into theme type variations. Colours are never free to tune (N2): a role picks among existing base colours.",
+      "white": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 1,
+          "hex": "#ffffff"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "white-a00": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1,
+            1,
+            1
+          ],
+          "alpha": 0,
+          "hex": "#ffffff"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "black-a00": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0,
+          "hex": "#000000"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "mist-edf5f7": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294118,
+            0.9607843,
+            0.9686275
+          ],
+          "alpha": 1,
+          "hex": "#edf5f7"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "mist-7f93a2": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4980392,
+            0.5764706,
+            0.6352941
+          ],
+          "alpha": 1,
+          "hex": "#7f93a2"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-8de5f5": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5529412,
+            0.8980392,
+            0.9607843
+          ],
+          "alpha": 1,
+          "hex": "#8de5f5"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-73ddf5": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4509804,
+            0.8666667,
+            0.9607843
+          ],
+          "alpha": 1,
+          "hex": "#73ddf5"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-64cce5": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3921569,
+            0.8,
+            0.8980392
+          ],
+          "alpha": 1,
+          "hex": "#64cce5"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-52c6e8": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3215686,
+            0.7764706,
+            0.9098039
+          ],
+          "alpha": 1,
+          "hex": "#52c6e8"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-52c6e8-a75": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3215686,
+            0.7764706,
+            0.9098039
+          ],
+          "alpha": 0.75,
+          "hex": "#52c6e8"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-52c6e8-a38": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3215686,
+            0.7764706,
+            0.9098039
+          ],
+          "alpha": 0.38,
+          "hex": "#52c6e8"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "cyan-52c6e8-a30": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3215686,
+            0.7764706,
+            0.9098039
+          ],
+          "alpha": 0.3,
+          "hex": "#52c6e8"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-4f8aa8": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3098039,
+            0.5411765,
+            0.6588235
+          ],
+          "alpha": 1,
+          "hex": "#4f8aa8"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-3f7590": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2470588,
+            0.4588235,
+            0.5647059
+          ],
+          "alpha": 1,
+          "hex": "#3f7590"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-3f7590-a90": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2470588,
+            0.4588235,
+            0.5647059
+          ],
+          "alpha": 0.9,
+          "hex": "#3f7590"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-3f7590-a85": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2470588,
+            0.4588235,
+            0.5647059
+          ],
+          "alpha": 0.85,
+          "hex": "#3f7590"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-3f7590-a60": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2470588,
+            0.4588235,
+            0.5647059
+          ],
+          "alpha": 0.6,
+          "hex": "#3f7590"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-28506a": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1568627,
+            0.3137255,
+            0.4156863
+          ],
+          "alpha": 1,
+          "hex": "#28506a"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "steel-223545": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1333333,
+            0.2078431,
+            0.2705882
+          ],
+          "alpha": 1,
+          "hex": "#223545"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-1d4663": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1137255,
+            0.2745098,
+            0.3882353
+          ],
+          "alpha": 1,
+          "hex": "#1d4663"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-234859-a95": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1372549,
+            0.2823529,
+            0.3490196
+          ],
+          "alpha": 0.95,
+          "hex": "#234859"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-174461-a85": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.09019608,
+            0.2666667,
+            0.3803922
+          ],
+          "alpha": 0.85,
+          "hex": "#174461"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-1a4160": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1019608,
+            0.254902,
+            0.3764706
+          ],
+          "alpha": 1,
+          "hex": "#1a4160"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-132a3d": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0745098,
+            0.1647059,
+            0.2392157
+          ],
+          "alpha": 1,
+          "hex": "#132a3d"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-102333": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0627451,
+            0.1372549,
+            0.2
+          ],
+          "alpha": 1,
+          "hex": "#102333"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0a2036-a62": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.03921569,
+            0.1254902,
+            0.2117647
+          ],
+          "alpha": 0.62,
+          "hex": "#0a2036"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0a2036-a40": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.03921569,
+            0.1254902,
+            0.2117647
+          ],
+          "alpha": 0.4,
+          "hex": "#0a2036"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0d1f2e": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.05098039,
+            0.1215686,
+            0.1803922
+          ],
+          "alpha": 1,
+          "hex": "#0d1f2e"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0b1a27": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.04313725,
+            0.1019608,
+            0.1529412
+          ],
+          "alpha": 1,
+          "hex": "#0b1a27"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0a1826": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.03921569,
+            0.09411765,
+            0.1490196
+          ],
+          "alpha": 1,
+          "hex": "#0a1826"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0b1622": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.04313725,
+            0.08627451,
+            0.1333333
+          ],
+          "alpha": 1,
+          "hex": "#0b1622"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-0c1621-a90": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.04705882,
+            0.08627451,
+            0.1294118
+          ],
+          "alpha": 0.9,
+          "hex": "#0c1621"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-081420": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.03137255,
+            0.07843137,
+            0.1254902
+          ],
+          "alpha": 1,
+          "hex": "#081420"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "ink-060d17-a90": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.02352941,
+            0.05098039,
+            0.09019608
+          ],
+          "alpha": 0.9,
+          "hex": "#060d17"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "shade-02060c-a60": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137,
+            0.02352941,
+            0.04705882
+          ],
+          "alpha": 0.6,
+          "hex": "#02060c"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "shade-02060c-a55": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137,
+            0.02352941,
+            0.04705882
+          ],
+          "alpha": 0.55,
+          "hex": "#02060c"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "shade-02060c-a50": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137,
+            0.02352941,
+            0.04705882
+          ],
+          "alpha": 0.5,
+          "hex": "#02060c"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "shade-02060c-a45": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.007843137,
+            0.02352941,
+            0.04705882
+          ],
+          "alpha": 0.45,
+          "hex": "#02060c"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      },
+      "shade-01040a-a75": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.003921569,
+            0.01568627,
+            0.03921569
+          ],
+          "alpha": 0.75,
+          "hex": "#01040a"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 Table B; game_theme.tres"
+          }
+        }
+      }
+    },
+    "role": {
+      "$description": "What each theme slot means. Theme slots and code read roles, never base colours. Each role names the theme slots it fills (theme); scripts/export_ui_tokens.py writes them.",
+      "control": {
+        "$description": "Rounded menu buttons (Button) and the states every button family shares.",
+        "bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-132a3d}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_normal.bg_color"
+              ]
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.base.steel-4f8aa8}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_normal.border_color"
+              ]
+            }
+          }
+        },
+        "shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-02060c-a55}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_normal.shadow_color",
+                "TouchButton_normal.shadow_color"
+              ]
+            }
+          }
+        },
+        "hover-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-1a4160}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_hover.bg_color",
+                "TerminalButton_hover.bg_color",
+                "TerminalTab_hovered.bg_color",
+                "PopupMenu_hover.bg_color"
+              ]
+            }
+          }
+        },
+        "hover-border": {
+          "$type": "color",
+          "$value": "{color.base.cyan-73ddf5}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_hover.border_color",
+                "TouchButton_hover.border_color",
+                "TerminalButton_hover.border_color",
+                "TerminalTab_hovered.border_color",
+                "PopupMenu_hover.border_color"
+              ]
+            }
+          }
+        },
+        "hover-glow": {
+          "$type": "color",
+          "$value": "{color.base.cyan-52c6e8-a38}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_hover.shadow_color",
+                "TouchButton_hover.shadow_color"
+              ]
+            }
+          }
+        },
+        "pressed-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0d1f2e}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_pressed.bg_color"
+              ]
+            }
+          }
+        },
+        "pressed-border": {
+          "$type": "color",
+          "$value": "{color.base.cyan-52c6e8}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_pressed.border_color",
+                "TerminalButton_pressed.border_color"
+              ]
+            }
+          }
+        },
+        "pressed-shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-02060c-a50}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_pressed.shadow_color"
+              ]
+            }
+          }
+        },
+        "disabled-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0c1621-a90}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_disabled.bg_color"
+              ]
+            }
+          }
+        },
+        "disabled-border": {
+          "$type": "color",
+          "$value": "{color.base.steel-223545}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_disabled.border_color",
+                "TerminalButton_disabled.border_color",
+                "TerminalTab_disabled.border_color"
+              ]
+            }
+          }
+        },
+        "text": {
+          "$type": "color",
+          "$value": "{color.base.mist-edf5f7}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button/colors/font_color",
+                "CheckButton/colors/font_color",
+                "OptionButton/colors/font_color",
+                "PopupMenu/colors/font_color"
+              ]
+            }
+          }
+        },
+        "text-disabled": {
+          "$type": "color",
+          "$value": "{color.base.mist-7f93a2}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button/colors/font_disabled_color",
+                "CheckButton/colors/font_disabled_color",
+                "OptionButton/colors/font_disabled_color"
+              ]
+            }
+          }
+        },
+        "text-active": {
+          "$type": "color",
+          "$value": "{color.base.white}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button/colors/font_focus_color",
+                "Button/colors/font_hover_color",
+                "Button/colors/font_hover_pressed_color",
+                "Button/colors/font_pressed_color",
+                "PopupMenu/colors/font_hover_color"
+              ]
+            }
+          }
+        }
+      },
+      "focus": {
+        "$description": "The focus ring every control shares (B7).",
+        "ring": {
+          "$type": "color",
+          "$value": "{color.base.cyan-8de5f5}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_focus.border_color",
+                "TouchButton_focus.border_color",
+                "TerminalButton_focus.border_color",
+                "TabBar_tab_focus.border_color"
+              ]
+            }
+          }
+        },
+        "fill": {
+          "$type": "color",
+          "$value": "{color.base.white-a00}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "Button_focus.bg_color",
+                "TouchButton_focus.bg_color",
+                "TerminalButton_focus.bg_color",
+                "TabBar_tab_focus.bg_color"
+              ]
+            }
+          }
+        }
+      },
+      "touch": {
+        "$description": "On-screen touch buttons (TouchButton: arrows, USE, PAUSE, answers).",
+        "bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0a2036-a62}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_normal.bg_color"
+              ]
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.base.cyan-52c6e8-a75}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_normal.border_color"
+              ]
+            }
+          }
+        },
+        "hover-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-174461-a85}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_hover.bg_color"
+              ]
+            }
+          }
+        },
+        "pressed-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-234859-a95}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_pressed.bg_color"
+              ]
+            }
+          }
+        },
+        "pressed-border": {
+          "$type": "color",
+          "$value": "{color.base.cyan-8de5f5}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_pressed.border_color"
+              ]
+            }
+          }
+        },
+        "pressed-shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-02060c-a45}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_pressed.shadow_color"
+              ]
+            }
+          }
+        },
+        "disabled-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0a2036-a40}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_disabled.bg_color"
+              ]
+            }
+          }
+        },
+        "disabled-border": {
+          "$type": "color",
+          "$value": "{color.base.cyan-52c6e8-a30}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TouchButton_disabled.border_color"
+              ]
+            }
+          }
+        }
+      },
+      "terminal": {
+        "$description": "The Settings terminal look: square buttons, tabs, the surface panel and drop-down menus.",
+        "bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-102333}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalButton_normal.bg_color",
+                "TerminalTab_unselected.bg_color",
+                "PopupMenu_panel.bg_color"
+              ]
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.base.steel-3f7590}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalButton_normal.border_color",
+                "TerminalTab_unselected.border_color",
+                "PopupMenu_panel.border_color"
+              ]
+            }
+          }
+        },
+        "shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-02060c-a50}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalButton_normal.shadow_color",
+                "TerminalTab_unselected.shadow_color"
+              ]
+            }
+          }
+        },
+        "hover-glow": {
+          "$type": "color",
+          "$value": "{color.base.cyan-52c6e8-a30}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalButton_hover.shadow_color",
+                "TerminalTab_hovered.shadow_color",
+                "TerminalTab_selected.shadow_color"
+              ]
+            }
+          }
+        },
+        "pressed-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0b1a27}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalButton_pressed.bg_color"
+              ]
+            }
+          }
+        },
+        "disabled-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0b1622}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalButton_disabled.bg_color",
+                "TerminalTab_disabled.bg_color"
+              ]
+            }
+          }
+        },
+        "tab-selected-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-1d4663}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalTab_selected.bg_color"
+              ]
+            }
+          }
+        },
+        "tab-selected-border": {
+          "$type": "color",
+          "$value": "{color.base.cyan-73ddf5}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalTab_selected.border_color"
+              ]
+            }
+          }
+        },
+        "panel-bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-081420}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalPanel.bg_color"
+              ]
+            }
+          }
+        },
+        "panel-border": {
+          "$type": "color",
+          "$value": "{color.base.steel-3f7590-a85}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "TerminalPanel.border_color"
+              ]
+            }
+          }
+        },
+        "popup-shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-02060c-a60}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "PopupMenu_panel.shadow_color"
+              ]
+            }
+          }
+        }
+      },
+      "slider": {
+        "$description": "HSlider track and fill.",
+        "track": {
+          "$type": "color",
+          "$value": "{color.base.steel-28506a}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "HSlider_track.bg_color"
+              ]
+            }
+          }
+        },
+        "fill": {
+          "$type": "color",
+          "$value": "{color.base.cyan-64cce5}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "HSlider_fill.bg_color"
+              ]
+            }
+          }
+        },
+        "edge": {
+          "$type": "color",
+          "$value": "{color.base.black-a00}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "HSlider_track.border_color",
+                "HSlider_fill.border_color"
+              ]
+            }
+          }
+        }
+      },
+      "hud-card": {
+        "$description": "HudCard: the play HUD's cards (top card, dialogue, hint, tutorial).",
+        "bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-060d17-a90}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "HudCard.bg_color"
+              ]
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.base.steel-3f7590-a60}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "HudCard.border_color"
+              ]
+            }
+          }
+        },
+        "shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-02060c-a60}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "HudCard.shadow_color"
+              ]
+            }
+          }
+        }
+      },
+      "menu-panel": {
+        "$description": "MenuPanel: pause, credits, changelog and end card.",
+        "bg": {
+          "$type": "color",
+          "$value": "{color.base.ink-0a1826}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "MenuPanel.bg_color"
+              ]
+            }
+          }
+        },
+        "border": {
+          "$type": "color",
+          "$value": "{color.base.steel-3f7590-a90}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "MenuPanel.border_color"
+              ]
+            }
+          }
+        },
+        "shadow": {
+          "$type": "color",
+          "$value": "{color.base.shade-01040a-a75}",
+          "$extensions": {
+            "com.mrdemonwolf.wolfoverride": {
+              "status": "today",
+              "source": "C2 Table B",
+              "theme": [
+                "MenuPanel.shadow_color"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "type": {
+    "$description": "Type roles (2.2, fixes B5). A role's size in canvas px = round(size x profile text-scale x TEXT SIZE), the same rounding as TextSize.px. Floors are per profile (profile.*.text-min).",
+    "display": {
+      "$description": "The title WOLF OVERRIDE only. 42 is today's title size; this token becomes its home.",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 42,
+          "unit": "px"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; today's title size",
+            "min": 8,
+            "max": 56,
+            "step": 1
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Montserrat",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 700,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      }
+    },
+    "h1": {
+      "$description": "Screen titles (SYSTEM SETTINGS, SESSION PAUSED). 2x Body, like Apple's ramp.",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 32,
+          "unit": "px"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; R6 7.2; APL-TYPE",
+            "min": 8,
+            "max": 56,
+            "step": 1
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Montserrat",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 700,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      }
+    },
+    "h2": {
+      "$description": "Tabs, section heads, menu buttons.",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 22,
+          "unit": "px"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; R6 7.2; APL-TYPE",
+            "min": 8,
+            "max": 56,
+            "step": 1
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Montserrat",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 600,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      }
+    },
+    "h3": {
+      "$description": "Row labels, card headers.",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 18,
+          "unit": "px"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; R6 7.2; APL-TYPE",
+            "min": 8,
+            "max": 56,
+            "step": 1
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Montserrat",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 600,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      }
+    },
+    "dialogue": {
+      "$description": "Conversation and bark text (today 23).",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 22,
+          "unit": "px"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; R6 7.2; APL-TYPE",
+            "min": 8,
+            "max": 56,
+            "step": 1
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Roboto",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 400,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.3,
+        "$description": "Two-line dialogue box. Blocks of 3 or more lines use type.body.line-height.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2",
+            "min": 1.1,
+            "max": 1.6,
+            "step": 0.05
+          }
+        }
+      }
+    },
+    "body": {
+      "$description": "Control text, notes, prompt pill, objective. Its size is also the theme's default_font_size.",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$description": "Also written to game_theme.tres default_font_size by scripts/export_ui_tokens.py.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; today's default_font_size",
+            "min": 8,
+            "max": 56,
+            "step": 1,
+            "theme": [
+              "default_font_size"
+            ]
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Roboto",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 400,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 1.5,
+        "$description": "Blocks of more than 2 lines.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "XAG101"
+          }
+        }
+      }
+    },
+    "caption": {
+      "$description": "Breadcrumb, version, hints, tags.",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 13,
+          "unit": "px"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "B5; R6 7.2; APL-TYPE",
+            "min": 8,
+            "max": 56,
+            "step": 1
+          }
+        }
+      },
+      "face": {
+        "$type": "fontFamily",
+        "$value": "Roboto",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; Q6 (no new font)",
+            "options": [
+              "Montserrat",
+              "Roboto"
+            ]
+          }
+        }
+      },
+      "weight": {
+        "$type": "fontWeight",
+        "$value": 400,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.2; shipped weights only",
+            "options": [
+              400,
+              600,
+              700
+            ]
+          }
+        }
+      }
+    },
+    "contrast": {
+      "$description": "Contrast minimums against the worst patch behind the text (XAG102).",
+      "text": {
+        "$type": "number",
+        "$value": 4.5,
+        "$description": "Ratio for normal text.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "XAG102"
+          }
+        }
+      },
+      "large": {
+        "$type": "number",
+        "$value": 3,
+        "$description": "Ratio for large text and disabled text.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "XAG102"
+          }
+        }
+      },
+      "large-size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 18,
+          "unit": "px"
+        },
+        "$description": "Text this size and up counts as large.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "XAG102"
+          }
+        }
+      }
+    }
+  },
+  "density": {
+    "$description": "Control sizes (2.3, fixes B6): row and button height, minimum hit area and gaps, in canvas px unless a unit is named.",
+    "pointer": {
+      "$type": "dimension",
+      "$value": {
+        "value": 32,
+        "unit": "px"
+      },
+      "$description": "Row and button height with mouse, keyboard or pad on desktop.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "MS-TV (desktop proxy, verify R2 #13); WCAG-TGT",
+          "min": 24,
+          "max": 40,
+          "step": 1,
+          "hard_min": 24
+        }
+      }
+    },
+    "handheld": {
+      "$type": "dimension",
+      "$value": {
+        "value": 48,
+        "unit": "px"
+      },
+      "$description": "Row and button height on the ROG Ally and other handheld PCs, all inputs. 7.5 mm needs at least 47 canvas px on the Ally (0.1614 mm each).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "MS-TGT; verify R5 W2",
+          "min": 47,
+          "max": 64,
+          "step": 1,
+          "hard_min": 47
+        }
+      }
+    },
+    "phone": {
+      "$type": "dimension",
+      "$value": {
+        "value": 58,
+        "unit": "px"
+      },
+      "$description": "Computed at run time as the larger of density.phone-min-pt and density.phone-min-dp on the device; 58 is the iPhone 14 Pro Max result (46 pt, 7.7 mm).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "computed",
+          "source": "APL-GC; G-TGT; R5 4.1"
+        }
+      }
+    },
+    "phone-min-pt": {
+      "$type": "number",
+      "$value": 44,
+      "$description": "Phone touch target minimum, in points (iOS).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "APL-GC"
+        }
+      }
+    },
+    "phone-min-dp": {
+      "$type": "number",
+      "$value": 48,
+      "$description": "Phone touch target minimum, in dp (Android): 48 x screen_get_dpi() / 160 device px, never screen_get_scale().",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "G-TGT; A-DM; gap-2"
+        }
+      }
+    },
+    "phone-minor-pt": {
+      "$type": "number",
+      "$value": 28,
+      "$description": "Minor phone targets, in points (35 canvas px on the iPhone 14 Pro Max).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "R5 4.1"
+        }
+      }
+    },
+    "touch-floor": {
+      "$type": "dimension",
+      "$value": "{density.pointer}",
+      "$description": "Touch density never goes below the pointer row (44 pt is only 30.9 canvas px on the iPad Air 13).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "gap-2"
+        }
+      }
+    },
+    "pointer-hit-min": {
+      "$type": "dimension",
+      "$value": {
+        "value": 24,
+        "unit": "px"
+      },
+      "$description": "Smallest hit area with a mouse.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "WCAG-TGT"
+        }
+      }
+    },
+    "gap": {
+      "$type": "dimension",
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Gap between targets (desktop and handheld).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "MS-SPACE; R2 3.1"
+        }
+      }
+    },
+    "gap-phone-dp": {
+      "$type": "number",
+      "$value": 8,
+      "$description": "Gap between targets on phones, in dp (10 canvas px on the iPhone 14 Pro Max).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "G-TGT"
+        }
+      }
+    },
+    "label-gap": {
+      "$type": "dimension",
+      "$value": {
+        "value": 12,
+        "unit": "px"
+      },
+      "$description": "Gap between a control and its label.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "MS-SPACE; R2 3.1"
+        }
+      }
+    },
+    "edge-pad": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "From a panel edge to its text.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "MS-SPACE; R2 3.1"
+        }
+      }
+    },
+    "touch-switch": {
+      "$type": "number",
+      "$value": 1,
+      "$description": "When the desktop profile switches to handheld density after a real touch: off, at the next screen open (rows never jump under the finger) or at once. Index into options.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "2.3",
+          "options": [
+            "off",
+            "next-screen",
+            "immediate"
+          ]
+        }
+      }
+    }
+  },
+  "profile": {
+    "$description": "Per-device-class defaults (2.4). The profile changes defaults and density, never access. Input presentation follows the last input; the profile only sets first-launch defaults.",
+    "hud-margin": {
+      "$type": "dimension",
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "HUD distance from the screen edges on desktop and handheld; phones use the OS safe area.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "MS-SPACE",
+          "min": 8,
+          "max": 32,
+          "step": 1
+        }
+      }
+    },
+    "desktop": {
+      "$description": "Mac and Windows: mouse, keyboard, optional pad.",
+      "density": {
+        "$type": "dimension",
+        "$value": "{density.pointer}",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.4"
+          }
+        }
+      },
+      "text-scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Profile text scale.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.4",
+            "min": 1,
+            "max": 1.5,
+            "step": 0.05
+          }
+        }
+      },
+      "text-min": {
+        "$type": "dimension",
+        "$value": {
+          "value": 9,
+          "unit": "px"
+        },
+        "$description": "Body height floor: 18 px at 1080p (macOS 10 pt is 7.5 canvas px, lower, and UNVERIFIED). Floors are body heights; Godot's font_size is the em, ratio UNVERIFIED (2.1).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "XAG101; R1 0"
+          }
+        }
+      }
+    },
+    "handheld": {
+      "$description": "ROG Ally (2023) and other handheld PCs: built-in Xbox-layout pad first, 10-point touch.",
+      "density": {
+        "$type": "dimension",
+        "$value": "{density.handheld}",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.4"
+          }
+        }
+      },
+      "text-scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Profile text scale.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.4",
+            "min": 1,
+            "max": 1.5,
+            "step": 0.05
+          }
+        }
+      },
+      "text-size": {
+        "$type": "number",
+        "$value": 125,
+        "$description": "TEXT SIZE default on handhelds, in percent (Make the fonts larger).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-HHG; R5 5.3"
+          }
+        }
+      },
+      "text-min": {
+        "$type": "dimension",
+        "$value": {
+          "value": 7,
+          "unit": "px"
+        },
+        "$description": "Body height floor: 14 px at 1080p (Steam Deck: 6.75).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-HH G4 (corrected); DECK"
+          }
+        }
+      },
+      "text-recommended": {
+        "$type": "dimension",
+        "$value": {
+          "value": 9,
+          "unit": "px"
+        },
+        "$description": "Recommended body height: 18 px at 1080p.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-HH G4; DECK"
+          }
+        }
+      },
+      "tv-margin-y": {
+        "$type": "dimension",
+        "$value": {
+          "value": 27,
+          "unit": "px"
+        },
+        "$description": "Optional top and bottom margin when docked to a TV.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-TV"
+          }
+        }
+      },
+      "tv-margin-x": {
+        "$type": "dimension",
+        "$value": {
+          "value": 48,
+          "unit": "px"
+        },
+        "$description": "Optional side margin when docked to a TV.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-TV"
+          }
+        }
+      },
+      "settings-frame": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Settings in the desktop card or full screen inside the safe area. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "3.1 step 5",
+            "options": [
+              "card",
+              "full"
+            ]
+          }
+        }
+      }
+    },
+    "phone": {
+      "$description": "iPhone, iPad and Android: touch first, optional pad.",
+      "density": {
+        "$type": "dimension",
+        "$value": "{density.phone}",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "2.4"
+          }
+        }
+      },
+      "text-scale": {
+        "$type": "number",
+        "$value": 1.334,
+        "$description": "Computed per device: max(text-scale-min, body-pt / (type.body.size x pt per canvas px)). 1.334 is the iPhone 14 Pro Max result; the iPad Air 13 stays 1.0. Android matches the iPhone's physical Body (2.82 mm; 1.48 on the Pixel 8).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "computed",
+            "source": "APL-GAMES; R5 5.2; R6 7.3; gap-2"
+          }
+        }
+      },
+      "text-scale-min": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Floor of the phone text scale, so a tablet never shrinks menus.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "gap-2",
+            "min": 0.75,
+            "max": 1.25,
+            "step": 0.05
+          }
+        }
+      },
+      "body-pt": {
+        "$type": "number",
+        "$value": 17,
+        "$description": "Body size on phones, in points (Apple's iOS default).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-GAMES"
+          }
+        }
+      },
+      "text-min-pt": {
+        "$type": "number",
+        "$value": 11,
+        "$description": "Smallest text on phones, in points.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-GAMES"
+          }
+        }
+      },
+      "settings-frame": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Settings in the desktop card or full screen inside the safe area. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "3.1 step 5",
+            "options": [
+              "card",
+              "full"
+            ]
+          }
+        }
+      },
+      "use-size-mm": {
+        "$type": "number",
+        "$value": 15,
+        "$description": "Height of the on-screen USE target, in mm (114 canvas px on the iPhone 14 Pro Max).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "XAG107; R7 9"
+          }
+        }
+      },
+      "use-size-min": {
+        "$type": "dimension",
+        "$value": {
+          "value": 80,
+          "unit": "px"
+        },
+        "$description": "The USE target is never smaller (9.6 mm).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "N1"
+          }
+        }
+      },
+      "pause-size": {
+        "$type": "dimension",
+        "$value": "{density.phone}",
+        "$description": "PAUSE at 44 pt, inside the safe area, clear of the Dynamic Island.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-GC; N1"
+          }
+        }
+      },
+      "move-zone": {
+        "$type": "number",
+        "$value": 0.4,
+        "$description": "The floating move pad catches touches over this share of the screen width, from the left.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "N1"
+          }
+        }
+      }
+    }
+  },
+  "motion": {
+    "$description": "UI motion (6.1). Under REDUCED MOTION, hover and focus change colour only, panels and screens fade without moving, and idle stops.",
+    "press": {
+      "$description": "A button or tappable dips; its sound plays. Starts on the input frame.",
+      "duration": {
+        "$type": "duration",
+        "$value": {
+          "value": 60,
+          "unit": "ms"
+        },
+        "$description": "UIMotion's press tween.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "R6 3.3; C2 9; NN-RT",
+            "min": 40,
+            "max": 100,
+            "step": 5,
+            "hard_max": 100,
+            "band": [
+              60,
+              100
+            ]
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 0.965,
+        "$description": "UIMotion's press scale.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "R6 3.3; C2 9",
+            "min": 0.92,
+            "max": 1,
+            "step": 0.005
+          }
+        }
+      }
+    },
+    "focus": {
+      "$description": "Hover or focus highlight.",
+      "in": {
+        "$type": "duration",
+        "$value": {
+          "value": 100,
+          "unit": "ms"
+        },
+        "$description": "UIMotion's lift tween (today it runs both ways).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "R6 3.3; MS-EASE",
+            "min": 50,
+            "max": 167,
+            "step": 1,
+            "band": [
+              83,
+              167
+            ]
+          }
+        }
+      },
+      "out": {
+        "$type": "duration",
+        "$value": {
+          "value": 80,
+          "unit": "ms"
+        },
+        "$description": "Proposal for the way back; the game keeps focus.in both ways until this is approved.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R6 3.3; MS-EASE",
+            "min": 50,
+            "max": 167,
+            "step": 1,
+            "band": [
+              83,
+              167
+            ]
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1.025,
+        "$description": "UIMotion's lift scale.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "R6 3.3; C2 9",
+            "min": 1,
+            "max": 1.06,
+            "step": 0.005
+          }
+        }
+      }
+    },
+    "panel": {
+      "$description": "Tab switch, drop-down, dialogue box in. Exits are shorter than entries.",
+      "in": {
+        "$type": "duration",
+        "$value": {
+          "value": 200,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "NN-AN",
+            "min": 100,
+            "max": 300,
+            "step": 10,
+            "hard_max": 499
+          }
+        }
+      },
+      "out": {
+        "$type": "duration",
+        "$value": {
+          "value": 150,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "NN-AN",
+            "min": 100,
+            "max": 300,
+            "step": 10,
+            "hard_max": 499
+          }
+        }
+      }
+    },
+    "screen": {
+      "$description": "Title to Settings, pause open (today's pause reveal is 120 ms).",
+      "in": {
+        "$type": "duration",
+        "$value": {
+          "value": 250,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "NN-AN",
+            "min": 120,
+            "max": 400,
+            "step": 10,
+            "hard_max": 499,
+            "band": [
+              200,
+              300
+            ]
+          }
+        }
+      },
+      "out": {
+        "$type": "duration",
+        "$value": {
+          "value": 200,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "NN-AN",
+            "min": 120,
+            "max": 400,
+            "step": 10,
+            "hard_max": 499,
+            "band": [
+              200,
+              300
+            ]
+          }
+        }
+      }
+    },
+    "stagger": {
+      "$description": "Title buttons after the logo: the whole group lands within this; any input completes it.",
+      "total": {
+        "$type": "duration",
+        "$value": {
+          "value": 400,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R6 3.3",
+            "min": 200,
+            "max": 600,
+            "step": 10
+          }
+        }
+      }
+    },
+    "idle": {
+      "$description": "Logo blink, rule sweep, light flicker: slow and irregular. Each wait is picked between period-min and period-max. Start picked for the mockups (the brief has it UNSET; M03 sets it).",
+      "period-min": {
+        "$type": "duration",
+        "$value": {
+          "value": 4000,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R6 3.3; R4 9.2; UNSET in brief",
+            "min": 1000,
+            "max": 20000,
+            "step": 500,
+            "hard_min": 1000
+          }
+        }
+      },
+      "period-max": {
+        "$type": "duration",
+        "$value": {
+          "value": 10000,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R6 3.3; R4 9.2; UNSET in brief",
+            "min": 1000,
+            "max": 20000,
+            "step": 500,
+            "hard_min": 1000
+          }
+        }
+      }
+    },
+    "reduced-pulse": {
+      "$type": "duration",
+      "$value": {
+        "value": 1000,
+        "unit": "ms"
+      },
+      "$description": "Under REDUCED MOTION the loading sweep becomes an opacity pulse with this period (1 Hz or slower).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "R4 9.5; 5.9",
+          "min": 1000,
+          "max": 4000,
+          "step": 100,
+          "hard_min": 1000
+        }
+      }
+    },
+    "ease": {
+      "$description": "Easing curves (CSS cubic-bezier order).",
+      "in": {
+        "$type": "cubicBezier",
+        "$value": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "$description": "For things entering.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-EASE"
+          }
+        }
+      },
+      "out": {
+        "$type": "cubicBezier",
+        "$value": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "$description": "For things leaving.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "MS-EASE"
+          }
+        }
+      }
+    }
+  },
+  "timing": {
+    "$description": "Screen fades, cards and the loading indicator (section 5).",
+    "fade": {
+      "$description": "Screen fades: RETRY today, door-led room changes and Continue (B22).",
+      "out": {
+        "$type": "duration",
+        "$value": {
+          "value": 250,
+          "unit": "ms"
+        },
+        "$description": "RETRY's fade out.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 5; NN-AN",
+            "min": 100,
+            "max": 450,
+            "step": 10,
+            "hard_max": 499,
+            "band": [
+              200,
+              300
+            ]
+          }
+        }
+      },
+      "hold": {
+        "$type": "duration",
+        "$value": {
+          "value": 100,
+          "unit": "ms"
+        },
+        "$description": "Dark hold between out and in on a room change.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R4 9.3",
+            "min": 100,
+            "max": 450,
+            "step": 10,
+            "hard_max": 499
+          }
+        }
+      },
+      "in": {
+        "$type": "duration",
+        "$value": {
+          "value": 350,
+          "unit": "ms"
+        },
+        "$description": "RETRY's fade in.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "today",
+            "source": "C2 5; NN-AN",
+            "min": 100,
+            "max": 450,
+            "step": 10,
+            "hard_max": 499
+          }
+        }
+      },
+      "control-return": {
+        "$type": "number",
+        "$value": 0.5,
+        "$description": "Share of the fade-in after which control returns.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R4 9.3",
+            "min": 0,
+            "max": 1,
+            "step": 0.05
+          }
+        }
+      }
+    },
+    "resume-card": {
+      "$description": "Continue: today's top card restyled (room name and objective) over the paused room.",
+      "hold": {
+        "$type": "duration",
+        "$value": {
+          "value": 2000,
+          "unit": "ms"
+        },
+        "$description": "Closes on any input or after this.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R4 9.4",
+            "min": 1000,
+            "max": 4000,
+            "step": 100
+          }
+        }
+      },
+      "guard": {
+        "$type": "duration",
+        "$value": {
+          "value": 300,
+          "unit": "ms"
+        },
+        "$description": "Input is swallowed for this long after it shows (0.6 s is the title's guard).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R4 9.4",
+            "min": 0,
+            "max": 600,
+            "step": 50
+          }
+        }
+      }
+    },
+    "first-visit": {
+      "$description": "A room's name on its first visit, over live play; never blocks input, no tips.",
+      "hold": {
+        "$type": "duration",
+        "$value": {
+          "value": 2000,
+          "unit": "ms"
+        },
+        "$description": "Same as the resume card, so one hold is learned.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R4 9.3",
+            "min": 1000,
+            "max": 3000,
+            "step": 100,
+            "band": [
+              1500,
+              2000
+            ]
+          }
+        }
+      },
+      "fade": {
+        "$type": "duration",
+        "$value": {
+          "value": 300,
+          "unit": "ms"
+        },
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R4 9.3",
+            "min": 150,
+            "max": 450,
+            "step": 10,
+            "hard_max": 499
+          }
+        }
+      }
+    },
+    "indicator": {
+      "$description": "The one shared loading indicator (5.8).",
+      "delay": {
+        "$type": "duration",
+        "$value": {
+          "value": 500,
+          "unit": "ms"
+        },
+        "$description": "Waits this long before showing.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "AX-CLPB"
+          }
+        }
+      },
+      "min-show": {
+        "$type": "duration",
+        "$value": {
+          "value": 500,
+          "unit": "ms"
+        },
+        "$description": "Once shown, stays at least this long. Also a loading card's minimum show.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "AX-CLPB"
+          }
+        }
+      }
+    },
+    "loading-view": {
+      "$description": "The loading view, only for a slow load (5.6).",
+      "delay": {
+        "$type": "duration",
+        "$value": {
+          "value": 1000,
+          "unit": "ms"
+        },
+        "$description": "No loading view under about 1 s.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "NN-PI; R4 9.5"
+          }
+        }
+      },
+      "percent-after": {
+        "$type": "duration",
+        "$value": {
+          "value": 10000,
+          "unit": "ms"
+        },
+        "$description": "Past this, a real percent joins the indicator.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "NN-PI; NN-RT"
+          }
+        }
+      }
+    },
+    "input-repeat": {
+      "$description": "Held D-pad and stick repeat in menus (pads send no echo events). Start picked for the mockups (the brief has it UNSET; M08 and M09 set it with a real pad).",
+      "delay": {
+        "$type": "duration",
+        "$value": {
+          "value": 400,
+          "unit": "ms"
+        },
+        "$description": "First repeat after the press.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "4.5; UNSET in brief",
+            "min": 150,
+            "max": 800,
+            "step": 25
+          }
+        }
+      },
+      "rate": {
+        "$type": "number",
+        "$value": 10,
+        "$description": "Repeats per second after that.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "4.5; UNSET in brief",
+            "min": 4,
+            "max": 30,
+            "step": 1
+          }
+        }
+      }
+    }
+  },
+  "dialogue": {
+    "$description": "The one dialogue box (6.3, B10): conversation, bark and system hint. Row length and reading speed live in i18n/languages.json; MAX_ROWS in dialogue_boxes.gd.",
+    "backing": {
+      "$type": "number",
+      "$value": 0.5,
+      "$description": "Opacity of the box backing; the DIALOGUE BACKING setting's default.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "XAG104; HAM 50%; TWP-OPT 33%",
+          "min": 0,
+          "max": 1,
+          "step": 0.05,
+          "band": [
+            0.33,
+            0.5
+          ]
+        }
+      }
+    },
+    "box": {
+      "$description": "Box height at the desktop profile, 100%.",
+      "height-portrait": {
+        "$type": "dimension",
+        "$value": {
+          "value": 135,
+          "unit": "px"
+        },
+        "$description": "With a portrait: about 25% of the screen.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "CELESTE-SHOT; HADES-SHOT; R7 1",
+            "min": 108,
+            "max": 162,
+            "step": 1,
+            "band": [
+              135,
+              146
+            ]
+          }
+        }
+      },
+      "height-plain": {
+        "$type": "dimension",
+        "$value": {
+          "value": 100,
+          "unit": "px"
+        },
+        "$description": "Without a portrait.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R7 B10a.2",
+            "min": 81,
+            "max": 135,
+            "step": 1
+          }
+        }
+      }
+    },
+    "portrait": {
+      "$description": "Speaker portrait (placeholder crops until B24 is settled).",
+      "size": {
+        "$type": "dimension",
+        "$value": {
+          "value": 108,
+          "unit": "px"
+        },
+        "$description": "Square, on the speaker's side.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R7 1",
+            "min": 81,
+            "max": 135,
+            "step": 1
+          }
+        }
+      }
+    },
+    "text-speed": {
+      "$description": "TEXT SPEED choices, in characters per second (Instant shows the line at once).",
+      "slow": {
+        "$type": "number",
+        "$value": 25,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R7; NETFLIX",
+            "min": 20,
+            "max": 50,
+            "step": 1,
+            "hard_min": 20
+          }
+        }
+      },
+      "normal": {
+        "$type": "number",
+        "$value": 50,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "GDM"
+          }
+        }
+      },
+      "fast": {
+        "$type": "number",
+        "$value": 100,
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "R7",
+            "min": 50,
+            "max": 200,
+            "step": 10
+          }
+        }
+      }
+    },
+    "punctuation-pause": {
+      "$type": "duration",
+      "$value": {
+        "value": 300,
+        "unit": "ms"
+      },
+      "$description": "Pause at . ? ! while typing, skipping abbreviations.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "GDM"
+        }
+      }
+    },
+    "auto-advance": {
+      "$description": "AUTO-ADVANCE (off by default): reading time from reading_cps.",
+      "min-hold": {
+        "$type": "duration",
+        "$value": {
+          "value": 1000,
+          "unit": "ms"
+        },
+        "$description": "Shortest time a line stays.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "NETFLIX; AGS"
+          }
+        }
+      },
+      "input-guard": {
+        "$type": "duration",
+        "$value": {
+          "value": 500,
+          "unit": "ms"
+        },
+        "$description": "Input is ignored this long after an auto-advanced line.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "AGS"
+          }
+        }
+      }
+    },
+    "bark": {
+      "$description": "Walk-and-talk lines as a bubble over the speaker; timed; never take USE.",
+      "min-hold": {
+        "$type": "duration",
+        "$value": {
+          "value": 1000,
+          "unit": "ms"
+        },
+        "$description": "Shortest time a bark stays.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "R7; HAM; AGS"
+          }
+        }
+      },
+      "gap": {
+        "$type": "duration",
+        "$value": {
+          "value": 250,
+          "unit": "ms"
+        },
+        "$description": "Gap between barks.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "R7; HAM; AGS"
+          }
+        }
+      }
+    }
+  },
+  "alert": {
+    "$description": "Alerts are light, not sound (6.5, B9).",
+    "beacon-rate": {
+      "$type": "number",
+      "$value": 1.0,
+      "$description": "Beacon pulse, in flashes per second. FLASHING LIGHTS Reduced makes it a steady glow.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "WCAG-FLASH; XAG118; R4 9.3",
+          "min": 0.5,
+          "max": 3,
+          "step": 0.1,
+          "hard_max": 3,
+          "band": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    "flash-area-max": {
+      "$type": "number",
+      "$value": 0.028,
+      "$description": "Share of the screen that may flash at once: 25% of any 10-degree field, about 120 x 120 canvas px (computed; assumes the WCAG reference screen fills the same view).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "computed",
+          "source": "WCAG-FLASH (corrected); verify R1 #22"
+        }
+      }
+    },
+    "large-flash-area": {
+      "$type": "number",
+      "$value": 0.2,
+      "$description": "A flash covering this share of the screen or more counts as large.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "XAG118"
+        }
+      }
+    },
+    "large-flash-swing-max": {
+      "$type": "number",
+      "$value": 0.1,
+      "$description": "A large flash keeps its brightness swing under this.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "XAG118"
+        }
+      }
+    },
+    "red-ratio": {
+      "$type": "number",
+      "$value": 0.8,
+      "$description": "R / (R + G + B) at or above this is a red flash: fade it in and hold, never strobe.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "sourced",
+          "source": "XAG118"
+        }
+      }
+    }
+  },
+  "devices": {
+    "$description": "Reference screens for the mockups and headless tests only; the game reads the real screen. Canvas size, view and camera are computed from these by the 2.5 formulas, never stored.",
+    "aspect-min": {
+      "$type": "number",
+      "$value": 1.3333333,
+      "$description": "Screens taller than 4:3 get top and bottom bars (2.5.2 rule 1). The wide bound (2.4:1) is computed from the room width, the play zoom and the canvas height.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "GD-RES; gap-2",
+          "min": 1.25,
+          "max": 1.6
+        }
+      }
+    },
+    "desktop": {
+      "$description": "Mac default window, 1280x720.",
+      "width": {
+        "$type": "number",
+        "$value": 1280,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "C2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 720,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "C2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "C2"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 0,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "ally": {
+      "$description": "ROG Ally (2023): 7 in, 1920x1080, 120 Hz, 10-point touch (every Ally model has this panel).",
+      "width": {
+        "$type": "number",
+        "$value": 1920,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "ASUS-ALLY; ASUS-XALLY; ASUS-XALLYX; R3 2.2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 1080,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "ASUS-ALLY; ASUS-XALLY; ASUS-XALLYX; R3 2.2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "ASUS-ALLY; ASUS-XALLY; ASUS-XALLYX; R3 2.2"
+          }
+        }
+      },
+      "ppi": {
+        "$type": "number",
+        "$value": 314.7,
+        "$description": "Pixels per inch.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "ASUS-ALLY; ASUS-XALLY; ASUS-XALLYX; R3 2.2"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "iphone": {
+      "$description": "iPhone 14 Pro Max, landscape: 932x430 pt at @3x (UNVERIFIED but standard).",
+      "width": {
+        "$type": "number",
+        "$value": 2796,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-14PM; verify R5 U2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 1290,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-14PM; verify R5 U2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 3,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-14PM; verify R5 U2"
+          }
+        }
+      },
+      "ppi": {
+        "$type": "number",
+        "$value": 460,
+        "$description": "Pixels per inch.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-14PM; verify R5 U2"
+          }
+        }
+      },
+      "inset-left": {
+        "$type": "number",
+        "$value": 59,
+        "$description": "Safe-area inset in landscape, in points.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "UYL14"
+          }
+        }
+      },
+      "inset-right": {
+        "$type": "number",
+        "$value": 59,
+        "$description": "Safe-area inset in landscape, in points.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "UYL14"
+          }
+        }
+      },
+      "inset-bottom": {
+        "$type": "number",
+        "$value": 21,
+        "$description": "Safe-area inset in landscape, in points.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "UYL14"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "deck": {
+      "$description": "Steam Deck LCD (reference): 7 in, 1280x800.",
+      "width": {
+        "$type": "number",
+        "$value": 1280,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "R3 2.2; gap-2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 800,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "R3 2.2; gap-2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "R3 2.2; gap-2"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "ipad": {
+      "$description": "iPad Air 13-inch (M4): 12.9 in, 1366x1024 pt at @2x (UNVERIFIED but standard). Safe-area insets not measured.",
+      "width": {
+        "$type": "number",
+        "$value": 2732,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-IPADAIR; gap-2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 2048,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-IPADAIR; gap-2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-IPADAIR; gap-2"
+          }
+        }
+      },
+      "ppi": {
+        "$type": "number",
+        "$value": 264,
+        "$description": "Pixels per inch.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-IPADAIR; gap-2"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "android": {
+      "$description": "Pixel 8 (reference Android): 6.2 in, 20:9, 60-120 Hz. Cutout and back-gesture strip widths are not measured; the mockup reads them from the URL.",
+      "width": {
+        "$type": "number",
+        "$value": 2400,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PIXEL-SPECS; gap-2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 1080,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PIXEL-SPECS; gap-2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PIXEL-SPECS; gap-2"
+          }
+        }
+      },
+      "ppi": {
+        "$type": "number",
+        "$value": 428,
+        "$description": "Pixels per inch.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PIXEL-SPECS; gap-2"
+          }
+        }
+      },
+      "density-dpi": {
+        "$type": "number",
+        "$value": 420,
+        "$description": "Android densityDpi (UNVERIFIED).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PIXEL-SPECS; gap-2 (UNVERIFIED)"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 2,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "uw21": {
+      "$description": "21:9 monitor, 2560x1080 (3440x1440 gives the same canvas).",
+      "width": {
+        "$type": "number",
+        "$value": 2560,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "gap-2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 1080,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "gap-2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "gap-2"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 0,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    },
+    "uw32": {
+      "$description": "32:9 monitor: this 3840x1080 capture stands in for 5120x1440 (same shape); the canvas pillarboxes.",
+      "width": {
+        "$type": "number",
+        "$value": 3840,
+        "$description": "Screen width in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PCGW-STS; PCGW-CELESTE; gap-2"
+          }
+        }
+      },
+      "height": {
+        "$type": "number",
+        "$value": 1080,
+        "$description": "Screen height in device px.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PCGW-STS; PCGW-CELESTE; gap-2"
+          }
+        }
+      },
+      "scale": {
+        "$type": "number",
+        "$value": 1,
+        "$description": "Device px per CSS px for the mockup frame and captures.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PCGW-STS; PCGW-CELESTE; gap-2"
+          }
+        }
+      },
+      "profile": {
+        "$type": "number",
+        "$value": 0,
+        "$description": "Which profile the device starts in. Index into options.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "2.4",
+            "options": [
+              "desktop",
+              "handheld",
+              "phone"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

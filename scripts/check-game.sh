@@ -75,6 +75,11 @@ if ! cmp -s "$work/changelog.txt" apps/game/assets/changelog.txt; then
   echo "apps/game/assets/changelog.txt is out of date: run python3 scripts/export_changelog.py and commit the result" >&2
   exit 1
 fi
+# The theme's colours and default font size are generated from the UI token file (brief 2.7); the
+# committed theme must match, and the token file must keep its limits. The script prints what is wrong.
+if ! python3 scripts/export_ui_tokens.py --check; then
+  exit 1
+fi
 
 if ! import_game "$godot" "$logs" "$limit"; then
   keep_work=1

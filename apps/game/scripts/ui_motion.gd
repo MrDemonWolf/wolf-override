@@ -3,11 +3,18 @@ extends RefCounted
 ## Hover, focus and press motion shared by every menu button.
 ## Tweens only touch scale around the control's centre and stay at or under 0.1 s, so they never
 ## hold up input and read as a nudge rather than an animation for players who want little motion.
+## The scales and times live in the UI token file (UiTokens, brief 2.7), which the mockups read too;
+## its hard limit keeps a press at or under 0.1 s, while a tuned lift may run to its slider's end.
 
-const LIFT_SCALE: Vector2 = Vector2(1.025, 1.025)
-const PRESS_SCALE: Vector2 = Vector2(0.965, 0.965)
-const LIFT_SECONDS: float = 0.1
-const PRESS_SECONDS: float = 0.06
+## The size a hovered or focused button rests at (motion.focus.scale).
+static var LIFT_SCALE: Vector2 = Vector2.ONE * UiTokens.number("motion.focus.scale")
+## The size a held button shrinks to (motion.press.scale).
+static var PRESS_SCALE: Vector2 = Vector2.ONE * UiTokens.number("motion.press.scale")
+## Seconds to lift on hover or focus and to settle back when it ends (motion.focus.in; one time both
+## ways today, while the shorter motion.focus.out is a mockup proposal only).
+static var LIFT_SECONDS: float = UiTokens.seconds("motion.focus.in")
+## Seconds to shrink when pressed (motion.press.duration), under the 0.1 s "instant" limit.
+static var PRESS_SECONDS: float = UiTokens.seconds("motion.press.duration")
 
 
 static func attach(button: BaseButton) -> void:
