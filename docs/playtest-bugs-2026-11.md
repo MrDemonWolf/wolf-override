@@ -21,8 +21,8 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
 
 1. **Handheld:** his handheld is the ROG Ally (2023). Call it that everywhere.
 2. **Loading:** "better loading screen" means a better boot, door-led room transitions, a Continue resume card, and a loading view only for a slow load (mockup M04). No tips on short loads.
-3. **Speakers:** the default speaker mark is a name tab, a colour and a small mark (WOLF's cyan eye, Rowan's badge). Painted portraits wait until B13's art rules are in place (B24).
-4. **Phone controls:** the default is the left move pad plus tapping a station or WOLF to use it. Tap-to-walk is an option in Settings.
+3. **Speakers (recommended, not yet decided):** a name tab, a colour and a small mark (WOLF's cyan eye, Rowan's badge) for now; painted portraits after B13's art rules are in place (B24). The mockups show both so Nathanial can choose by eye.
+4. **Phone controls (recommended, not yet decided):** the left move pad plus tapping a station or WOLF to use it, with tap-to-walk as a Settings option. The mockups show both so Nathanial can choose by eye.
 
 ## B1. iPhone: the game does not fill the screen
 
