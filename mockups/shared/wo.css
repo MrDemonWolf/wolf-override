@@ -1,0 +1,702 @@
+/*
+ * wo.css: the one shared stylesheet for the WOLF OVERRIDE HTML mockups (design brief 7.1).
+ *
+ * What it is for: the look of every game UI component the mockups show (.wo-*) and of the
+ * mockup's own chrome (.mk-*: control strip, device frames, Tune panel, sheets).
+ *
+ * Contract (brief 7.1, checked by export_ui_tokens.py --check-css):
+ * - It holds no token values. Every colour, font size, duration, easing and opacity is a
+ *   var(--wo-...) that mockups/shared/wo.js sets from the game's own files:
+ *   --wo-<token path> from apps/game/ui/ui.tokens.json (--wo-type-body-size, --wo-color-role-*),
+ *   --wo-<ThemeType>-<state>-{bg,border,bw,radius,pad,shadow,inset,image} and
+ *   --wo-<ThemeType>-<font colour> from game_theme.tres (box metrics stay there),
+ *   --wo-today-* from the scene or script that owns the value today,
+ *   --wo-fs-<role>, --wo-density, --wo-hit-min, --wo-edge-*, --wo-inset-*, --wo-glyph-h,
+ *   --wo-touch-*, --wo-row-ch, --wo-canvas-w/h per frame (the profile math in wo.js).
+ * - No colour literal, duration, cubic-bezier( or numeric font-size anywhere; inside .wo-*
+ *   rules no length but 0 and 1px (percentages are proportions of the element, not values).
+ *   Opacities are 0 and 1 only. Colour words never appear in names, so a named-colour scan
+ *   cannot trip on an identifier.
+ * - Units: inside a .wo-frame one CSS px is one canvas px (wo.js scales the frame).
+ */
+
+/* ------------------------------------------------------------------------------------------ */
+/* Loading and the no-fallback state                                                           */
+/* ------------------------------------------------------------------------------------------ */
+
+html[data-wo-state="loading"] body > * { visibility: hidden; }
+html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Text roles (brief 2.2). Size per frame: --wo-fs-<role>; face and weight from type.<role>.*  */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-frame, .mk-page {
+  font-synthesis: none;
+  font-family: var(--wo-type-body-face);
+  font-weight: var(--wo-type-body-weight);
+  font-variation-settings: "wght" var(--wo-type-body-weight);
+  font-size: var(--wo-fs-body);
+  line-height: var(--wo-type-body-line-height);
+}
+.wo-t-display { font-family: var(--wo-type-display-face); font-weight: var(--wo-type-display-weight); font-variation-settings: "wght" var(--wo-type-display-weight); font-size: var(--wo-fs-display); line-height: normal; }
+.wo-t-h1 { font-family: var(--wo-type-h1-face); font-weight: var(--wo-type-h1-weight); font-variation-settings: "wght" var(--wo-type-h1-weight); font-size: var(--wo-fs-h1); line-height: normal; }
+.wo-t-h2 { font-family: var(--wo-type-h2-face); font-weight: var(--wo-type-h2-weight); font-variation-settings: "wght" var(--wo-type-h2-weight); font-size: var(--wo-fs-h2); line-height: normal; }
+.wo-t-h3 { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); font-size: var(--wo-fs-h3); line-height: normal; }
+.wo-t-dialogue { font-family: var(--wo-type-dialogue-face); font-weight: var(--wo-type-dialogue-weight); font-variation-settings: "wght" var(--wo-type-dialogue-weight); font-size: var(--wo-fs-dialogue); line-height: var(--wo-type-dialogue-line-height); }
+.wo-t-body { font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); line-height: var(--wo-type-body-line-height); }
+.wo-t-caption { font-family: var(--wo-type-caption-face); font-weight: var(--wo-type-caption-weight); font-variation-settings: "wght" var(--wo-type-caption-weight); font-size: var(--wo-fs-caption); line-height: var(--wo-type-body-line-height); }
+.wo-t-muted { color: var(--wo-today-text-note); }
+
+/* ------------------------------------------------------------------------------------------ */
+/* The canvas (one per device frame)                                                           */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+  color: var(--wo-Button-font_color);
+  background: var(--wo-today-title-bg);
+}
+.wo-layer { position: absolute; inset: 0; }
+/* Layout primitives: gaps from the density tokens, never a number of their own. */
+.wo-stack { display: flex; flex-direction: column; align-items: flex-start; gap: var(--wo-density-gap); }
+.wo-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--wo-density-gap); }
+.wo-split { display: flex; align-items: flex-start; gap: var(--wo-density-edge-pad); }
+.wo-split > * { flex: 1 1 0; min-width: 0; }
+/* The HUD-safe box: inside the OS safe area and the profile's HUD margin (2.4 Safe area). */
+.wo-safe {
+  position: absolute;
+  left: var(--wo-edge-left);
+  right: var(--wo-edge-right);
+  top: var(--wo-edge-top);
+  bottom: var(--wo-edge-bottom);
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* StyleBox mixin: a component sets --sb-* to one theme type and state                         */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-btn, .wo-touch, .wo-tab, .wo-card, .wo-panel, .wo-terminal-panel, .wo-pill, .wo-box,
+.wo-nametab, .wo-bark, .wo-answer, .wo-toast, .wo-select, .wo-popup {
+  box-sizing: border-box;
+  background-color: var(--sb-bg);
+  border-style: solid;
+  border-color: var(--sb-border);
+  border-width: var(--sb-bw);
+  border-radius: var(--sb-radius);
+  padding: var(--sb-pad);
+  box-shadow: var(--sb-shadow);
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Buttons (theme Button, TerminalButton, TouchButton) with the motion tokens (6.1)            */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-btn, .wo-answer, .wo-select {
+  --sb-bg: var(--wo-Button-normal-bg); --sb-border: var(--wo-Button-normal-border); --sb-bw: var(--wo-Button-normal-bw);
+  --sb-radius: var(--wo-Button-normal-radius); --sb-pad: var(--wo-Button-normal-pad); --sb-shadow: var(--wo-Button-normal-shadow);
+  --ring-radius: var(--wo-Button-focus-radius); --ring-bw: var(--wo-Button-focus-bw); --ring-inset: var(--wo-Button-focus-inset); --ring: var(--wo-Button-focus-border);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wo-density-gap);
+  min-height: var(--wo-density);
+  min-width: var(--wo-density);
+  color: var(--wo-Button-font_color);
+  font-family: var(--wo-type-h2-face);
+  font-weight: var(--wo-type-h2-weight);
+  font-variation-settings: "wght" var(--wo-type-h2-weight);
+  font-size: var(--wo-fs-h2);
+  line-height: normal;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transform: scale(1);
+  transition: transform var(--wo-motion-focus-out) var(--wo-motion-ease-out), background-color var(--wo-motion-focus-out) var(--wo-motion-ease-out);
+}
+.wo-btn:hover, .wo-btn.is-hover, .wo-answer:hover, .wo-answer.is-hover, .wo-select:hover, .wo-select.is-hover,
+[data-ring="on"] .wo-btn:focus, [data-ring="on"] .wo-answer:focus, [data-ring="on"] .wo-select:focus, .wo-btn.is-focus, .wo-answer.is-focus {
+  --sb-bg: var(--wo-Button-hover-bg); --sb-border: var(--wo-Button-hover-border); --sb-bw: var(--wo-Button-hover-bw);
+  --sb-radius: var(--wo-Button-hover-radius); --sb-pad: var(--wo-Button-hover-pad); --sb-shadow: var(--wo-Button-hover-shadow);
+  color: var(--wo-Button-font_hover_color);
+  transform: scale(var(--wo-motion-focus-scale));
+  transition: transform var(--wo-motion-focus-in) var(--wo-motion-ease-in), background-color var(--wo-motion-focus-in) var(--wo-motion-ease-in);
+}
+.wo-btn:active, .wo-btn.is-pressed, .wo-answer:active, .wo-answer.is-pressed, .wo-select:active {
+  --sb-bg: var(--wo-Button-pressed-bg); --sb-border: var(--wo-Button-pressed-border); --sb-bw: var(--wo-Button-pressed-bw);
+  --sb-radius: var(--wo-Button-pressed-radius); --sb-pad: var(--wo-Button-pressed-pad); --sb-shadow: var(--wo-Button-pressed-shadow);
+  color: var(--wo-Button-font_pressed_color);
+  transform: scale(var(--wo-motion-press-scale));
+  transition: transform var(--wo-motion-press-duration) var(--wo-motion-ease-in);
+}
+.wo-btn[disabled], .wo-btn.is-disabled, .wo-answer[disabled], .wo-select[disabled] {
+  --sb-bg: var(--wo-Button-disabled-bg); --sb-border: var(--wo-Button-disabled-border); --sb-bw: var(--wo-Button-disabled-bw);
+  --sb-radius: var(--wo-Button-disabled-radius); --sb-pad: var(--wo-Button-disabled-pad); --sb-shadow: var(--wo-Button-disabled-shadow);
+  color: var(--wo-Button-font_disabled_color);
+  transform: scale(1);
+  cursor: default;
+}
+/* The focus ring is the theme's focus StyleBox drawn over the control, shown only after key or
+   pad input (6.2 B7): wo.js sets data-ring="on" on the frame for those inputs. */
+.wo-btn::after, .wo-answer::after, .wo-select::after, .wo-tab::after, .wo-touch::after {
+  content: "";
+  position: absolute;
+  inset: var(--ring-inset);
+  border: solid var(--ring);
+  border-width: var(--ring-bw);
+  border-radius: var(--ring-radius);
+  opacity: 0;
+  pointer-events: none;
+}
+[data-ring="on"] .wo-btn:focus::after, [data-ring="on"] .wo-answer:focus::after, [data-ring="on"] .wo-select:focus::after,
+[data-ring="on"] .wo-tab:focus::after, .wo-btn.is-focus::after, .wo-answer.is-focus::after, .wo-tab.is-focus::after { opacity: 1; }
+
+.wo-btn.wo-terminal {
+  --sb-bg: var(--wo-TerminalButton-normal-bg); --sb-border: var(--wo-TerminalButton-normal-border); --sb-bw: var(--wo-TerminalButton-normal-bw);
+  --sb-radius: var(--wo-TerminalButton-normal-radius); --sb-pad: var(--wo-TerminalButton-normal-pad); --sb-shadow: var(--wo-TerminalButton-normal-shadow);
+  --ring-radius: var(--wo-TerminalButton-focus-radius); --ring-bw: var(--wo-TerminalButton-focus-bw); --ring-inset: var(--wo-TerminalButton-focus-inset); --ring: var(--wo-TerminalButton-focus-border);
+  color: var(--wo-TerminalButton-font_color);
+}
+.wo-btn.wo-terminal:hover, .wo-btn.wo-terminal.is-hover, [data-ring="on"] .wo-btn.wo-terminal:focus, .wo-btn.wo-terminal.is-focus {
+  --sb-bg: var(--wo-TerminalButton-hover-bg); --sb-border: var(--wo-TerminalButton-hover-border); --sb-bw: var(--wo-TerminalButton-hover-bw);
+  --sb-radius: var(--wo-TerminalButton-hover-radius); --sb-pad: var(--wo-TerminalButton-hover-pad); --sb-shadow: var(--wo-TerminalButton-hover-shadow);
+}
+.wo-btn.wo-terminal:active, .wo-btn.wo-terminal.is-pressed {
+  --sb-bg: var(--wo-TerminalButton-pressed-bg); --sb-border: var(--wo-TerminalButton-pressed-border); --sb-bw: var(--wo-TerminalButton-pressed-bw);
+  --sb-radius: var(--wo-TerminalButton-pressed-radius); --sb-pad: var(--wo-TerminalButton-pressed-pad); --sb-shadow: var(--wo-TerminalButton-pressed-shadow);
+}
+.wo-btn.wo-terminal[disabled], .wo-btn.wo-terminal.is-disabled {
+  --sb-bg: var(--wo-TerminalButton-disabled-bg); --sb-border: var(--wo-TerminalButton-disabled-border); --sb-bw: var(--wo-TerminalButton-disabled-bw);
+  --sb-radius: var(--wo-TerminalButton-disabled-radius); --sb-pad: var(--wo-TerminalButton-disabled-pad); --sb-shadow: var(--wo-TerminalButton-disabled-shadow);
+}
+
+/* Touch controls: ◀ ▶ (today's size), USE (15 mm on a phone), PAUSE (44 pt on a phone). */
+.wo-touch {
+  --sb-bg: var(--wo-TouchButton-normal-bg); --sb-border: var(--wo-TouchButton-normal-border); --sb-bw: var(--wo-TouchButton-normal-bw);
+  --sb-radius: var(--wo-TouchButton-normal-radius); --sb-pad: var(--wo-TouchButton-normal-pad); --sb-shadow: var(--wo-TouchButton-normal-shadow);
+  --ring-radius: var(--wo-TouchButton-focus-radius); --ring-bw: var(--wo-TouchButton-focus-bw); --ring-inset: var(--wo-TouchButton-focus-inset); --ring: var(--wo-TouchButton-focus-border);
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--wo-TouchButton-font_color);
+  font-family: var(--wo-type-h2-face);
+  font-weight: var(--wo-type-h2-weight);
+  font-variation-settings: "wght" var(--wo-type-h2-weight);
+  font-size: var(--wo-fs-h2);
+  user-select: none;
+  touch-action: none;
+}
+.wo-touch:hover, .wo-touch.is-hover {
+  --sb-bg: var(--wo-TouchButton-hover-bg); --sb-border: var(--wo-TouchButton-hover-border); --sb-shadow: var(--wo-TouchButton-hover-shadow);
+}
+.wo-touch:active, .wo-touch.is-pressed {
+  --sb-bg: var(--wo-TouchButton-pressed-bg); --sb-border: var(--wo-TouchButton-pressed-border); --sb-shadow: var(--wo-TouchButton-pressed-shadow);
+  transform: scale(var(--wo-motion-press-scale));
+}
+.wo-touch.is-arrow { width: var(--wo-today-arrow-w); height: var(--wo-today-arrow-h); font-family: var(--wo-type-body-face); font-size: var(--wo-fs-h1); }
+.wo-touch.is-use { width: max(var(--wo-today-use-w), var(--wo-touch-use)); height: var(--wo-touch-use); }
+.wo-touch.is-pause { min-width: var(--wo-touch-pause); height: var(--wo-touch-pause); font-size: var(--wo-fs-body); }
+
+/* The floating move pad (2.3, N1): catch zone over the left share of the screen, and the soft ring
+   where the thumb landed. Its size starts at the USE target's (proposal; tune in M05). */
+.wo-move-zone { position: absolute; left: 0; top: 0; bottom: 0; width: var(--wo-move-zone); }
+.wo-move-ring {
+  position: absolute;
+  width: var(--wo-touch-use);
+  height: var(--wo-touch-use);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: solid var(--wo-TouchButton-normal-border);
+  border-width: var(--wo-TouchButton-normal-bw);
+  background: var(--wo-TouchButton-normal-bg);
+  pointer-events: none;
+}
+.wo-move-ring::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40%;
+  height: 40%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--wo-TouchButton-pressed-bg);
+  border: solid var(--wo-TouchButton-pressed-border);
+  border-width: var(--wo-TouchButton-normal-bw);
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Glyphs (4.4): a Body line tall, so the letter is the Body size; currentColor only          */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-glyph { display: inline-flex; align-items: center; gap: var(--wo-density-gap); vertical-align: middle; line-height: 0; }
+.wo-glyph[hidden] { display: none; }
+.wo-glyph-svg { height: var(--wo-glyph-h); width: auto; overflow: visible; }
+.wo-glyph-text { fill: currentColor; font-family: var(--wo-type-h2-face), var(--wo-type-body-face); font-weight: var(--wo-type-display-weight); font-variation-settings: "wght" var(--wo-type-display-weight); }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Tabs and the footer prompt bar (3.1 steps 6-7)                                              */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-tabs { display: flex; align-items: center; gap: var(--wo-density-gap); }
+.wo-tab {
+  --sb-bg: var(--wo-TerminalTabBar-tab_unselected-bg); --sb-border: var(--wo-TerminalTabBar-tab_unselected-border); --sb-bw: var(--wo-TerminalTabBar-tab_unselected-bw);
+  --sb-radius: var(--wo-TerminalTabBar-tab_unselected-radius); --sb-pad: var(--wo-TerminalTabBar-tab_unselected-pad); --sb-shadow: var(--wo-TerminalTabBar-tab_unselected-shadow);
+  --ring-radius: var(--wo-TerminalTabBar-tab_focus-radius); --ring-bw: var(--wo-TerminalTabBar-tab_focus-bw); --ring-inset: var(--wo-TerminalTabBar-tab_focus-inset); --ring: var(--wo-TerminalTabBar-tab_focus-border);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--wo-density);
+  color: var(--wo-Button-font_color);
+  font-family: var(--wo-type-h2-face);
+  font-weight: var(--wo-type-h2-weight);
+  font-variation-settings: "wght" var(--wo-type-h2-weight);
+  font-size: var(--wo-fs-h2);
+  cursor: pointer;
+  outline: none;
+}
+.wo-tab:hover, .wo-tab.is-hover {
+  --sb-bg: var(--wo-TerminalTabBar-tab_hovered-bg); --sb-border: var(--wo-TerminalTabBar-tab_hovered-border); --sb-bw: var(--wo-TerminalTabBar-tab_hovered-bw);
+  --sb-radius: var(--wo-TerminalTabBar-tab_hovered-radius); --sb-pad: var(--wo-TerminalTabBar-tab_hovered-pad); --sb-shadow: var(--wo-TerminalTabBar-tab_hovered-shadow);
+}
+.wo-tab[aria-selected="true"] {
+  --sb-bg: var(--wo-TerminalTabBar-tab_selected-bg); --sb-border: var(--wo-TerminalTabBar-tab_selected-border); --sb-bw: var(--wo-TerminalTabBar-tab_selected-bw);
+  --sb-radius: var(--wo-TerminalTabBar-tab_selected-radius); --sb-pad: var(--wo-TerminalTabBar-tab_selected-pad); --sb-shadow: var(--wo-TerminalTabBar-tab_selected-shadow);
+  color: var(--wo-Button-font_focus_color);
+}
+.wo-tab[aria-disabled="true"] {
+  --sb-bg: var(--wo-TerminalTabBar-tab_disabled-bg); --sb-border: var(--wo-TerminalTabBar-tab_disabled-border); --sb-bw: var(--wo-TerminalTabBar-tab_disabled-bw);
+  --sb-radius: var(--wo-TerminalTabBar-tab_disabled-radius); --sb-pad: var(--wo-TerminalTabBar-tab_disabled-pad); --sb-shadow: var(--wo-TerminalTabBar-tab_disabled-shadow);
+  color: var(--wo-Button-font_disabled_color);
+}
+
+.wo-footer { display: flex; align-items: center; justify-content: flex-end; gap: var(--wo-density-label-gap); min-height: var(--wo-density); }
+.wo-footer-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wo-density-gap);
+  min-height: var(--wo-hit-min);
+  color: var(--wo-Button-font_color);
+  font-size: var(--wo-fs-body);
+  cursor: pointer;
+}
+.wo-footer-item:hover { color: var(--wo-Button-font_hover_color); }
+/* On touch the footer shows a BACK button only (3.1 step 7). */
+[data-input="touch"] .wo-footer-item:not(.is-back) { display: none; }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Settings rows and their controls (3.1)                                                      */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-terminal-panel {
+  --sb-bg: var(--wo-TerminalPanel-panel-bg); --sb-border: var(--wo-TerminalPanel-panel-border); --sb-bw: var(--wo-TerminalPanel-panel-bw);
+  --sb-radius: var(--wo-TerminalPanel-panel-radius); --sb-pad: var(--wo-TerminalPanel-panel-pad); --sb-shadow: var(--wo-TerminalPanel-panel-shadow);
+  padding: var(--wo-density-edge-pad);
+}
+.wo-rows { display: flex; flex-direction: column; gap: var(--wo-density-gap); }
+.wo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: var(--wo-density-label-gap);
+  min-height: var(--wo-density);
+}
+.wo-row-label { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); font-size: var(--wo-fs-h3); line-height: normal; }
+.wo-row-control { display: flex; align-items: center; justify-content: flex-end; gap: var(--wo-density-gap); min-height: var(--wo-density); }
+.wo-row-note { flex-basis: 100%; color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
+
+.wo-select { justify-content: space-between; font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); }
+.wo-popup {
+  --sb-bg: var(--wo-PopupMenu-panel-bg); --sb-border: var(--wo-PopupMenu-panel-border); --sb-bw: var(--wo-PopupMenu-panel-bw);
+  --sb-radius: var(--wo-PopupMenu-panel-radius); --sb-pad: var(--wo-PopupMenu-panel-pad); --sb-shadow: var(--wo-PopupMenu-panel-shadow);
+  color: var(--wo-PopupMenu-font_color);
+}
+.wo-popup-item { min-height: var(--wo-density); display: flex; align-items: center; padding: var(--wo-PopupMenu-hover-pad); border-radius: var(--wo-PopupMenu-hover-radius); }
+.wo-popup-item:hover, .wo-popup-item.is-hover { background: var(--wo-PopupMenu-hover-bg); color: var(--wo-PopupMenu-font_hover_color); }
+
+/* HSlider: the theme's track and fill boxes; a round grabber half a row tall (Godot's grabber is
+   an engine icon with no file in the project, so its shape is the mockup's). */
+.wo-slider { position: relative; flex: 1; height: var(--wo-density); display: flex; align-items: center; }
+.wo-slider-track { position: relative; width: 100%; padding: var(--wo-HSlider-slider-pad); background: var(--wo-HSlider-slider-bg); border-radius: var(--wo-HSlider-slider-radius); }
+.wo-slider-fill { position: absolute; left: 0; top: 0; bottom: 0; width: var(--fill); background: var(--wo-HSlider-grabber_area-bg); border-radius: var(--wo-HSlider-grabber_area-radius); }
+.wo-slider-grab { position: absolute; top: 50%; left: var(--fill); width: calc(var(--wo-density) / 2); height: calc(var(--wo-density) / 2); transform: translate(-50%, -50%); border-radius: 50%; background: var(--wo-Button-font_color); }
+
+/* CheckButton: the theme sets only its text and focus; the switch is an engine icon, drawn here
+   from the slider's track and fill colours. */
+.wo-toggle { position: relative; width: var(--wo-density); height: calc(var(--wo-density) / 2); border-radius: var(--wo-density); background: var(--wo-HSlider-slider-bg); }
+.wo-toggle::after { content: ""; position: absolute; top: 0; left: 0; width: 50%; height: 100%; border-radius: 50%; background: var(--wo-Button-font_disabled_color); transition: left var(--wo-motion-focus-in) var(--wo-motion-ease-in); }
+.wo-toggle[aria-checked="true"] { background: var(--wo-HSlider-grabber_area-bg); }
+.wo-toggle[aria-checked="true"]::after { left: 50%; background: var(--wo-Button-font_color); }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Cards and panels (HudCard, MenuPanel, CardSheen; today's 4 px accent)                       */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-card {
+  --sb-bg: var(--wo-HudCard-panel-bg); --sb-border: var(--wo-HudCard-panel-border); --sb-bw: var(--wo-HudCard-panel-bw);
+  --sb-radius: var(--wo-HudCard-panel-radius); --sb-pad: var(--wo-HudCard-panel-pad); --sb-shadow: var(--wo-HudCard-panel-shadow);
+  position: relative;
+  overflow: hidden;
+  padding: var(--wo-density-gap) var(--wo-density-edge-pad);
+}
+.wo-panel {
+  --sb-bg: var(--wo-MenuPanel-panel-bg); --sb-border: var(--wo-MenuPanel-panel-border); --sb-bw: var(--wo-MenuPanel-panel-bw);
+  --sb-radius: var(--wo-MenuPanel-panel-radius); --sb-pad: var(--wo-MenuPanel-panel-pad); --sb-shadow: var(--wo-MenuPanel-panel-shadow);
+  position: relative;
+  overflow: hidden;
+  padding: var(--wo-density-edge-pad);
+}
+.wo-card::before, .wo-panel::before { content: ""; position: absolute; inset: 0; background: var(--wo-CardSheen-panel-image); pointer-events: none; }
+.wo-accent { position: absolute; left: 0; top: 0; bottom: 0; width: var(--wo-today-accent-w); background: var(--wo-today-accent); }
+.wo-rule { height: var(--wo-today-accent-w); background: var(--wo-today-accent); }
+.wo-backdrop { position: absolute; inset: 0; background: var(--wo-today-pause-backdrop); }
+
+/* The pause panel (6.2 Pause): title, then a column of buttons. */
+.wo-pause { display: flex; flex-direction: column; gap: var(--wo-density-gap); }
+.wo-pause .wo-btn { width: 100%; }
+
+/* Resume card and first-visit name: today's top card restyled (5.3, 5.5; no second card). */
+.wo-resume { display: flex; flex-direction: column; gap: var(--wo-density-gap); padding-left: calc(var(--wo-today-accent-w) + var(--wo-density-edge-pad)); }
+.wo-resume-room { font-family: var(--wo-type-h2-face); font-weight: var(--wo-type-h2-weight); font-variation-settings: "wght" var(--wo-type-h2-weight); font-size: var(--wo-fs-h2); line-height: normal; color: var(--wo-Button-font_focus_color); }
+.wo-resume-goal { font-size: var(--wo-fs-body); color: var(--wo-today-text-hint); }
+
+/* Controller disconnected (4.5): a card over the paused game naming the way back. */
+.wo-toast {
+  --sb-bg: var(--wo-MenuPanel-panel-bg); --sb-border: var(--wo-MenuPanel-panel-border); --sb-bw: var(--wo-MenuPanel-panel-bw);
+  --sb-radius: var(--wo-MenuPanel-panel-radius); --sb-pad: var(--wo-MenuPanel-panel-pad); --sb-shadow: var(--wo-MenuPanel-panel-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wo-density-gap);
+  padding: var(--wo-density-edge-pad);
+}
+.wo-toast-title { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); font-size: var(--wo-fs-h3); }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Dialogue (6.3): one box, name tab, speaker mark, portrait toggle, continue mark, bark       */
+/* ------------------------------------------------------------------------------------------ */
+
+[data-speaker="wolf"] { --wo-speaker: var(--wo-today-speaker-wolf); }
+[data-speaker="engineer"] { --wo-speaker: var(--wo-today-speaker-engineer); }
+[data-speaker="director"] { --wo-speaker: var(--wo-today-speaker-director); }
+[data-speaker="other"] { --wo-speaker: var(--wo-today-speaker-other); }
+
+.wo-box {
+  --sb-bg: var(--wo-dialogue-backing-color);
+  --sb-border: var(--wo-HudCard-panel-border); --sb-bw: var(--wo-HudCard-panel-bw);
+  --sb-radius: var(--wo-HudCard-panel-radius); --sb-pad: var(--wo-HudCard-panel-pad); --sb-shadow: var(--wo-HudCard-panel-shadow);
+  position: absolute;
+  left: var(--wo-edge-left);
+  right: var(--wo-edge-right);
+  bottom: var(--wo-edge-bottom);
+  min-height: var(--wo-dialogue-box-height-plain);
+  display: flex;
+  align-items: center;
+  gap: var(--wo-density-edge-pad);
+  padding: var(--wo-density-label-gap) var(--wo-density-edge-pad);
+  cursor: pointer;
+}
+html[data-speaker="portrait"] .wo-box.has-portrait { min-height: var(--wo-dialogue-box-height-portrait); }
+.wo-box.is-top { bottom: auto; top: var(--wo-edge-top); }
+/* A box in the flow of a sheet (M01), with room above it for its name tab. */
+.wo-box.is-inline { position: relative; left: auto; right: auto; bottom: auto; align-self: stretch; margin-top: var(--wo-density); }
+.wo-box-text {
+  max-width: var(--wo-row-ch);
+  font-family: var(--wo-type-dialogue-face);
+  font-weight: var(--wo-type-dialogue-weight);
+  font-variation-settings: "wght" var(--wo-type-dialogue-weight);
+  font-size: var(--wo-fs-dialogue);
+  line-height: var(--wo-type-dialogue-line-height);
+  color: var(--wo-Button-font_color);
+}
+.wo-nametab {
+  --sb-bg: var(--wo-TerminalTabBar-tab_selected-bg); --sb-border: var(--wo-speaker); --sb-bw: var(--wo-TerminalTabBar-tab_selected-bw);
+  --sb-radius: var(--wo-TerminalTabBar-tab_selected-radius); --sb-pad: var(--wo-TerminalTabBar-tab_selected-pad); --sb-shadow: none;
+  position: absolute;
+  left: var(--wo-density-edge-pad);
+  bottom: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wo-density-gap);
+  color: var(--wo-speaker);
+  font-family: var(--wo-type-h3-face);
+  font-weight: var(--wo-type-h3-weight);
+  font-variation-settings: "wght" var(--wo-type-h3-weight);
+  font-size: var(--wo-fs-h3);
+  line-height: normal;
+}
+html[data-speaker="portrait"] .wo-nametab .wo-glyph { display: none; }
+.wo-nametab .wo-glyph-svg { height: var(--wo-fs-h3); }
+/* Placeholder portrait (toggle; no portrait art exists, B24): a head crop of the stand sprite. */
+.wo-portrait { display: none; flex: none; width: var(--wo-dialogue-portrait-size); height: var(--wo-dialogue-portrait-size); border: solid var(--wo-speaker); border-width: var(--wo-HudCard-panel-bw); border-radius: var(--wo-HudCard-panel-radius); overflow: hidden; position: relative; background: var(--wo-today-title-bg); }
+html[data-speaker="portrait"] .wo-portrait { display: block; }
+.wo-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+[data-speaker="wolf"] .wo-portrait img { object-position: right; }
+.wo-portrait-label { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: var(--wo-fs-caption); color: var(--wo-today-text-muted); background: var(--wo-HudCard-panel-bg); }
+/* Continue mark: a small down triangle, bottom right, only once the line is complete. */
+.wo-continue { position: absolute; right: var(--wo-density-edge-pad); bottom: var(--wo-density-gap); width: var(--wo-fs-caption); height: var(--wo-fs-caption); background: var(--wo-speaker, var(--wo-today-accent)); clip-path: polygon(0 0, 100% 0, 50% 100%); opacity: 0; }
+.wo-box.is-complete .wo-continue { opacity: 1; transition: opacity var(--wo-motion-focus-in) var(--wo-motion-ease-in); }
+/* Bark bubble over the speaker: the box's style, timed, never takes USE. */
+.wo-bark {
+  --sb-bg: var(--wo-dialogue-backing-color);
+  --sb-border: var(--wo-speaker); --sb-bw: var(--wo-HudCard-panel-bw);
+  --sb-radius: var(--wo-HudCard-panel-radius); --sb-pad: var(--wo-HudCard-panel-pad); --sb-shadow: var(--wo-HudCard-panel-shadow);
+  position: absolute;
+  transform: translate(-50%, -100%);
+  max-width: var(--wo-row-ch);
+  padding: var(--wo-density-gap) var(--wo-density-label-gap);
+  font-family: var(--wo-type-dialogue-face);
+  font-size: var(--wo-fs-dialogue);
+  line-height: var(--wo-type-dialogue-line-height);
+  pointer-events: none;
+}
+.wo-bark::after { content: ""; position: absolute; left: 50%; top: 100%; width: var(--wo-fs-caption); height: var(--wo-fs-caption); transform: translateX(-50%); background: var(--wo-speaker); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+
+/* The prompt pill (6.3): glyph, verb, object; as tall as the profile's density; on touch the pill
+   itself is the button and shows no glyph. */
+.wo-pill {
+  --sb-bg: var(--wo-HudCard-panel-bg); --sb-border: var(--wo-HudCard-panel-border); --sb-bw: var(--wo-HudCard-panel-bw);
+  --sb-radius: var(--wo-density); --sb-pad: var(--wo-HudCard-panel-pad); --sb-shadow: var(--wo-HudCard-panel-shadow);
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wo-density-gap);
+  min-height: var(--wo-density);
+  padding: 0 var(--wo-density-label-gap);
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+  color: var(--wo-Button-font_color);
+  font-size: var(--wo-fs-body);
+  cursor: pointer;
+}
+.wo-pill.is-far { color: var(--wo-today-text-note); }
+.wo-pill.is-inline { position: relative; transform: none; }
+.wo-box ~ .wo-pill, .wo-pill.is-hidden { opacity: 0; pointer-events: none; }
+
+/* Answer cards (6.3 Choices): two cards with glyphs; full-width pair at the bottom on touch. */
+.wo-answers { position: absolute; right: var(--wo-edge-right); bottom: var(--wo-edge-bottom); display: flex; flex-direction: column; align-items: stretch; gap: var(--wo-density-gap); }
+.wo-answer { justify-content: flex-start; text-align: left; font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); }
+[data-input="touch"] .wo-answers { left: var(--wo-edge-left); flex-direction: row; }
+[data-input="touch"] .wo-answer { flex: 1; min-height: max(var(--wo-density), var(--wo-today-choice-h)); }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Loading (section 5): the shared sweep indicator, the loading view and the card              */
+/* ------------------------------------------------------------------------------------------ */
+
+/* One shared indicator (5.8): the logo's 160 x 3 track; its lit segment crosses it once per
+   BAR_SWEEP_SECONDS while a load is pending; .is-done lights the whole rule and stops. */
+.wo-sweep { position: relative; width: var(--wo-today-sweep-w); height: var(--wo-today-sweep-h); background: var(--wo-today-bar-track); overflow: hidden; }
+.wo-sweep-seg { position: absolute; top: 0; bottom: 0; left: 0; width: calc(var(--wo-today-bar-segment) * 100%); background: var(--wo-today-bar-fill); opacity: 0; }
+.wo-sweep.is-running .wo-sweep-seg { opacity: 1; animation: wo-sweep var(--wo-today-bar-sweep) linear infinite; }
+.wo-sweep.is-done .wo-sweep-seg { opacity: 1; width: 100%; animation: none; }
+@keyframes wo-sweep { from { transform: translateX(-100%); } to { transform: translateX(calc(100% / var(--wo-today-bar-segment))); } }
+/* Reduced motion (5.9): the sweep becomes a slow opacity pulse (motion.reduced-pulse). */
+html[data-motion="reduced"] .wo-sweep.is-running .wo-sweep-seg { width: 100%; animation: wo-pulse var(--wo-motion-reduced-pulse) linear infinite alternate; }
+@keyframes wo-pulse { from { opacity: 0; } to { opacity: 1; } }
+
+.wo-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--wo-density-label-gap); }
+.wo-loading-plate { position: absolute; inset: 0; overflow: hidden; }
+.wo-loading-plate img { width: 100%; height: 100%; object-fit: cover; }
+.wo-loading-dim { position: absolute; inset: 0; background: var(--wo-today-fade-color); opacity: var(--wo-loading-dim); }
+.wo-loading-name { position: relative; font-family: var(--wo-type-h1-face); font-weight: var(--wo-type-h1-weight); font-variation-settings: "wght" var(--wo-type-h1-weight); font-size: var(--wo-fs-h1); line-height: normal; color: var(--wo-Button-font_focus_color); }
+.wo-loading-status { position: relative; font-size: var(--wo-fs-body); color: var(--wo-today-text-note); }
+.wo-loading-tip { position: relative; max-width: var(--wo-row-ch); text-align: center; font-size: var(--wo-fs-body); line-height: var(--wo-type-body-line-height); }
+.wo-prompt { position: absolute; right: var(--wo-edge-right); bottom: var(--wo-edge-bottom); display: inline-flex; align-items: center; gap: var(--wo-density-gap); font-size: var(--wo-fs-body); }
+
+/* Screen fades (5.1): out, hold, in, from the timing tokens. */
+.wo-fade { position: absolute; inset: 0; background: var(--wo-today-fade-color); opacity: 0; pointer-events: none; }
+.wo-fade.is-out { opacity: 1; transition: opacity var(--wo-timing-fade-out) linear; }
+.wo-fade.is-in { opacity: 0; transition: opacity var(--wo-timing-fade-in) linear; }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Alerts (6.5): beacon glow pulsing at alert.beacon-rate; steady when flashing is reduced     */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-beacon { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(closest-side, var(--wo-today-beacon), transparent); animation: wo-beacon var(--wo-beacon-period) linear infinite; mix-blend-mode: screen; }
+@keyframes wo-beacon { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+html[data-flashing="reduced"] .wo-beacon { animation: none; opacity: 1; }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Motion: entrance stagger (5.2 step 7) and the reduced-motion switch (6.1)                   */
+/* ------------------------------------------------------------------------------------------ */
+
+.is-entering > .wo-enter { animation: wo-rise var(--wo-motion-panel-in) var(--wo-motion-ease-in) both; animation-delay: var(--wo-enter-delay); }
+.is-entering.is-entered > .wo-enter { animation: none; }
+@keyframes wo-rise { from { opacity: 0; transform: translateY(var(--wo-today-reveal-offset)); } to { opacity: 1; transform: none; } }
+html[data-motion="reduced"] .is-entering > .wo-enter { animation-name: wo-appear; }
+@keyframes wo-appear { from { opacity: 0; } to { opacity: 1; } }
+html[data-motion="reduced"] .wo-btn, html[data-motion="reduced"] .wo-btn:hover, html[data-motion="reduced"] .wo-btn:active,
+html[data-motion="reduced"] .wo-btn.is-hover, html[data-motion="reduced"] .wo-btn.is-pressed, html[data-motion="reduced"] [data-ring="on"] .wo-btn:focus,
+html[data-motion="reduced"] .wo-answer, html[data-motion="reduced"] .wo-touch { transform: none; }
+
+/* ------------------------------------------------------------------------------------------ */
+/* World frames (7.1): the room at the play zoom, bleeds and the post grade                   */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-world-view { position: absolute; inset: 0; overflow: hidden; }
+.wo-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.wo-piece { position: absolute; }
+.wo-piece > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; user-select: none; }
+.wo-piece.is-flip > img { transform: scaleX(-1); }
+.wo-bleed { overflow: hidden; }
+.wo-bleed > img { height: auto; }
+.wo-bleed.is-bottom > img { transform: scaleY(-1); }
+.wo-bleed.is-left > img { left: auto; right: 0; height: 100%; transform: scaleX(-1); }
+.wo-bleed.is-right > img { height: 100%; transform: scaleX(-1); }
+.wo-grade { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; }
+.wo-outline { outline: solid var(--wo-color-role-focus-ring); outline-width: 1px; }
+
+/* Hit areas (?hits=1): each tappable's area grown to the profile minimum plus the phone margin. */
+.wo-tap { cursor: pointer; }
+html[data-hits="on"] .wo-tap::before {
+  content: attr(data-wo-tap);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, var(--wo-hit-min));
+  height: max(100%, var(--wo-hit-min));
+  transform: translate(-50%, -50%);
+  outline: dashed var(--wo-color-role-focus-ring);
+  outline-width: 1px;
+  box-shadow: 0 0 0 var(--wo-hit-margin) var(--wo-color-role-touch-bg);
+  color: var(--wo-color-role-focus-ring);
+  font-size: var(--wo-fs-caption);
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------------------------------ */
+/* Mockup chrome (.mk-*): not game UI, plain lengths allowed; colours still from the files     */
+/* ------------------------------------------------------------------------------------------ */
+
+html, body { margin: 0; }
+body { background: var(--wo-today-title-bg); color: var(--wo-Button-font_color); }
+.mk-page { min-height: 100vh; display: flex; flex-direction: column; font-size: var(--wo-fs-body); }
+.mk-page a { color: var(--wo-today-accent); }
+.mk-main { padding: 16px 24px 48px; display: flex; flex-direction: column; gap: 24px; }
+.mk-main h1 { font-family: var(--wo-type-h1-face); font-weight: var(--wo-type-h1-weight); font-variation-settings: "wght" var(--wo-type-h1-weight); font-size: var(--wo-fs-h1); margin: 0; display: flex; align-items: center; gap: 12px; }
+.mk-main h1 img { width: 48px; height: 48px; }
+.mk-main h2 { font-family: var(--wo-type-h2-face); font-weight: var(--wo-type-h2-weight); font-variation-settings: "wght" var(--wo-type-h2-weight); font-size: var(--wo-fs-h2); margin: 8px 0 0; }
+.mk-main h3 { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); font-size: var(--wo-fs-h3); margin: 8px 0 4px; }
+.mk-main p, .mk-main li { max-width: 72ch; }
+.mk-lead { color: var(--wo-today-text-sub); margin: 0; }
+.mk-note { color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); margin: 4px 0; }
+
+/* Control strip */
+.mk-strip { position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 6px 12px; background: var(--wo-TerminalPanel-panel-bg); border-bottom: 1px solid var(--wo-TerminalPanel-panel-border); font-family: var(--wo-type-body-face); font-size: var(--wo-fs-caption); }
+.mk-home { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); color: var(--wo-today-accent); text-decoration: none; margin-right: 8px; }
+.mk-field { display: inline-flex; align-items: center; gap: 6px; }
+.mk-field span { color: var(--wo-today-text-muted); }
+.mk-field.is-check span { color: inherit; }
+.mk-strip select, .mk-tune select, .mk-tune input[type="number"] { font: inherit; color: inherit; background: var(--wo-TerminalButton-normal-bg); border: 1px solid var(--wo-TerminalButton-normal-border); border-radius: 3px; padding: 2px 4px; }
+.mk-btn { font: inherit; color: inherit; background: var(--wo-TerminalButton-normal-bg); border: 1px solid var(--wo-TerminalButton-normal-border); border-radius: 3px; padding: 3px 10px; cursor: pointer; }
+.mk-btn:hover { background: var(--wo-TerminalButton-hover-bg); border-color: var(--wo-TerminalButton-hover-border); }
+.mk-btn.is-small { padding: 0 6px; }
+.mk-status { margin-left: auto; color: var(--wo-today-text-muted); }
+
+/* Notices */
+.mk-notice { margin: 24px; padding: 16px 20px; border: 2px solid currentColor; font-family: system-ui, sans-serif; }
+.mk-notice strong { display: block; margin-bottom: 8px; }
+.mk-problems { padding: 8px 12px; background: var(--wo-color-role-hud-card-bg); border-bottom: 2px solid var(--wo-today-lamp-shut); color: var(--wo-today-label-alert); font-size: var(--wo-fs-caption); }
+
+/* Device frames */
+.mk-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+html[data-clean="1"] .mk-stage { height: 100vh; }
+.mk-device { position: relative; flex: none; overflow: hidden; background: var(--wo-today-fade-color); }
+.mk-device-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.mk-device-row.is-one { grid-template-columns: minmax(0, 1280px); }
+.mk-device-fig { margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mk-device-cap { color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
+.mk-screen { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
+.mk-safe { position: absolute; z-index: 60; pointer-events: none; display: flex; align-items: flex-end; justify-content: center; font-family: var(--wo-type-body-face); font-size: var(--wo-fs-caption); color: var(--wo-today-label-alert); }
+.mk-safe.is-inset { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--wo-today-lamp-shut) 22%, transparent) 0 6px, transparent 6px 12px); }
+.mk-safe.is-gesture { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--wo-today-amber) 30%, transparent) 0 6px, transparent 6px 12px); writing-mode: vertical-rl; }
+.mk-safe.is-unknown { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--wo-today-amber) 22%, transparent) 0 6px, transparent 6px 12px); }
+.mk-safe.is-label { height: auto !important; padding: 4px 8px; align-items: flex-start; background: color-mix(in srgb, var(--wo-today-fade-color) 70%, transparent); }
+
+/* Tune panel */
+html[data-tune="open"] body { padding-right: 420px; }
+.mk-tune { position: fixed; top: 0; right: 0; bottom: 0; width: 420px; z-index: 200; display: flex; flex-direction: column; background: var(--wo-TerminalPanel-panel-bg); border-left: 1px solid var(--wo-TerminalPanel-panel-border); font-family: var(--wo-type-body-face); font-size: var(--wo-fs-caption); }
+.mk-tune-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--wo-TerminalPanel-panel-border); }
+.mk-tune-head strong { font-family: var(--wo-type-h3-face); font-size: var(--wo-fs-h3); margin-right: auto; }
+.mk-diff { padding: 6px 10px; white-space: pre-wrap; color: var(--wo-today-text-sub); border-bottom: 1px solid var(--wo-TerminalPanel-panel-border); max-height: 40vh; overflow: auto; }
+.mk-patch { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: var(--wo-fs-caption); background: var(--wo-color-role-hud-card-bg); color: inherit; }
+.mk-tune-body { overflow: auto; padding: 4px 10px 40px; }
+.mk-tune details { border-bottom: 1px solid var(--wo-TerminalPanel-panel-border); padding: 4px 0; }
+.mk-tune summary { cursor: pointer; font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); padding: 4px 0; }
+.mk-trow { padding: 6px 0; border-top: 1px dashed var(--wo-TerminalTabBar-tab_unselected-border); }
+.mk-trow-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.mk-trow code { font-family: ui-monospace, monospace; }
+.mk-chip { padding: 0 5px; border-radius: 8px; border: 1px solid currentColor; }
+.mk-chip.is-proposal { color: var(--wo-today-accent); }
+.mk-chip.is-today { color: var(--wo-today-text-sub); }
+.mk-chip.is-sourced { color: var(--wo-today-done); }
+.mk-chip.is-computed { color: var(--wo-today-amber); }
+.mk-src { color: var(--wo-today-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+.mk-desc { color: var(--wo-today-text-muted); margin: 2px 0; }
+.mk-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 3px; }
+.mk-ctl input[type="range"] { flex: 1 1 160px; accent-color: var(--wo-today-accent); }
+.mk-ctl input[type="range"].has-band { background: linear-gradient(to right, transparent var(--band-a), color-mix(in srgb, var(--wo-today-done) 35%, transparent) var(--band-a) var(--band-b), transparent var(--band-b)); border-radius: 4px; }
+.mk-ctl input[type="number"] { width: 72px; }
+.mk-val, .mk-lim, .mk-unit, .mk-live { color: var(--wo-today-text-muted); }
+.mk-live { color: var(--wo-today-amber); }
+.mk-unlock { display: inline-flex; align-items: center; gap: 4px; color: var(--wo-today-text-muted); }
+.mk-floors > div { padding-left: 8px; }
+.is-ok { color: var(--wo-today-done); }
+.is-warn { color: var(--wo-today-amber); }
+.is-bad { color: var(--wo-today-lamp-shut); }
+td.is-bad { background: color-mix(in srgb, var(--wo-today-lamp-shut) 14%, transparent); }
+td.is-warn { background: color-mix(in srgb, var(--wo-today-amber) 12%, transparent); }
+
+/* Sheets */
+.mk-section { display: flex; flex-direction: column; gap: 8px; }
+.mk-table { border-collapse: collapse; font-size: var(--wo-fs-caption); width: 100%; }
+.mk-table th, .mk-table td { border: 1px solid var(--wo-TerminalPanel-panel-border); padding: 4px 8px; text-align: left; vertical-align: top; }
+.mk-table th { color: var(--wo-today-text-sub); font-weight: var(--wo-type-h3-weight); }
+.mk-swatch { display: inline-block; width: 18px; height: 18px; vertical-align: middle; border: 1px solid var(--wo-TerminalPanel-panel-border); background: var(--sw); }
+.mk-density { display: inline-block; vertical-align: middle; width: 64px; height: var(--d); border: 1px solid var(--wo-Button-normal-border); background: var(--wo-Button-normal-bg); }
+.mk-type-sample[data-role] { font-size: var(--wo-fs-body); }
+.mk-type-sample[data-role="display"] { font-family: var(--wo-type-display-face); font-weight: var(--wo-type-display-weight); font-variation-settings: "wght" var(--wo-type-display-weight); }
+.mk-type-sample[data-role="h1"] { font-family: var(--wo-type-h1-face); font-weight: var(--wo-type-h1-weight); font-variation-settings: "wght" var(--wo-type-h1-weight); }
+.mk-type-sample[data-role="h2"] { font-family: var(--wo-type-h2-face); font-weight: var(--wo-type-h2-weight); font-variation-settings: "wght" var(--wo-type-h2-weight); }
+.mk-type-sample[data-role="h3"] { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); }
+.mk-glyph-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.mk-glyph-cell { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 56px; color: var(--wo-Button-font_color); }
+.mk-glyph-cell figcaption { font-size: var(--wo-fs-caption); color: var(--wo-today-text-muted); }
+.mk-font-sample[data-face="Roboto"] { font-family: var(--wo-type-body-face); font-size: var(--wo-fs-h2); }
+.mk-font-sample[data-face="Montserrat"] { font-family: var(--wo-type-h1-face); font-weight: var(--wo-type-h1-weight); font-variation-settings: "wght" var(--wo-type-h1-weight); font-size: var(--wo-fs-h2); }
+.mk-motion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.mk-motion-cell { margin: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px; border: 1px solid var(--wo-TerminalPanel-panel-border); }
+.mk-motion-cell figcaption { font-size: var(--wo-fs-caption); color: var(--wo-today-text-muted); }
+.mk-beacon-demo { width: 48px; height: 48px; }
+.mk-motion-demo { width: 120px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--wo-Button-normal-bg); border: 1px solid var(--wo-Button-normal-border); border-radius: 6px; }
+.mk-motion-demo.is-press { animation: mk-press calc(var(--wo-motion-press-duration) * 12) var(--wo-motion-ease-in) infinite; }
+@keyframes mk-press { 0%, 8% { transform: scale(var(--wo-motion-press-scale)); } 9%, 100% { transform: scale(1); } }
+.mk-motion-demo.is-lift { animation: mk-lift calc(var(--wo-motion-focus-in) * 16) var(--wo-motion-ease-in) infinite; }
+@keyframes mk-lift { 0%, 40% { transform: scale(var(--wo-motion-focus-scale)); background: var(--wo-Button-hover-bg); } 50%, 100% { transform: scale(1); } }
+.mk-motion-demo.is-panel { animation: mk-panel calc(var(--wo-motion-panel-in) * 8) var(--wo-motion-ease-in) infinite; }
+@keyframes mk-panel { 0% { opacity: 0; transform: translateY(var(--wo-today-reveal-offset)); } 12%, 70% { opacity: 1; transform: none; } 80%, 100% { opacity: 0; } }
+.mk-motion-demo.is-screen { animation: mk-panel calc(var(--wo-motion-screen-in) * 8) var(--wo-motion-ease-in) infinite; }
+.mk-motion-demo.is-fade { animation: mk-fade calc((var(--wo-timing-fade-out) + var(--wo-timing-fade-hold) + var(--wo-timing-fade-in)) * 4) linear infinite; }
+@keyframes mk-fade { 0%, 60% { opacity: 1; } 66%, 72% { opacity: 0; } 85%, 100% { opacity: 1; } }
+.mk-motion-demo.is-idle.is-tick { background: var(--wo-Button-hover-bg); }
+html[data-motion="reduced"] .mk-motion-demo { animation: none; }
+.mk-stagger-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.mk-motion-stagger { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.wo-btn.is-static { cursor: default; }
+
+/* Index */
+.mk-index { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.mk-index li { padding: 12px 14px; border: 1px solid var(--wo-TerminalPanel-panel-border); background: var(--wo-TerminalPanel-panel-bg); display: flex; flex-direction: column; gap: 4px; }
+.mk-index a { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); font-size: var(--wo-fs-h3); text-decoration: none; }
+.mk-index [data-status="planned"] a { color: var(--wo-today-text-muted); }
+.mk-pill { align-self: flex-start; padding: 0 6px; border-radius: 8px; border: 1px solid currentColor; font-size: var(--wo-fs-caption); }
+.mk-index [data-status="built"] .mk-pill { color: var(--wo-today-done); }
+.mk-index [data-status="planned"] .mk-pill { color: var(--wo-today-text-muted); }

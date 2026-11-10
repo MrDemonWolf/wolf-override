@@ -1,0 +1,123 @@
+<!doctype html>
+<!--
+  M01: the foundations sheet (design brief 7.3). Three device frames side by side (desktop,
+  ROG Ally (2023), iPhone 14 Pro Max) share one <template> of sample UI; the sheets below are
+  drawn by mockups/shared/wo.js from the token file, the theme and the game's scripts.
+  Markup and per-screen data only. Words are the build's English strings; the dialogue line is
+  WOLF's, from the corridor (i18n msgid "I've got the contact. Give me a moment.").
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundations sheet</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-strip="speaker flashing">
+<main class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M01 Foundations</h1>
+  <p class="mk-lead">What this page is for: check the shared type, colour, size, motion and glyph rules before any screen uses them.</p>
+
+  <section class="mk-section">
+    <h2>Three profiles, one rulebook</h2>
+    <p class="mk-note">Each frame uses its own profile: size, text scale, TEXT SIZE default and input. Change the input in the strip to see glyphs and the focus ring follow it.</p>
+    <div class="mk-device-row">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="desktop" data-wo-fit="width"><div class="wo-frame" data-wo-template="m01-sample"></div></section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="ally" data-wo-fit="width"><div class="wo-frame" data-wo-template="m01-sample"></div></section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="iphone" data-wo-fit="width"><div class="wo-frame" data-wo-template="m01-sample"></div></section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mk-section"><h2>Type roles</h2><div data-wo-sheet="type"></div></section>
+  <section class="mk-section"><h2>Colour roles</h2><div data-wo-sheet="colors"></div></section>
+  <section class="mk-section"><h2>Scene and script colours (not in the token file yet)</h2><div data-wo-sheet="literals"></div></section>
+  <section class="mk-section"><h2>Densities</h2><div data-wo-sheet="densities"></div></section>
+  <section class="mk-section"><h2>Motion</h2><div data-wo-sheet="motion"></div></section>
+  <section class="mk-section"><h2>Glyphs</h2><div data-wo-sheet="glyphs"></div></section>
+  <section class="mk-section"><h2>Fonts</h2><div data-wo-sheet="fonts"></div></section>
+
+  <section class="mk-section">
+    <h2>World frame check</h2>
+    <p class="mk-note">The world composer with C3's corridor framing (camera at its right clamp). Props should stand on the painted floor. The device follows the strip.</p>
+    <div class="mk-device-row is-one">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+          <div class="wo-frame">
+            <div class="wo-world-view" data-wo-world>
+              <script type="application/json">
+                {"camera": "right", "framing": "auto", "grade": true, "pieces": [
+                  {"src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
+                  {"src": "doors/seal-back.png", "x": 724.80, "y": 311.13, "w": 94.5, "h": 144.5},
+                  {"src": "doors/seal-wall.png", "x": 708.43, "y": 0, "w": 91, "h": 458.5, "brightness": 0.72},
+                  {"src": "rooms/corridor-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
+                  {"src": "doors/seal-head.png", "x": 706.50, "y": 294.24, "w": 91, "h": 136.5},
+                  {"node": "BreakerArt", "tap": "BREAKER"},
+                  {"node": "RelayArt", "tap": "COOLANT RELAY"},
+                  {"node": "CheckpointArt", "tap": "SAFE POINT"},
+                  {"src": "props/bypass-gearbox.png", "x": 682, "y": 379, "w": 22.18, "h": 29.82},
+                  {"src": "props/handwheel.png", "x": 683.09, "y": 388.98, "w": 21.82, "h": 21.6},
+                  {"node": "Wolf/BodySprite", "at": [462, 423], "tap": "WOLF"},
+                  {"node": "Human/BodySprite", "at": [655, 410], "flip": true},
+                  {"src": "doors/seal-front.png", "x": 787.96, "y": 0, "w": 86.5, "h": 477}
+                ]}
+              </script>
+            </div>
+          </div>
+        </section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+</main>
+
+<template id="m01-sample">
+  <div class="wo-safe wo-split">
+    <div class="wo-panel wo-stack">
+      <div class="wo-t-h1" data-wo-probe="h1">SYSTEM SETTINGS</div>
+      <div class="wo-t-caption wo-t-muted" data-wo-probe="caption">THE DEN  /  LOCAL CONFIGURATION</div>
+      <div class="wo-tabs">
+        <span data-wo-glyph="tab_prev"></span>
+        <button class="wo-tab" type="button" aria-selected="true">DISPLAY</button>
+        <button class="wo-tab" type="button">AUDIO</button>
+        <span data-wo-glyph="tab_next"></span>
+      </div>
+      <div class="wo-rows">
+        <div class="wo-row"><span class="wo-row-label" data-wo-probe="h3">WINDOW SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-probe="row">1280 &#215; 720</button></span></div>
+        <div class="wo-row"><span class="wo-row-label">FULLSCREEN</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-checked="true" data-wo-focus tabindex="0"></span></span></div>
+      </div>
+      <div class="wo-footer">
+        <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+        <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+      </div>
+    </div>
+    <div class="wo-stack">
+      <div class="wo-cluster">
+        <button class="wo-btn" type="button" data-wo-probe="button">NEW GAME</button>
+        <button class="wo-btn is-hover" type="button">CONTINUE</button>
+        <button class="wo-btn is-focus" type="button">SETTINGS</button>
+        <button class="wo-btn is-pressed" type="button">CREDITS</button>
+        <button class="wo-btn" type="button" disabled>CHANGELOG</button>
+      </div>
+      <span class="wo-pill is-inline" data-wo-probe="pill"><span data-wo-glyph="interact"></span>READ DISPLAY</span>
+      <div class="wo-t-body" data-wo-probe="body">No checkpoint yet. Saving starts at the first SAFE POINT.</div>
+      <div class="wo-box is-inline is-complete" data-speaker="wolf">
+        <div class="wo-nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
+        <div class="wo-portrait"><img src="../apps/game/assets/characters/wolf-stand.png" alt=""><span class="wo-portrait-label">placeholder crop</span></div>
+        <div class="wo-box-text" data-wo-probe="dialogue">I've got the contact. Give me a moment.</div>
+        <span class="wo-continue"></span>
+      </div>
+    </div>
+  </div>
+</template>
+</body>
+</html>
