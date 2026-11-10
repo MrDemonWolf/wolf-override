@@ -1,0 +1,497 @@
+<!doctype html>
+<!--
+  M11: controller map and glyph sheet (design brief 7.3 M11; spec 4.1 hard rules, 4.2 button map,
+  4.4 glyphs and last-input switching, 4.6 rebinding, 3.1 layout rules, 3.2 CONTROLS rows).
+
+  What it is for: check what every Xbox button does in each part of the game (play, dialogue,
+  menus, credits), how the prompts look for each controller family, and that the in-game
+  controller map follows a remap. Sizes: 1920 x 1080 (ROG Ally (2023)) and 1280 x 720 (desktop).
+
+  Layout of the page:
+    1-4. the CONTROLLER MAP view, one frame per context (PLAY, DIALOGUE, MENUS, CREDITS);
+    5.   Settings > CONTROLS with the new CONTROLLER MAP row and the controller bindings;
+    6-7. the same CONTROLS page and the PLAY map after one remap (Interact / continue on RT);
+    8.   the 4.2 button map as a table: the one home of this page's map data;
+    9.   the glyph family table (Xbox, PlayStation, Nintendo, Steam Deck, keyboard, touch);
+    10.  the inputs the game never uses (4.1).
+  With ?clean=1 every stage is one viewport tall, so a --full capture holds each frame at real size.
+
+  Contract:
+  - Markup and per-screen data only: no inline style values and no page script (brief 7.1). The
+    look comes from mockups/shared/wo.css, every behaviour from mockups/shared/wo.js.
+  - One home for the map data: the table #m11-map-source (section 8). Each cell holds callouts
+    (.wo-callout) with data-wo-input (an Xbox input name, "LS DPad" for a pair) and, where the build
+    or the brief has one, data-wo-action (an InputMap action). The map frames read that table; they
+    hold no copy of it. A callout with data-wo-action sits on the button that action is bound to now,
+    so a remap moves it (XAG 107: remaps update controller maps).
+  - Proposals: the CONTROLLER MAP row and view on the CONTROLS page (the brief asks for a diagram
+    that follows rebinding; one view per context keeps the 3.1 one-column rule), its words
+    ("CONTROLLER MAP", "BUTTONS FOR", "NOT USED HERE", "OPEN") and the short action labels, worded
+    from 4.2. Action row names are the build's (game_settings.gd ACTION_NAMES).
+
+  Waiting on shared pieces (listed in the step's shared_requests). Until they land the map frames
+  show their header and footer with an empty map, the remap frames look like the default ones,
+  and the non-Xbox families are names, not glyphs:
+  - the pad map renderer: data-wo-padmap="<source selector>" draws the Xbox pad once and places
+    the source's callouts for the frame's data-wo-padmap-context; data-wo-padmap-name gets the
+    context's name;
+  - binding overrides: data-wo-bind="interact=RT" on a frame and a ?bind= URL key, applied by the
+    bindings reader, so glyphs, rows and the map all follow one remap;
+  - data-wo-glyph-input="pad|keyboard" (an action's glyph for one input class whatever the last
+    input) and data-wo-glyph-all (every binding, not only the first; the stick is a binding too);
+  - the Guide (Xbox button) glyph and the PlayStation, Nintendo and Steam Deck glyph families
+    (Q12: Kenney CC0 or painted);
+  - the settings shell with a scrolling body (already asked for by M08 and M09).
+
+  Words: no story text. Row names and notes from the build (game_settings.gd, main.tscn) and
+  from brief 3.2 and 4.2.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controller map</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-nav>
+<header class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M11 Controller map</h1>
+  <p class="mk-lead">What this page is for: see what every Xbox button does in each part of the game, and check that the map follows a remap.</p>
+  <ul class="mk-note">
+    <li>Frames 1 to 4: the CONTROLLER MAP view, one per context.</li>
+    <li>Frames 5 to 7: Settings &gt; CONTROLS, then one remap: Interact / continue moves to RT.</li>
+    <li>Below the frames: the button map table, the glyph families and the inputs we never use.</li>
+    <li>Device and input come from the strip. Sizes to judge: ROG Ally (2023) and desktop.</li>
+  </ul>
+  <p class="mk-note">Jump to:
+    <a href="#map-play">PLAY</a> ·
+    <a href="#map-dialogue">DIALOGUE</a> ·
+    <a href="#map-menus">MENUS</a> ·
+    <a href="#map-credits">CREDITS</a> ·
+    <a href="#controls">CONTROLS</a> ·
+    <a href="#remap">after a remap</a> ·
+    <a href="#map-table">button map table</a> ·
+    <a href="#families">glyph families</a> ·
+    <a href="#never">never used</a>
+  </p>
+</header>
+
+<!-- 1-4. The CONTROLLER MAP view, one frame per context. The frames share one template and
+     differ only in data-wo-padmap-context. -->
+<header class="mk-main" id="map-play">
+  <h2>1 · CONTROLLER MAP: PLAY</h2>
+  <ul class="mk-note">
+    <li>Opened from Settings &gt; CONTROLS (frame 5). Proposal.</li>
+    <li>Each label sits beside its button. Buttons with nothing to do here sit in one line under the pad.</li>
+    <li>D-pad left and right, or a click on the arrows, switch the context.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="map-play" data-wo-template="m11-map" data-wo-padmap-context="play"></div>
+  </section>
+</section>
+
+<header class="mk-main" id="map-dialogue">
+  <h2>2 · CONTROLLER MAP: DIALOGUE</h2>
+  <p class="mk-note">A conversation box is open. Walking and the menu buttons rest.</p>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="map-dialogue" data-wo-template="m11-map" data-wo-padmap-context="dialogue"></div>
+  </section>
+</section>
+
+<header class="mk-main" id="map-menus">
+  <h2>3 · CONTROLLER MAP: MENUS</h2>
+  <p class="mk-note">Title, Pause and Settings. X and Y stay free in menus (Y is also Godot's ui_select).</p>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="map-menus" data-wo-template="m11-map" data-wo-padmap-context="menus"></div>
+  </section>
+</section>
+
+<header class="mk-main" id="map-credits">
+  <h2>4 · CONTROLLER MAP: CREDITS / CHANGELOG</h2>
+  <p class="mk-note">Read-only pages: scroll, page and go back.</p>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="map-credits" data-wo-template="m11-map" data-wo-padmap-context="credits"></div>
+  </section>
+</section>
+
+<!-- 5. Settings > CONTROLS with the CONTROLLER MAP row first in the controller section. -->
+<header class="mk-main" id="controls">
+  <h2>5 · CONTROLS: the way in</h2>
+  <ul class="mk-note">
+    <li>CONTROLLER MAP is the first row of the controller section, so a pad player finds it at once.</li>
+    <li>The binding rows show the bound glyph, read from the build's bindings (main.gd).</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="controls" data-wo-template="m11-controls"></div>
+  </section>
+</section>
+
+<!-- 6-7. One remap: Interact / continue on RT. data-wo-bind scopes the remap to these frames, so
+     the default frames above stay as they are. -->
+<header class="mk-main" id="remap">
+  <h2>6 · CONTROLS after a remap: Interact / continue on RT</h2>
+  <ul class="mk-note">
+    <li>The player rebound Interact / continue to RT (RT does nothing in play, so there is no clash).</li>
+    <li>Menus still select with A: ui_accept is not remapped (C1 section 5).</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="controls-remap" data-wo-template="m11-controls" data-wo-bind="interact=RT"></div>
+  </section>
+</section>
+
+<header class="mk-main" id="remap-map">
+  <h2>7 · CONTROLLER MAP: PLAY after the remap</h2>
+  <ul class="mk-note">
+    <li>USE / HOLD TO CRANK now sits on RT.</li>
+    <li>A has nothing to do in play, so it joins the NOT USED HERE line.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="map-play-remap" data-wo-template="m11-map" data-wo-padmap-context="play" data-wo-bind="interact=RT"></div>
+  </section>
+</section>
+
+<!-- 8. The button map (brief 4.2): the one home of this page's map data. Rows are 4.2's inputs,
+     columns its contexts. Every cell holds one or two callouts; "—" marks a button with nothing
+     to do there. Notes are for this sheet only; the in-game map shows glyph and label. -->
+<main class="mk-main">
+  <section class="mk-section" id="map-table">
+    <h2>8 · Button map by context (brief 4.2)</h2>
+    <ul class="mk-note">
+      <li>Every 4.2 row appears once in each context.</li>
+      <li>A callout with an action follows that action's binding; the others are fixed inputs.</li>
+      <li>Hold A to crank starts on the press frame; TOGGLE HOLDS latches it (6.7.1).</li>
+    </ul>
+    <table class="mk-table wo-padmap-source" id="m11-map-source">
+      <thead>
+        <tr>
+          <th>Input (Xbox)</th>
+          <th data-wo-context-name="play">PLAY</th>
+          <th data-wo-context-name="dialogue">DIALOGUE</th>
+          <th data-wo-context-name="menus">MENUS</th>
+          <th data-wo-context-name="credits">CREDITS / CHANGELOG</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-wo-row="LS / D-pad">
+          <th>Left stick / D-pad</th>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-input="LS DPad"><span data-wo-glyph="pad:LS"></span><span data-wo-glyph="pad:DPad"></span> <span class="wo-callout-label">WALK</span> <span class="wo-callout-note">Part tilt walks, full tilt jogs.</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-input="LS DPad"><span data-wo-glyph="pad:LS"></span><span data-wo-glyph="pad:DPad"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="LS DPad"><span data-wo-glyph="pad:LS"></span><span data-wo-glyph="pad:DPad"></span> <span class="wo-callout-label">MOVE / CHANGE</span> <span class="wo-callout-note">Moves focus. One press changes a slider or option.</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout" data-wo-input="LS DPad"><span data-wo-glyph="pad:LS"></span><span data-wo-glyph="pad:DPad"></span> <span class="wo-callout-label">SCROLL</span> <span class="wo-callout-note">Stick, or D-pad up and down.</span></span></td>
+        </tr>
+        <tr data-wo-row="A">
+          <th>A</th>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-input="A" data-wo-action="interact"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">USE / HOLD TO CRANK</span> <span class="wo-callout-note">Uses the target in reach on the press frame.</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-input="A" data-wo-action="interact"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">FINISH LINE, THEN NEXT</span> <span class="wo-callout-note">First press shows the whole line; the next advances.</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="A" data-wo-action="ui_accept"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">SELECT</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-input="A"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">—</span></span></td>
+        </tr>
+        <tr data-wo-row="B">
+          <th>B</th>
+          <td data-wo-context="play"><span class="wo-callout is-none" data-wo-input="B"><span data-wo-glyph="pad:B"></span> <span class="wo-callout-label">—</span> <span class="wo-callout-note">Reserved in play.</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-input="B"><span data-wo-glyph="pad:B"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="B" data-wo-action="ui_cancel"><span data-wo-glyph="pad:B"></span> <span class="wo-callout-label">BACK</span> <span class="wo-callout-note">Back one level. At the Pause menu: resume.</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout" data-wo-input="B" data-wo-action="ui_cancel"><span data-wo-glyph="pad:B"></span> <span class="wo-callout-label">BACK TO TITLE</span></span></td>
+        </tr>
+        <tr data-wo-row="X / Y">
+          <th>X / Y</th>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-input="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-input="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span> <span class="wo-callout-note">As today.</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-input="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-input="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout is-none" data-wo-input="X"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-input="Y"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">—</span> <span class="wo-callout-note">Godot's ui_select is also Y: keep menus free of it.</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-input="X"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-input="Y"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">—</span></span></td>
+        </tr>
+        <tr data-wo-row="LB / RB">
+          <th>LB / RB</th>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-input="LB"><span data-wo-glyph="pad:LB"></span> <span class="wo-callout-label">PREVIOUS TARGET</span></span> <span class="wo-callout" data-wo-input="RB"><span data-wo-glyph="pad:RB"></span> <span class="wo-callout-label">NEXT TARGET</span> <span class="wo-callout-note">Targets in reach. Our own design: tune in play.</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-input="LB"><span data-wo-glyph="pad:LB"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-input="RB"><span data-wo-glyph="pad:RB"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="LB" data-wo-action="tab_prev"><span data-wo-glyph="pad:LB"></span> <span class="wo-callout-label">PREVIOUS TAB</span></span> <span class="wo-callout" data-wo-input="RB" data-wo-action="tab_next"><span data-wo-glyph="pad:RB"></span> <span class="wo-callout-label">NEXT TAB</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-input="LB"><span data-wo-glyph="pad:LB"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-input="RB"><span data-wo-glyph="pad:RB"></span> <span class="wo-callout-label">—</span></span></td>
+        </tr>
+        <tr data-wo-row="LT / RT">
+          <th>LT / RT</th>
+          <td data-wo-context="play"><span class="wo-callout is-none" data-wo-input="LT"><span data-wo-glyph="pad:LT"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-input="RT"><span data-wo-glyph="pad:RT"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-input="LT"><span data-wo-glyph="pad:LT"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-input="RT"><span data-wo-glyph="pad:RT"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="LT" data-wo-action="page_up"><span data-wo-glyph="pad:LT"></span> <span class="wo-callout-label">PAGE UP</span></span> <span class="wo-callout" data-wo-input="RT" data-wo-action="page_down"><span data-wo-glyph="pad:RT"></span> <span class="wo-callout-label">PAGE DOWN</span> <span class="wo-callout-note">Long lists.</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout" data-wo-input="LT" data-wo-action="page_up"><span data-wo-glyph="pad:LT"></span> <span class="wo-callout-label">PAGE UP</span></span> <span class="wo-callout" data-wo-input="RT" data-wo-action="page_down"><span data-wo-glyph="pad:RT"></span> <span class="wo-callout-label">PAGE DOWN</span></span></td>
+        </tr>
+        <tr data-wo-row="Right stick">
+          <th>Right stick</th>
+          <td data-wo-context="play"><span class="wo-callout is-none" data-wo-input="RS"><span data-wo-glyph="pad:RS"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-input="RS"><span data-wo-glyph="pad:RS"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="RS"><span data-wo-glyph="pad:RS"></span> <span class="wo-callout-label">SCROLL</span> <span class="wo-callout-note">Long pages.</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout" data-wo-input="RS"><span data-wo-glyph="pad:RS"></span> <span class="wo-callout-label">SCROLL</span></span></td>
+        </tr>
+        <tr data-wo-row="Menu">
+          <th>Menu (≡)</th>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-input="Menu" data-wo-action="pause_game"><span data-wo-glyph="pad:Menu"></span> <span class="wo-callout-label">PAUSE</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-input="Menu" data-wo-action="pause_game"><span data-wo-glyph="pad:Menu"></span> <span class="wo-callout-label">PAUSE</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout" data-wo-input="Menu" data-wo-action="pause_game"><span data-wo-glyph="pad:Menu"></span> <span class="wo-callout-label">RESUME / BACK</span> <span class="wo-callout-note">Pause menu: resume. Settings: back.</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-input="Menu"><span data-wo-glyph="pad:Menu"></span> <span class="wo-callout-label">—</span></span></td>
+        </tr>
+        <tr data-wo-row="View">
+          <th>View</th>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-input="View" data-wo-action="objective"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">OBJECTIVE / HOLD: SHOW USABLE</span> <span class="wo-callout-note">Hold outlines everything usable in the room (Q8).</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-input="View"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="menus"><span class="wo-callout is-none" data-wo-input="View"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">—</span></span></td>
+          <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-input="View"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">—</span></span></td>
+        </tr>
+        <tr data-wo-row="Xbox button">
+          <th>Xbox button</th>
+          <td colspan="4" data-wo-context="play dialogue menus credits"><span class="wo-callout is-system" data-wo-input="Guide"><span class="wo-callout-label">SYSTEM</span> <span class="wo-callout-note">Reserved by the system: Game Bar, app switch. The game never reads it.</span></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 9. Glyph families (brief 4.4, R3 5.1 and 5.2). Rows are the prompts the game shows; the
+       position column says which physical button each family prints. The Xbox column uses the
+       shared glyphs; the keyboard column reads the build's bindings by action. -->
+  <section class="mk-section" id="families">
+    <h2>9 · Glyph families (brief 4.4)</h2>
+    <ul class="mk-note">
+      <li>The family comes from the pad's vendor ID first, its name second. Never the GUID.</li>
+      <li>Godot's buttons are positional: on a Nintendo pad the south button is printed B.</li>
+      <li>Keyboard glyphs show only after a key press. Touch shows no glyph: the on-screen control is the button.</li>
+      <li>PlayStation, Nintendo and Steam Deck are names until their glyphs exist (Q12: Kenney CC0 or painted).</li>
+    </ul>
+    <table class="mk-table">
+      <thead>
+        <tr>
+          <th>Prompt</th>
+          <th>Position</th>
+          <th>Xbox</th>
+          <th>PlayStation</th>
+          <th>Nintendo</th>
+          <th>Steam Deck</th>
+          <th>Keyboard</th>
+          <th>Touch</th>
+        </tr>
+        <tr>
+          <th>Chosen when</th>
+          <th></th>
+          <th>Vendor 1118 (Microsoft) or 2821 (ASUS, ROG Ally); an unknown pad; "Steam Virtual Gamepad"</th>
+          <th>Vendor 1356 (Sony)</th>
+          <th>Vendor 1406 (Nintendo)</th>
+          <th>Vendor 10462 (Valve)</th>
+          <th>The last input was a key</th>
+          <th>The last input was a touch</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Walk</td>
+          <td>Left stick, D-pad</td>
+          <td><span data-wo-glyph="pad:LS"></span><span data-wo-glyph="pad:DPad"></span></td>
+          <td>Left stick, D-pad</td>
+          <td>Left stick, + Control Pad</td>
+          <td>Left stick, D-pad</td>
+          <td><span data-wo-glyph="move_left" data-wo-glyph-input="keyboard"></span><span data-wo-glyph="move_right" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: the ◀ ▶ buttons, or the move pad</td>
+        </tr>
+        <tr>
+          <td>Use / continue</td>
+          <td>South</td>
+          <td><span data-wo-glyph="pad:A"></span></td>
+          <td>Cross</td>
+          <td>B</td>
+          <td>A</td>
+          <td><span data-wo-glyph="interact" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: the USE button, or tap the thing</td>
+        </tr>
+        <tr>
+          <td>Answer 1</td>
+          <td>West</td>
+          <td><span data-wo-glyph="pad:X"></span></td>
+          <td>Square</td>
+          <td>Y</td>
+          <td>X</td>
+          <td><span data-wo-glyph="choice_1" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: tap the answer card</td>
+        </tr>
+        <tr>
+          <td>Answer 2</td>
+          <td>North</td>
+          <td><span data-wo-glyph="pad:Y"></span></td>
+          <td>Triangle</td>
+          <td>X</td>
+          <td>Y</td>
+          <td><span data-wo-glyph="choice_2" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: tap the answer card</td>
+        </tr>
+        <tr>
+          <td>Select</td>
+          <td>South</td>
+          <td><span data-wo-glyph="pad:A"></span></td>
+          <td>Cross</td>
+          <td>B</td>
+          <td>A</td>
+          <td><span data-wo-glyph="ui_accept" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: tap the item</td>
+        </tr>
+        <tr>
+          <td>Back</td>
+          <td>East</td>
+          <td><span data-wo-glyph="pad:B"></span></td>
+          <td>Circle</td>
+          <td>A</td>
+          <td>B</td>
+          <td><span data-wo-glyph="ui_cancel" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: the BACK button</td>
+        </tr>
+        <tr>
+          <td>Pause</td>
+          <td>Right of centre</td>
+          <td><span data-wo-glyph="pad:Menu"></span></td>
+          <td>Options</td>
+          <td>+</td>
+          <td>Menu (≡)</td>
+          <td><span data-wo-glyph="pause_game" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: the PAUSE button</td>
+        </tr>
+        <tr>
+          <td>Objective</td>
+          <td>Left of centre</td>
+          <td><span data-wo-glyph="pad:View"></span></td>
+          <td>Create (PS5), Share (PS4)</td>
+          <td>−</td>
+          <td>View</td>
+          <td><span data-wo-glyph="objective" data-wo-glyph-input="keyboard"></span></td>
+          <td>None: tap the objective line</td>
+        </tr>
+        <tr>
+          <td>Tabs</td>
+          <td>Shoulders</td>
+          <td><span data-wo-glyph="pad:LB"></span><span data-wo-glyph="pad:RB"></span></td>
+          <td>L1, R1</td>
+          <td>L, R</td>
+          <td>L1, R1 (UNVERIFIED)</td>
+          <td>None bound yet: click the tab</td>
+          <td>None: tap the tab</td>
+        </tr>
+        <tr>
+          <td>Pages</td>
+          <td>Triggers</td>
+          <td><span data-wo-glyph="pad:LT"></span><span data-wo-glyph="pad:RT"></span></td>
+          <td>L2, R2</td>
+          <td>ZL, ZR</td>
+          <td>L2, R2 (UNVERIFIED)</td>
+          <td>None bound yet</td>
+          <td>None: drag the page</td>
+        </tr>
+        <tr>
+          <td>Scroll</td>
+          <td>Right stick</td>
+          <td><span data-wo-glyph="pad:RS"></span></td>
+          <td>Right stick</td>
+          <td>Right stick</td>
+          <td>Right stick</td>
+          <td>None bound yet</td>
+          <td>None: drag the page</td>
+        </tr>
+        <tr>
+          <td>System (never read)</td>
+          <td>Logo</td>
+          <td>Xbox button</td>
+          <td>PS button</td>
+          <td>HOME</td>
+          <td>Steam button</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+    <ul class="mk-note">
+      <li>Names: R3 5.1 (Godot JoyButton docs, Microsoft GamepadButtons). Vendor IDs: R3 5.2 (SDL controller_list.h).</li>
+      <li>The Steam Deck shoulder and trigger names are not in R3: UNVERIFIED until a Deck capture or Valve's glyph set confirms them.</li>
+      <li>Nintendo still confirms with its right-hand A, so a "swap confirm and back" option goes with the Nintendo family (R3 5.4).</li>
+      <li>BUTTON PROMPTS in Settings picks Auto, Keyboard, Xbox, PlayStation or Nintendo (3.2). Auto is Xbox on the ROG Ally.</li>
+    </ul>
+  </section>
+
+  <!-- 10. The hard rules of 4.1: inputs that are never required. -->
+  <section class="mk-section" id="never">
+    <h2>10 · Never used (brief 4.1)</h2>
+    <ul class="mk-note">
+      <li>Stick clicks (LS and RS pressed in; L3 and R3).</li>
+      <li>Back paddles (Xbox Elite P1 to P4; Steam Deck L4, L5, R4, R5).</li>
+      <li>ROG Ally M1 and M2: system modifiers by default (ASUS).</li>
+      <li>Gyro, impulse triggers, the DualSense touchpad, Share and Capture.</li>
+      <li>Every screen works with the D-pad or stick plus A and B.</li>
+    </ul>
+  </section>
+</main>
+
+<!-- The CONTROLLER MAP view: a sub-view of Settings > CONTROLS. The context name and the map come
+     from #m11-map-source through the pad map renderer; the frame says which context. -->
+<template id="m11-map">
+  <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+  <div class="wo-backdrop"></div>
+  <div class="wo-safe wo-toast wo-padmap-view">
+    <div class="wo-row">
+      <span class="wo-t-h2" data-wo-probe="map-title">CONTROLLER MAP</span>
+      <span class="wo-row-control">
+        <span class="wo-row-label">BUTTONS FOR</span>
+        <button class="wo-select is-focus" type="button" data-wo-focus data-wo-padmap-cycle data-wo-probe="map-context"><span aria-hidden="true">◀</span><span data-wo-padmap-name></span><span aria-hidden="true">▶</span></button>
+      </span>
+    </div>
+    <div class="wo-padmap" data-wo-padmap="#m11-map-source" data-wo-padmap-free="NOT USED HERE" data-wo-probe="padmap"></div>
+    <div class="wo-footer">
+      <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+    </div>
+  </div>
+</template>
+
+<!-- Settings > CONTROLS, scrolled to the controller section (3.2 H: controller bindings first).
+     Each binding shows the glyph of its current pad binding, whatever the last input. -->
+<template id="m11-controls">
+  <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+  <div class="wo-backdrop"></div>
+  <div class="wo-safe wo-toast">
+    <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+    <div class="wo-t-h1">SYSTEM SETTINGS</div>
+    <div class="wo-tabs" role="tablist">
+      <span data-wo-glyph="tab_prev"></span>
+      <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+      <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+      <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="controls">CONTROLS</button>
+      <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+      <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+      <span data-wo-glyph="tab_next"></span>
+    </div>
+    <div class="wo-terminal-panel wo-settings-body" data-wo-page="controls">
+      <div class="wo-rows">
+        <div class="wo-t-h2">CONTROLLER</div>
+        <div class="wo-row wo-split"><span class="wo-row-label">CONTROLLER MAP</span><span class="wo-row-control"><button class="wo-btn wo-terminal is-focus" type="button" data-wo-focus data-wo-probe="map-row">OPEN</button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">Move left</span><span class="wo-row-control"><button class="wo-select wo-btn wo-terminal" type="button" data-wo-focus><span class="wo-cluster" data-wo-glyph="move_left" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">Move right</span><span class="wo-row-control"><button class="wo-select wo-btn wo-terminal" type="button" data-wo-focus><span class="wo-cluster" data-wo-glyph="move_right" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">Interact / continue</span><span class="wo-row-control"><button class="wo-select wo-btn wo-terminal" type="button" data-wo-focus><span class="wo-cluster" data-wo-glyph="interact" data-wo-glyph-input="pad" data-wo-probe="bind-interact"></span></button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">Response 1</span><span class="wo-row-control"><button class="wo-select wo-btn wo-terminal" type="button" data-wo-focus><span class="wo-cluster" data-wo-glyph="choice_1" data-wo-glyph-input="pad"></span></button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">Response 2</span><span class="wo-row-control"><button class="wo-select wo-btn wo-terminal" type="button" data-wo-focus><span class="wo-cluster" data-wo-glyph="choice_2" data-wo-glyph-input="pad"></span></button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">Pause</span><span class="wo-row-control"><button class="wo-select wo-btn wo-terminal" type="button" data-wo-focus><span class="wo-cluster" data-wo-glyph="pause_game" data-wo-glyph-input="pad"></span></button></span></div>
+        <div class="wo-row wo-split"><span class="wo-row-label">BUTTON PROMPTS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>AUTO (XBOX)</span><span aria-hidden="true">▶</span></button></span></div>
+      </div>
+    </div>
+    <div class="wo-footer">
+      <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+      <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+      <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+    </div>
+  </div>
+</template>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  M03: the title screen with idle motion (design brief 7.3 M03; specs 6.2 B7 and B8, 5.2 step 7,
+  4.3 Title, 3.1 step 7, 2.5.3 step 14). One device frame, picked in the strip, fills the stage.
+
+  Markup and per-screen data only. Layout, motion and every reader live in mockups/shared/wo.css
+  and mockups/shared/wo.js. Words are the build's English strings (main.tscn TitleScreen,
+  main.gd NO_CHECKPOINT_NOTE) plus two labels the brief adds: QUIT (6.2) and SELECT (3.1 step 7).
+  The version comes from project.godot (data-wo-text), never written here. No story text.
+
+  Layout (Proposal, from 6.2 and 2.5.3 step 14):
+  - the key art is cover-cropped from the focus point below, so it keeps its shape on every screen;
+  - the column (TitleVeil plus the menu) is anchored right inside the safe rect;
+  - the mark sits beside the title as one lockup, so five buttons fit at 48 px on the Ally;
+  - one linear button list (NEW GAME, CONTINUE, SETTINGS, CREDITS, QUIT) wraps; disabled CONTINUE
+    is skipped; its reason sits beside it; QUIT shows on desktop and handheld only;
+  - CHANGELOG sits bottom-left, as today, clear of the engineer and WOLF;
+  - a dark fade rises from the bottom edge, so the bottom row reads over the lit wet floor;
+  - the column's bottom row holds the version and the credit line, right-aligned beside the
+    footer prompt bar (3.1 step 7), over the darkest part of the veil, so they stay readable;
+    on touch only the prompts hide.
+
+  Per-screen data (Proposal, tune on this page):
+  - cover focus [0.3, 0.3]: the share of the overflow cropped from the left and the top. 0.3 keeps
+    the engineer and WOLF in view at 4:3 (iPad) and the ceiling lamps at 19.5:9 (iPhone) and 32:9.
+  - spots: three lights in the art that flicker on their own idle timers (6.2 B8), as centre and
+    size in the key art's own pixels, read off the art: the near ceiling lamp, the far ceiling
+    lamp and the lamp over the door. Each dips dark twice per tick (a tube cutting out).
+  - the eye: the logo mark's cyan eyes are the seventh top-level path of logo-mark.svg.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Title screen</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-nav>
+<div class="mk-stage">
+  <section class="mk-device" data-wo-device="url"><div class="wo-frame" data-wo-template="m03-title"></div></section>
+</div>
+
+<template id="m03-title">
+  <div class="wo-title">
+    <div class="wo-cover" data-wo-cover>
+      <script type="application/json">
+        {"node": "CanvasLayer/TitleScreen/CorridorArt", "focus": [0.3, 0.3], "spots": [
+          {"name": "near ceiling lamp", "x": 338, "y": 112, "w": 150, "h": 120},
+          {"name": "far ceiling lamp", "x": 220, "y": 210, "w": 84, "h": 64},
+          {"name": "door lamp", "x": 686, "y": 282, "w": 150, "h": 84}
+        ]}
+      </script>
+    </div>
+    <div class="wo-title-scrim"></div>
+
+    <div class="wo-title-col" data-wo-probe="column">
+      <div class="wo-title-veil"></div>
+      <div class="wo-title-main" data-wo-enter>
+        <div class="wo-t-body wo-title-brand" data-wo-probe="brand">MRDEMONWOLF, INC. PRESENTS</div>
+        <div class="wo-rule" data-wo-idle data-wo-probe="rule"></div>
+        <div class="wo-cluster wo-title-lockup">
+          <span class="wo-svg wo-title-mark" data-wo-svg="logo-mark.svg" data-wo-part="eye=path:nth-of-type(7)" data-wo-idle data-wo-probe="mark"></span>
+          <div class="wo-stack">
+            <div class="wo-t-display" role="heading" aria-level="1" data-wo-probe="title">WOLF OVERRIDE</div>
+            <div class="wo-t-h3 wo-title-sub" data-wo-probe="subtitle">CHAPTER 1&#160; /&#160; LOCKDOWN</div>
+          </div>
+        </div>
+        <button class="wo-btn" type="button" autofocus data-wo-probe="new-game">NEW GAME</button>
+        <div class="wo-split">
+          <button class="wo-btn" type="button" disabled data-wo-probe="continue">CONTINUE</button>
+          <span class="wo-t-caption wo-t-muted wo-title-note" data-wo-probe="continue-note">No checkpoint yet. Saving starts at the first SAFE POINT.</span>
+        </div>
+        <button class="wo-btn" type="button" data-wo-probe="settings">SETTINGS</button>
+        <button class="wo-btn" type="button" data-wo-probe="credits">CREDITS</button>
+        <button class="wo-btn" type="button" data-wo-only="desktop handheld" data-wo-probe="quit">QUIT</button>
+      </div>
+      <div class="wo-footer" data-wo-probe="footer">
+        <div class="wo-stack wo-title-meta">
+          <span class="wo-t-caption wo-t-muted" data-wo-text="project:application/config/version" data-wo-probe="version"></span>
+          <span class="wo-t-caption wo-t-muted" data-wo-probe="credit">Concept: Nathanial Henniges&#160; /&#160; AI-assisted development</span>
+        </div>
+        <span class="wo-footer-item" data-wo-probe="select"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+      </div>
+    </div>
+
+    <div class="wo-title-foot" data-wo-enter data-wo-probe="foot">
+      <button class="wo-btn" type="button" data-wo-probe="changelog">CHANGELOG</button>
+    </div>
+  </div>
+</template>
+</body>
+</html>

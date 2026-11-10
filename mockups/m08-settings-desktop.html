@@ -1,0 +1,573 @@
+<!doctype html>
+<!--
+  M08: Settings on the desktop (design brief 7.3 M08, settings rules 3.1, settings tree 3.2).
+
+  What it is for: judge the desktop Settings screen, mouse first, with keyboard and pad as well,
+  before it goes into Godot. Ten frames, one per state, each a full 1280 x 720 Mac window:
+  DISPLAY (base, fullscreen with the FRAME LIMIT list open, keep-or-revert), AUDIO, CONTROLS
+  (keyboard rebind, controller rows, hold-to-confirm reset), ACCESSIBILITY (top, and the
+  dialogue rows with the live preview) and GENERAL.
+
+  Contract:
+  - Markup and per-screen data only. Every look comes from mockups/shared/wo.css and every
+    behaviour from mockups/shared/wo.js; the input (mouse, keyboard, pad) comes from the strip.
+  - Frames show the D column of brief 3.2 on macOS. Windows shows WINDOW MODE where macOS shows
+    FULLSCREEN (stage notes say so).
+  - Words: the build's English strings where the build has the row (game_settings.gd, main.gd,
+    main.tscn); row names, choices and notes the build does not have yet come from brief 3.2.
+    Notes the brief does not word are marked "proposal copy" in the stage notes. The one
+    dialogue line is WOLF's, from the corridor (msgid "I've got the contact. Give me a moment.").
+  - Each state is its own frame because wo.js has no settings state switcher yet ("Waiting on
+    shared" in the stage notes). data-mk-state names a frame's state for probes and crops.
+    Values a component needs (a slider's fill, a hold's progress) are data attributes
+    (data-wo-value, 0..1) for wo.js to read; data-wo-tab and data-wo-page pair tabs with pages.
+  - Layout from shared classes only: the card is .wo-safe.wo-toast (the HUD-safe box, so five
+    H2 tabs fit), the footer is pinned by .wo-prompt, and .wo-row.wo-split gives every row the
+    same value column. The open list uses .wo-answers and the keep-or-undo dialog .wo-loading,
+    until wo.css has an anchored list and a modal layer.
+  - Real art only: the title key art behind the dimmed backdrop, the corridor far and mid
+    plates behind the dialogue preview.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings, desktop</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-nav>
+<header class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M08 Settings, desktop</h1>
+  <p class="mk-lead">What this page is for: check the desktop Settings screen in a 1280 × 720 Mac window, mouse first, then keyboard and pad.</p>
+  <ul class="mk-note">
+    <li>Each frame below is one state. Scroll down through them.</li>
+    <li>Pick mouse, keyboard or pad in the strip. Glyphs and the focus ring follow it.</li>
+    <li>Arrow keys walk the focused frame. The walk wraps at the end.</li>
+    <li>Tabs, lists, the countdown and the hold do not move yet. Each state is its own frame.</li>
+    <li>Rows are 35 or 40 canvas px, not 32, until the shared row fix lands.</li>
+  </ul>
+  <p class="mk-note">States:
+    <a href="#display">DISPLAY</a> ·
+    <a href="#display-open">fullscreen and FRAME LIMIT list</a> ·
+    <a href="#display-keep">keep or undo</a> ·
+    <a href="#audio">AUDIO</a> ·
+    <a href="#controls-keys">CONTROLS keyboard rebind</a> ·
+    <a href="#controls-pad">CONTROLS controller</a> ·
+    <a href="#controls-end">CONTROLS hold to restore</a> ·
+    <a href="#access">ACCESSIBILITY</a> ·
+    <a href="#access-end">ACCESSIBILITY dialogue preview</a> ·
+    <a href="#general">GENERAL</a>
+  </p>
+</header>
+
+<!-- 1. DISPLAY, the base state. WINDOW SIZE holds focus (hidden after mouse use, ringed after a key or pad press). -->
+<header class="mk-main" id="display">
+  <h2>1 · DISPLAY</h2>
+  <ul class="mk-note">
+    <li>Mouse first. Six rows in one column: label left, value right.</li>
+    <li>WINDOW SIZE has focus. A mouse shows no ring; a key or pad press shows it.</li>
+    <li>Windows shows WINDOW MODE where macOS shows FULLSCREEN.</li>
+    <li>MONITOR shows only with two or more screens.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="display">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="display">
+          <div class="wo-rows">
+            <label class="wo-row wo-split"><span class="wo-row-label">FULLSCREEN</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">WINDOW SIZE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox" autofocus>1280 × 720</button></div>
+            <label class="wo-row wo-split"><span class="wo-row-label">V-SYNC</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">FRAME LIMIT</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Match display (60 Hz)</button></div>
+            <div class="wo-t-body wo-t-muted">V-sync on: up to 60 Hz.</div>
+            <label class="wo-row wo-split"><span class="wo-row-label">SHOW FPS</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">EDGE SMOOTHING</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">OFF</button></div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 2. DISPLAY in fullscreen: WINDOW SIZE disabled with its note; the FRAME LIMIT list open with V-sync on. -->
+<header class="mk-main" id="display-open">
+  <h2>2 · Fullscreen, and the FRAME LIMIT list with V-sync on</h2>
+  <ul class="mk-note">
+    <li>FULLSCREEN is on, so WINDOW SIZE is off and says why (proposal copy).</li>
+    <li>The FRAME LIMIT list is open. On a 60 Hz screen with V-sync on, 60 FPS and up are greyed.</li>
+    <li>The list is pushed up to fit the screen, as a Godot popup near the bottom is.</li>
+    <li>EDGE SMOOTHING is below the fold: two notes make this page scroll.</li>
+    <li>Waiting on shared: grey text for a disabled terminal control, a disabled list item, an anchored list.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="display-open">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="display">
+          <div class="wo-rows">
+            <label class="wo-row wo-split"><span class="wo-row-label">FULLSCREEN</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">WINDOW SIZE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox" disabled>1280 × 720</button></div>
+            <div class="wo-t-body wo-t-muted">Turn off FULLSCREEN to choose a size.</div>
+            <label class="wo-row wo-split"><span class="wo-row-label">V-SYNC</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">FRAME LIMIT</span><button class="wo-select wo-btn wo-terminal is-pressed" type="button" aria-haspopup="listbox" aria-expanded="true">Match display (60 Hz)</button></div>
+            <div class="wo-t-body wo-t-muted">V-sync on: up to 60 Hz.</div>
+            <label class="wo-row wo-split"><span class="wo-row-label">SHOW FPS</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+        <div class="wo-answers">
+          <div class="wo-popup" role="listbox" aria-label="FRAME LIMIT">
+            <div class="wo-popup-item is-hover" role="option" aria-selected="true">Match display (60 Hz)</div>
+            <div class="wo-popup-item" role="option">30 FPS</div>
+            <div class="wo-popup-item wo-t-muted" role="option" aria-disabled="true">60 FPS</div>
+            <div class="wo-popup-item wo-t-muted" role="option" aria-disabled="true">120 FPS</div>
+            <div class="wo-popup-item wo-t-muted" role="option" aria-disabled="true">144 FPS</div>
+            <div class="wo-popup-item wo-t-muted" role="option" aria-disabled="true">165 FPS</div>
+            <div class="wo-popup-item wo-t-muted" role="option" aria-disabled="true">240 FPS</div>
+            <div class="wo-popup-item wo-t-muted" role="option" aria-disabled="true">UNCAPPED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 3. Keep or undo: WINDOW SIZE changed to 1600 x 900; the dialog counts down 15 s, then goes back. -->
+<header class="mk-main" id="display-keep">
+  <h2>3 · Keep or undo a window change</h2>
+  <ul class="mk-note">
+    <li>Only WINDOW SIZE, and WINDOW MODE on Windows, ask to keep or undo.</li>
+    <li>It goes back by itself after 15 s. KEEP takes focus.</li>
+    <li>Words are proposal copy.</li>
+    <li>Waiting on shared: the countdown, and a 15 s token.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="display-keep">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="display">
+          <div class="wo-rows">
+            <label class="wo-row wo-split"><span class="wo-row-label">FULLSCREEN</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">WINDOW SIZE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">1600 × 900</button></div>
+            <label class="wo-row wo-split"><span class="wo-row-label">V-SYNC</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">FRAME LIMIT</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Match display (60 Hz)</button></div>
+            <div class="wo-t-body wo-t-muted">V-sync on: up to 60 Hz.</div>
+            <label class="wo-row wo-split"><span class="wo-row-label">SHOW FPS</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">EDGE SMOOTHING</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">OFF</button></div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+      <div class="wo-loading" role="alertdialog" aria-label="Keep this window size?">
+        <div class="wo-backdrop"></div>
+        <div class="wo-panel wo-pause" data-wo-countdown="15">
+          <div class="wo-t-h2">KEEP THIS WINDOW SIZE?</div>
+          <div class="wo-t-body">Going back to 1280 × 720 in 15 s.</div>
+          <button class="wo-btn wo-terminal" type="button">KEEP</button>
+          <button class="wo-btn wo-terminal" type="button">UNDO</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 4. AUDIO: five volume sliders (0-100, default 100) and MUTE WHEN UNFOCUSED. -->
+<header class="mk-main" id="audio">
+  <h2>4 · AUDIO</h2>
+  <ul class="mk-note">
+    <li>Five sliders, 0 to 100, default 100. One press moves one step.</li>
+    <li>The note under the panel is the build's.</li>
+    <li>Waiting on shared: slider fills from data-wo-value. Until then a full slider looks empty.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="audio">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="audio">
+          <div class="wo-rows">
+            <div class="wo-row wo-split"><span class="wo-row-label">MASTER</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-value="1.0"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>100%</div></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">MUSIC</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-value="1.0"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>100%</div></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">EFFECTS</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-value="1.0"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>100%</div></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">VOICE</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-value="1.0"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>100%</div></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">UI SOUNDS</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-value="1.0"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>100%</div></div>
+            <label class="wo-row wo-split"><span class="wo-row-label">MUTE WHEN UNFOCUSED</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+          </div>
+        </div>
+        <div class="wo-t-body wo-t-muted">Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet.</div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 5. CONTROLS, top: the keyboard bindings, with Interact / continue waiting for a key. -->
+<header class="mk-main" id="controls-keys">
+  <h2>5 · CONTROLS: rebinding a key</h2>
+  <ul class="mk-note">
+    <li>Keyboard first on the desktop. The controller section follows.</li>
+    <li>Interact / continue is waiting for a key. The note is the build's.</li>
+    <li>Esc cancels and cannot be bound. CANCEL REBIND takes BACK's place in the footer.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="controls-keys">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="controls">
+          <div class="wo-rows">
+            <div class="wo-t-h2">KEYBOARD</div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Move left</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="key:A"></span><span data-wo-glyph="key:←"></span></span></button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Move right</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="key:D"></span><span data-wo-glyph="key:→"></span></span></button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Interact / continue</span><button class="wo-select wo-btn wo-terminal is-pressed" type="button" data-wo-rebind="waiting"><span class="wo-cluster"><span data-wo-glyph="key:E"></span></span></button></div>
+            <div class="wo-t-body wo-t-muted">Press a keyboard input for Interact / continue. Esc cancels.</div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Response 1</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="key:1"></span></span></button></div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item is-back"><span data-wo-glyph="key:Esc"></span>CANCEL REBIND</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 6. CONTROLS, scrolled: the controller bindings under their own header. -->
+<header class="mk-main" id="controls-pad">
+  <h2>6 · CONTROLS: controller bindings</h2>
+  <ul class="mk-note">
+    <li>The page scrolled to the controller section.</li>
+    <li>Each binding shows its Xbox glyph, not a word.</li>
+    <li>Pause (Menu) is one row further down.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="controls-pad">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="controls">
+          <div class="wo-rows">
+            <div class="wo-t-h2">CONTROLLER</div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Move left</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="pad:DPadLeft"></span><span data-wo-glyph="pad:LS"></span></span></button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Move right</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="pad:DPadRight"></span><span data-wo-glyph="pad:LS"></span></span></button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Interact / continue</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="pad:A"></span></span></button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Response 1</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="pad:X"></span></span></button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">Response 2</span><button class="wo-select wo-btn wo-terminal" type="button"><span class="wo-cluster"><span data-wo-glyph="pad:Y"></span></span></button></div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 7. CONTROLS, at the end: RESTORE DEFAULT CONTROLS held down, part way. -->
+<header class="mk-main" id="controls-end">
+  <h2>7 · CONTROLS: hold to restore the defaults</h2>
+  <ul class="mk-note">
+    <li>The end of the page. RESTORE DEFAULT CONTROLS is held down.</li>
+    <li>A hold, not a second dialog (Celeste 1.4). "Hold to confirm." is proposal copy.</li>
+    <li>Waiting on shared: the hold fill, a hold-time token, slider fills.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="controls-end">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="controls">
+          <div class="wo-rows">
+            <div class="wo-row wo-split"><span class="wo-row-label">BUTTON PROMPTS</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Auto</button></div>
+            <label class="wo-row wo-split"><span class="wo-row-label">CLICK / TAP TO INTERACT</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">VIBRATION</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">100%</button></div>
+            <div class="wo-row wo-split"><span class="wo-row-label">STICK DEAD ZONE</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="10" aria-valuemax="80" aria-valuenow="25" data-wo-value="0.2143"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>25%</div></div>
+            <label class="wo-row wo-split"><span class="wo-row-label">TOGGLE HOLDS</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">RESTORE DEFAULT CONTROLS</span><button class="wo-select wo-btn wo-terminal is-pressed" type="button" data-wo-hold data-wo-value="0.6"><span class="wo-cluster"><span data-wo-glyph="ui_accept"></span>HOLD</span></button></div>
+            <div class="wo-t-body wo-t-muted">Hold to confirm.</div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 8. ACCESSIBILITY, top: the first six rows beside the live dialogue preview (3.1 step 9). -->
+<header class="mk-main" id="access">
+  <h2>8 · ACCESSIBILITY</h2>
+  <ul class="mk-note">
+    <li>TEXT SIZE and REDUCED MOTION moved here from DISPLAY.</li>
+    <li>The preview is the real dialogue box over the corridor plates.</li>
+    <li>It follows TEXT SIZE (strip) and dialogue.backing (Tune).</li>
+    <li>The rows take half the width while the preview shows.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="access">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="accessibility">
+          <div class="wo-split">
+            <div class="wo-rows">
+              <div class="wo-row wo-split"><span class="wo-row-label">TEXT SIZE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">100%</button></div>
+              <label class="wo-row wo-split"><span class="wo-row-label">REDUCED MOTION</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="false"><span class="wo-toggle" aria-checked="false"></span></button></label>
+              <div class="wo-row wo-split"><span class="wo-row-label">SCREEN SHAKE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">100%</button></div>
+              <div class="wo-row wo-split"><span class="wo-row-label">FLASHING LIGHTS</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">On</button></div>
+              <div class="wo-row wo-split"><span class="wo-row-label">TEXT SPEED</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Normal</button></div>
+              <div class="wo-row wo-split"><span class="wo-row-label">AUTO-ADVANCE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Off</button></div>
+            </div>
+            <div class="wo-card">
+              <div class="wo-loading-plate"><img src="../apps/game/assets/rooms/corridor-far.png" alt=""></div>
+              <div class="wo-loading-plate"><img src="../apps/game/assets/rooms/corridor-mid.png" alt=""></div>
+              <div class="wo-box is-inline is-complete" data-speaker="wolf">
+                <div class="wo-nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
+                <div class="wo-box-text">I've got the contact. Give me a moment.</div>
+                <span class="wo-continue"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 9. ACCESSIBILITY, scrolled: the dialogue rows beside the preview; DIALOGUE BACKING at 50%. -->
+<header class="mk-main" id="access-end">
+  <h2>9 · ACCESSIBILITY: the dialogue rows</h2>
+  <ul class="mk-note">
+    <li>The page scrolled to its end.</li>
+    <li>DIALOGUE BACKING is 50%, the token dialogue.backing. The preview uses the token.</li>
+    <li>Waiting on shared: slider fills from data-wo-value.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="access-end">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="accessibility">
+          <div class="wo-split">
+            <div class="wo-rows">
+              <div class="wo-row wo-split"><span class="wo-row-label">FLASHING LIGHTS</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">On</button></div>
+              <div class="wo-row wo-split"><span class="wo-row-label">TEXT SPEED</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Normal</button></div>
+              <div class="wo-row wo-split"><span class="wo-row-label">AUTO-ADVANCE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Off</button></div>
+              <div class="wo-row wo-split"><span class="wo-row-label">DIALOGUE BACKING</span><div class="wo-row-control"><div class="wo-slider" role="slider" tabindex="0" data-wo-focus aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-wo-value="0.5"><div class="wo-slider-track"><div class="wo-slider-fill"></div><div class="wo-slider-grab"></div></div></div>50%</div></div>
+              <label class="wo-row wo-split"><span class="wo-row-label">SPEAKER NAMES</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            </div>
+            <div class="wo-card">
+              <div class="wo-loading-plate"><img src="../apps/game/assets/rooms/corridor-far.png" alt=""></div>
+              <div class="wo-loading-plate"><img src="../apps/game/assets/rooms/corridor-mid.png" alt=""></div>
+              <div class="wo-box is-inline is-complete" data-speaker="wolf">
+                <div class="wo-nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
+                <div class="wo-box-text">I've got the contact. Give me a moment.</div>
+                <span class="wo-continue"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- 10. GENERAL: LANGUAGE, DEVICE PROFILE, PAUSE WHEN UNFOCUSED, RESET ALL SETTINGS (hold). -->
+<header class="mk-main" id="general">
+  <h2>10 · GENERAL</h2>
+  <ul class="mk-note">
+    <li>LANGUAGE names each language in itself. Its note is the build's.</li>
+    <li>DEVICE PROFILE says what Auto picked (proposal copy).</li>
+    <li>RESET ALL SETTINGS is a hold, like RESTORE DEFAULT CONTROLS.</li>
+  </ul>
+</header>
+<section class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-mk-state="general">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-toast">
+        <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="display">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="audio">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="controls">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" data-wo-tab="accessibility">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="general">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-terminal-panel" data-wo-page="general">
+          <div class="wo-rows">
+            <div class="wo-row wo-split"><span class="wo-row-label">LANGUAGE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">English</button></div>
+            <div class="wo-t-body wo-t-muted">Until you choose a language, the game uses your system's.</div>
+            <div class="wo-row wo-split"><span class="wo-row-label">DEVICE PROFILE</span><button class="wo-select wo-btn wo-terminal" type="button" aria-haspopup="listbox">Auto (Desktop)</button></div>
+            <label class="wo-row wo-split"><span class="wo-row-label">PAUSE WHEN UNFOCUSED</span><button class="wo-select wo-btn wo-terminal" type="button" role="switch" aria-checked="true"><span class="wo-toggle" aria-checked="true"></span></button></label>
+            <div class="wo-row wo-split"><span class="wo-row-label">RESET ALL SETTINGS</span><button class="wo-select wo-btn wo-terminal" type="button" data-wo-hold data-wo-value="0"><span class="wo-cluster"><span data-wo-glyph="ui_accept"></span>HOLD</span></button></div>
+          </div>
+        </div>
+        <div class="wo-prompt"><div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+          <span class="wo-footer-item"><span data-wo-glyph="tab_prev"></span><span data-wo-glyph="tab_next"></span>TABS</span>
+        </div></div>
+      </div>
+    </div>
+  </section>
+</section>
+</body>
+</html>

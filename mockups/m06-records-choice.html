@@ -1,0 +1,150 @@
+<!doctype html>
+<!--
+  M06: the Records Access choice (design brief 7.3 M06, built on 6.3 Choices, 6.4, 4.2-4.4, 2.3-2.5).
+
+  What it shows: the moment WOLF finds the mirror index and asks which way to read it. The engineer
+  stands at the MIRROR PORT's left, WOLF at its right; two answer cards wait for the player.
+
+  Markup and per-screen data only (brief 7.1): every style, value and behaviour comes from
+  mockups/shared/wo.css and mockups/shared/wo.js, which read the game's own files.
+
+  Words are the build's English strings, copied exactly (no new story text):
+  - the question: scripts/main.gd, the mirror branch of _interact_records ("I found the mirror index.
+    We can use my readout or your maintenance port."), speaker WOLF;
+  - the answers: scripts/main.gd MIRROR_CHOICE_TEXT ("USE WOLF'S READOUT", "USE MANUAL PORT").
+
+  World data: C3 section 5 placements (world px, top-left and size) and the game's own positions:
+  - camera x 477.23 = the engineer's x at the port: RecordsRoom.MIRROR_X 520 minus the side offset
+    min(MIRROR_HALF_WIDTH 31.77 + M0Actor.HUMAN_REACH 17 - STATION_OVERLAP 6, reach 58 - 2) = 42.77
+    (main.gd _station_side_x; the camera follows the engineer, main.gd _update_gameplay_camera);
+  - WOLF at x 595.97 = main.gd WOLF_MIRROR_X (551.8 + 5 + M0Actor.WOLF_SNOUT 39.17), facing the port;
+  - door pieces: brightness 1.35 and 0.72 are DoorKit.BEYOND_LIFT and WALL_LIFT (door_kit.gd 22-23).
+  Not drawn (no shared reader yet): the shut swing leaves (a perspective mesh), the screens' lit glass,
+  floor reflections and the room's drawn beacon housings. Station names are left out on purpose: words
+  live on the prompt pill, not floating in the world (brief section 1, principle 6), and the pill
+  hides while a conversation box is open (6.3). The world takes no taps while the choice is open:
+  the two cards are the only targets, and ?hits=1 shows their hit areas.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Records Access choice</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body data-wo-strip="speaker" data-wo-nav>
+
+<!-- The live screen: one frame at the strip's device, as big as the window (clean=1 makes it the
+     whole viewport, so a capture is exactly what the device shows). Its markup is the template below:
+     an [autofocus] inside a template lands after wo.js has mounted the frame, so the first card holds
+     the (hidden) focus when the choice opens; with keys or a pad its ring shows (4.3 Choices). -->
+<main class="mk-stage">
+  <section class="mk-device" data-wo-device="url">
+    <div class="wo-frame" data-wo-template="m06-choice"></div>
+  </section>
+</main>
+
+<div class="mk-page">
+<section class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M06 Records Access choice</h1>
+  <p class="mk-lead">What this page is for: judge how the player answers WOLF at the mirror port, with every input.</p>
+  <ul class="mk-note">
+    <li>Pad: X picks the first card, Y the second. The D-pad moves the ring; A picks the ringed card.</li>
+    <li>Keyboard: 1 and 2 pick a card. The arrow keys move the ring; Enter picks.</li>
+    <li>Mouse: hover lights one card; a click picks it on release.</li>
+    <li>Touch: the two cards fill the bottom row, in thumb reach; a tap picks one on release.</li>
+    <li>The box sits at the top here: WOLF, the engineer and the MIRROR PORT stand low in the view.</li>
+    <li>Try the strip: Input, TEXT SIZE, Speaker (placeholder portrait) and hit areas.</li>
+  </ul>
+  <h3>Not wired yet</h3>
+  <ul class="mk-note">
+    <li>X, Y, 1 and 2 do not pick a card here yet. They wait for the shared answer handler in wo.js.</li>
+    <li>A picked card does not close the pair yet. Nothing after the choice is shown.</li>
+  </ul>
+
+  <section class="mk-section">
+    <h2>Answer card states</h2>
+    <ul class="mk-note">
+      <li>Row 1: both cards resting.</li>
+      <li>Row 2: mouse hover on the first card.</li>
+      <li>Row 3: the ring on the first card, after a key or pad press.</li>
+      <li>Row 4: the second card pressed.</li>
+      <li>Only one card is lit at a time.</li>
+    </ul>
+    <div class="mk-device-row is-one">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+          <div class="wo-frame">
+            <div class="wo-safe wo-rows">
+              <div class="wo-cluster">
+                <span class="wo-answer"><span data-wo-glyph="choice_1"></span>USE WOLF'S READOUT</span>
+                <span class="wo-answer"><span data-wo-glyph="choice_2"></span>USE MANUAL PORT</span>
+              </div>
+              <div class="wo-cluster">
+                <span class="wo-answer is-hover" data-wo-probe="state-hover"><span data-wo-glyph="choice_1"></span>USE WOLF'S READOUT</span>
+                <span class="wo-answer"><span data-wo-glyph="choice_2"></span>USE MANUAL PORT</span>
+              </div>
+              <div class="wo-cluster">
+                <span class="wo-answer is-focus" data-wo-probe="state-ring"><span data-wo-glyph="choice_1"></span>USE WOLF'S READOUT</span>
+                <span class="wo-answer"><span data-wo-glyph="choice_2"></span>USE MANUAL PORT</span>
+              </div>
+              <div class="wo-cluster">
+                <span class="wo-answer"><span data-wo-glyph="choice_1"></span>USE WOLF'S READOUT</span>
+                <span class="wo-answer is-pressed" data-wo-probe="state-pressed"><span data-wo-glyph="choice_2"></span>USE MANUAL PORT</span>
+              </div>
+            </div>
+          </div>
+        </section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+</section>
+</div>
+
+<!-- The choice as it opens at the mirror port (per-screen data). -->
+<template id="m06-choice">
+  <!-- World: Records Access, framed on the engineer at the port (camera x 477.23, see the header). -->
+  <div class="wo-world-view" data-wo-world>
+    <script type="application/json">
+      {"camera": 477.23, "framing": "auto", "grade": true, "pieces": [
+        {"src": "rooms/records-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
+        {"src": "doors/records-entry-back.png", "x": -10, "y": 0, "w": 109.5, "h": 461.5, "brightness": 1.35},
+        {"src": "doors/records-entry-wall.png", "x": 56.71, "y": 0, "w": 103, "h": 444.5, "brightness": 0.72},
+        {"src": "doors/records-exit-back.png", "x": 851.66, "y": 0, "w": 118.5, "h": 463, "brightness": 1.35},
+        {"src": "doors/records-exit-wall.png", "x": 791.96, "y": 0, "w": 101, "h": 444.5, "brightness": 0.72},
+        {"src": "rooms/records-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
+        {"src": "doors/records-entry-front.png", "x": -10, "y": 0, "w": 70, "h": 465.5},
+        {"src": "props/records-container.png", "x": 775.5, "y": 369, "w": 43, "h": 73},
+        {"src": "props/records-purge-queue.png", "x": 153.57, "y": 367.95, "w": 72.86, "h": 72.05},
+        {"src": "props/records-mirror-port.png", "x": 488.23, "y": 360.04, "w": 63.54, "h": 79.96},
+        {"node": "Human/BodySprite", "at": [477.23, 410]},
+        {"node": "Wolf/BodySprite", "at": [595.97, 423], "flip": true},
+        {"src": "doors/records-exit-front.png", "x": 889.40, "y": 0, "w": 80.5, "h": 469.5}
+      ]}
+    </script>
+  </div>
+
+  <!-- The question box, at the top: the speakers and the target stand low (6.3 Position). It sits in
+       the flow of the HUD-safe box (.wo-safe), so its name tab keeps the room above it that
+       .wo-box.is-inline leaves; .wo-box.is-top would push the tab off the top of the screen. -->
+  <div class="wo-safe">
+    <div class="wo-box is-inline has-portrait" data-speaker="wolf" data-wo-probe="box">
+      <div class="wo-nametab" data-wo-probe="nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
+      <div class="wo-portrait"><img src="../apps/game/assets/characters/wolf-stand.png" alt=""><span class="wo-portrait-label">placeholder crop</span></div>
+      <div class="wo-box-text" data-wo-probe="question">I found the mirror index. We can use my readout or your maintenance port.</div>
+    </div>
+  </div>
+
+  <!-- The answers: right-aligned cards with X / Y (or 1 / 2) on keys, mouse and pad; a full-width
+       pair at the bottom on touch (6.3 Choices). Both are focusable, so the D-pad or arrows and
+       A or Enter reach them as well as X / Y (4.2). data-wo-answer (1, 2) names each card for the
+       shared answer handler that X / Y and the choice_1 / choice_2 keys will use (not in wo.js yet). -->
+  <div class="wo-answers" role="group" aria-label="Answers" data-wo-probe="answers">
+    <button class="wo-answer wo-tap" type="button" data-wo-focus data-wo-answer="1" data-wo-tap="answer 1" data-wo-probe="answer-1" autofocus><span data-wo-glyph="choice_1"></span>USE WOLF'S READOUT</button>
+    <button class="wo-answer wo-tap" type="button" data-wo-focus data-wo-answer="2" data-wo-tap="answer 2" data-wo-probe="answer-2"><span data-wo-glyph="choice_2"></span>USE MANUAL PORT</button>
+  </div>
+</template>
+</body>
+</html>

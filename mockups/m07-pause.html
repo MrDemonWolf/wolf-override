@@ -1,0 +1,165 @@
+<!doctype html>
+<!--
+  M07: pause and controller disconnected (design brief 7.3 M07; spec 6.2 "Pause", 4.2 button map,
+  4.5 hot-plug, 6.7.5 phone interruption, 3.1 step 7 footer prompts).
+
+  Markup and per-screen data only: every look and behaviour comes from mockups/shared/wo.css and
+  mockups/shared/wo.js. Four states, one section each:
+    1. pause over the corridor (the strip's device);
+    2. the return-to-title warning (the strip's device; RETURN TO TITLE holds focus);
+    3. controller disconnected (the strip's device);
+    4. back from the background (always the iPhone 14 Pro Max, touch).
+
+  Words:
+  - Build strings (main.tscn PauseOverlay): "SESSION PAUSED", "RESUME", "SETTINGS",
+    "RETURN TO TITLE", and ReturnWarning "Returning keeps your last checkpoint.\nUnsaved progress
+    will be lost.".
+  - Brief wording, not in the build yet: "QUIT TO DESKTOP" (2.4 Quit, 3.2), the footer verb
+    "SELECT" (3.1 step 7), and the disconnect card (4.5: "Controller disconnected. Reconnect it, or
+    press any key or tap to continue.").
+  - No story text.
+
+  Waiting on shared pieces (listed in the step's shared_requests; marked "pending" below):
+  - data-wo-only="desktop handheld" hides QUIT in phone frames;
+  - data-wo-current on a frame names the item that holds focus there (section 2 moves it to
+    RETURN TO TITLE); until then the first frame's RESUME takes real focus through autofocus;
+  - a screen-open motion on the motion.screen.* tokens (today the panel uses the entrance
+    stagger, which runs on motion.panel.in);
+  - Menu, B and Esc closing the overlay, and the 0.3 s touch guard after a return;
+  - one corridor world file shared with M01 and M05: until then the piece list below repeats
+    M01's "World frame check" list (C3 section 4 numbers, camera at the right clamp);
+  - several templates per frame, so section 3 can show the frozen corridor behind its card.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pause and disconnect</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-nav>
+<main class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M07 Pause and controller disconnected</h1>
+  <p class="mk-lead">What this page is for: check the pause card, its prompts, the disconnect card and the return from the background on each device.</p>
+
+  <section class="mk-section" id="m07-pause">
+    <h2>1. Pause over the corridor</h2>
+    <ul class="mk-note">
+      <li>The world stops behind today's pause backdrop.</li>
+      <li>RESUME has focus. The ring shows only after a key or pad press.</li>
+      <li>Menu, B or Esc resumes (pending: shared overlay behaviour).</li>
+      <li>QUIT TO DESKTOP shows on desktop and ROG Ally (2023) only (pending: shared platform switch).</li>
+      <li>The card opens with motion.screen.in (pending: today it uses the entrance motion).</li>
+    </ul>
+    <div class="mk-device-row is-one">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m07-paused"></div></section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mk-section" id="m07-warning">
+    <h2>2. Return-to-title warning</h2>
+    <ul class="mk-note">
+      <li>Today's two warning lines stay under the buttons, on every pause.</li>
+      <li>No extra confirm step: it would add a press and new words.</li>
+      <li>Here RETURN TO TITLE holds focus (pending: shared focus marker).</li>
+    </ul>
+    <div class="mk-device-row is-one">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m07-paused" data-wo-current="title"></div></section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mk-section" id="m07-disconnect">
+    <h2>3. Controller disconnected</h2>
+    <ul class="mk-note">
+      <li>Shows when the pad in use drops during play. The game pauses.</li>
+      <li>The card names every way back: reconnect, any key, or a tap.</li>
+      <li>A reconnect alone does not resume. The next press does.</li>
+      <li>The frozen corridor behind it is pending (shared: several templates per frame).</li>
+    </ul>
+    <div class="mk-device-row is-one">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+          <div class="wo-frame">
+            <div class="wo-backdrop"></div>
+            <div class="wo-safe">
+              <div class="wo-loading" data-wo-enter>
+                <div class="wo-panel wo-toast" role="alertdialog" aria-labelledby="m07-toast-title" data-wo-probe="toast">
+                  <div class="wo-toast-title" id="m07-toast-title" data-wo-probe="toast-title">CONTROLLER DISCONNECTED</div>
+                  <div class="wo-rule"></div>
+                  <div class="wo-t-body" data-wo-probe="toast-body">Reconnect it, or press any key or tap to continue.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="mk-section" id="m07-background">
+    <h2>4. Back from the background (iPhone)</h2>
+    <ul class="mk-note">
+      <li>The same pause card. No new text.</li>
+      <li>RESUME has focus, with no ring on touch.</li>
+      <li>The world stays frozen behind the card.</li>
+      <li>Touches are ignored for timing.resume-card.guard after the return (pending: shared guard).</li>
+    </ul>
+    <div class="mk-device-row is-one">
+      <figure class="mk-device-fig">
+        <section class="mk-device" data-wo-device="iphone" data-wo-fit="width"><div class="wo-frame" data-wo-template="m07-paused"></div></section>
+        <figcaption class="mk-device-cap"></figcaption>
+      </figure>
+    </div>
+  </section>
+</main>
+
+<!-- The paused corridor: the frozen world, today's backdrop and the pause card (6.2 Pause). -->
+<template id="m07-paused">
+  <div class="wo-world-view" data-wo-world>
+    <script type="application/json">
+      {"camera": "right", "framing": "auto", "grade": true, "pieces": [
+        {"src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
+        {"src": "doors/seal-back.png", "x": 724.80, "y": 311.13, "w": 94.5, "h": 144.5},
+        {"src": "doors/seal-wall.png", "x": 708.43, "y": 0, "w": 91, "h": 458.5, "brightness": 0.72},
+        {"src": "rooms/corridor-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
+        {"src": "doors/seal-head.png", "x": 706.50, "y": 294.24, "w": 91, "h": 136.5},
+        {"node": "BreakerArt", "tap": "BREAKER"},
+        {"node": "RelayArt", "tap": "COOLANT RELAY"},
+        {"node": "CheckpointArt", "tap": "SAFE POINT"},
+        {"src": "props/bypass-gearbox.png", "x": 682, "y": 379, "w": 22.18, "h": 29.82},
+        {"src": "props/handwheel.png", "x": 683.09, "y": 388.98, "w": 21.82, "h": 21.6},
+        {"node": "Wolf/BodySprite", "at": [462, 423], "tap": "WOLF"},
+        {"node": "Human/BodySprite", "at": [655, 410], "flip": true},
+        {"src": "doors/seal-front.png", "x": 787.96, "y": 0, "w": 86.5, "h": 477}
+      ]}
+    </script>
+  </div>
+  <div class="wo-backdrop" data-wo-probe="backdrop"></div>
+  <div class="wo-safe">
+    <div class="wo-loading" data-wo-enter>
+      <div class="wo-panel wo-pause" role="dialog" data-wo-probe="panel">
+        <div class="wo-t-h1" data-wo-probe="pause-title">SESSION PAUSED</div>
+        <div class="wo-rule"></div>
+        <button class="wo-btn" type="button" autofocus data-wo-id="resume" data-wo-probe="resume">RESUME</button>
+        <button class="wo-btn" type="button" data-wo-id="settings" data-wo-probe="settings">SETTINGS</button>
+        <button class="wo-btn" type="button" data-wo-id="title" data-wo-probe="return">RETURN TO TITLE</button>
+        <button class="wo-btn" type="button" data-wo-id="quit" data-wo-only="desktop handheld" data-wo-probe="quit">QUIT TO DESKTOP</button>
+        <div class="wo-t-body wo-t-muted" data-wo-probe="warning">Returning keeps your last checkpoint.<br>Unsaved progress will be lost.</div>
+        <div class="wo-footer" data-wo-probe="footer">
+          <span class="wo-footer-item" data-wo-probe="footer-select"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item" data-wo-probe="footer-resume"><span data-wo-glyph="ui_cancel"></span>RESUME</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+</body>
+</html>

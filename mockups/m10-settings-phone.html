@@ -1,0 +1,335 @@
+<!doctype html>
+<!--
+  M10: Settings on a phone and a tablet (design brief 7.3 M10, built from 3.1 layout rules, the phone
+  (P) column of the settings tree in 3.2, 2.2-2.4 the phone profile, 2.6 Android edges, 4.4 glyphs).
+
+  What this page is for: judge the full-screen settings on the iPhone 14 Pro Max, the Pixel 8 and the
+  iPad Air 13, touch first, before Godot work.
+
+  Layout of the page: six states, each a whole device screen in its own .mk-stage (with ?clean=1 each
+  stage is exactly one viewport tall, so a --full capture holds every state at real size), then short
+  notes. Every frame follows the strip's device (data-wo-device="url"): iphone, android or ipad. The
+  strip's "Phone controls" switch (?touch=tapwalk) flips TOUCH SCHEME between its two choices.
+
+  Decisions used (Nathanial, November 9, 2026): the phone default is the left move pad plus a tap on a
+  station or WOLF to use it; tap-to-walk is the other TOUCH SCHEME choice.
+
+  Markup and per-screen data only: no inline style values and no page script (brief 7.1). The settings
+  shell (wo-settings, -head, -body, wo-rows-head, row states) is the same markup M09 uses, so one shared
+  shell serves both pages; on a phone-profile frame that shell lays the tabs out as a left rail and
+  moves the footer (BACK on touch) into the title row (see this step's shared_requests). These attributes wait for shared support and do nothing until it lands:
+  data-wo-scheme (show one TOUCH SCHEME variant), data-wo-input (pin a frame's input class),
+  data-wo-scroll (open a page scrolled), data-wo-min-refresh (hide a frame-rate choice the screen
+  cannot show).
+
+  Words: UI labels from the build (game_settings.gd, main.gd's "30 FPS" items, main.tscn) and from the
+  brief's settings tree (3.2). No story text.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings, phone and tablet</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-nav data-wo-strip="touch">
+
+<!-- State 1: CONTROLS on touch. The four phone-only rows (3.2): TOUCH SCHEME (default: move pad + tap
+     to use), CONTROL SIZE, SWAP SIDES, HAPTICS. No pad is connected, so no controller rows, no
+     BUTTON PROMPTS and no STICK DEAD ZONE; no keyboard, so no keyboard rows. -->
+<section class="mk-stage" aria-label="State 1: CONTROLS on touch" data-m10-state="controls">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-terminal-panel wo-settings is-full" data-wo-probe="panel">
+        <header class="wo-settings-head">
+          <div class="wo-t-h1" data-wo-probe="title">SYSTEM SETTINGS</div>
+          <div class="wo-t-caption wo-t-muted" data-wo-probe="crumb">THE DEN  /  LOCAL CONFIGURATION</div>
+        </header>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-probe="tab">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-probe="tab">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-probe="tab">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-probe="tab">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-probe="tab">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-settings-body" role="tabpanel">
+          <div class="wo-rows">
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TOUCH SCHEME</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus data-wo-probe="control"><span aria-hidden="true">◀</span><span><span data-wo-scheme="pad">MOVE PAD + TAP TO USE</span><span data-wo-scheme="tapwalk">TAP TO WALK</span></span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note"><span data-wo-scheme="pad">Left thumb moves. Tap a station or WOLF to use it.</span><span data-wo-scheme="tapwalk">Tap the floor to walk. Tap a station or WOLF to go and use it.</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">CONTROL SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus data-wo-probe="control"><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note">Size of the on-screen buttons.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SWAP SIDES</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SWAP SIDES" aria-checked="false" data-wo-scheme="pad" data-wo-focus tabindex="0" data-wo-probe="control"></span><span class="wo-toggle" role="switch" aria-label="SWAP SIDES" aria-checked="false" aria-disabled="true" data-wo-scheme="tapwalk"></span></span><span class="wo-row-note" data-wo-probe="note"><span data-wo-scheme="pad">Move pad on the right, USE on the left.</span><span data-wo-scheme="tapwalk">Only with the move pad.</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">HAPTICS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus data-wo-probe="control"><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note">Also sets controller rumble.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TOGGLE HOLDS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="TOGGLE HOLDS" aria-checked="false" data-wo-focus tabindex="0" data-wo-probe="control"></span></span><span class="wo-row-note" data-wo-probe="note">Tap once to start a crank, again to stop.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold data-wo-probe="control"><span data-wo-glyph="ui_accept"></span>HOLD TO RESET</button></span></div>
+          </div>
+        </div>
+        <div class="wo-footer" data-wo-probe="footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back" data-wo-probe="back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- State 2: DISPLAY, phone rows only (3.2 P column): no WINDOW MODE, WINDOW SIZE, MONITOR or V-SYNC.
+     FRAME RATE is open: 30 / 60 / 120 FPS, default 60; 120 shows only on a screen of 119 Hz or more
+     (the iPhone 14 Pro Max and the Pixel 8 go to 120 Hz; the iPad Air 13 stays at 60 Hz, UNVERIFIED
+     for the M4 model). -->
+<section class="mk-stage" aria-label="State 2: DISPLAY, FRAME RATE open" data-m10-state="display">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-terminal-panel wo-settings is-full">
+        <header class="wo-settings-head">
+          <div class="wo-t-h1">SYSTEM SETTINGS</div>
+          <div class="wo-t-caption wo-t-muted">THE DEN  /  LOCAL CONFIGURATION</div>
+        </header>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-settings-body" role="tabpanel">
+          <div class="wo-rows">
+            <div class="wo-row is-open" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">FRAME RATE</span><span class="wo-row-control"><button class="wo-select is-hover" type="button" aria-expanded="true" data-wo-focus data-wo-probe="control"><span aria-hidden="true">◀</span><span>60 FPS</span><span aria-hidden="true">▶</span></button><span class="wo-popup is-open" role="listbox" aria-label="FRAME RATE" data-wo-probe="popup"><span class="wo-popup-item" role="option" data-wo-probe="option">30 FPS</span><span class="wo-popup-item is-hover" role="option" aria-selected="true" data-wo-probe="option">60 FPS</span><span class="wo-popup-item" role="option" data-wo-min-refresh="119" data-wo-probe="option">120 FPS</span></span></span><span class="wo-row-note" data-wo-probe="note">120 FPS shows only on 120 Hz screens.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SHOW FPS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SHOW FPS" aria-checked="false" data-wo-focus tabindex="0"></span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">EDGE SMOOTHING</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>OFF</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">BATTERY SAVER</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="BATTERY SAVER" aria-checked="false" data-wo-focus tabindex="0"></span></span><span class="wo-row-note" data-wo-probe="note">On: 30 FPS cap, edge smoothing off.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SCREEN EDGE MARGIN</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>AUTO</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note">Auto keeps buttons clear of the notch and corners.</span></div>
+          </div>
+        </div>
+        <div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- State 3: ACCESSIBILITY, a page that scrolls (3.1 step 4: phones scroll instead of shrinking text).
+     Eight rows do not fit at phone density, so the page opens part-way down: a row is cut at the top
+     and at the bottom, and the scroll bar shows where the page is. -->
+<section class="mk-stage" aria-label="State 3: ACCESSIBILITY, scrolled" data-m10-state="scroll">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-terminal-panel wo-settings is-full">
+        <header class="wo-settings-head">
+          <div class="wo-t-h1">SYSTEM SETTINGS</div>
+          <div class="wo-t-caption wo-t-muted">THE DEN  /  LOCAL CONFIGURATION</div>
+        </header>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-settings-body" role="tabpanel" data-wo-scroll="0.3" data-wo-probe="scroll-body">
+          <div class="wo-rows">
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TEXT SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">REDUCED MOTION</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="REDUCED MOTION" aria-checked="false" data-wo-focus tabindex="0"></span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SCREEN SHAKE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">FLASHING LIGHTS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>ON</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TEXT SPEED</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>NORMAL</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">AUTO-ADVANCE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>OFF</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">DIALOGUE BACKING</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="DIALOGUE BACKING" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">50%</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SPEAKER NAMES</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SPEAKER NAMES" aria-checked="true" data-wo-focus tabindex="0"></span></span></div>
+          </div>
+        </div>
+        <div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- State 4: CONTROLS with an Xbox pad connected to the phone. The pad adds its rows first (bindings,
+     BUTTON PROMPTS, STICK DEAD ZONE; 3.2 "only while a pad is connected"); the touch rows follow. The
+     frame is pinned to pad input (data-wo-input), so the LB / RB glyphs, the footer prompts and the
+     focus ring show; rows keep the phone density, since a finger can still arrive (2.3). -->
+<section class="mk-stage" aria-label="State 4: CONTROLS with a pad connected" data-m10-state="pad">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width" data-wo-input="pad">
+    <div class="wo-frame">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-terminal-panel wo-settings is-full">
+        <header class="wo-settings-head">
+          <div class="wo-t-h1">SYSTEM SETTINGS</div>
+          <div class="wo-t-caption wo-t-muted">THE DEN  /  LOCAL CONFIGURATION</div>
+        </header>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev" data-wo-probe="pad-glyph"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">GENERAL</button>
+          <span data-wo-glyph="tab_next" data-wo-probe="pad-glyph"></span>
+        </div>
+        <div class="wo-settings-body" role="tabpanel">
+          <div class="wo-rows">
+            <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">CONTROLLER</div>
+            <div class="wo-row is-focus" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">MOVE LEFT</span><span class="wo-row-control"><button class="wo-btn wo-terminal is-focus" type="button" data-wo-focus><span data-wo-glyph="pad:DPadLeft"></span><span data-wo-glyph="pad:LS"></span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">MOVE RIGHT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="pad:DPadRight"></span><span data-wo-glyph="pad:LS"></span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">INTERACT / CONTINUE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="pad:A"></span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESPONSE 1</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="pad:X"></span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESPONSE 2</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="pad:Y"></span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">PAUSE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="pad:Menu"></span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">BUTTON PROMPTS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>AUTO (XBOX)</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">STICK DEAD ZONE</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="STICK DEAD ZONE" aria-valuemin="0.1" aria-valuemax="0.8" aria-valuenow="0.25" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">0.25</span></span></div>
+            <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">TOUCH</div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TOUCH SCHEME</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span><span data-wo-scheme="pad">MOVE PAD + TAP TO USE</span><span data-wo-scheme="tapwalk">TAP TO WALK</span></span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">CONTROL SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">SWAP SIDES</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SWAP SIDES" aria-checked="false" data-wo-scheme="pad" data-wo-focus tabindex="0"></span><span class="wo-toggle" role="switch" aria-label="SWAP SIDES" aria-checked="false" aria-disabled="true" data-wo-scheme="tapwalk"></span></span></div>
+            <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">ALL INPUTS</div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">HAPTICS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note">Phone haptics and controller rumble.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">TOGGLE HOLDS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="TOGGLE HOLDS" aria-checked="false" data-wo-focus tabindex="0"></span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold><span data-wo-glyph="ui_accept"></span>HOLD TO RESET</button></span></div>
+          </div>
+        </div>
+        <div class="wo-footer">
+          <span class="wo-footer-item" data-wo-probe="pad-prompt"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back" data-wo-probe="pad-prompt"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- State 5: AUDIO. One slider per bus plus UI SOUNDS; no MUTE WHEN UNFOCUSED on a phone (the OS
+     owns audio focus, 3.2). -->
+<section class="mk-stage" aria-label="State 5: AUDIO" data-m10-state="audio">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-terminal-panel wo-settings is-full">
+        <header class="wo-settings-head">
+          <div class="wo-t-h1">SYSTEM SETTINGS</div>
+          <div class="wo-t-caption wo-t-muted">THE DEN  /  LOCAL CONFIGURATION</div>
+        </header>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-settings-body" role="tabpanel">
+          <div class="wo-rows">
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">MASTER</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="MASTER" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">MUSIC</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="MUSIC" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">EFFECTS</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="EFFECTS" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">VOICE</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="VOICE" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100</span></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">UI SOUNDS</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="UI SOUNDS" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-focus tabindex="0"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100</span></span></div>
+          </div>
+        </div>
+        <div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- State 6: GENERAL. DEVICE PROFILE shows Auto (Touch); no PAUSE WHEN UNFOCUSED, since a phone always
+     pauses when it leaves the app (2.4 Interruption). No QUIT anywhere on a phone (QA1561). -->
+<section class="mk-stage" aria-label="State 6: GENERAL" data-m10-state="general">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame">
+      <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+      <div class="wo-backdrop"></div>
+      <div class="wo-safe wo-terminal-panel wo-settings is-full">
+        <header class="wo-settings-head">
+          <div class="wo-t-h1">SYSTEM SETTINGS</div>
+          <div class="wo-t-caption wo-t-muted">THE DEN  /  LOCAL CONFIGURATION</div>
+        </header>
+        <div class="wo-tabs" role="tablist">
+          <span data-wo-glyph="tab_prev"></span>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">DISPLAY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">AUDIO</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">CONTROLS</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="false">ACCESSIBILITY</button>
+          <button class="wo-tab" type="button" role="tab" aria-selected="true">GENERAL</button>
+          <span data-wo-glyph="tab_next"></span>
+        </div>
+        <div class="wo-settings-body" role="tabpanel">
+          <div class="wo-rows">
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">LANGUAGE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>English</span><span aria-hidden="true">▶</span></button></span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">DEVICE PROFILE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>AUTO (TOUCH)</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note" data-wo-probe="note">A change asks first, then resets the defaults.</span></div>
+            <div class="wo-row" data-wo-probe="row"><span class="wo-row-label" data-wo-probe="label">RESET ALL SETTINGS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold><span data-wo-glyph="ui_accept"></span>HOLD TO RESET</button></span></div>
+          </div>
+        </div>
+        <div class="wo-footer">
+          <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
+          <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<main class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M10 Settings, phone and tablet</h1>
+  <p class="mk-lead">What this page is for: judge the full-screen settings on a phone and a tablet, touch first.</p>
+  <section class="mk-section">
+    <h2>The six states above</h2>
+    <ol class="mk-note">
+      <li>CONTROLS on touch: TOUCH SCHEME, CONTROL SIZE, SWAP SIDES and HAPTICS.</li>
+      <li>DISPLAY: phone rows only. FRAME RATE is open: 30, 60 or 120 FPS.</li>
+      <li>ACCESSIBILITY: too many rows for one screen, so the page scrolls. Text never shrinks.</li>
+      <li>CONTROLS with a pad connected: controller rows come first, then the touch rows.</li>
+      <li>AUDIO: one slider per sound.</li>
+      <li>GENERAL: DEVICE PROFILE fixes a wrong guess in one change. RESET is hold to confirm.</li>
+    </ol>
+  </section>
+  <section class="mk-section">
+    <h2>Layout (proposal)</h2>
+    <ul class="mk-note">
+      <li>The tabs stand in a column on the left. A phone is short, so a tab row would cost a row of settings.</li>
+      <li>BACK sits top right, in the title row. That leaves room for five or six rows.</li>
+      <li>Rows stay 44 pt tall or more. Long pages scroll; the last row fades when more lies below.</li>
+      <li>On the iPad every page fits, so nothing scrolls there.</li>
+    </ul>
+  </section>
+  <section class="mk-section">
+    <h2>Not on a phone</h2>
+    <ul class="mk-note">
+      <li>WINDOW MODE, WINDOW SIZE, MONITOR and V-SYNC: the OS owns the window.</li>
+      <li>MUTE WHEN UNFOCUSED and PAUSE WHEN UNFOCUSED: a phone always pauses and mutes.</li>
+      <li>CLICK / TAP TO INTERACT: TOUCH SCHEME covers it.</li>
+      <li>QUIT: never on iOS. Android Back quits from the bare title.</li>
+    </ul>
+  </section>
+  <section class="mk-section">
+    <h2>How to use it</h2>
+    <ul class="mk-note">
+      <li>Set Device to iPhone, Android or iPad in the strip.</li>
+      <li>Set Phone controls to "tap to walk" to see the other TOUCH SCHEME.</li>
+      <li>Set Input to pad to see every state with pad prompts and the focus ring.</li>
+      <li>Android: add cutout= and edge= (canvas px) to see the unmeasured bands.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
