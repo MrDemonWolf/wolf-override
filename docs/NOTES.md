@@ -8,6 +8,7 @@ Every moved file is still in git history at commit `1cf8d73`: open one with `git
 
 - [Notes & Research](https://app.notion.com/p/3fbd61481c7b81228069c3438442a480): the index page in Notion
 - [Inbox (temporary notes)](https://app.notion.com/p/3fbd61481c7b81799e00c9bc7b2c61a0): quick notes waiting to be sorted
+- [Nathanial's play notes (2026-11-06)](https://app.notion.com/p/410d61481c7b819b9ed4c3364ef3fc5b): his own notebook for hands-on Mac and iPhone play sessions, a checklist per block and a dated session log; linked from the Game Hub
 - [Migration record (2026-10-16)](https://app.notion.com/p/3fbd61481c7b81569636d2063f0acf00): the migration plan and the map from every moved path to its Notion page
 - [Twitch: category, Drops and integration (2026-10-16)](https://app.notion.com/p/3fbd61481c7b818c9af4dcfb19b031bd): how to get a Twitch category, Twitch Drops and Twitch integration ideas
 - [Website SEO (October 2026)](https://app.notion.com/p/3fed61481c7b8190a987cc31ef06ea28): what the SEO work changed on the site (PRs #84, #85, #86, #108, #109), Nathanial's to-do list (Search Console, Bing, profile links) and the full researched plan with its sources
