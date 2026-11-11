@@ -8,11 +8,16 @@
   Markup and per-screen data only. One stage template (m04-stage) is shared by every frame on the page;
   the shared sequence player in mockups/shared/wo.js plays it from the data block below on one clock
   (brief 7.1 "Loading compare"). Until that player lands, every frame shows its first moment.
+  Shared pieces this page needs (requested for the Integrate step): the sequence player
+  (data-wo-seq*), data-wo-when, templates from another page with an include set, the loading.dim
+  token, and data-wo-only-input (an item shown only for one input class, like M03's data-wo-only
+  for profiles).
 
-  Words: the build's English strings (main.gd location card rows and objectives, the CONTINUE
-  prompt); the title is M03's template, included. Two lines are proposals, not build text: "RESTORING ..." (brief 5.6 wording)
-  and the tip placeholder (brief 7.3 M04b layout 5). Art: real game files only, placed with C3's
-  numbers (code/C3-assets-for-mockups.md sections 4 and 5).
+  Words: the build's English strings (main.gd location card rows and objectives, the continue
+  prompt "CONTINUE" / "TAP CONTINUE"); the title is M03's template, included. Two lines are
+  proposals, not build text: "RESTORING ..." (brief 5.6 wording) and the tip placeholder (brief 7.3
+  M04b layout 5). Art: real game files only, placed with C3's numbers
+  (code/C3-assets-for-mockups.md sections 4 and 5).
 
   The room change starts where today's build starts it: the engineer uses the SAFE POINT once it is
   reached (main.gd _interact_checkpoint, m0_state.gd enter_records), past the open seal, and arrives
@@ -98,7 +103,8 @@
 
 <!--
   Per-screen data for the sequence player (wo.js). Times live in the token file; this holds only
-  what is particular to this screen: the order of moments, which stage parts each moment uses, the
+  what is particular to this screen: the order of moments, the stage parts each moment goes from
+  and to (the "card", "load" and "fade" parts serve every moment), the words each moment shows, the
   measured work behind each change, and the run the per-run total counts.
 -->
 <script type="application/json" data-wo-seq-data>
@@ -111,15 +117,17 @@
   "run": {"room": 3, "continue": 1},
   "run-about": "One run of today's slice: 3 room changes and 1 Continue (brief 7.3 M04b, added-time table).",
   "moments": {
-    "continue": {"label": "Continue", "from": "title", "to": "corridor", "card": "card-corridor", "view": "load-continue"},
-    "room": {"label": "Room change", "from": "corridor", "to": "records", "card": "card-records", "view": "load-room"}
-  }
+    "continue": {"label": "Continue", "from": "title", "to": "corridor", "room": "MAINTENANCE / LOCKDOWN", "goal": "SAFE POINT REACHED"},
+    "room": {"label": "Room change", "from": "corridor", "to": "records", "room": "RECORDS ACCESS / FIRST COPY", "goal": "COPY PURGE ORDER"}
+  },
+  "words-about": "room and goal are the build's English location card rows for that moment (main.gd: the location chain before _show_top_card, and _objective()): a save made at the SAFE POINT resumes in the corridor with SAFE POINT REACHED; Records opens on COPY PURGE ORDER."
 }
 </script>
 
 <!--
   The stage: every part of both moments, back to front. The player shows the parts of the moment
-  that is playing and sets each one's opacity from the plan; until it runs, only the title shows.
+  that is playing, sets each one's opacity from the plan and fills each [data-wo-seq-text] with
+  that moment's words; until it runs, only the title shows.
 -->
 <template id="m04-stage">
   <!-- From: the title, M03's own template (included, never copied), in the "save exists" state the
@@ -182,22 +190,15 @@
   </div>
 
   <!-- Today's top card restyled (brief 5.3, 5.5): the resume card after Continue and the first-visit
-       name in a new room. Rows are main.gd's location card: location, then _objective(). -->
-  <div class="wo-layer" data-wo-seq-part="card-corridor" hidden>
+       name in a new room. One card for both moments: its two rows are main.gd's location card
+       (location, then _objective()), filled from the playing moment's "room" and "goal" in the data
+       block (data-wo-seq-text), so each string has one home on this page. -->
+  <div class="wo-layer" data-wo-seq-part="card" hidden>
     <div class="wo-safe wo-stack">
       <div class="wo-card wo-resume" data-wo-probe="card">
         <span class="wo-accent"></span>
-        <div class="wo-resume-room" data-wo-probe="card-room">MAINTENANCE / LOCKDOWN</div>
-        <div class="wo-resume-goal" data-wo-probe="card-goal">SAFE POINT REACHED</div>
-      </div>
-    </div>
-  </div>
-  <div class="wo-layer" data-wo-seq-part="card-records" hidden>
-    <div class="wo-safe wo-stack">
-      <div class="wo-card wo-resume" data-wo-probe="card">
-        <span class="wo-accent"></span>
-        <div class="wo-resume-room" data-wo-probe="card-room">RECORDS ACCESS / FIRST COPY</div>
-        <div class="wo-resume-goal" data-wo-probe="card-goal">COPY PURGE ORDER</div>
+        <div class="wo-resume-room" data-wo-seq-text="room" data-wo-probe="card-room"></div>
+        <div class="wo-resume-goal" data-wo-seq-text="goal" data-wo-probe="card-goal"></div>
       </div>
     </div>
   </div>
@@ -205,39 +206,29 @@
   <!-- The screen fade (timing.fade.out / hold / in). -->
   <div class="wo-fade" data-wo-seq-part="fade"></div>
 
-  <!-- The loading view (M04, slow loads only) and the loading card (M04b): one component, the next
-       room dimmed under it. The plan picks the bits: M04's view is the status line and the sweep
-       (5.6: the name as "RESTORING ..."); M04b's card adds the H1 name, the tip and the prompt
-       (7.3 M04b layout). Status words follow brief 5.6 (a proposal, not build text). The tip is
-       broken by hand into rows of at most 40 characters (brief 2.2), as DialogueBoxes would wrap it:
-       a ch-wide column lets a proportional row hold about 57.
+  <!-- The loading view (M04, slow loads only) and the loading card (M04b): one component for both
+       moments, over the next room (the moment's "to" part, shown under it and dimmed). The plan
+       picks the bits: M04's view is the status line and the sweep (5.6: the name as
+       "RESTORING ..."); M04b's card adds the H1 name, the tip and the prompt (7.3 M04b layout).
+       The key art bit is M04b's art=key, Continue only. Status words follow brief 5.6 (a proposal,
+       not build text). The tip is broken by hand into rows of at most 40 characters (brief 2.2), as
+       DialogueBoxes would wrap it: a ch-wide column lets a proportional row hold about 57.
        The plate and the dim cover the whole screen; the words sit in .wo-safe, so a long name at
        TEXT SIZE 200% wraps inside the safe rect instead of running into the iPhone insets
-       (7.3 M04b accept 9). -->
-  <div class="wo-layer" data-wo-seq-part="load-continue" hidden>
+       (7.3 M04b accept 9). The prompt is the build's continue prompt (main.gd _continue_prompt):
+       the interact glyph and CONTINUE, or TAP CONTINUE on touch, where no glyph shows. -->
+  <div class="wo-layer" data-wo-seq-part="load" hidden>
     <div class="wo-loading-plate" data-wo-seq-bit="keyart"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
     <div class="wo-loading-dim" data-wo-seq-bit="dim"></div>
     <div class="wo-safe">
       <div class="wo-loading">
-        <div class="wo-loading-name" data-wo-seq-bit="name" data-wo-probe="load-name">MAINTENANCE / LOCKDOWN</div>
+        <div class="wo-loading-name" data-wo-seq-bit="name" data-wo-seq-text="room" data-wo-probe="load-name"></div>
         <div class="wo-sweep" data-wo-seq-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING MAINTENANCE / LOCKDOWN<span data-wo-seq-percent></span></div>
+        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING <span data-wo-seq-text="room"></span><span data-wo-seq-percent></span></div>
         <div class="wo-loading-tip" data-wo-seq-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
       </div>
     </div>
-    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
-  </div>
-  <div class="wo-layer" data-wo-seq-part="load-room" hidden>
-    <div class="wo-loading-dim" data-wo-seq-bit="dim"></div>
-    <div class="wo-safe">
-      <div class="wo-loading">
-        <div class="wo-loading-name" data-wo-seq-bit="name" data-wo-probe="load-name">RECORDS ACCESS / FIRST COPY</div>
-        <div class="wo-sweep" data-wo-seq-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING RECORDS ACCESS / FIRST COPY<span data-wo-seq-percent></span></div>
-        <div class="wo-loading-tip" data-wo-seq-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
-      </div>
-    </div>
-    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span>CONTINUE</span>
+    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span><span data-wo-only-input="touch">TAP</span>CONTINUE</span>
   </div>
 </template>
 </body>
