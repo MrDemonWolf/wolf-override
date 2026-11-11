@@ -39,23 +39,19 @@
   <section class="mk-device" data-wo-device="url">
     <div class="wo-frame">
 
-      <div class="wo-world-view" data-wo-world>
+      <div class="wo-world-view" data-wo-world="data/corridor.json">
         <script type="application/json">
-          {"camera": "right", "cameras": {"talk": "left", "hint": "left", "walkto": "left"},
-           "framing": "auto", "grade": true, "pieces": [
-            {"src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom sides"},
-            {"beacons": "CorridorDepth", "drop": 40},
-            {"src": "doors/seal-back.png", "x": 724.80, "y": 311.13, "w": 94.5, "h": 144.5, "id": "door", "tap": "SEAL"},
-            {"src": "doors/seal-wall.png", "x": 708.43, "y": 0, "w": 91, "h": 458.5, "brightness": 0.72},
-            {"src": "rooms/corridor-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
-            {"src": "doors/seal-curtain.png", "quad": [[722.4, 310.2], [791.4, 325.2], [791.4, 456.4], [722.4, 429.7]]},
-            {"src": "doors/seal-head.png", "x": 706.50, "y": 294.24, "w": 91, "h": 136.5},
-            {"node": "PurgeTerminalArt", "id": "display"},
-            {"node": "BreakerArt", "id": "breaker", "tap": "BREAKER", "when": {"is-usable": "usable"}},
-            {"node": "RelayArt", "id": "relay", "tap": "COOLANT RELAY", "when": {"is-usable": "usable", "is-hover": "walkto"}},
-            {"node": "CheckpointArt", "id": "safe", "tap": "SAFE POINT", "when": {"is-usable": "usable"}},
-            {"src": "props/bypass-gearbox.png", "x": 682, "y": 379, "w": 22.18, "h": 29.82, "id": "bypass", "tap": "MANUAL BYPASS", "when": {"is-usable": "usable"}},
-            {"src": "props/handwheel.png", "x": 683.09, "y": 388.98, "w": 21.82, "h": 21.6, "when": {"is-usable": "usable"}},
+          {"cameras": {"talk": "left", "hint": "left", "walkto": "left"}, "pieces": [
+            {"id": "far", "bleed": "bottom sides"},
+            {"beacons": "CorridorDepth", "drop": 40, "slot": "back"},
+            {"id": "door", "tap": "SEAL"},
+            {"src": "doors/seal-curtain.png", "quad": [[722.4, 310.2], [791.4, 325.2], [791.4, 456.4], [722.4, 429.7]], "slot": "curtain"},
+            {"node": "PurgeTerminalArt", "id": "display", "slot": "props"},
+            {"id": "breaker", "when": {"is-usable": "usable"}},
+            {"id": "relay", "when": {"is-usable": "usable", "is-hover": "walkto"}},
+            {"id": "safe", "when": {"is-usable": "usable"}},
+            {"id": "bypass", "tap": "MANUAL BYPASS", "when": {"is-usable": "usable"}},
+            {"id": "wheel", "when": {"is-usable": "usable"}},
             {"reach": "corridor", "y": 436, "h": 8, "buffer": 0.1, "walk": 80},
 
             {"node": "Wolf/BodySprite", "id": "wolf", "at": [469, 423], "flip": true, "tap": "WOLF", "scene": "talk hint walkto"},
@@ -69,9 +65,7 @@
 
             {"node": "Wolf/BodySprite", "id": "wolf", "at": [462, 423], "tap": "WOLF", "scene": "pill usable touch lockdown", "when": {"is-usable": "usable"}},
             {"node": "Human/BodySprite", "at": [655, 410], "flip": true, "scene": "pill usable touch"},
-            {"node": "Human/BodySprite", "at": [712, 410], "flip": true, "scene": "lockdown"},
-
-            {"src": "doors/seal-front.png", "x": 787.96, "y": 0, "w": 86.5, "h": 477}
+            {"node": "Human/BodySprite", "at": [712, 410], "flip": true, "scene": "lockdown"}
           ]}
         </script>
       </div>

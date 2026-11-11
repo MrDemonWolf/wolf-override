@@ -123,22 +123,11 @@
 
 <!-- The paused corridor: the frozen world, today's backdrop and the pause card (6.2 Pause). -->
 <template id="m07-paused">
-  <div class="wo-world-view" data-wo-world>
+  <div class="wo-world-view" data-wo-world="data/corridor.json">
     <script type="application/json">
-      {"camera": "right", "framing": "auto", "grade": true, "pieces": [
-        {"src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
-        {"src": "doors/seal-back.png", "x": 724.80, "y": 311.13, "w": 94.5, "h": 144.5},
-        {"src": "doors/seal-wall.png", "x": 708.43, "y": 0, "w": 91, "h": 458.5, "brightness": 0.72},
-        {"src": "rooms/corridor-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
-        {"src": "doors/seal-head.png", "x": 706.50, "y": 294.24, "w": 91, "h": 136.5},
-        {"node": "BreakerArt", "tap": "BREAKER"},
-        {"node": "RelayArt", "tap": "COOLANT RELAY"},
-        {"node": "CheckpointArt", "tap": "SAFE POINT"},
-        {"src": "props/bypass-gearbox.png", "x": 682, "y": 379, "w": 22.18, "h": 29.82},
-        {"src": "props/handwheel.png", "x": 683.09, "y": 388.98, "w": 21.82, "h": 21.6},
+      {"pieces": [
         {"node": "Wolf/BodySprite", "at": [462, 423], "tap": "WOLF"},
-        {"node": "Human/BodySprite", "at": [655, 410], "flip": true},
-        {"src": "doors/seal-front.png", "x": 787.96, "y": 0, "w": 86.5, "h": 477}
+        {"node": "Human/BodySprite", "at": [655, 410], "flip": true}
       ]}
     </script>
   </div>

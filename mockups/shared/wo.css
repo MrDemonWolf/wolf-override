@@ -120,8 +120,14 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   transform: scale(1);
   transition: transform var(--wo-motion-focus-out) var(--wo-motion-ease-out), background-color var(--wo-motion-focus-out) var(--wo-motion-ease-out);
 }
-.wo-btn:hover, .wo-btn.is-hover, .wo-answer:hover, .wo-answer.is-hover, .wo-select:hover, .wo-select.is-hover,
-[data-ring="on"] .wo-btn:focus, [data-ring="on"] .wo-answer:focus, [data-ring="on"] .wo-select:focus, .wo-btn.is-focus, .wo-answer.is-focus {
+/* Buttons and selects are exactly the profile density tall: no block padding, the label centred
+   (Godot's row helper sets content margins to (density - font height) / 2, the same box). */
+.wo-btn, .wo-select { padding-block: 0; }
+/* Hover looks apply only while the frame's input is the pointer (a pad or key player never sees a
+   stray hover); .is-current is the frame's focus holder (wo.js markCurrent), drawn like focus. */
+[data-input="pointer"] .wo-btn:hover, .wo-btn.is-hover, [data-input="pointer"] .wo-answer:hover, .wo-answer.is-hover, [data-input="pointer"] .wo-select:hover, .wo-select.is-hover,
+[data-ring="on"] .wo-btn:focus, [data-ring="on"] .wo-answer:focus, [data-ring="on"] .wo-select:focus, .wo-btn.is-focus, .wo-answer.is-focus, .wo-select.is-focus,
+[data-ring="on"] .wo-btn.is-current, [data-ring="on"] .wo-answer.is-current, [data-ring="on"] .wo-select.is-current {
   --sb-bg: var(--wo-Button-hover-bg); --sb-border: var(--wo-Button-hover-border); --sb-bw: var(--wo-Button-hover-bw);
   --sb-radius: var(--wo-Button-hover-radius); --sb-pad: var(--wo-Button-hover-pad); --sb-shadow: var(--wo-Button-hover-shadow);
   color: var(--wo-Button-font_hover_color);
@@ -135,7 +141,7 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   transform: scale(var(--wo-motion-press-scale));
   transition: transform var(--wo-motion-press-duration) var(--wo-motion-ease-in);
 }
-.wo-btn[disabled], .wo-btn.is-disabled, .wo-answer[disabled], .wo-select[disabled] {
+.wo-btn[disabled], .wo-btn.is-disabled, .wo-answer[disabled], .wo-select[disabled], .wo-select[aria-disabled="true"] {
   --sb-bg: var(--wo-Button-disabled-bg); --sb-border: var(--wo-Button-disabled-border); --sb-bw: var(--wo-Button-disabled-bw);
   --sb-radius: var(--wo-Button-disabled-radius); --sb-pad: var(--wo-Button-disabled-pad); --sb-shadow: var(--wo-Button-disabled-shadow);
   color: var(--wo-Button-font_disabled_color);
@@ -155,7 +161,11 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   pointer-events: none;
 }
 [data-ring="on"] .wo-btn:focus::after, [data-ring="on"] .wo-answer:focus::after, [data-ring="on"] .wo-select:focus::after,
-[data-ring="on"] .wo-tab:focus::after, .wo-btn.is-focus::after, .wo-answer.is-focus::after, .wo-tab.is-focus::after { opacity: 1; }
+[data-ring="on"] .wo-tab:focus::after, .wo-btn.is-focus::after, .wo-answer.is-focus::after, .wo-tab.is-focus::after, .wo-select.is-focus::after,
+[data-ring="on"] .is-current::after { opacity: 1; }
+/* Switches and sliders have no ring StyleBox of their own (CheckButton and HSlider use
+   Button_focus): the ring is drawn as a box shadow of that box's border width and colour. */
+[data-ring="on"] .wo-toggle:focus, .wo-toggle.is-focus, [data-ring="on"] .wo-slider:focus, .wo-slider.is-focus { outline: none; box-shadow: 0 0 0 var(--wo-Button-focus-bw-top) var(--wo-Button-focus-border); }
 
 .wo-btn.wo-terminal {
   --sb-bg: var(--wo-TerminalButton-normal-bg); --sb-border: var(--wo-TerminalButton-normal-border); --sb-bw: var(--wo-TerminalButton-normal-bw);
@@ -163,7 +173,7 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   --ring-radius: var(--wo-TerminalButton-focus-radius); --ring-bw: var(--wo-TerminalButton-focus-bw); --ring-inset: var(--wo-TerminalButton-focus-inset); --ring: var(--wo-TerminalButton-focus-border);
   color: var(--wo-TerminalButton-font_color);
 }
-.wo-btn.wo-terminal:hover, .wo-btn.wo-terminal.is-hover, [data-ring="on"] .wo-btn.wo-terminal:focus, .wo-btn.wo-terminal.is-focus {
+[data-input="pointer"] .wo-btn.wo-terminal:hover, .wo-btn.wo-terminal.is-hover, [data-ring="on"] .wo-btn.wo-terminal:focus, .wo-btn.wo-terminal.is-focus, [data-ring="on"] .wo-btn.wo-terminal.is-current {
   --sb-bg: var(--wo-TerminalButton-hover-bg); --sb-border: var(--wo-TerminalButton-hover-border); --sb-bw: var(--wo-TerminalButton-hover-bw);
   --sb-radius: var(--wo-TerminalButton-hover-radius); --sb-pad: var(--wo-TerminalButton-hover-pad); --sb-shadow: var(--wo-TerminalButton-hover-shadow);
 }
@@ -174,6 +184,7 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
 .wo-btn.wo-terminal[disabled], .wo-btn.wo-terminal.is-disabled {
   --sb-bg: var(--wo-TerminalButton-disabled-bg); --sb-border: var(--wo-TerminalButton-disabled-border); --sb-bw: var(--wo-TerminalButton-disabled-bw);
   --sb-radius: var(--wo-TerminalButton-disabled-radius); --sb-pad: var(--wo-TerminalButton-disabled-pad); --sb-shadow: var(--wo-TerminalButton-disabled-shadow);
+  color: var(--wo-Button-font_disabled_color);
 }
 
 /* Touch controls: ◀ ▶ (today's size), USE (15 mm on a phone), PAUSE (44 pt on a phone). */
@@ -193,7 +204,7 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   user-select: none;
   touch-action: none;
 }
-.wo-touch:hover, .wo-touch.is-hover {
+[data-input="pointer"] .wo-touch:hover, .wo-touch.is-hover {
   --sb-bg: var(--wo-TouchButton-hover-bg); --sb-border: var(--wo-TouchButton-hover-border); --sb-shadow: var(--wo-TouchButton-hover-shadow);
 }
 .wo-touch:active, .wo-touch.is-pressed {
@@ -217,6 +228,7 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   border-width: var(--wo-TouchButton-normal-bw);
   background: var(--wo-TouchButton-normal-bg);
   pointer-events: none;
+  box-sizing: border-box;
 }
 .wo-move-ring::after {
   content: "";
@@ -262,7 +274,7 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   cursor: pointer;
   outline: none;
 }
-.wo-tab:hover, .wo-tab.is-hover {
+[data-input="pointer"] .wo-tab:hover, .wo-tab.is-hover {
   --sb-bg: var(--wo-TerminalTabBar-tab_hovered-bg); --sb-border: var(--wo-TerminalTabBar-tab_hovered-border); --sb-bw: var(--wo-TerminalTabBar-tab_hovered-bw);
   --sb-radius: var(--wo-TerminalTabBar-tab_hovered-radius); --sb-pad: var(--wo-TerminalTabBar-tab_hovered-pad); --sb-shadow: var(--wo-TerminalTabBar-tab_hovered-shadow);
 }
@@ -277,6 +289,59 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   color: var(--wo-Button-font_disabled_color);
 }
 
+/* ------------------------------------------------------------------------------------------ */
+/* Controller map (M11; brief 4.2): pad drawing in the middle, callouts beside their buttons,  */
+/* one line of the buttons with nothing to do here. Callouts also sit in the 4.2 sheet table. */
+/* ------------------------------------------------------------------------------------------ */
+
+.wo-callout { display: inline-flex; align-items: center; gap: var(--wo-density-gap); min-height: var(--wo-glyph-h); font-size: var(--wo-fs-body); line-height: var(--wo-type-body-line-height); color: var(--wo-Button-font_color); white-space: nowrap; }
+.wo-callout-note { color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
+.wo-callout.is-none, .wo-callout.is-system { color: var(--wo-today-text-note); }
+.wo-callout.is-clash { color: var(--wo-today-label-alert); }
+.mk-table .wo-callout { display: flex; flex-wrap: wrap; font-size: inherit; white-space: normal; }
+.mk-table .wo-callout-note { flex-basis: 100%; }
+
+/* In the settings shell the map takes the place of the scrolling body: all the height left. */
+.wo-settings > .wo-padmap { flex: 1 1 0; min-height: 0; }
+.wo-padmap {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36% minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "top top top" "left mid right" "free free free";
+  column-gap: var(--wo-density-label-gap);
+  row-gap: var(--wo-density-gap);
+}
+.wo-padmap .wo-callout-note { display: none; }
+/* Above the pad: two halves split on the pad's centre line; the left half's callouts point right. */
+.wo-padmap-top { grid-area: top; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--wo-density-label-gap); align-items: end; }
+/* The top row keeps one callout line even when a context puts nothing above the pad (credits),
+   so the pad stays in the same place while the player flips through the contexts. */
+.wo-padmap-top-l, .wo-padmap-top-r { display: flex; align-items: flex-end; gap: var(--wo-density-edge-pad); min-width: 0; min-height: var(--wo-glyph-h); }
+.wo-padmap-top-l { justify-content: flex-end; }
+.wo-padmap-top-l .wo-callout { flex-direction: row-reverse; }
+/* Side columns: wo.js sets each callout's top level with its button (stackColumn); the row gap
+   is the least space it keeps between two callouts. Left callouts point right, at the pad. */
+.wo-padmap-left, .wo-padmap-right { position: relative; min-width: 0; row-gap: var(--wo-density-gap); }
+.wo-padmap-left { grid-area: left; }
+.wo-padmap-right { grid-area: right; }
+.wo-padmap-left > .wo-callout, .wo-padmap-right > .wo-callout { position: absolute; top: 0; }
+.wo-padmap-left > .wo-callout { right: 0; flex-direction: row-reverse; }
+.wo-padmap-right > .wo-callout { left: 0; }
+.wo-padmap-mid { grid-area: mid; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.wo-padmap-pad { width: 100%; height: 100%; color: var(--wo-TerminalPanel-panel-border); overflow: visible; }
+.wo-pad-body { fill: var(--wo-TerminalButton-normal-bg); stroke: currentColor; }
+.wo-pad-spot { fill: var(--wo-TerminalPanel-panel-bg); stroke: currentColor; }
+.wo-pad-spot.is-used { fill: var(--wo-Button-hover-bg); stroke: var(--wo-color-role-focus-ring); }
+.wo-pad-spot.is-system { stroke: var(--wo-today-text-note); }
+.wo-padmap-free { grid-area: free; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--wo-density-gap); color: var(--wo-today-text-note); }
+.wo-padmap-free-label { font-size: var(--wo-fs-body); }
+/* The system's button sits apart from the unused ones: a wider gap before it. */
+.wo-padmap-free > .wo-callout { margin-left: var(--wo-density-label-gap); }
+.wo-padmap-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.wo-padmap-lines line { stroke: var(--wo-color-role-focus-ring); }
+.wo-padmap-lines circle { fill: var(--wo-color-role-focus-ring); }
+
 .wo-footer { display: flex; align-items: center; justify-content: flex-end; gap: var(--wo-density-label-gap); min-height: var(--wo-density); }
 .wo-footer-item {
   display: inline-flex;
@@ -287,12 +352,40 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   font-size: var(--wo-fs-body);
   cursor: pointer;
 }
-.wo-footer-item:hover { color: var(--wo-Button-font_hover_color); }
-/* On touch the footer shows a BACK button only (3.1 step 7). */
+[data-input="pointer"] .wo-footer-item:hover { color: var(--wo-Button-font_hover_color); }
+/* On touch the footer shows a BACK button only (3.1 step 7); a footer of prompts alone (no BACK,
+   nothing else in it) takes no room at all. */
 [data-input="touch"] .wo-footer-item:not(.is-back) { display: none; }
+[data-input="touch"] .wo-footer:not(:has(> :not(.wo-footer-item))):not(:has(> .is-back)) { display: none; }
+/* On touch BACK is a real button at the profile density (3.1 step 7). */
+[data-input="touch"] .wo-footer-item.is-back {
+  box-sizing: border-box;
+  justify-content: center;
+  min-width: var(--wo-density);
+  min-height: var(--wo-density);
+  padding: 0 var(--wo-density-edge-pad);
+  background-color: var(--wo-TerminalButton-normal-bg);
+  border: solid var(--wo-TerminalButton-normal-border);
+  border-width: var(--wo-TerminalButton-normal-bw);
+  border-radius: var(--wo-TerminalButton-normal-radius);
+}
+
+/* Per-profile items: data-wo-only="desktop handheld" hides an item on the other profiles (QUIT is
+   never on a phone or tablet, 2.4 Quit; Android Back quits from the bare title instead). */
+[data-profile="desktop"] [data-wo-only]:not([data-wo-only~="desktop"]),
+[data-profile="handheld"] [data-wo-only]:not([data-wo-only~="handheld"]),
+[data-profile="phone"] [data-wo-only]:not([data-wo-only~="phone"]) { display: none; }
+/* Per-input items: data-wo-only-input="touch" shows an item only while its frame's input class is
+   one of the listed ones (pointer, keyboard, pad, touch): M04b's TAP CONTINUE (main.gd _continue_prompt). */
+.wo-frame[data-input="pointer"] [data-wo-only-input]:not([data-wo-only-input~="pointer"]),
+.wo-frame[data-input="keyboard"] [data-wo-only-input]:not([data-wo-only-input~="keyboard"]),
+.wo-frame[data-input="pad"] [data-wo-only-input]:not([data-wo-only-input~="pad"]),
+.wo-frame[data-input="touch"] [data-wo-only-input]:not([data-wo-only-input~="touch"]) { display: none; }
+/* TOUCH SCHEME variants follow the strip's Phone controls switch (html[data-touch-scheme], ?touch=). */
+html[data-touch-scheme="pad"] [data-wo-scheme="tapwalk"], html[data-touch-scheme="tapwalk"] [data-wo-scheme="pad"] { display: none; }
 
 /* ------------------------------------------------------------------------------------------ */
-/* Settings rows and their controls (3.1)                                                      */
+/* Settings shell (3.1; M08, M09, M10, M11): head, tabs, a body that scrolls, footer; rows      */
 /* ------------------------------------------------------------------------------------------ */
 
 .wo-terminal-panel {
@@ -300,18 +393,97 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   --sb-radius: var(--wo-TerminalPanel-panel-radius); --sb-pad: var(--wo-TerminalPanel-panel-pad); --sb-shadow: var(--wo-TerminalPanel-panel-shadow);
   padding: var(--wo-density-edge-pad);
 }
+/* One shell for every device: the head line, the tab strip, the body (fills what is left and
+   scrolls: pages scroll instead of shrinking text, 3.1 step 4) and the footer prompts, which stay
+   in one place on every page. Put it on the HUD-safe box (.wo-safe) or on the desktop card. */
+.wo-settings { display: flex; flex-direction: column; gap: var(--wo-density-gap); }
+.wo-settings > * { flex: none; }
+/* The title and its caption on one baseline. */
+.wo-settings-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--wo-density-label-gap); }
+.wo-settings-body { flex: 1 1 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--wo-HSlider-grabber_area-bg) var(--wo-HSlider-slider-bg); }
+/* Scroll cue: the last row-height of the body fades out, and the rows end with that much empty
+   space, so a row only fades while more of the page lies below it. */
+.wo-settings-body { mask-image: linear-gradient(to bottom, currentColor calc(100% - var(--wo-density)), transparent); }
+.wo-settings-body > .wo-rows { padding-bottom: var(--wo-density); }
+.wo-settings > .wo-footer { margin-top: auto; }
+/* The desktop card: today's SettingsMenu size (main.tscn, 760 x 464), centred, never past the safe
+   rect, in the terminal look with the CardSheen over it (3.1 step 5). */
+.wo-settings-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(var(--wo-today-settings-w), var(--wo-canvas-w) - var(--wo-edge-left) - var(--wo-edge-right));
+  height: min(var(--wo-today-settings-h), var(--wo-canvas-h) - var(--wo-edge-top) - var(--wo-edge-bottom));
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+.wo-settings-card::before { content: ""; position: absolute; inset: 0; background: var(--wo-CardSheen-panel-image); pointer-events: none; }
+/* The tab strip scrolls sideways when five tabs and the LB / RB glyphs are wider than the panel
+   (the Ally at TEXT SIZE 125%); the glyphs stay pinned at its ends over the panel colour, and
+   wo.js scrolls the selected tab into view. */
+.wo-settings > .wo-tabs { position: relative; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.wo-tabs > .wo-tab { flex: none; }
+.wo-tabs > .wo-glyph:first-child, .wo-tabs > .wo-glyph:last-child { position: sticky; z-index: 1; align-self: stretch; background: var(--wo-TerminalPanel-panel-bg); }
+.wo-tabs > .wo-glyph:first-child { left: 0; }
+.wo-tabs > .wo-glyph:last-child { right: 0; }
+/* A page of a tab (data-wo-page) shows only while its tab is selected (wo.js selectTab). */
+/* Phones: the tabs become a left rail (LB and RB on one line above it), the footer moves up beside
+   the title and the body takes the right column, so 58 and 63 px rows still show five or six. */
+.wo-frame[data-profile="phone"] .wo-settings {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: var(--wo-density-edge-pad);
+  row-gap: var(--wo-density-gap);
+}
+.wo-frame[data-profile="phone"] .wo-settings-head { grid-column: 1 / -1; grid-row: 1; align-self: center; }
+.wo-frame[data-profile="phone"] .wo-settings > .wo-footer { grid-column: 2; grid-row: 1; justify-self: end; align-self: center; margin-top: 0; }
+.wo-frame[data-profile="phone"] .wo-settings > .wo-tabs { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: var(--wo-density-gap); overflow: visible; }
+.wo-frame[data-profile="phone"] .wo-settings > .wo-tabs > .wo-tab { grid-column: 1 / -1; }
+.wo-frame[data-profile="phone"] .wo-settings > .wo-tabs > .wo-glyph:first-child { position: static; grid-row: 1; grid-column: 1; justify-self: start; }
+.wo-frame[data-profile="phone"] .wo-settings > .wo-tabs > .wo-glyph:last-child { position: static; grid-row: 1; grid-column: 2; justify-self: end; }
+.wo-frame[data-profile="phone"] .wo-settings-body { grid-column: 2; grid-row: 2; }
+
+/* Rows: label | control, one control column per page (density.control-share of the row, a
+   proposal), so every control and slider starts at the same x. A note runs under both. */
 .wo-rows { display: flex; flex-direction: column; gap: var(--wo-density-gap); }
+.wo-rows-head { padding-top: var(--wo-density-gap); color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
 .wo-row {
-  display: flex;
-  flex-wrap: wrap;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc(var(--wo-density-control-share) * 100%);
   align-items: center;
-  justify-content: space-between;
   column-gap: var(--wo-density-label-gap);
   min-height: var(--wo-density);
+  cursor: pointer;
 }
+.wo-row > :nth-child(n + 3) { grid-column: 1 / -1; }
 .wo-row-label { font-family: var(--wo-type-h3-face); font-weight: var(--wo-type-h3-weight); font-variation-settings: "wght" var(--wo-type-h3-weight); font-size: var(--wo-fs-h3); line-height: normal; }
-.wo-row-control { display: flex; align-items: center; justify-content: flex-end; gap: var(--wo-density-gap); min-height: var(--wo-density); }
-.wo-row-note { flex-basis: 100%; color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
+.wo-row-control { position: relative; display: flex; align-items: center; justify-content: flex-end; gap: var(--wo-density-gap); min-height: var(--wo-density); }
+/* Controls fill the column (a switch keeps its shape); a slider leaves a fixed width for its value. */
+.wo-row-control > :is(.wo-select, .wo-btn, .wo-slider), .wo-row > :is(.wo-select, .wo-btn) { flex: 1 1 auto; min-width: 0; }
+.wo-row-control > .wo-slider ~ .wo-t-body { flex: none; min-width: var(--wo-density); text-align: end; }
+.wo-row-note { color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
+/* Row buttons are Body, like the selects beside them (game_settings.gd sets its row buttons to the
+   body size), not the menu buttons' H2. */
+.wo-row .wo-btn { font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); }
+/* The row that holds focus is lit whole (the TerminalButton hover box) with the theme's ring
+   around it; the control inside draws no ring of its own, so there is one highlight. */
+.wo-row.is-focus, [data-ring="on"] .wo-row:focus-within, [data-ring="on"] .wo-row:has(.is-current), [data-input="pointer"] .wo-row:hover {
+  background: var(--wo-TerminalButton-hover-bg);
+  border-radius: var(--wo-TerminalButton-hover-radius);
+}
+.wo-row.is-focus::after, [data-ring="on"] .wo-row:focus-within::after, [data-ring="on"] .wo-row:has(.is-current)::after {
+  content: "";
+  position: absolute;
+  inset: var(--wo-TerminalButton-focus-inset);
+  border: solid var(--wo-TerminalButton-focus-border);
+  border-width: var(--wo-TerminalButton-focus-bw);
+  border-radius: var(--wo-TerminalButton-focus-radius);
+  pointer-events: none;
+}
+.wo-row :is(.wo-btn, .wo-select)::after { content: none; }
+.wo-row :is(.wo-toggle, .wo-slider):focus { box-shadow: none; }
 
 .wo-select { justify-content: space-between; font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); }
 .wo-popup {
@@ -319,22 +491,54 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
   --sb-radius: var(--wo-PopupMenu-panel-radius); --sb-pad: var(--wo-PopupMenu-panel-pad); --sb-shadow: var(--wo-PopupMenu-panel-shadow);
   color: var(--wo-PopupMenu-font_color);
 }
-.wo-popup-item { min-height: var(--wo-density); display: flex; align-items: center; padding: var(--wo-PopupMenu-hover-pad); border-radius: var(--wo-PopupMenu-hover-radius); }
-.wo-popup-item:hover, .wo-popup-item.is-hover { background: var(--wo-PopupMenu-hover-bg); color: var(--wo-PopupMenu-font_hover_color); }
+/* A list in a row is shut until opened; an open one drops under its select, over the rows below
+   (Godot draws it as a popup), or sits above it (.is-above, wo.js placeList, as PopupMenu flips). */
+.wo-row-control > .wo-popup:not(.is-open) { display: none; }
+.wo-popup.is-open { position: absolute; top: 100%; right: 0; z-index: 10; display: flex; flex-direction: column; min-width: 100%; }
+.wo-popup.is-open.is-above { top: auto; bottom: 100%; }
+.wo-popup-item { min-height: var(--wo-density); display: flex; align-items: center; padding: var(--wo-PopupMenu-hover-pad); border-radius: var(--wo-PopupMenu-hover-radius); cursor: pointer; }
+[data-input="pointer"] .wo-popup-item:hover, .wo-popup-item.is-hover { background: var(--wo-PopupMenu-hover-bg); color: var(--wo-PopupMenu-font_hover_color); }
+/* A choice that cannot be picked (above the refresh rate with V-sync on, 3.2). */
+.wo-popup-item[aria-disabled="true"] { color: var(--wo-Button-font_disabled_color); cursor: default; }
 
 /* HSlider: the theme's track and fill boxes; a round grabber half a row tall (Godot's grabber is
-   an engine icon with no file in the project, so its shape is the mockup's). */
-.wo-slider { position: relative; flex: 1; height: var(--wo-density); display: flex; align-items: center; }
+   an engine icon with no file in the project, so its shape is the mockup's). wo.js sets --fill
+   from aria-valuenow, aria-valuemin and aria-valuemax. */
+.wo-slider { position: relative; flex: 1; height: var(--wo-density); display: flex; align-items: center; outline: none; }
 .wo-slider-track { position: relative; width: 100%; padding: var(--wo-HSlider-slider-pad); background: var(--wo-HSlider-slider-bg); border-radius: var(--wo-HSlider-slider-radius); }
 .wo-slider-fill { position: absolute; left: 0; top: 0; bottom: 0; width: var(--fill); background: var(--wo-HSlider-grabber_area-bg); border-radius: var(--wo-HSlider-grabber_area-radius); }
 .wo-slider-grab { position: absolute; top: 50%; left: var(--fill); width: calc(var(--wo-density) / 2); height: calc(var(--wo-density) / 2); transform: translate(-50%, -50%); border-radius: 50%; background: var(--wo-Button-font_color); }
 
 /* CheckButton: the theme sets only its text and focus; the switch is an engine icon, drawn here
    from the slider's track and fill colours. */
-.wo-toggle { position: relative; width: var(--wo-density); height: calc(var(--wo-density) / 2); border-radius: var(--wo-density); background: var(--wo-HSlider-slider-bg); }
+.wo-toggle { position: relative; flex: none; width: var(--wo-density); height: calc(var(--wo-density) / 2); border-radius: var(--wo-density); background: var(--wo-HSlider-slider-bg); outline: none; }
 .wo-toggle::after { content: ""; position: absolute; top: 0; left: 0; width: 50%; height: 100%; border-radius: 50%; background: var(--wo-Button-font_disabled_color); transition: left var(--wo-motion-focus-in) var(--wo-motion-ease-in); }
 .wo-toggle[aria-checked="true"] { background: var(--wo-HSlider-grabber_area-bg); }
 .wo-toggle[aria-checked="true"]::after { left: 50%; background: var(--wo-Button-font_color); }
+/* A switch that does not apply (SWAP SIDES under tap to walk): Button's disabled colours. */
+.wo-toggle[aria-disabled="true"] { background: var(--wo-Button-disabled-bg); box-shadow: inset 0 0 0 1px var(--wo-Button-disabled-border); }
+.wo-toggle[aria-disabled="true"]::after { background: var(--wo-Button-font_disabled_color); }
+
+/* Hold to confirm (3.2): the control fills left to right with the slider's fill colour while held
+   (wo.js sets --fill over timing.hold-confirm, or from data-wo-value for a still). */
+[data-wo-hold] { background-image: linear-gradient(to right, var(--wo-HSlider-grabber_area-bg) var(--fill, 0%), transparent var(--fill, 0%)); }
+/* A rebind waiting for its input: the focus colour pulses slowly (motion.reduced-pulse); steady
+   under REDUCED MOTION. */
+.is-capturing.wo-btn { animation: wo-capture var(--wo-motion-reduced-pulse) var(--wo-motion-ease-in) infinite alternate; }
+@keyframes wo-capture { from { box-shadow: 0 0 0 0 transparent; } to { box-shadow: 0 0 0 var(--wo-Button-focus-bw-top) var(--wo-Button-focus-border); } }
+html[data-motion="reduced"] .is-capturing.wo-btn { animation: none; box-shadow: 0 0 0 var(--wo-Button-focus-bw-top) var(--wo-Button-focus-border); }
+
+/* A modal layer: the backdrop over the whole frame and one card centred in the safe rect
+   (keep-or-revert, a hold confirm). */
+.wo-modal { position: absolute; inset: 0; display: grid; place-items: center; padding: var(--wo-edge-top) var(--wo-edge-right) var(--wo-edge-bottom) var(--wo-edge-left); }
+.wo-modal > :not(.wo-backdrop) { position: relative; max-width: 100%; max-height: 100%; }
+/* Key art or a room plate covering the whole frame at any shape (object-fit cover): one backdrop
+   for settings screens, the loading view's plate and any full-frame picture. */
+.wo-plate, .wo-loading-plate { position: absolute; inset: 0; overflow: hidden; }
+.wo-plate > img, .wo-loading-plate > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* A scroller that keeps its children whole: they scroll inside the safe rect instead of squeezing. */
+.wo-scroll { max-height: 100%; overflow-y: auto; }
+.wo-scroll > * { flex-shrink: 0; }
 
 /* ------------------------------------------------------------------------------------------ */
 /* Cards and panels (HudCard, MenuPanel, CardSheen; today's 4 px accent)                       */
@@ -359,9 +563,18 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
 .wo-rule { height: var(--wo-today-accent-w); background: var(--wo-today-accent); }
 .wo-backdrop { position: absolute; inset: 0; background: var(--wo-today-pause-backdrop); }
 
-/* The pause panel (6.2 Pause): title, then a column of buttons. */
-.wo-pause { display: flex; flex-direction: column; gap: var(--wo-density-gap); }
+/* The pause panel (6.2 Pause): title, then a column of buttons. On a short screen (TEXT SIZE 200%,
+   a phone in landscape) it scrolls inside the safe rect instead of squeezing its buttons. */
+.wo-pause { display: flex; flex-direction: column; gap: var(--wo-density-gap); max-height: 100%; overflow-y: auto; }
+.wo-pause > * { flex-shrink: 0; }
 .wo-pause .wo-btn { width: 100%; }
+
+/* Overlays (wo.js setOverlay): a pause or a dialog over the screen, closed by B, Esc, Menu or a
+   [data-wo-close] item. The screen-open motion (data-wo-open="screen", motion.screen.in): the
+   backdrop fades in and the card rises by MENU_REVEAL_OFFSET (main.gd) while it fades in. */
+[data-wo-open="screen"].is-opening .wo-backdrop { animation: wo-appear var(--wo-motion-screen-in) var(--wo-motion-ease-in) backwards; }
+[data-wo-open="screen"].is-opening :is(.wo-panel, .wo-toast, .wo-terminal-panel) { animation: wo-rise var(--wo-motion-screen-in) var(--wo-motion-ease-in) backwards; }
+html[data-motion="reduced"] [data-wo-open="screen"].is-opening :is(.wo-panel, .wo-toast, .wo-terminal-panel) { animation-name: wo-appear; }
 
 /* Resume card and first-visit name: today's top card restyled (5.3, 5.5; no second card). */
 .wo-resume { display: flex; flex-direction: column; gap: var(--wo-density-gap); padding-left: calc(var(--wo-today-accent-w) + var(--wo-density-edge-pad)); }
@@ -405,8 +618,10 @@ html[data-wo-state="error"] body > :not(.mk-notice) { display: none; }
 }
 html[data-speaker="portrait"] .wo-box.has-portrait { min-height: var(--wo-dialogue-box-height-portrait); }
 .wo-box.is-top { bottom: auto; top: var(--wo-edge-top); }
-/* A box in the flow of a sheet (M01), with room above it for its name tab. */
-.wo-box.is-inline { position: relative; left: auto; right: auto; bottom: auto; align-self: stretch; margin-top: var(--wo-density); }
+.wo-box.is-top .wo-nametab { bottom: auto; top: 100%; }
+/* A box in the flow of a sheet (M01), with room above it for exactly its name tab's height
+   (wo.js nameTabRoom sets --wo-nametab-h from the laid-out tab). */
+.wo-box.is-inline { position: relative; left: auto; right: auto; bottom: auto; align-self: stretch; margin-top: var(--wo-nametab-h, 0); }
 .wo-box-text {
   max-width: var(--wo-row-ch);
   font-family: var(--wo-type-dialogue-face);
@@ -450,6 +665,12 @@ html[data-speaker="portrait"] .wo-portrait { display: block; }
   --sb-radius: var(--wo-HudCard-panel-radius); --sb-pad: var(--wo-HudCard-panel-pad); --sb-shadow: var(--wo-HudCard-panel-shadow);
   position: absolute;
   transform: translate(-50%, -100%);
+  /* max-content: a positioned box near the right edge would otherwise shrink to the room left of
+     it and wrap early; the row length caps it instead. The speaker mark leads, a gap before the words. */
+  display: flex;
+  align-items: center;
+  gap: var(--wo-density-gap);
+  width: max-content;
   max-width: var(--wo-row-ch);
   padding: var(--wo-density-gap) var(--wo-density-label-gap);
   font-family: var(--wo-type-dialogue-face);
@@ -478,13 +699,86 @@ html[data-speaker="portrait"] .wo-portrait { display: block; }
 }
 .wo-pill.is-far { color: var(--wo-today-text-note); }
 .wo-pill.is-inline { position: relative; transform: none; }
-.wo-box ~ .wo-pill, .wo-pill.is-hidden { opacity: 0; pointer-events: none; }
+/* An open conversation box hides the pill (a hidden box or a system hint does not). */
+.wo-box:not([hidden]):not([data-speaker="hint"]) ~ .wo-pill, .wo-pill.is-hidden { opacity: 0; pointer-events: none; }
 
-/* Answer cards (6.3 Choices): two cards with glyphs; full-width pair at the bottom on touch. */
+/* Answer cards (6.3 Choices): two cards with glyphs; full-width pair at the bottom on touch. The
+   focus lift grows each card from its anchored side, so it never crosses the safe edge. */
 .wo-answers { position: absolute; right: var(--wo-edge-right); bottom: var(--wo-edge-bottom); display: flex; flex-direction: column; align-items: stretch; gap: var(--wo-density-gap); }
+.wo-answers > .wo-answer { transform-origin: right center; }
+[data-input="touch"] .wo-answers > .wo-answer { transform-origin: center bottom; }
 .wo-answer { justify-content: flex-start; text-align: left; font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); }
 [data-input="touch"] .wo-answers { left: var(--wo-edge-left); flex-direction: row; }
 [data-input="touch"] .wo-answer { flex: 1; min-height: max(var(--wo-density), var(--wo-today-choice-h)); }
+/* The choice dock (6.3): the question's box above the answers at the bottom of the safe rect;
+   answers right-aligned for keys, mouse and pad and full width on touch. wo.js placeBoxes moves
+   the dock to the top (.is-top) when it would cover the speakers' floor line. */
+.wo-choice { position: absolute; left: var(--wo-edge-left); right: var(--wo-edge-right); bottom: var(--wo-edge-bottom); display: flex; flex-direction: column; align-items: flex-end; gap: var(--wo-density-gap); }
+.wo-choice.is-top { bottom: auto; top: var(--wo-edge-top); }
+.wo-choice > .wo-box { position: relative; left: auto; right: auto; bottom: auto; top: auto; align-self: stretch; margin-top: var(--wo-nametab-h, 0); }
+.wo-choice > .wo-answers { position: static; }
+[data-input="touch"] .wo-choice > .wo-answers { align-self: stretch; }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Title screen (6.2 B7 and B8, 2.5.3 step 14): cover art, veil, right column, idle motion     */
+/* ------------------------------------------------------------------------------------------ */
+
+/* Cover art: wo.js sizes and places the box (art scale = max(canvas w / art w, canvas h / art h),
+   offset by the focus point), so the art keeps its shape and fills any canvas
+   (STRETCH_KEEP_ASPECT_COVERED). Children sit in the art's own proportions. */
+.wo-cover { position: absolute; left: 0; top: 0; overflow: hidden; pointer-events: none; }
+.wo-cover > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; user-select: none; }
+/* A light in the art (6.2 B8: a light change from the world's own sources). Invisible at rest; an
+   idle tick dips it dark twice, hard on and off, like a tube cutting out: two flashes in
+   4 x motion.focus.in, so never more than 3 in a second (WCAG-FLASH). */
+.wo-spot { position: absolute; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, var(--wo-today-title-bg), transparent); opacity: 0; }
+.wo-spot.is-tick { animation: wo-flicker calc(var(--wo-motion-focus-in) * 4) steps(1, end) 1; }
+@keyframes wo-flicker { 0% { opacity: 1; } 15% { opacity: 0; } 30% { opacity: 1; } 45%, 100% { opacity: 0; } }
+
+/* Inline real SVG art (wo.js inlines [data-wo-svg]), so one part can move: the logo mark's eye
+   closes and opens on an idle tick (a blink of 2 x motion.focus.in). */
+.wo-svg { display: inline-block; line-height: 0; }
+.wo-svg > svg { width: 100%; height: 100%; }
+.wo-svg [data-wo-part="eye"] { transform-box: fill-box; transform-origin: center; }
+.wo-svg.is-tick [data-wo-part="eye"] { animation: wo-blink calc(var(--wo-motion-focus-in) * 2) var(--wo-motion-ease-in) 1; }
+@keyframes wo-blink { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0); } }
+
+/* The rule's scan sweep: a soft glint as wide as the loading sweep's segment crosses the rule once
+   per idle tick, at the logo bar's speed (studio_logo.gd BAR_SEGMENT, BAR_SWEEP_SECONDS), so one
+   speed is learned. It plays the shared wo-sweep keyframes; it is not a loading indicator. */
+.wo-rule[data-wo-idle] { position: relative; overflow: hidden; }
+.wo-rule[data-wo-idle]::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: calc(var(--wo-today-bar-segment) * 100%); background: linear-gradient(to right, transparent, var(--wo-Button-font_color), transparent); opacity: 0; }
+.wo-rule.is-tick::after { opacity: 1; animation: wo-sweep var(--wo-today-bar-sweep) linear 1 both; }
+
+/* The title (6.2): the column is anchored right inside the safe rect, at least today's TitleLine
+   wide and as wide as its widest line (the title lockup grows with TEXT SIZE). The TitleVeil
+   gradient runs from just left of the column to the canvas edge, full height. */
+.wo-title { position: absolute; inset: 0; }
+.wo-title-col { position: absolute; z-index: 0; top: var(--wo-edge-top); right: var(--wo-edge-right); bottom: var(--wo-edge-bottom); display: flex; flex-direction: column; width: max-content; min-width: var(--wo-today-title-col-w); }
+.wo-title-veil { position: absolute; z-index: -1; top: calc(-1 * var(--wo-edge-top)); right: calc(-1 * var(--wo-edge-right)); bottom: calc(-1 * var(--wo-edge-bottom)); left: calc(-1 * var(--wo-density-edge-pad)); background: var(--wo-TitleVeil-panel-image); }
+/* A dark fade up from the bottom edge (the title backdrop colour), under the column and CHANGELOG,
+   so the version, the credit and CHANGELOG stay readable over the lit wet floor of the art. It
+   ends below the characters' feet on 16:9 (25% of the canvas). */
+.wo-title-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 25%; background: linear-gradient(to top, var(--wo-today-title-bg), transparent); pointer-events: none; }
+/* The head and menu, centred between the column top and the footer prompt bar. */
+.wo-title-main { margin-block: auto; display: flex; flex-direction: column; align-items: stretch; gap: var(--wo-density-gap); }
+/* Menu buttons: one linear list, each half the column (today's 224 at 464), left-aligned; CONTINUE
+   keeps that width beside its reason (a padded flex item would take the split's gap). */
+.wo-title-main > .wo-btn, .wo-title-main > .wo-split > .wo-btn { flex: none; align-self: flex-start; width: calc(50% - var(--wo-density-edge-pad) / 2); }
+/* The bottom row: the version and the credit line, right-aligned beside the footer prompts, over
+   the darkest part of the veil (the column's left edge can sit over the lit wet floor). On touch
+   the prompts hide (3.1 step 7) and the version and credit stay. */
+.wo-title-col > .wo-footer { align-self: stretch; }
+.wo-title-meta { align-items: flex-end; text-align: end; }
+/* The lockup: the mark at today's LogoMark size (main.tscn), beside the title and subtitle. */
+.wo-title-lockup { flex-wrap: nowrap; }
+.wo-title-mark { flex: none; width: var(--wo-today-title-mark); height: var(--wo-today-title-mark); }
+.wo-title-brand { color: var(--wo-today-text-brand); }
+.wo-title-sub { color: var(--wo-today-text-sub); }
+/* CONTINUE's reason sits beside it and never widens the column (its own width counts as 0). */
+.wo-title-note { contain: inline-size; }
+/* CHANGELOG, bottom-left inside the safe rect (2.5.3 step 14). */
+.wo-title-foot { position: absolute; left: var(--wo-edge-left); bottom: var(--wo-edge-bottom); }
 
 /* ------------------------------------------------------------------------------------------ */
 /* Loading (section 5): the shared sweep indicator, the loading view and the card              */
@@ -496,19 +790,43 @@ html[data-speaker="portrait"] .wo-portrait { display: block; }
 .wo-sweep-seg { position: absolute; top: 0; bottom: 0; left: 0; width: calc(var(--wo-today-bar-segment) * 100%); background: var(--wo-today-bar-fill); opacity: 0; }
 .wo-sweep.is-running .wo-sweep-seg { opacity: 1; animation: wo-sweep var(--wo-today-bar-sweep) linear infinite; }
 .wo-sweep.is-done .wo-sweep-seg { opacity: 1; width: 100%; animation: none; }
+/* Past timing.loading-view.percent-after the line stops looping and fills to the real progress
+   (5.1 "percent bar past 10 s", 5.6): wo.js sets --wo-sweep-done (0 to 1). No motion, so REDUCED
+   MOTION needs no rule of its own. */
+.wo-sweep.is-percent .wo-sweep-seg { opacity: 1; width: calc(var(--wo-sweep-done) * 100%); animation: none; }
 @keyframes wo-sweep { from { transform: translateX(-100%); } to { transform: translateX(calc(100% / var(--wo-today-bar-segment))); } }
 /* Reduced motion (5.9): the sweep becomes a slow opacity pulse (motion.reduced-pulse). */
 html[data-motion="reduced"] .wo-sweep.is-running .wo-sweep-seg { width: 100%; animation: wo-pulse var(--wo-motion-reduced-pulse) linear infinite alternate; }
 @keyframes wo-pulse { from { opacity: 0; } to { opacity: 1; } }
 
 .wo-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--wo-density-label-gap); }
-.wo-loading-plate { position: absolute; inset: 0; overflow: hidden; }
-.wo-loading-plate img { width: 100%; height: 100%; object-fit: cover; }
 .wo-loading-dim { position: absolute; inset: 0; background: var(--wo-today-fade-color); opacity: var(--wo-loading-dim); }
 .wo-loading-name { position: relative; font-family: var(--wo-type-h1-face); font-weight: var(--wo-type-h1-weight); font-variation-settings: "wght" var(--wo-type-h1-weight); font-size: var(--wo-fs-h1); line-height: normal; color: var(--wo-Button-font_focus_color); }
 .wo-loading-status { position: relative; font-size: var(--wo-fs-body); color: var(--wo-today-text-note); }
+/* A long room name or status wraps at TEXT SIZE 200% (7.3 M04b accept 3, 9) with its rows centred
+   and balanced, so no word sits alone on the last row; the player glues " / " to the word before it,
+   so a name breaks after its separator. */
+.wo-loading-name, .wo-loading-status { text-align: center; text-wrap: balance; }
+/* M04's view has one line of words, the status, and no H1 name (the player hides the name bit):
+   alone over the dimmed plate it is the headline, so it takes the Body text colour (the muted
+   colour is for M04b, under the name; it measured 2.2 to 3.7:1 against the brightest plate pixel). */
+.wo-loading:has(> .wo-loading-name[hidden]) > .wo-loading-status { color: var(--wo-Button-font_color); }
 .wo-loading-tip { position: relative; max-width: var(--wo-row-ch); text-align: center; font-size: var(--wo-fs-body); line-height: var(--wo-type-body-line-height); }
 .wo-prompt { position: absolute; right: var(--wo-edge-right); bottom: var(--wo-edge-bottom); display: inline-flex; align-items: center; gap: var(--wo-density-gap); font-size: var(--wo-fs-body); }
+
+/* The studio logo (studio_logo.tscn, M02): the base canvas centred in the frame (one box for a scene
+   laid out at 960 x 540, so it stays centred on wide and tall screens, 2.5.3 step 15); its parts are
+   placed by data-wo-node. The navy backdrop, the radial glow, the mascot with its grin overlay and
+   the company name centred in its label box. */
+.wo-scene-base { position: absolute; left: calc((var(--wo-canvas-w) - var(--wo-base-w)) / 2); top: calc((var(--wo-canvas-h) - var(--wo-base-h)) / 2); width: var(--wo-base-w); height: var(--wo-base-h); }
+.wo-logo { background: var(--wo-today-logo-bg); }
+.wo-logo-glow { background: var(--wo-today-logo-glow); pointer-events: none; }
+.wo-logo-mascot > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; user-select: none; }
+.wo-logo-name { display: flex; align-items: center; justify-content: center; white-space: nowrap; color: var(--wo-today-logo-name); }
+/* The launch image: the boot splash drawn whole (stretch Keep) on the launch colour (wo.js
+   --wo-launch-bg: the logo's navy, or today's black with ?splash=today). */
+.wo-launch { background: var(--wo-launch-bg); }
+.wo-launch > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; }
 
 /* Screen fades (5.1): out, hold, in, from the timing tokens. */
 .wo-fade { position: absolute; inset: 0; background: var(--wo-today-fade-color); opacity: 0; pointer-events: none; }
@@ -527,14 +845,17 @@ html[data-flashing="reduced"] .wo-beacon { animation: none; opacity: 1; }
 /* Motion: entrance stagger (5.2 step 7) and the reduced-motion switch (6.1)                   */
 /* ------------------------------------------------------------------------------------------ */
 
-.is-entering > .wo-enter { animation: wo-rise var(--wo-motion-panel-in) var(--wo-motion-ease-in) both; animation-delay: var(--wo-enter-delay); }
+/* Fill "backwards" only: the from-state holds during the delay, and nothing is pinned after the
+   end, so a button's own hover and press scale (motion.focus.scale, motion.press.scale) work at
+   once ("both" kept transform: none on every entered button until an input ended the group). */
+.is-entering > .wo-enter { animation: wo-rise var(--wo-motion-panel-in) var(--wo-motion-ease-in) backwards; animation-delay: var(--wo-enter-delay); }
 .is-entering.is-entered > .wo-enter { animation: none; }
 @keyframes wo-rise { from { opacity: 0; transform: translateY(var(--wo-today-reveal-offset)); } to { opacity: 1; transform: none; } }
 html[data-motion="reduced"] .is-entering > .wo-enter { animation-name: wo-appear; }
 @keyframes wo-appear { from { opacity: 0; } to { opacity: 1; } }
-html[data-motion="reduced"] .wo-btn, html[data-motion="reduced"] .wo-btn:hover, html[data-motion="reduced"] .wo-btn:active,
-html[data-motion="reduced"] .wo-btn.is-hover, html[data-motion="reduced"] .wo-btn.is-pressed, html[data-motion="reduced"] [data-ring="on"] .wo-btn:focus,
-html[data-motion="reduced"] .wo-answer, html[data-motion="reduced"] .wo-touch { transform: none; }
+/* REDUCED MOTION removes every focus lift and press dip, in every state (6.1, 5.9); the second
+   :is() lifts this rule over the state rules it overrides. */
+html[data-motion="reduced"] :is(.wo-btn, .wo-answer, .wo-select, .wo-touch, .wo-tab):is(*, :hover, :focus, :active, .is-hover, .is-focus, .is-pressed, .is-current) { transform: none; }
 
 /* ------------------------------------------------------------------------------------------ */
 /* World frames (7.1): the room at the play zoom, bleeds and the post grade                   */
@@ -553,24 +874,77 @@ html[data-motion="reduced"] .wo-answer, html[data-motion="reduced"] .wo-touch { 
 .wo-grade { position: absolute; inset: 0; width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; }
 .wo-outline { outline: solid var(--wo-color-role-focus-ring); outline-width: 1px; }
 
-/* Hit areas (?hits=1): each tappable's area grown to the profile minimum plus the phone margin. */
+/* Hit areas (?hits=1; wo.js hitLayer): each tappable's area in canvas px, grown to the profile
+   minimum, with the phone margin as an inner band, clipped to the OS safe area. */
 .wo-tap { cursor: pointer; }
-html[data-hits="on"] .wo-tap::before {
-  content: attr(data-wo-tap);
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: max(100%, var(--wo-hit-min));
-  height: max(100%, var(--wo-hit-min));
-  transform: translate(-50%, -50%);
-  outline: dashed var(--wo-color-role-focus-ring);
-  outline-width: 1px;
-  box-shadow: 0 0 0 var(--wo-hit-margin) var(--wo-color-role-touch-bg);
-  color: var(--wo-color-role-focus-ring);
-  font-size: var(--wo-fs-caption);
-  z-index: 50;
-  pointer-events: none;
-}
+.wo-hits { position: absolute; overflow: hidden; pointer-events: none; }
+html:not([data-hits="on"]) .wo-hits { display: none; }
+.wo-hit.is-short { border-color: var(--wo-today-label-alert); color: var(--wo-today-label-alert); }
+.wo-hit { position: absolute; box-sizing: border-box; border: 1px dashed var(--wo-color-role-focus-ring); box-shadow: inset 0 0 0 var(--wo-hit-margin) var(--wo-color-role-touch-bg); color: var(--wo-color-role-focus-ring); font-size: var(--wo-fs-caption); line-height: normal; }
+
+/* Reach and USE buffer bands (6.4, 6.7.2 #4; wo.js reachBands), only with the hit-area overlay. */
+.wo-band { position: absolute; pointer-events: none; }
+.wo-band.is-jog { background: var(--wo-color-role-terminal-hover-glow); }
+.wo-band.is-walk { background: var(--wo-color-role-control-hover-glow); }
+.wo-band.is-reach { background: var(--wo-color-role-touch-border); }
+html:not([data-hits="on"]) .wo-band { display: none; }
+
+/* "Show what I can use" (6.4 step 10) and pointer hover (step 7): a rim traced around the art's own
+   alpha in the focus ring colour. */
+.wo-piece.is-usable > img, .wo-piece.is-hover > img { filter: drop-shadow(0 0 1px var(--wo-color-role-focus-ring)) drop-shadow(0 0 1px var(--wo-color-role-focus-ring)); }
+
+/* A piece mapped onto a world quad (the seal curtain); wo.js sets the matrix3d. */
+.wo-quad { transform-origin: 0 0; }
+/* Beacon parts (6.5; wo.js beaconPieces): atlas crops, and the lens filled with the warning colour
+   through the atlas alpha. The light is a .wo-beacon masked the same way. */
+.wo-crop { position: absolute; overflow: hidden; }
+.wo-crop > img { position: absolute; max-width: none; }
+.wo-lens { position: absolute; background: var(--wo-today-beacon); }
+
+/* ------------------------------------------------------------------------------------------ */
+/* Play HUD (6.3, 6.4 step 13, 2.5.3 step 11): anchored to the safe rect                       */
+/* ------------------------------------------------------------------------------------------ */
+
+/* A .wo-safe holding the play HUD lets taps through to the world except on its own controls. */
+.wo-hud { pointer-events: none; }
+.wo-hud > * { pointer-events: auto; }
+.wo-hud > .wo-touch.is-pause { right: 0; top: 0; transform-origin: right top; }
+.wo-hud > .wo-touch.is-use { right: 0; bottom: 0; transform-origin: right bottom; }
+/* The move pad's ring rests in the safe rect's bottom-left corner (where today's arrows were),
+   clear of the Android edge strip and cutout, which wo.js adds to the edges. */
+.wo-hud > .wo-move-ring { left: calc(var(--wo-touch-use) / 2); top: calc(100% - var(--wo-touch-use) / 2); }
+/* Touch controls show only while touch is the input; tap to walk drops the pad and USE. */
+.wo-frame:not([data-input="touch"]) .wo-hud > .wo-touch,
+.wo-frame:not([data-input="touch"]) .wo-hud > .wo-move-zone,
+.wo-frame:not([data-input="touch"]) .wo-hud > .wo-move-ring,
+html[data-touch-scheme="tapwalk"] .wo-hud > .wo-touch.is-use,
+html[data-touch-scheme="tapwalk"] .wo-hud > .wo-move-zone,
+html[data-touch-scheme="tapwalk"] .wo-hud > .wo-move-ring { display: none; }
+/* While a conversation box is open the engineer stops: the move pad goes; USE stays (it advances). */
+.wo-box:not([hidden]):not([data-speaker="hint"]) ~ .wo-hud > .wo-move-zone,
+.wo-box:not([hidden]):not([data-speaker="hint"]) ~ .wo-hud > .wo-move-ring { display: none; }
+/* On touch the box ends a gap short of USE, so the right thumb never covers a line; a hint, shown
+   while the engineer still walks, also starts a gap past the move ring. */
+html:not([data-touch-scheme="tapwalk"]) .wo-frame[data-input="touch"] .wo-box { right: calc(var(--wo-edge-right) + max(var(--wo-today-use-w), var(--wo-touch-use)) + max(var(--wo-density-gap), var(--wo-hit-margin))); }
+html:not([data-touch-scheme="tapwalk"]) .wo-frame[data-input="touch"] .wo-box[data-speaker="hint"] { left: calc(var(--wo-edge-left) + var(--wo-touch-use) + max(var(--wo-density-gap), var(--wo-hit-margin))); }
+
+/* A system hint: the same box, the ContextHint accent, a terminal mark before the line (6.3). It is
+   the game's own short line, not speech, so it is Body on one row and the box is a row tall. */
+[data-speaker="hint"] { --wo-speaker: var(--wo-today-accent-hint); }
+.wo-box[data-speaker="hint"] { min-height: var(--wo-density); }
+.wo-box[data-speaker="hint"] .wo-box-text { max-width: none; font-family: var(--wo-type-body-face); font-weight: var(--wo-type-body-weight); font-variation-settings: "wght" var(--wo-type-body-weight); font-size: var(--wo-fs-body); line-height: var(--wo-type-body-line-height); }
+.wo-box-mark { flex: none; color: var(--wo-speaker); }
+/* The untyped rest of a revealing line keeps its place (wo.js reveal). */
+.wo-reveal-rest { visibility: hidden; }
+
+/* Tap to walk (6.4 step 5): a ring on the floor where the tap sent the engineer. */
+.wo-walk-mark { position: absolute; display: none; width: var(--wo-density); height: calc(var(--wo-density) / 2); transform: translate(-50%, -50%); border-radius: 50%; border: solid var(--wo-color-role-focus-ring); border-width: var(--wo-TouchButton-normal-bw); pointer-events: none; }
+html[data-touch-scheme="tapwalk"] .wo-frame[data-input="touch"] .wo-walk-mark:not([hidden]) { display: block; }
+
+/* Elements wo.js hides with the hidden attribute stay hidden whatever display their component sets:
+   scenes, views (data-wo-when), tab pages, overlays, clock parts, refresh-gated choices and
+   countdown dialogs. After every component rule, so it wins ties. */
+html :is([data-wo-scene], [data-wo-when], [data-wo-page], [data-wo-overlay], [data-wo-boot-part], [data-wo-seq-part], [data-wo-seq-bit], [data-wo-min-refresh], [data-wo-countdown])[hidden] { display: none; }
 
 /* ------------------------------------------------------------------------------------------ */
 /* Mockup chrome (.mk-*): not game UI, plain lengths allowed; colours still from the files     */
@@ -611,7 +985,10 @@ body { background: var(--wo-today-title-bg); color: var(--wo-Button-font_color);
 html[data-clean="1"] .mk-stage { height: 100vh; }
 .mk-device { position: relative; flex: none; overflow: hidden; background: var(--wo-today-fade-color); }
 .mk-device-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
-.mk-device-row.is-one { grid-template-columns: minmax(0, 1280px); }
+/* One frame per row may reach its device's own CSS width (wo.js caps the fit at 1); two frames
+   share a row without leaving a third column empty. */
+.mk-device-row.is-one { grid-template-columns: minmax(0, 1fr); }
+.mk-device-row.is-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .mk-device-fig { margin: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .mk-device-cap { color: var(--wo-today-text-muted); font-size: var(--wo-fs-caption); }
 .mk-screen { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }

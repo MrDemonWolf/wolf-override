@@ -7,7 +7,8 @@
 
   Markup and per-screen data only. One stage template (m04-stage) is shared by every frame on the page;
   the shared sequence player in mockups/shared/wo.js plays it from the data block below on one clock
-  (brief 7.1 "Loading compare"). Until that player lands, every frame shows its first moment.
+  (brief 7.1 "Loading compare"). Until that player and the include reader land, the stage stays dark
+  (the title is an include) and the page says why.
   Shared pieces this page needs (requested for the Integrate step): the sequence player
   (data-wo-seq*), data-wo-when, templates from another page with an include set, the loading.dim
   token, and data-wo-only-input (an item shown only for one input class, like M03's data-wo-only
@@ -43,11 +44,13 @@
   </div>
 </div>
 
-<!-- Side by side on one clock (loading=compare): first on the page, so a capture shows both frames. -->
-<div data-wo-when="loading=compare">
+<!-- Side by side on one clock (loading=compare): first on the page, so a capture shows both frames.
+     Starts hidden: the data-wo-when pass shows it for loading=compare, and a wo.js without that
+     pass shows only the M04 stage above (the chosen path), never two empty frames. -->
+<div data-wo-when="loading=compare" hidden>
   <div class="mk-main">
     <h2>M04 (chosen) and M04b (comparison only), one clock</h2>
-    <div class="mk-device-row">
+    <div class="mk-device-row is-two">
       <figure class="mk-device-fig">
         <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m04-stage" data-wo-seq="m04"></div></section>
         <figcaption class="mk-device-cap"></figcaption>
@@ -65,7 +68,8 @@
 <main class="mk-main">
   <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M04 Continue, room change and first visit</h1>
   <p class="mk-lead">What this page is for: judge the door-led room change, the Continue resume card and the slow-load view on one clock.</p>
-  <p class="mk-lead" data-wo-when="loading=m04b">You are looking at M04b: comparison only. M04 is the chosen path.</p>
+  <!-- Hidden until the data-wo-when pass shows it for loading=m04b, so the default (M04) never reads as M04b. -->
+  <p class="mk-lead" data-wo-when="loading=m04b" hidden>You are looking at M04b: comparison only. M04 is the chosen path.</p>
   <ul class="mk-note">
     <li>M04 is the chosen path (Nathanial, November 9).</li>
     <li>M04b is a comparison only. Pick it, or both side by side, under Loading in the strip.</li>
@@ -78,7 +82,7 @@
   </ul>
   <!-- Shows only while wo.js has no data-wo-when pass (the player and that pass land together), so
        today's page says why nothing plays. Delete this line in the same change that adds the player. -->
-  <p class="mk-note" data-wo-when="player=missing">Playback needs the shared sequence player in wo.js (requested). Until it lands, every frame shows its first moment.</p>
+  <p class="mk-note" data-wo-when="player=missing">Playback needs the shared sequence player and the include reader in wo.js (requested). Until they land, the screen above stays dark.</p>
 
   <!-- Beats of M04 at the measured load, in ms from each moment's start (the same plan numbers the
        Added time table states). M04b and slow loads use the same buttons; their beats move. -->
@@ -148,43 +152,21 @@
        at the SAFE POINT's left (x 842: within its 52 px reach of 876, right of the seal's near-end
        column, which ends at x 824, and clear of the iPhone's right inset); WOLF follows through the
        doorway. -->
-  <div class="wo-world-view" data-wo-world data-wo-seq-part="corridor" hidden>
+  <div class="wo-world-view" data-wo-world="data/corridor.json" data-wo-seq-part="corridor" hidden>
     <script type="application/json">
-      {"camera": "right", "framing": "auto", "grade": true, "pieces": [
-        {"src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
-        {"src": "doors/seal-back.png", "x": 724.80, "y": 311.13, "w": 94.5, "h": 144.5},
-        {"src": "doors/seal-wall.png", "x": 708.43, "y": 0, "w": 91, "h": 458.5, "brightness": 0.72},
-        {"src": "rooms/corridor-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
-        {"src": "doors/seal-head.png", "x": 706.50, "y": 294.24, "w": 91, "h": 136.5},
-        {"node": "BreakerArt"},
-        {"node": "RelayArt"},
-        {"node": "CheckpointArt"},
-        {"src": "props/bypass-gearbox.png", "x": 682, "y": 379, "w": 22.18, "h": 29.82},
-        {"src": "props/handwheel.png", "x": 683.09, "y": 388.98, "w": 21.82, "h": 21.6},
+      {"pieces": [
         {"node": "Wolf/BodySprite", "at": [765, 423]},
-        {"node": "Human/BodySprite", "at": [842, 410]},
-        {"src": "doors/seal-front.png", "x": 787.96, "y": 0, "w": 86.5, "h": 477}
+        {"node": "Human/BodySprite", "at": [842, 410]}
       ]}
     </script>
   </div>
 
   <!-- Records Access at its entry: both actors where m0_state.enter_records() stands them (C3 section 5). -->
-  <div class="wo-world-view" data-wo-world data-wo-seq-part="records" hidden>
+  <div class="wo-world-view" data-wo-world="data/records.json" data-wo-seq-part="records" hidden>
     <script type="application/json">
-      {"camera": "left", "framing": "auto", "grade": true, "pieces": [
-        {"src": "rooms/records-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
-        {"src": "doors/records-entry-back.png", "x": -10, "y": 0, "w": 109.5, "h": 461.5, "brightness": 1.35},
-        {"src": "doors/records-entry-wall.png", "x": 56.71, "y": 0, "w": 103, "h": 444.5, "brightness": 0.72},
-        {"src": "doors/records-exit-back.png", "x": 851.66, "y": 0, "w": 118.5, "h": 463, "brightness": 1.35},
-        {"src": "doors/records-exit-wall.png", "x": 791.96, "y": 0, "w": 101, "h": 444.5, "brightness": 0.72},
-        {"src": "rooms/records-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
-        {"src": "props/records-purge-queue.png", "x": 153.57, "y": 367.95, "w": 72.86, "h": 72.05},
-        {"src": "props/records-mirror-port.png", "x": 488.23, "y": 360.04, "w": 63.54, "h": 79.96},
-        {"src": "props/records-container.png", "x": 775.5, "y": 369, "w": 43, "h": 73},
+      {"pieces": [
         {"node": "Human/BodySprite", "at": [128, 410]},
-        {"node": "Wolf/BodySprite", "at": [216, 423]},
-        {"src": "doors/records-entry-front.png", "x": -10, "y": 0, "w": 70, "h": 465.5},
-        {"src": "doors/records-exit-front.png", "x": 889.40, "y": 0, "w": 80.5, "h": 469.5}
+        {"node": "Wolf/BodySprite", "at": [216, 423]}
       ]}
     </script>
   </div>

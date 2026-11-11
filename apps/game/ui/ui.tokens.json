@@ -1964,6 +1964,20 @@
           ]
         }
       }
+    },
+    "control-share": {
+      "$type": "number",
+      "$value": 0.5,
+      "$description": "Share of a settings row's width the control column takes, the same on every page, so every control and slider starts at one x (3.1).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "brief 3.1 (M08, M09 and M10 asked for one value column)",
+          "min": 0.35,
+          "max": 0.65,
+          "step": 0.05
+        }
+      }
     }
   },
   "profile": {
@@ -2800,6 +2814,61 @@
           }
         }
       }
+    },
+    "keep-revert": {
+      "$type": "duration",
+      "$value": {
+        "value": 15000,
+        "unit": "ms"
+      },
+      "$description": "WINDOW MODE and WINDOW SIZE ask \"Keep or revert?\" and go back on their own after this (3.1 step 8).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "brief 3.1 step 8; KSU; verify R2 #24 (a sensible default, not a Windows standard)",
+          "min": 5000,
+          "max": 30000,
+          "step": 1000
+        }
+      }
+    },
+    "hold-confirm": {
+      "$type": "duration",
+      "$value": {
+        "value": 2000,
+        "unit": "ms"
+      },
+      "$description": "Hold to confirm (RESTORE DEFAULT CONTROLS, RESET ALL SETTINGS): how long the press is held before it confirms.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "brief 3.2 (hold to confirm, CELESTE14; no length given); 2.0 s matches the bypass hold (bypass_handle.gd, gap-5), so one hold length is learned; XAG107 flags holds of 2 to 3 s",
+          "min": 1000,
+          "max": 3000,
+          "step": 100
+        }
+      }
+    }
+  },
+  "loading": {
+    "$description": "The loading view (M04, slow loads only) and the loading card (M04b): brief 5.6 and 7.3.",
+    "dim": {
+      "$type": "number",
+      "$value": 0.55,
+      "$description": "Opacity of the dark layer over the next room's plate, so the plate shows at about 45% and stays darker than the room it reveals (one dark dip).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "brief 7.3 M04b layout 1 (about 45%); R8 R8-e",
+          "min": 0.3,
+          "max": 0.8,
+          "step": 0.05,
+          "band": [
+            0.5,
+            0.6
+          ]
+        }
+      }
     }
   },
   "dialogue": {
@@ -3194,6 +3263,17 @@
             ]
           }
         }
+      },
+      "refresh-hz": {
+        "$type": "number",
+        "$value": 120,
+        "$description": "The panel's top refresh rate in Hz (3.2: FRAME RATE offers 120 only at 119 Hz or more).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "ASUS-ALLY; ASUS-XALLY; ASUS-XALLYX; R3 2.2"
+          }
+        }
       }
     },
     "iphone": {
@@ -3288,6 +3368,17 @@
               "handheld",
               "phone"
             ]
+          }
+        }
+      },
+      "refresh-hz": {
+        "$type": "number",
+        "$value": 120,
+        "$description": "The panel's top refresh rate in Hz (3.2: FRAME RATE offers 120 only at 119 Hz or more).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "APL-14PM (ProMotion, up to 120 Hz)"
           }
         }
       }
@@ -3405,6 +3496,17 @@
             ]
           }
         }
+      },
+      "refresh-hz": {
+        "$type": "number",
+        "$value": 60,
+        "$description": "The panel's top refresh rate in Hz (3.2: FRAME RATE offers 120 only at 119 Hz or more).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "UNVERIFIED (M10 request): iPad Air has no ProMotion; check with a device log (2.5.3 step 20)"
+          }
+        }
       }
     },
     "android": {
@@ -3477,6 +3579,17 @@
               "handheld",
               "phone"
             ]
+          }
+        }
+      },
+      "refresh-hz": {
+        "$type": "number",
+        "$value": 120,
+        "$description": "The panel's top refresh rate in Hz (3.2: FRAME RATE offers 120 only at 119 Hz or more).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "PIXEL-SPECS (60-120 Hz; the top rate)"
           }
         }
       }

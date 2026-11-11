@@ -15,7 +15,24 @@
  *     <outDir>   folder for the PNGs (made if missing)
  *     [query]    extra URL query for every capture, for example "input=pad&text=150"
  *   Options:
- *     --states "name:query;name2:query2"  one capture per state, named <page>__<device>__<name>.png
+ *     --states "name:query;name2:query2"  one capture per state, named <page>__<device>__<name>.png.
+ *                                         In a state's query, keys starting with "@" are actions,
+ *                                         not page parameters; they run in order after the page is
+ *                                         ready (and --settle) and before the screenshot, with real
+ *                                         (trusted) input: @hover=<selector>, @click=<selector>,
+ *                                         @key=<key name, e.g. ArrowDown>, @wait=<ms>,
+ *                                         @tick=<selector> (adds the idle "is-tick" class),
+ *                                         @eval=<expression> (for example WO.motion.stagger()),
+ *                                         @freeze=<ms> (pauses every animation at that time),
+ *                                         @tap=<selector> (a touch press and click on its centre),
+ *                                         @pad=<Xbox button, e.g. A, X, LB, DPadDown> (the
+ *                                         page's own pad path, WO.pad.press; no Gamepad needed)
+ *     --hover <selector>                  hover this before every screenshot (@hover in each state)
+ *     --press <keys>                      press these keys, comma list, before every screenshot
+ *     --input "key:Space@300;tap@300;padA@300"
+ *                                         scripted presses for every state: each waits its @ms after
+ *                                         the one before, then presses (key:<name>, tap[:<selector>]
+ *                                         on the first frame by default, pad<Button>)
  *     --eval <file.js | expression>       evaluated in the page after it is ready (for example
  *                                         "WO.probe()"); the JSON result is written next to the PNG
  *     --full                              capture the full page height, not just the viewport
@@ -81,6 +98,48 @@ function chromiumPath(arg) {
   return undefined;
 }
 
+/**
+ * One state action (see --states): real mouse and keyboard input through Playwright, a wait, an
+ * expression, an idle tick on matching elements, or every running animation paused at [v] ms of
+ * its own time (delays included, so @freeze=150 shows an entrance 150 ms in).
+ */
+async function runAction(tab, k, v) {
+  if (k === '@hover') return tab.hover(v);
+  if (k === '@click') return tab.click(v);
+  if (k === '@key') return tab.keyboard.press(v);
+  if (k === '@wait') return tab.waitForTimeout(Number(v));
+  if (k === '@eval') return tab.evaluate((src) => (0, eval)(src), v);
+  if (k === '@tick') return tab.evaluate((sel) => document.querySelectorAll(sel).forEach((el) => el.classList.add('is-tick')), v);
+  if (k === '@freeze') return tab.evaluate((ms) => document.getAnimations().forEach((a) => { a.pause(); a.currentTime = ms; }), Number(v));
+  if (k === '@tap') {
+    return tab.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      if (!el) throw new Error('no element ' + sel);
+      const r = el.getBoundingClientRect(), o = { bubbles: true, composed: true, pointerType: 'touch', isPrimary: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 };
+      el.dispatchEvent(new PointerEvent('pointerdown', o));
+      el.dispatchEvent(new PointerEvent('pointerup', o));
+      el.dispatchEvent(new MouseEvent('click', o));
+    }, v);
+  }
+  if (k === '@pad') return tab.evaluate((b) => window.WO.pad.press(b), v);
+  throw new Error('unknown action');
+}
+/** The actions every state runs, from --hover, --press and --input (see the usage above). */
+function globalActions(opt) {
+  const out = [];
+  if (opt.hover) out.push(['@hover', opt.hover]);
+  if (opt.press) for (const key of opt.press.split(',').filter(Boolean)) out.push(['@key', key]);
+  for (const step of (opt.input || '').split(';').filter(Boolean)) {
+    const [what, ms] = step.split('@');
+    if (ms) out.push(['@wait', ms]);
+    if (what.startsWith('key:')) out.push(['@key', what.slice(4)]);
+    else if (what.startsWith('tap')) out.push(['@tap', what.slice(4) || '.wo-frame']);
+    else if (what.startsWith('pad')) out.push(['@pad', what.slice(3)]);
+    else throw new Error('--input: unknown step ' + step);
+  }
+  return out;
+}
+
 async function main() {
   const { pos, opt } = parseArgs(process.argv.slice(2));
   if (pos.length < 3) {
@@ -112,7 +171,8 @@ async function main() {
       const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: vp.scale });
       for (const [state, stateQuery] of states) {
         const q = new URLSearchParams(query);
-        for (const [k, v] of new URLSearchParams(stateQuery)) q.set(k, v);
+        const actions = globalActions(opt);
+        for (const [k, v] of new URLSearchParams(stateQuery)) { if (k.startsWith('@')) actions.push([k, v]); else q.set(k, v); }
         q.set('device', name);
         if (!opt.chrome && !q.has('clean')) q.set('clean', '1');
         const [path, pageQuery] = page.split('?');
@@ -132,6 +192,9 @@ async function main() {
         const st = await tab.evaluate(() => document.documentElement.dataset.woState);
         if (st === 'error' && !opt['allow-not-loaded']) errors.push('Tokens not loaded: ' + url);
         if (opt.settle) await tab.waitForTimeout(Number(opt.settle));
+        for (const [k, v] of actions) {
+          try { await runAction(tab, k, v); } catch (e) { errors.push('action ' + k + '=' + v + ': ' + e.message); }
+        }
         const file = join(outDir, `${stem}__${name}${state ? '__' + state : ''}.png`);
         await tab.screenshot({ path: file, fullPage: !!opt.full });
         if (evalExpr) {
