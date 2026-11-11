@@ -165,6 +165,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
 
 -- Development --
+- Every Apple build uses the bundle ID com.mrdemonwolf.wolfoverride, by Nathanial's decision; the macOS preset used dev. before.
+- A new iOS export preset (development signing, iOS 15 or later, iPhone and iPad) exports an Xcode project headless; the first build ran on Nathanial's iPhone 14 Pro Max over Wi-Fi.
 - The press kit zip is built by a script from the site's own files each time the site is built, so the repository never stores a second copy of them.
 - The game's version lives in one place, apps/game/project.godot; the macOS and Windows test builds now take it from there instead of 0.0.0.
 - F12 bug captures record the game's version.
