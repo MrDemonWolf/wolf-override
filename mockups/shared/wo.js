@@ -650,6 +650,7 @@
     ['speaker-engineer', 'color', 'konst', 'main.gd', 'ENGINEER_TINT'],
     ['accent-w', 'px', 'rectW', 'main.tscn', 'CanvasLayer/TopBar/Accent'],
     ['sweep-w', 'px', 'rectW', 'studio_logo.tscn', 'LoadBar'],
+    ['logo-name-size', 'px', 'prop', 'studio_logo.tscn', 'CompanyName', 'theme_override_font_sizes/font_size'],
     ['sweep-h', 'px', 'rectH', 'studio_logo.tscn', 'LoadBar'],
     ['bar-segment', 'num', 'konst', 'studio_logo.gd', 'BAR_SEGMENT'],
     ['bar-sweep', 'ms', 'konst', 'studio_logo.gd', 'BAR_SWEEP_SECONDS'],
@@ -664,6 +665,7 @@
     ['pause-h', 'px', 'rectH', 'main.tscn', 'CanvasLayer/PauseButton'],
     ['choice-h', 'px', 'rectH', 'main.tscn', 'CanvasLayer/TouchControls/Choice1'],
     ['title-col-w', 'px', 'rectW', 'main.tscn', 'CanvasLayer/TitleScreen/TitleLine'],
+    ['pause-panel-w', 'px', 'rectW', 'main.tscn', 'CanvasLayer/PauseOverlay/Panel'],
     ['settings-w', 'px', 'rectW', 'main.tscn', 'CanvasLayer/PauseOverlay/Panel/SettingsMenu'],
     ['settings-h', 'px', 'rectH', 'main.tscn', 'CanvasLayer/PauseOverlay/Panel/SettingsMenu'],
     ['title-mark', 'px', 'rectW', 'main.tscn', 'CanvasLayer/TitleScreen/LogoMark'],
@@ -810,8 +812,7 @@
 
   /**
    * The profile values for device [d] (brief 2.2-2.4): text scale, TEXT SIZE, role sizes
-   * (round(base x profile scale x TEXT SIZE) as TextSize.px rounds, but up when round() would
-   * break a floor), density, the minimum hit size, HUD edges (Android: widened by ?cutout= and
+   * (base x profile scale x TEXT SIZE, rounded up), density, the minimum hit size, HUD edges (Android: widened by ?cutout= and
    * ?edge=), phone control sizes, and the text floors that apply.
    * [opts.text] overrides TEXT SIZE (%); [opts.touched] says a desktop frame takes handheld
    * density because a real touch reached it (layoutFrames applies density.touch-switch).
@@ -822,30 +823,30 @@
     P.textScale = p === 'phone' ? phoneTextScale(d) : num('profile.' + p + '.text-scale');
     P.textSize = opts.text || (p === 'handheld' ? num('profile.handheld.text-size') : defaultTextSize());
     P.floors = textFloors(d, p);
-    // round(base x profile scale x TEXT SIZE), as TextSize.px rounds, except that rounding never
-    // takes a role under a floor it applies to: then it rounds up (iPhone Body: 21.34 rounds to 21,
-    // under the 17 pt floor of 21.35, so it becomes 22). TextSize.px needs the same rule (M04, M10).
+    // base x profile scale x TEXT SIZE, rounded up for every role, so no role falls under its
+    // computed size or a floor (one rule; before, only a role under a floor rounded up, so iPhone
+    // Dialogue rounded down to 29 while Body rounded up to 22; M05 review). A proposal for
+    // TextSize.px, which rounds to nearest today. The 1e-9 keeps an exact whole size whole.
     P.roles = {};
-    for (const r of roles()) {
-      const x = num('type.' + r + '.size') * P.textScale * (P.textSize / 100);
-      const v = Math.round(x);
-      P.roles[r] = P.floors.some((f) => (!f.role || f.role === r) && v < f.px - 1e-9) ? Math.ceil(x) : v;
-    }
+    for (const r of roles()) P.roles[r] = Math.ceil(num('type.' + r + '.size') * P.textScale * (P.textSize / 100) - 1e-9);
     if (p === 'phone') P.density = phoneDensity(d);
     else if (p === 'handheld') P.density = num('profile.handheld.density');
     else P.density = opts.touched ? num('profile.handheld.density') : num('profile.desktop.density');
     P.hitMin = p === 'desktop' && !opts.touched ? num('density.pointer-hit-min') : P.density;
     P.hitMargin = p === 'phone' ? dpToCanvas(d, num('density.gap-phone-dp')) : 0;
+    // The HUD-safe edges: profile.hud-margin inside whatever the screen keeps clear (the OS safe-area
+    // insets; on Android also the cutout and the back-gesture strip), the same rule on every profile,
+    // so phone text never sits on a curved-corner band (M02 review). Android (2.6): the cutout (drawn
+    // on the left) and the back-gesture strip (both sides) widths come from ?cutout= and ?edge= in
+    // canvas px until a device log measures them (2.5.3 step 3, 2.6 step 1).
     const m = num('profile.hud-margin');
-    P.edges = { left: Math.max(m, d.insets.left), right: Math.max(m, d.insets.right), top: Math.max(m, d.insets.top), bottom: Math.max(m, d.insets.bottom) };
-    // Android (2.6): the cutout (drawn on the left) and the back-gesture strip (both sides) widths come
-    // from ?cutout= and ?edge= in canvas px until a device log measures them; the HUD and the move pad
-    // keep out of both, as the game's safe rect will (2.5.3 step 3, 2.6 step 1).
+    const clear = { left: d.insets.left, right: d.insets.right, top: d.insets.top, bottom: d.insets.bottom };
     if (d.android) {
       const cut = Number(url.get('cutout')) || 0, edge = Number(url.get('edge')) || 0;
-      P.edges.left = Math.max(P.edges.left, cut, edge);
-      P.edges.right = Math.max(P.edges.right, edge);
+      clear.left = Math.max(clear.left, cut, edge);
+      clear.right = Math.max(clear.right, edge);
     }
+    P.edges = { left: clear.left + m, right: clear.right + m, top: clear.top + m, bottom: clear.bottom + m };
     if (p === 'phone') {
       P.useSize = Math.max(num('profile.phone.use-size-min'), mmToCanvas(d, num('profile.phone.use-size-mm')));
       P.pauseSize = P.density;
@@ -889,12 +890,15 @@
   function setInput(mode, fromEvent) {
     if (mode === 'mouse') mode = 'pointer';
     if (input.mode === mode) return;
-    const wasPointer = input.mode === 'pointer' || input.mode === 'touch';
+    // The first key or pad press while the active frame shows no ring only reveals it (6.2 B7 rule
+    // 4). Read from the ring itself, not the last mode, so it covers both "after pointer use" and
+    // "a desktop frame before any input" (focus held without its ring).
+    const f = activeFrame();
+    const wasOff = !!f && f.dataset.ring === 'off';
     input.mode = mode;
     if (mode === 'touch') input.touched = true;
     if (fromEvent) url.set('input', mode === 'pointer' ? 'mouse' : mode);
-    // First key or pad press after pointer use only reveals the ring (6.2 B7 rule 4).
-    input.revealOnly = wasPointer && (mode === 'keyboard' || mode === 'pad');
+    input.revealOnly = wasOff && (mode === 'keyboard' || mode === 'pad');
     applyInput();
   }
   const inChrome = (el) => el && el.closest && el.closest('.mk-strip, .mk-tune, .mk-notice');
@@ -925,8 +929,10 @@
   addEventListener('keydown', (e) => {
     if (inChrome(e.target) || !readyState) return;
     if (!document.body.hasAttribute('data-wo-nav') && !(document.activeElement && document.activeElement.closest('.wo-frame'))) return;
-    const dir = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key];
-    if (dir) { e.preventDefault(); nav(dir); }
+    const dir = { ArrowUp: 'Up', ArrowLeft: 'Left', ArrowDown: 'Down', ArrowRight: 'Right' }[e.key];
+    if (dir) { e.preventDefault(); dirPress(dir); }
+    // Enter or Space on an open list picks the item under the cursor, not the select under it.
+    if ((e.key === 'Enter' || e.key === ' ') && listAccept()) e.preventDefault();
     // A pause key that just opened an overlay prevents the default, so the same Esc does not close it.
     if (e.key === 'Escape' && !e.defaultPrevented) emit('back');
   });
@@ -944,29 +950,161 @@
    *  unselected tabs are skipped: only the selected tab is a focus stop (LB and RB switch tabs). */
   function focusables() {
     const scope = activeFrame() || document;
+    // In a settings screen the tabs are on LB, RB, clicks and taps only: the up and down walk runs
+    // through the rows and wraps last row to first (3.1 step 3).
+    const tabsOff = !!scope.querySelector('.wo-settings-body');
     return [...scope.querySelectorAll('.wo-btn, .wo-tab, .wo-touch, .wo-answer, [data-wo-focus]')].filter((el) => !el.disabled
-      && el.getAttribute('aria-disabled') !== 'true' && el.offsetParent !== null && !(el.matches('.wo-tab') && el.getAttribute('aria-selected') !== 'true'));
+      && el.getAttribute('aria-disabled') !== 'true' && el.offsetParent !== null
+      && !(el.matches('.wo-tab') && (tabsOff || el.getAttribute('aria-selected') !== 'true')));
   }
   /**
    * Moves focus [dir] (-1 or 1) in focusables(), wrapping (XAG112). With nothing focused in the frame
    * it moves from the frame's current item (data-wo-current), as Godot moves from the control that
    * holds hidden focus. The first press after pointer use only shows the ring on the focused item.
    */
-  function nav(dir) {
-    const list = focusables();
-    if (!list.length) return;
-    let cur = list.indexOf(document.activeElement);
-    if (cur < 0) cur = list.indexOf(currentItem(activeFrame()));
-    if (input.revealOnly && cur >= 0) { input.revealOnly = false; list[cur].focus({ preventScroll: true }); return; }
+  function nav(dir, across = false) {
+    const all = focusables();
+    if (!all.length) return;
+    let cur = all.indexOf(document.activeElement);
+    if (cur < 0) cur = all.indexOf(currentItem(activeFrame()));
+    if (input.revealOnly && cur >= 0) { input.revealOnly = false; focusInView(all[cur]); return; }
     input.revealOnly = false;
-    const next = cur < 0 ? list[0] : list[(cur + dir + list.length) % list.length];
-    next.focus({ preventScroll: true });
+    if (cur < 0) { focusInView(all[0]); return; }
+    // Nav groups ([data-wo-nav-group]: the title's CHANGELOG corner): Up and Down stay inside the
+    // current group and wrap there; Left and Right ([across]) step to the next group's first item.
+    // With no groups on the screen every item is in one group, so the walk is one wrapping list.
+    const groupOf = (el) => el.closest('[data-wo-nav-group]');
+    const g = groupOf(all[cur]);
+    if (across) {
+      const groups = [...new Set(all.map(groupOf))];
+      if (groups.length < 2) { focusInView(all[(cur + dir + all.length) % all.length]); return; }
+      const ng = groups[(groups.indexOf(g) + dir + groups.length) % groups.length];
+      focusInView(all.find((el) => groupOf(el) === ng));
+      return;
+    }
+    const list = all.filter((el) => groupOf(el) === g);
+    const i = list.indexOf(all[cur]);
+    focusInView(list[(i + dir + list.length) % list.length]);
   }
-  /** Hover moves the (hidden) focus, so there is only ever one highlight (6.2 B7 rule 3). */
+  /**
+   * Focuses [el] and brings it into view inside its nearest scroller only, never the page: a
+   * settings row is kept whole with one density gap of look-ahead (3.1 step 4), instantly under
+   * REDUCED MOTION, else smoothly. A scroller that is not a settings body uses the browser's own
+   * "nearest" rule.
+   */
+  function focusInView(el) {
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    followFocus(el);
+  }
+  function followFocus(el) {
+    const body = el.closest('.wo-settings-body, .wo-scroll, .wo-title-main');
+    if (!body || body.scrollHeight <= body.clientHeight) return;
+    const target = el.closest('.wo-row') || el;
+    const k = body.getBoundingClientRect().height / body.offsetHeight || 1;
+    const gap = parseFloat(getComputedStyle(body.closest('.wo-frame') || body).getPropertyValue('--wo-density-gap')) || 0;
+    const br = body.getBoundingClientRect(), tr = target.getBoundingClientRect();
+    const top = (tr.top - br.top) / k, bottom = (tr.bottom - br.top) / k;
+    let y = body.scrollTop;
+    if (top - gap < 0) y += top - gap; else if (bottom + gap > body.clientHeight) y += bottom + gap - body.clientHeight;
+    if (y === body.scrollTop) return;
+    body.scrollTo({ top: y, behavior: document.documentElement.dataset.motion === 'reduced' ? 'instant' : 'smooth' });
+  }
+  /** Tab key focus also follows into view (a desktop player walking rows with Tab). */
+  addEventListener('focusin', (e) => { if (readyState && e.target.closest && e.target.closest('.wo-frame') && input.mode === 'keyboard') followFocus(e.target); });
+  /**
+   * One direction press ([name] "Up", "Down", "Left" or "Right") from the arrow keys or the D-pad
+   * and left stick, written once for both. In order: an open list walks its enabled items (Up and
+   * Down; Left and Right do nothing there, as PopupMenu); a focused slider steps aria-valuenow by
+   * its data-wo-step; a focused select cycles its list; a focused [data-wo-padmap-cycle] steps the
+   * map's context; anything else moves focus (nav: Up and Down in the group, Left and Right across
+   * groups, or along the one list when there are none).
+   */
+  function dirPress(name) {
+    const back = name === 'Up' || name === 'Left' ? -1 : 1, side = name === 'Left' || name === 'Right';
+    const list = (activeFrame() || document).querySelector('.wo-popup.is-open');
+    if (list) { if (!side) listCursor(list, back); return; }
+    const el = document.activeElement && document.activeElement.closest && document.activeElement.closest('.wo-frame') ? document.activeElement : null;
+    if (el && side && !input.revealOnly) {
+      if (el.matches('.wo-slider')) { stepSlider(el, back); return; }
+      if (el.matches('[data-wo-padmap-cycle]')) { cyclePadmap(el, back); return; }
+      if (el.matches('.wo-select')) { const l = el.parentElement.querySelector(':scope > .wo-popup'); if (l) { cycleSelect(l, back); return; } }
+    }
+    nav(back, side);
+  }
+  /** Steps slider [el] by its data-wo-step ([dir] -1 or 1; default a twentieth of its range),
+   *  clamped to its range, and writes the value into the Body label beside it ("85%", or the
+   *  number with the step's decimals when the label has no %). */
+  function stepSlider(el, dir) {
+    const lo = Number(el.getAttribute('aria-valuemin') || 0), hi = Number(el.getAttribute('aria-valuemax') || 1);
+    const step = Number(el.dataset.woStep) || (hi - lo) / 20;
+    const places = (String(el.dataset.woStep || '').split('.')[1] || '').length;
+    const v = Math.min(hi, Math.max(lo, Number(el.getAttribute('aria-valuenow')) + dir * step));
+    el.setAttribute('aria-valuenow', v.toFixed(places));
+    fills(el.parentElement);
+    const label = el.parentElement.querySelector(':scope > .wo-slider ~ .wo-t-body');
+    if (label) label.textContent = label.textContent.trim().endsWith('%') ? v.toFixed(places) + '%' : v.toFixed(places);
+  }
+  /** The pickable items of list [list] (aria-disabled ones and refresh-gated hidden ones skipped). */
+  const listItems = (list) => [...list.querySelectorAll('.wo-popup-item')].filter((x) => x.getAttribute('aria-disabled') !== 'true' && !x.hidden);
+  /** Moves the pad and key cursor (.is-cursor, its own look in wo.css) in open list [list]. */
+  function listCursor(list, dir) {
+    const items = listItems(list);
+    if (!items.length) return;
+    const at = items.findIndex((x) => x.classList.contains('is-cursor'));
+    const from = at >= 0 ? at : items.findIndex((x) => x.getAttribute('aria-selected') === 'true');
+    list.querySelectorAll('.is-cursor').forEach((x) => x.classList.remove('is-cursor'));
+    items[from < 0 ? 0 : (from + dir + items.length) % items.length].classList.add('is-cursor');
+  }
+  /** A or Enter on an open list: picks the item under the cursor. True when it did. */
+  function listAccept() {
+    const list = (activeFrame() || document).querySelector('.wo-popup.is-open');
+    const item = list && list.querySelector('.wo-popup-item.is-cursor');
+    if (!item) return false;
+    pickItem(item);
+    return true;
+  }
+  /** Left and Right on a closed select pick the previous or next enabled item, wrapping. */
+  function cycleSelect(list, dir) {
+    const items = listItems(list);
+    if (!items.length) return;
+    const at = items.findIndex((x) => x.getAttribute('aria-selected') === 'true');
+    pickItem(items[(at + dir + items.length) % items.length], false);
+  }
+  /**
+   * Picks list item [item]: aria-selected moves to it and its text becomes the select's value.
+   * The value is the select's one visible text span (not the aria-hidden arrows); a select with
+   * several value spans (WINDOW SIZE's per-size spans) shows the one whose text matches instead.
+   * [close] false keeps the list as it is (a Left or Right cycle on a closed select).
+   */
+  function pickItem(item, close = true) {
+    const list = item.closest('.wo-popup');
+    list.querySelectorAll('.wo-popup-item').forEach((x) => { x.setAttribute('aria-selected', String(x === item)); x.classList.remove('is-cursor'); });
+    const sel = list.parentElement.querySelector(':scope > .wo-select');
+    const spans = sel ? [...sel.children].filter((x) => x.getAttribute('aria-hidden') !== 'true') : [];
+    const text = item.textContent.trim();
+    if (spans.length > 1) { const hit = spans.find((x) => x.textContent.trim() === text); if (hit) spans.forEach((x) => { x.hidden = x !== hit; }); }
+    else if (spans.length === 1) spans[0].textContent = text;
+    if (close) setList(list, false);
+  }
+  /**
+   * Hover moves the (hidden) focus, so there is only ever one highlight (6.2 B7 rule 3). A pointer
+   * entering a frame control before any input, or while that frame shows no ring, makes the pointer
+   * the input first, so a fresh desktop shows the hover look at once.
+   */
   addEventListener('pointerover', (e) => {
     const el = e.target.closest && e.target.closest('.wo-frame .wo-btn, .wo-frame .wo-tab, .wo-frame .wo-answer, .wo-frame [data-wo-focus]');
-    if (el && !el.disabled && input.mode === 'pointer') el.focus({ preventScroll: true });
+    if (!el || el.disabled || e.pointerType === 'touch') return;
+    const c = el.closest('.wo-frame');
+    if (input.mode === null || (input.mode !== 'pointer' && c.dataset.ring === 'off')) setInput('pointer', true);
+    if (input.mode === 'pointer') el.focus({ preventScroll: true });
   });
+  /** A pointer press on a frame control focuses it (every pointer type), so the focus a later key
+   *  or pad press moves from is the control the player last touched. Disabled controls are skipped. */
+  addEventListener('pointerdown', (e) => {
+    const el = readyState && e.target.closest && e.target.closest('.wo-frame :is(.wo-btn, .wo-tab, .wo-answer, .wo-select, [data-wo-focus])');
+    if (el && !el.disabled && el.getAttribute('aria-disabled') !== 'true') el.focus({ preventScroll: true });
+  }, true);
 
   // Current item (the control that holds focus in a frame) -------------------------------------
 
@@ -1021,9 +1159,9 @@
     setInput('pad', true);
     finishEntrances();
     if (fresh) emit('press', { kind: 'pad' });
-    const dir = { DPadUp: -1, DPadLeft: -1, DPadDown: 1, DPadRight: 1 }[name];
-    if (dir) { nav(dir); return; }
-    if (name === 'A' && document.activeElement && document.activeElement.closest('.wo-frame')) document.activeElement.click();
+    const dir = { DPadUp: 'Up', DPadLeft: 'Left', DPadDown: 'Down', DPadRight: 'Right' }[name];
+    if (dir) { dirPress(dir); return; }
+    if (name === 'A' && !listAccept() && document.activeElement && document.activeElement.closest('.wo-frame')) document.activeElement.click();
     if (PAD_EVENTS[name]) emit(PAD_EVENTS[name], { button: name, dir: name === 'LB' || name === 'LT' ? -1 : 1 });
   }
   WO.pad = { press: (name) => padPress(name), buttons: PAD };
@@ -1077,7 +1215,7 @@
   /** Godot's built-in ui_accept and ui_cancel keys (engine defaults, no file in the project). */
   const ENGINE_UI = { ui_accept: { keys: ['Enter', 'Space'], pad: [] }, ui_cancel: { keys: ['Esc'], pad: [] } };
   /** Actions the brief adds that the build does not have yet (4.2, 4.7 step 1): proposals. */
-  const PROPOSED_ACTIONS = { tab_prev: { keys: [], pad: ['LB'] }, tab_next: { keys: [], pad: ['RB'] }, page_up: { keys: [], pad: ['LT'] }, page_down: { keys: [], pad: ['RT'] }, objective: { keys: ['Tab'], pad: ['View'] } };
+  const PROPOSED_ACTIONS = { tab_prev: { keys: [], pad: ['LB'] }, tab_next: { keys: [], pad: ['RB'] }, target_prev: { keys: [], pad: ['LB'] }, target_next: { keys: [], pad: ['RB'] }, page_up: { keys: [], pad: ['LT'] }, page_down: { keys: [], pad: ['RT'] }, objective: { keys: ['Tab'], pad: ['View'] } };
   /**
    * The bindings, read from main.gd's _install_inputs (the build's one home for them), plus the
    * engine's ui_* defaults and the brief's proposed actions: {action: {keys: [...], pad: [...]}}.
@@ -1096,12 +1234,15 @@
       b[m[1]] = b[m[1]] || { keys: [], pad: [] };
       b[m[1]].pad.push(JOY_NAMES[m[2]] || m[2]);
     }
-    // The stick: _add_joy_axis binds the left stick's X axis (its body sets JOY_AXIS_LEFT_X), drawn as LS.
+    // The stick: _add_joy_axis binds the left stick's X axis (its body sets JOY_AXIS_LEFT_X), drawn as
+    // LS with its push direction from the value's sign ("LS:left" for -1.0, "LS:right" for 1.0), so
+    // MOVE LEFT and MOVE RIGHT never show the same glyph (M09, M10 review).
     const axisHelper = (text.match(/func _add_joy_axis\([^)]*\)[^\n]*\n((?:\t.*\n)+)/) || [])[1] || '';
     if (/JOY_AXIS_LEFT_X/.test(axisHelper)) {
-      for (const m of body.matchAll(/_add_joy_axis\(&"(\w+)", -?[\d.]+\)/g)) {
+      for (const m of body.matchAll(/_add_joy_axis\(&"(\w+)", (-?[\d.]+)\)/g)) {
         b[m[1]] = b[m[1]] || { keys: [], pad: [] };
-        if (!b[m[1]].pad.includes('LS')) b[m[1]].pad.push('LS');
+        const ls = 'LS:' + (Number(m[2]) < 0 ? 'left' : 'right');
+        if (!b[m[1]].pad.includes(ls)) b[m[1]].pad.push(ls);
       }
     }
     // Copies, so a remap below never edits the PROPOSED_ACTIONS constant.
@@ -1124,7 +1265,8 @@
 
   /**
    * SVG glyphs, drawn once here (brief 4.4: no glyph art in the repo until Q12). [name] is an Xbox
-   * name (A B X Y LB RB LT RT View Menu Guide DPad DPadUp DPadDown DPadLeft DPadRight LS RS),
+   * name (A B X Y LB RB LT RT View Menu Guide DPad DPadUp DPadDown DPadLeft DPadRight LS RS, and a
+   * stick push such as "LS:left"),
    * "key:<label>" for a keycap or "mouse:left|right". Drawn in currentColor only (no new colours).
    * "mark:wolf" and "mark:engineer" are the speaker marks (decision, November 9: name tab, colour
    * and a small mark). Geometry is in a 100-unit-tall box; the letter is 100 / the Body line height, so with the
@@ -1155,11 +1297,23 @@
       const arm = name.slice(4).toLowerCase();
       const a = H * 0.34, c = H / 2;
       parts = [h('svg:path', { d: `M${c - a / 2} ${sw} h${a} v${c - a / 2 - sw} h${c - a / 2 - sw} v${a} h${-(c - a / 2 - sw)} v${c - a / 2 - sw} h${-a} v${-(c - a / 2 - sw)} h${-(c - a / 2 - sw)} v${-a} h${c - a / 2 - sw} Z`, fill: 'none', stroke: 'currentColor', 'stroke-width': sw, 'stroke-linejoin': 'round' })];
-      const at = { up: [c, sw + a / 2], down: [c, H - sw - a / 2], left: [sw + a / 2, c], right: [H - sw - a / 2, c] }[arm];
-      if (at) parts.push(h('svg:circle', { cx: at[0], cy: at[1], r: a * 0.32, fill: 'currentColor' }));
-    } else if (/^(LS|RS)$/.test(name)) {
-      // A stick: a ridged ring (the thumb grip) around its side letter.
-      parts = [h('svg:circle', { cx: w / 2, cy: H / 2, r: H / 2 - sw, fill: 'none', stroke: 'currentColor', 'stroke-width': sw, 'stroke-dasharray': '6 4' }), text(name[0], w / 2, H / 2 + 2)];
+      // The pressed arm is filled whole (the arm's own rectangle, from the cross's edge to the hub,
+      // the hub left open), so DPadLeft and DPadRight read apart at a glance.
+      const L = c - a / 2 - sw;
+      const arms = { up: [c - a / 2, sw, a, L], down: [c - a / 2, c + a / 2, a, L], left: [sw, c - a / 2, L, a], right: [c + a / 2, c - a / 2, L, a] };
+      const r0 = arms[arm];
+      if (r0) parts.push(h('svg:rect', { x: r0[0], y: r0[1], width: r0[2], height: r0[3], fill: 'currentColor' }));
+    } else if (/^(LS|RS)(:(left|right|up|down))?$/.test(name)) {
+      // A stick: a solid ring with a small inner cap and its name; "LS:left" adds a filled arrow on
+      // that side of the ring for a stick push (move_left, move_right).
+      const [stick, way] = name.split(':');
+      if (way === 'left' || way === 'right') w = H * 1.36;
+      const cx = way === 'left' ? w - H / 2 : way === 'right' ? H / 2 : w / 2;
+      parts = [h('svg:circle', { cx, cy: H / 2, r: H / 2 - sw, fill: 'none', stroke: 'currentColor', 'stroke-width': sw }),
+        h('svg:circle', { cx, cy: H / 2, r: H * 0.3, fill: 'none', stroke: 'currentColor', 'stroke-width': sw * 0.5 }),
+        text(stick, cx, H / 2 + 2, fs * 0.62)];
+      const tip = { left: `M${sw} ${H / 2} L${w - H + sw} ${H * 0.3} L${w - H + sw} ${H * 0.7} Z`, right: `M${w - sw} ${H / 2} L${H - sw} ${H * 0.3} L${H - sw} ${H * 0.7} Z` }[way];
+      if (tip) parts.push(h('svg:path', { d: tip, fill: 'currentColor' }));
     } else if (name.startsWith('key:')) {
       const label = name.slice(4);
       w = Math.max(H, label.length * fs * 0.66 + H * 0.5);
@@ -1171,9 +1325,12 @@
         h('svg:line', { x1: w / 2, y1: sw, x2: w / 2, y2: H * 0.42, stroke: 'currentColor', 'stroke-width': sw * 0.6 }),
         h('svg:path', { d: right ? `M${w / 2} ${sw} A ${(w - 2 * sw) / 2} ${(w - 2 * sw) / 2} 0 0 1 ${w - sw} ${w / 2} L${w - sw} ${H * 0.42} L${w / 2} ${H * 0.42} Z` : `M${w / 2} ${sw} A ${(w - 2 * sw) / 2} ${(w - 2 * sw) / 2} 0 0 0 ${sw} ${w / 2} L${sw} ${H * 0.42} L${w / 2} ${H * 0.42} Z`, fill: 'currentColor' })];
     } else if (name === 'mark:wolf') {
-      // WOLF's mark: his cyan eye (the one light painted on him, wolf_lights.gd), as an almond.
-      w = H * 1.4;
-      parts = [h('svg:path', { d: `M${sw} ${H / 2} Q${w / 2} ${sw - 6} ${w - sw} ${H / 2} Q${w / 2} ${H - sw + 6} ${sw} ${H / 2} Z`, fill: 'none', stroke: 'currentColor', 'stroke-width': sw }), h('svg:circle', { cx: w / 2, cy: H / 2, r: H * 0.2, fill: 'currentColor' })];
+      // WOLF's mark: his head in profile, facing right as wolf-stand.png does (pointed ear, long
+      // snout), with his eye-light as one slanted slit (the one light painted on him,
+      // wolf_lights.gd). Not an almond eye: that read as a web "show password" icon (M05, M06 review).
+      w = H * 1.3;
+      parts = [h('svg:path', { d: `M${sw + 6} ${H - sw} L${sw + 4} ${H * 0.42} L${w * 0.22} ${sw} L${w * 0.38} ${H * 0.3} L${w * 0.56} ${H * 0.33} L${w - sw} ${H * 0.55} L${w - sw - 4} ${H * 0.68} L${w * 0.6} ${H * 0.72} L${w * 0.42} ${H - sw} Z`, fill: 'none', stroke: 'currentColor', 'stroke-width': sw, 'stroke-linejoin': 'round' }),
+        h('svg:path', { d: `M${w * 0.4} ${H * 0.44} L${w * 0.6} ${H * 0.47} L${w * 0.58} ${H * 0.55} L${w * 0.4} ${H * 0.51} Z`, fill: 'currentColor' })];
     } else if (name === 'mark:hint') {
       // A system hint's mark: a terminal prompt (chevron and cursor bar), so the line reads as the
       // game's own and not a speaker's (6.3: hints use the same box with a terminal mark).
@@ -1201,6 +1358,8 @@
     if (mode === 'touch') return [];
     const b = bindings(scope)[action];
     if (!b) throw new Error('no binding for action ' + action);
+    // With the mouse, USE is a click on the thing itself (6.4 step 7), as the walk-to pill shows.
+    if (mode === 'pointer' && action === 'interact') return ['mouse:left'];
     const list = mode === 'pad' ? b.pad : b.keys.map((k) => 'key:' + k);
     return all ? list : list.slice(0, 1);
   }
@@ -1323,7 +1482,7 @@
         const action = c.dataset.woAction;
         if (action) {
           if (!b[action]) throw new Error('no binding for action ' + action);
-          if (b[action].pad.length) inputs = [b[action].pad[0]];
+          if (b[action].pad.length) inputs = [b[action].pad[0].split(':')[0]];
         }
         for (const i of inputs) if (!PAD_SPOTS[i]) throw new Error('"' + i + '" is not on the pad (4.1: no stick clicks, paddles, M1/M2 or gyro)');
         const system = c.classList.contains('is-system');
@@ -1434,14 +1593,20 @@
   addEventListener('click', (e) => {
     const btn = e.target.closest && e.target.closest('[data-wo-padmap-cycle]');
     if (!btn || !readyState) return;
+    // A click on the left half of a selector (its ◀) goes back; anywhere else goes forward.
+    const r = btn.getBoundingClientRect();
+    cyclePadmap(btn, btn.matches('.wo-select') && e.clientX < r.left + r.width / 2 ? -1 : 1);
+  });
+  /** Steps the map of [btn]'s frame one context ([dir] -1 or 1), wrapping at the ends. */
+  function cyclePadmap(btn, dir) {
     const holder = btn.closest('[data-wo-padmap-context]');
     const map = holder && holder.querySelector('[data-wo-padmap]');
     const src = map && document.querySelector(map.dataset.woPadmap);
     if (!src) return;
     const names = [...src.querySelectorAll('[data-wo-context-name]')].map((x) => x.dataset.woContextName);
-    holder.dataset.woPadmapContext = names[(names.indexOf(holder.dataset.woPadmapContext) + 1) % names.length];
+    holder.dataset.woPadmapContext = names[(names.indexOf(holder.dataset.woPadmapContext) + dir + names.length) % names.length];
     renderPadmap(map);
-  });
+  }
   WO.padmap = { render: renderPadmaps, spots: PAD_SPOTS };
 
   // ---------------------------------------------------------------------------------------------
@@ -1456,15 +1621,18 @@
    *  page. Throws when it is missing (the problem list shows it). */
   async function templateFor(ref) {
     const i = ref.indexOf('#');
-    if (i < 0) { const t = document.getElementById(ref); if (!t) throw new Error('no <template id="' + ref + '">'); return t; }
+    const isTpl = (t, where) => {
+      if (!t) throw new Error(where + 'no <template id="' + (i < 0 ? ref : ref.slice(i + 1)) + '">');
+      if (t.tagName !== 'TEMPLATE') throw new Error(where + 'id "' + t.id + '" is a <' + t.tagName.toLowerCase() + '>, not a <template> (two elements share the id?)');
+      return t;
+    };
+    if (i < 0) return isTpl(document.getElementById(ref), '');
     const page = ref.slice(0, i), id = ref.slice(i + 1);
     if (!includePages.has(page)) {
       includePages.set(page, fetch(page, { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + page); return r.text(); })
         .then((t) => new DOMParser().parseFromString(t, 'text/html')));
     }
-    const tpl = (await includePages.get(page)).getElementById(id);
-    if (!tpl) throw new Error(page + ' has no <template id="' + id + '">');
-    return tpl;
+    return isTpl((await includePages.get(page)).getElementById(id), page + ': ');
   }
   /**
    * Fills every [data-wo-template] element once, before frames mount, so pages share markup instead
@@ -1491,6 +1659,10 @@
           for (const ref of el.dataset.woTemplate.split(/\s+/).filter(Boolean)) {
             const frag = document.importNode((await templateFor(ref)).content, true);
             frag.querySelectorAll('[autofocus]').forEach((x) => { x.removeAttribute('autofocus'); x.setAttribute('data-wo-autofocus', ''); });
+            // A copy from another page keeps pointing at its own page: a bare id inside it
+            // ("m08-footer") becomes "m08-settings-desktop.html#m08-footer".
+            const from = ref.includes('#') ? ref.slice(0, ref.indexOf('#')) : '';
+            if (from) frag.querySelectorAll('[data-wo-template]').forEach((x) => { x.dataset.woTemplate = x.dataset.woTemplate.split(/\s+/).filter(Boolean).map((r) => (r.includes('#') ? r : from + '#' + r)).join(' '); });
             el.append(frag);
           }
           const setEl = el.querySelector(':scope > script[data-wo-include-set]');
@@ -1585,12 +1757,20 @@
     }
   }
   /** Sets the per-frame profile variables on the canvas (they override the :root ones inside). */
-  function frameVars(f) {
-    const s = f.canvas.style, P = f.P, d = f.d;
+  /** The profile's type and size variables on style [s] from profile [P], written once for a frame
+   *  canvas and for :root (sheets and chrome): --wo-fs-<role>, --wo-glyph-h (a Body line),
+   *  --wo-text-factor (TEXT SIZE as a factor, 1 at 100%, so logo art can hold its profile size),
+   *  --wo-density and --wo-hit-min, all in canvas px. */
+  function profileVars(s, P) {
     for (const [r, px] of Object.entries(P.roles)) s.setProperty('--wo-fs-' + r, px + 'px');
     s.setProperty('--wo-glyph-h', P.roles.body * num('type.body.line-height') + 'px');
+    s.setProperty('--wo-text-factor', fmt(P.textSize / 100, 4));
     s.setProperty('--wo-density', P.density + 'px');
     s.setProperty('--wo-hit-min', P.hitMin + 'px');
+  }
+  function frameVars(f) {
+    const s = f.canvas.style, P = f.P, d = f.d;
+    profileVars(s, P);
     s.setProperty('--wo-hit-margin', P.hitMargin + 'px');
     s.setProperty('--wo-canvas-w', d.shape.cw + 'px');
     s.setProperty('--wo-canvas-h', d.shape.ch + 'px');
@@ -1621,7 +1801,9 @@
     const mode = pin ? (pin === 'mouse' ? 'pointer' : pin) : input.mode || PROFILE_INPUT[f.d.profile];
     f.canvas.dataset.input = mode;
     const real = pin || input.mode || f.d.profile !== 'desktop';
-    f.canvas.dataset.ring = (mode === 'keyboard' || mode === 'pad') && real ? 'on' : 'off';
+    // No ring while the boot's input guard swallows presses (data-wo-boot-guard, set by bootDraw):
+    // a ringed NEW GAME that ignores A looks frozen (M02 review).
+    f.canvas.dataset.ring = (mode === 'keyboard' || mode === 'pad') && real && !f.canvas.hasAttribute('data-wo-boot-guard') ? 'on' : 'off';
   }
   /** Draws the safe-area and unmeasured-area overlays for a frame (brief 7.1 Frame). */
   function safeOverlay(f) {
@@ -1670,8 +1852,24 @@
    * timing.resume-card.guard, so the first tap after a return lands on nothing, 6.7.5). Closing hides it.
    */
   function setOverlay(el, open) {
-    el.hidden = !open;
-    if (!open) return;
+    const c0 = el.closest('.wo-frame');
+    if (!open) {
+      if (el.hidden) return;
+      // Closing plays motion.screen.out (wo.css .is-closing: the backdrop and card fade, the card
+      // drops by MENU_REVEAL_OFFSET; a fade only under REDUCED MOTION), then hides the layer.
+      el.classList.remove('is-opening');
+      el.classList.add('is-closing');
+      clearTimeout(el._woCloseTimer);
+      el._woCloseTimer = setTimeout(() => { el.classList.remove('is-closing'); el.hidden = true; }, num('motion.screen.out'));
+      // Focus goes back to the frame's current control, never to the page body.
+      const cur = currentItem(c0);
+      const a = document.activeElement;
+      if (cur && (!a || a === document.body || el.contains(a))) cur.focus({ preventScroll: true });
+      return;
+    }
+    clearTimeout(el._woCloseTimer);
+    el.classList.remove('is-closing');
+    el.hidden = false;
     replayOpen(el);
     if (el.hasAttribute('data-wo-guard')) el._woGuardUntil = performance.now() + num('timing.resume-card.guard');
     const c = el.closest('.wo-frame'), cur = currentItem(c);
@@ -1686,7 +1884,7 @@
     }
   }
   /** The overlays of the active frame: [open] true gives the shown ones, false the hidden ones. */
-  const overlays = (open) => [...((activeFrame() || document).querySelectorAll('[data-wo-overlay]'))].filter((el) => el.hidden !== open);
+  const overlays = (open) => [...((activeFrame() || document).querySelectorAll('[data-wo-overlay]'))].filter((el) => (el.hidden || el.classList.contains('is-closing')) !== open);
   /** B or Esc (wo:back) closes the active frame's open list first, then its open overlay. */
   document.addEventListener('wo:back', () => {
     const list = (activeFrame() || document).querySelector('.wo-popup.is-open');
@@ -1696,15 +1894,29 @@
   });
   /** The pause key (pause_game: Esc today) and pad Menu toggle the active frame's overlay (4.2). */
   function togglePause() {
-    const open = overlays(true), shut = overlays(false);
+    const list = (activeFrame() || document).querySelector('.wo-popup.is-open');
+    if (list) { setList(list, false); return; }
+    // A dialog (role=alertdialog or data-wo-overlay="dialog": keep-or-revert) is opened by its own
+    // event only; the pause key and Menu never bring it back after it closes. Neither does an
+    // overlay gated on a sequence moment that is not now (data-wo-overlay-when).
+    const pausable = (o) => o.getAttribute('role') !== 'alertdialog' && o.dataset.woOverlay !== 'dialog' && overlayAllowed(o);
+    const open = overlays(true), shut = overlays(false).filter(pausable);
     if (open.length) setOverlay(open[open.length - 1], false); else if (shut.length) setOverlay(shut[0], true);
+  }
+  /** True when overlay [o] may open now: no data-wo-overlay-when, or its frame's sequence mark
+   *  (data-wo-seq-mark on the canvas, set by the sequence player) names that state. */
+  function overlayAllowed(o) {
+    const when = o.dataset.woOverlayWhen;
+    if (!when) return true;
+    const c = o.closest('.wo-frame');
+    return !!c && (c.dataset.woSeqMark || '').split(/\s+/).includes(when);
   }
   document.addEventListener('wo:menu', togglePause);
   addEventListener('keydown', (e) => {
     if (!readyState || inChrome(e.target) || e.repeat || !keyIs(e, 'pause_game')) return;
     // Esc is also ui_cancel: when it closes an open list or overlay, the wo:back it fires does that.
     if (overlays(true).length || (activeFrame() || document).querySelector('.wo-popup.is-open')) return;
-    if (!overlays(false).length) return;
+    if (!overlays(false).some((o) => o.getAttribute('role') !== 'alertdialog' && o.dataset.woOverlay !== 'dialog' && overlayAllowed(o))) return;
     e.preventDefault();
     togglePause();
   }, true);
@@ -1723,6 +1935,46 @@
     else if (open) { const c = open.closest('.wo-frame'), o = c && c.querySelector('[data-wo-overlay]'); if (o) setOverlay(o, true); }
   });
 
+  /** An overlay with data-wo-close-any closes on any press (wo:press: a key, a pointer press in its
+   *  frame, any pad button), respecting its data-wo-guard: the controller-disconnected card. */
+  document.addEventListener('wo:press', () => {
+    for (const o of overlays(true)) {
+      if (!o.hasAttribute('data-wo-close-any')) continue;
+      if (o._woGuardUntil && performance.now() < o._woGuardUntil) continue;
+      setOverlay(o, false);
+    }
+  });
+  /** When a keep-or-revert countdown runs out (wo:revert, detail {el}): its whole overlay closes,
+   *  the changed select goes back (the item named by the countdown's data-wo-revert) and focus
+   *  returns to the row that opened it (data-wo-revert-row, a data-wo-id; else the frame's current). */
+  document.addEventListener('wo:revert', (e) => {
+    const el = e.detail && e.detail.el;
+    if (!el) return;
+    const o = el.closest('[data-wo-overlay]');
+    if (o) setOverlay(o, false);
+    const c = el.closest('.wo-frame');
+    const back = el.dataset.woRevert;
+    if (c && back) {
+      const item = [...c.querySelectorAll('.wo-popup-item')].find((x) => x.textContent.trim() === back);
+      if (item) pickItem(item, false);
+    }
+    const row = c && el.dataset.woRevertRow && c.querySelector('[data-wo-id="' + el.dataset.woRevertRow + '"]');
+    if (row) row.focus({ preventScroll: true });
+  });
+
+  /** Footer prompts are clickable (3.1 step 7): a BACK item (.is-back) fires wo:back (or closes its
+   *  overlay through data-wo-close), an item showing tab_prev or tab_next fires wo:tab that way,
+   *  and a CANCEL REBIND item (its glyph is pause_game) ends the frame's rebind capture. */
+  addEventListener('click', (e) => {
+    const item = readyState && e.target.closest && e.target.closest('.wo-frame .wo-footer-item');
+    if (!item || item.hasAttribute('data-wo-close') || item.hasAttribute('data-wo-padmap-cycle')) return;
+    const g = (n) => item.querySelector('[data-wo-glyph="' + n + '"]');
+    const c = item.closest('.wo-frame');
+    if (g('pause_game') && c.querySelector('.is-capturing')) { c.querySelectorAll('.is-capturing').forEach((x) => x.classList.remove('is-capturing')); return; }
+    if (g('tab_prev') || g('tab_next')) { lastFrame = c; emit('tab', { dir: g('tab_prev') && !g('tab_next') ? -1 : 1 }); return; }
+    if (item.classList.contains('is-back')) { lastFrame = c; emit('back'); }
+  });
+
   // Answer cards (6.3 Choices, 4.2: X and Y answer; D-pad + A, click and tap also work) ---------
 
   /** Presses answer [n] (1 or 2) of the active frame: focus, the pressed look for
@@ -1735,6 +1987,31 @@
     setTimeout(() => el.classList.remove('is-pressed'), num('motion.press.duration'));
     el.click();
   }
+  /** How long a picked answer stays shut before the next press brings the choice back, so the
+   *  mockup can be tried again (a mockup convenience, not a game value). */
+  const ANSWER_RESET_MS = 1000;
+  /**
+   * The one answer path (a click, so X/Y, 1/2, A and taps all land here): the picked card holds lit
+   * (.is-chosen) after its press dip, then the cards and the question box leave on
+   * motion.screen.out (.is-closing in wo.css). Any press after ANSWER_RESET_MS brings them back.
+   */
+  addEventListener('click', (e) => {
+    const card = readyState && e.target.closest && e.target.closest('.wo-frame [data-wo-answer]');
+    const set = card && card.closest('.wo-answers');
+    if (!set || set.classList.contains('is-closing') || card.disabled) return;
+    const c = card.closest('.wo-frame');
+    card.classList.add('is-chosen');
+    const shut = [set, ...c.querySelectorAll('.wo-box:not([hidden])')];
+    setTimeout(() => shut.forEach((x) => x.classList.add('is-closing')), num('motion.press.duration'));
+    const until = performance.now() + ANSWER_RESET_MS;
+    const reset = () => {
+      if (performance.now() < until) return;
+      document.removeEventListener('wo:press', reset);
+      shut.forEach((x) => x.classList.remove('is-closing'));
+      card.classList.remove('is-chosen');
+    };
+    document.addEventListener('wo:press', reset);
+  });
   document.addEventListener('wo:answer', (e) => {
     const b = bindings();
     const n = b.choice_1.pad.includes(e.detail.button) ? 1 : b.choice_2.pad.includes(e.detail.button) ? 2 : 0;
@@ -1782,15 +2059,30 @@
     const i = tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true');
     if (!tabs.length) return;
     const next = tabs[(i + (e.detail && e.detail.dir < 0 ? -1 : 1) + tabs.length) % tabs.length];
-    const hadFocus = document.activeElement && document.activeElement.matches('.wo-tab');
+    const a = document.activeElement;
+    const hadTab = a && a.matches('.wo-tab');
+    const oldPage = a && a.closest && a.closest('[data-wo-page]');
+    const inFrame = a && a.closest && a.closest('.wo-frame') === bar.closest('.wo-frame');
     selectTab(next);
-    if (hadFocus) next.focus({ preventScroll: true });
+    if (hadTab) { next.focus({ preventScroll: true }); return; }
+    // Focus was in the page that just hid, or nowhere in this frame: the new page's first control
+    // takes it, so a pad player keeps a ring (3.1 step 6), and the page plays its open motion.
+    const scope = bar.closest('.wo-settings, .wo-frame') || document;
+    const page = next.dataset.woTab && scope.querySelector('[data-wo-page="' + next.dataset.woTab + '"]');
+    if (page) replayOpen(page);
+    if (page && (oldPage || !inFrame)) {
+      const first = focusables().find((el) => page.contains(el));
+      if (first) { focusInView(first); page.closest('.wo-settings-body') && (page.closest('.wo-settings-body').scrollTop = 0); }
+    }
   });
   /** Each render: ?tab=<key> selects that tab wherever a strip has it, and every strip shows its
    *  selected tab (a capture of any page is a URL). */
   function syncTabs() {
-    const want = url.get('tab');
     for (const bar of document.querySelectorAll('.wo-tabs')) {
+      // A frame may name its own open tab (data-wo-tab-open on the canvas or its .mk-device host),
+      // which wins over ?tab=, so one page shows several tabs at once.
+      const c = bar.closest('.wo-frame'), host = c && c.closest('.mk-device');
+      const want = (c && c.dataset.woTabOpen) || (host && host.dataset.woTabOpen) || url.get('tab');
       const tab = (want && bar.querySelector('.wo-tab[data-wo-tab="' + want + '"]')) || bar.querySelector('.wo-tab[aria-selected="true"]');
       if (tab) selectTab(tab);
     }
@@ -1808,13 +2100,15 @@
   /**
    * Places an open list under its select, or above it when it would cross the safe rect's bottom and
    * there is more room above (Godot's PopupMenu flips the same way), then slides it sideways to stay
-   * inside the safe rect. Measured in canvas px from the frame canvas.
+   * inside the safe rect. Measured in canvas px from the frame canvas. A list inside a scrolling
+   * settings body floats (wo.css position: fixed) and is placed by floatList instead.
    */
   function placeList(list) {
     const c = list.closest('.wo-frame'), f = c && frames.find((x) => x.canvas === c);
     if (!f || !f.P) return;
     list.classList.remove('is-above');
     list.style.translate = '';
+    if (list.closest('.wo-settings-body')) { floatList(list, f); return; }
     const cr = c.getBoundingClientRect(), k = cr.width / f.d.shape.cw;
     const r = list.getBoundingClientRect(), sel = list.parentElement.getBoundingClientRect();
     const E = f.P.edges, bottom = f.d.shape.ch - E.bottom, right = f.d.shape.cw - E.right;
@@ -1824,14 +2118,44 @@
     const dx = left < E.left ? E.left - left : left + w > right ? right - left - w : 0;
     if (dx) list.style.translate = dx + 'px 0';
   }
+  /**
+   * Places a floating list ([list] in frame [f]) against its containing block: the nearest
+   * transformed ancestor (the frame canvas or the desktop card), which position: fixed uses. It
+   * drops under its select, flips above when it does not fit below and does above, and otherwise
+   * slides up or down into the safe rect, as Godot clamps a PopupMenu into the window. It is at
+   * least the select's width and never wider than the safe rect. Sets style left, top, min-width
+   * and max-height in the containing block's px.
+   */
+  function floatList(list, f) {
+    let cb = list.parentElement;
+    while (cb && cb !== f.canvas && getComputedStyle(cb).transform === 'none') cb = cb.parentElement;
+    cb = cb || f.canvas;
+    const cbr = cb.getBoundingClientRect(), k = cbr.width / cb.offsetWidth || 1;
+    const fr = f.canvas.getBoundingClientRect(), kf = fr.width / f.d.shape.cw;
+    // The safe rect in client px, cut to the containing block (a card clips its own children).
+    const E = f.P.edges;
+    const safe = { l: Math.max(fr.left + E.left * kf, cbr.left), t: Math.max(fr.top + E.top * kf, cbr.top), r: Math.min(fr.right - E.right * kf, cbr.right), b: Math.min(fr.bottom - E.bottom * kf, cbr.bottom) };
+    const sel = list.parentElement.querySelector(':scope > .wo-select') || list.parentElement;
+    const sr = sel.getBoundingClientRect();
+    list.style.minWidth = sr.width / k + 'px';
+    list.style.maxHeight = (safe.b - safe.t) / k + 'px';
+    list.style.overflowY = 'auto';
+    const lr = list.getBoundingClientRect();
+    let top = sr.bottom;
+    if (top + lr.height > safe.b) {
+      if (sr.top - lr.height >= safe.t) { top = sr.top - lr.height; list.classList.add('is-above'); }
+      else top = Math.max(safe.t, safe.b - lr.height);
+    }
+    let left = Math.min(sr.right - lr.width, safe.r - lr.width);
+    left = Math.max(left, safe.l);
+    list.style.left = (left - cbr.left) / k + 'px';
+    list.style.top = (top - cbr.top) / k + 'px';
+  }
   addEventListener('click', (e) => {
     if (!readyState || !e.target.closest) return;
     const item = e.target.closest('.wo-frame .wo-popup-item');
     if (item) {
-      if (item.getAttribute('aria-disabled') === 'true') return;
-      const list = item.closest('.wo-popup');
-      list.querySelectorAll('.wo-popup-item').forEach((x) => x.setAttribute('aria-selected', String(x === item)));
-      setList(list, false);
+      if (item.getAttribute('aria-disabled') !== 'true') pickItem(item);
       return;
     }
     const sel = e.target.closest('.wo-frame .wo-select');
@@ -1931,6 +2255,42 @@
   function scrolls() {
     for (const el of document.querySelectorAll('[data-wo-scroll]')) el.scrollTop = Number(el.dataset.woScroll) * (el.scrollHeight - el.clientHeight);
   }
+  /**
+   * The title's CHANGELOG corner (.wo-title-foot) sits bottom-left; when the right column grows over
+   * it (a phone at TEXT SIZE 150-200%), the corner moves to the end of the column's scrolled list
+   * instead, so the two never overlap (M03 review). Each render starts from its own place again.
+   */
+  function titleFoot() {
+    for (const t of document.querySelectorAll('.wo-title')) {
+      const foot = t._woFoot || t.querySelector('.wo-title-foot'), main = t.querySelector('.wo-title-main'), col = t.querySelector('.wo-title-col');
+      if (!foot || !main || !col) continue;
+      t._woFoot = foot;
+      if (foot.parentElement !== t) { t.append(foot); foot.classList.remove('is-in-list'); }
+      const a = foot.getBoundingClientRect(), b = col.getBoundingClientRect();
+      if (a.width && a.right > b.left && a.bottom > b.top && a.top < b.bottom) { main.append(foot); foot.classList.add('is-in-list'); }
+    }
+  }
+  /** The shared scroll cue (wo.css data-wo-more): marks each settings body and .wo-scroll with
+   *  "up" when it is scrolled down at all and "down" while more lies below (1 canvas px slack for
+   *  rounding). Runs every render and on every scroll. */
+  function scrollCues(root = document) {
+    for (const el of root.querySelectorAll('.wo-settings-body, .wo-scroll, .wo-title-main')) {
+      const more = [el.scrollTop > 1 ? 'up' : '', el.scrollTop + el.clientHeight < el.scrollHeight - 1 ? 'down' : ''].filter(Boolean).join(' ');
+      if (more) el.dataset.woMore = more; else delete el.dataset.woMore;
+    }
+  }
+  // An entrance moves items down by MENU_REVEAL_OFFSET while it plays, which adds scroll height for
+  // a moment: the cue is read again when an animation in a scroller ends, so it never sticks on.
+  addEventListener('animationend', (e) => {
+    const sc = readyState && e.target.closest && e.target.closest('.wo-settings-body, .wo-scroll, .wo-title-main');
+    if (sc) scrollCues(sc.parentElement || document);
+  }, true);
+  addEventListener('scroll', (e) => {
+    const el = e.target;
+    if (!readyState || !el.matches || !el.matches('.wo-settings-body, .wo-scroll, .wo-title-main')) return;
+    scrollCues(el.parentElement || document);
+    el.querySelectorAll('.wo-popup.is-open').forEach(placeList);
+  }, true);
   /** Hides each [data-wo-min-refresh="hz"] choice on a frame whose device refresh rate is known and
    *  lower (3.2: 120 only on screens of 119 Hz or more). Unknown rates hide nothing. */
   function refreshChoices() {
@@ -1950,11 +2310,16 @@
   function screens() {
     markCurrent();
     syncTabs();
-    syncLists();
     fills();
     refreshChoices();
     nameTabRoom();
+    // [data-wo-text-size]: the frame's resolved TEXT SIZE (the profile default or ?text=), so a
+    // settings row never writes 100% or 125% by hand.
+    for (const f of frames) if (f.P) f.canvas.querySelectorAll('[data-wo-text-size]').forEach((x) => { x.textContent = Math.round(f.P.textSize) + '%'; });
     scrolls();
+    syncLists();
+    titleFoot();
+    scrollCues();
     countdowns();
     for (const el of document.querySelectorAll('[data-wo-open]:not(.is-opening)')) replayOpen(el);
     // A guarded overlay shown when the page opens stands for the return from the background (6.7.5).
@@ -1971,6 +2336,15 @@
   /** A small seeded random source (?seed=, default 1), so captures of idle motion repeat. */
   let seed = Number(url.get('seed')) || 1;
   const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  /** A random source of its own for one idle element, seeded from ?seed= and the element's name
+   *  ([key]: its data-wo-spot, data-wo-probe or index), so one element's ticks never shift another's
+   *  (the same Park-Miller step as rand). */
+  function streamFor(key) {
+    let s0 = Number(url.get('seed')) || 1;
+    for (const ch of String(key)) s0 = (s0 * 31 + ch.charCodeAt(0)) % 2147483647;
+    let st = s0 || 1;
+    return () => ((st = (st * 16807) % 2147483647) - 1) / 2147483646;
+  }
   /**
    * Entrance stagger for every [data-wo-enter] group: its children get --wo-enter-delay so the
    * whole group lands within motion.stagger.total (each item takes motion.panel.in). Any input
@@ -1979,7 +2353,10 @@
   function stagger(root = document) {
     const dur = num('motion.panel.in'), total = num('motion.stagger.total');
     for (const g of root.querySelectorAll('[data-wo-enter]')) {
-      const items = [...g.children];
+      // data-wo-enter-order="<n>" on a child sets its slot (lower first; unmarked children keep
+      // their DOM order between), so the logo mark can lead and the bottom row come last.
+      const items = [...g.children].map((el, i) => ({ el, i, o: el.dataset.woEnterOrder !== undefined ? Number(el.dataset.woEnterOrder) : i }))
+        .sort((a, b) => a.o - b.o || a.i - b.i).map((x) => x.el);
       const step = items.length > 1 ? Math.max(0, total - dur) / (items.length - 1) : 0;
       items.forEach((el, i) => { el.classList.add('wo-enter'); el.style.setProperty('--wo-enter-delay', fmt(i * step, 3) + 'ms'); });
       // Drop is-entering too, so a replay restarts the animation (re-adding a class that is still
@@ -2008,9 +2385,18 @@
     for (const [el, t] of idleTimers) if (reduced() || !el.isConnected) { clearTimeout(t); idleTimers.delete(el); }
     if (reduced()) return;
     const lo = num('motion.idle.period-min'), hi = num('motion.idle.period-max');
-    const arm = (el) => idleTimers.set(el, setTimeout(() => tick(el), lo + rand() * (hi - lo)));
+    // Two ticks on one screen are at least 4 x motion.focus.in apart (one flicker's length), so two
+    // lights never fire as one flash; a tick that would land closer waits that long.
+    const spacing = num('motion.focus.in') * 4;
+    const arm = (el) => {
+      if (!el._woRand) el._woRand = streamFor(el.dataset.woSpot || el.dataset.woProbe || [...document.querySelectorAll('[data-wo-idle]')].indexOf(el));
+      idleTimers.set(el, setTimeout(() => tick(el), lo + el._woRand() * (hi - lo)));
+    };
     const tick = (el) => {
       if (!el.isConnected || reduced()) { idleTimers.delete(el); return; }
+      const c = el.closest('.wo-frame') || document.body, now = performance.now();
+      if (c._woLastTick && now - c._woLastTick < spacing) { idleTimers.set(el, setTimeout(() => tick(el), spacing - (now - c._woLastTick))); return; }
+      c._woLastTick = now;
       el.classList.add('is-tick');
       const anims = el.getAnimations({ subtree: true });
       const done = anims.length ? Promise.all(anims.map((a) => a.finished.catch(() => 0))) : new Promise((r) => setTimeout(r, num('motion.focus.in') * 2));
@@ -2148,6 +2534,10 @@
    *  next one shows the line's next box, and after the last replays the first (the mockup's stand-in
    *  for "advance", 6.3 step 3, 6.4 step 8). */
   function pressBox(box) {
+    // While the box's frame shows answer cards, A or Enter belongs to the cards: it never retypes
+    // the question line (M06 review).
+    const c = box && box.closest('.wo-frame');
+    if (c && [...c.querySelectorAll('[data-wo-answer]')].some((x) => x.offsetParent !== null)) return;
     const el = box && box.querySelector('[data-wo-reveal]');
     if (!el || !el._reveal) return;
     if (el._reveal.done) reveal(el, el._reveal.index + 1); else el._reveal.complete();
@@ -2355,13 +2745,23 @@
    * Moves frame [f]'s dialogue boxes to the top when, at the bottom, they would cover the speakers'
    * feet (6.3 Position: "moves to the top when the speakers or the target stand in the lower third";
    * Celeste anchors per line). The test is the box's top against the floor line, (FLOOR_Y - view top)
-   * x zoom in canvas px; at TEXT SIZE 200% on a phone the box grows past it.
+   * x zoom in canvas px; at TEXT SIZE 200% on a phone the box grows past it. A box also moves up
+   * when, at the bottom, it would overlap the frame's shown answer cards (.wo-answers). A box with
+   * data-wo-place="bottom" (or "top") is pinned there, for side-by-side comparisons.
    */
   function placeBoxes(f, v) {
     const floor = (stage().floorY - v.top) * v.zoom;
+    const cr = f.canvas.getBoundingClientRect(), k = cr.width / f.d.shape.cw || 1;
+    const answers = [...f.canvas.querySelectorAll('.wo-answers')].filter((a) => a.getClientRects().length && a.offsetParent !== null);
     for (const b of f.canvas.querySelectorAll('.wo-box:not(.is-inline)')) {
       b.classList.remove('is-top');
-      if (b.getClientRects().length && f.d.shape.ch - f.P.edges.bottom - b.offsetHeight < floor) b.classList.add('is-top');
+      if (!b.getClientRects().length || b.closest('.wo-choice')) continue;
+      const pin = b.dataset.woPlace;
+      if (pin) { b.classList.toggle('is-top', pin === 'top'); continue; }
+      const top = f.d.shape.ch - f.P.edges.bottom - b.offsetHeight;
+      const covers = answers.some((a) => (a.getBoundingClientRect().top - cr.top) / k < f.d.shape.ch - f.P.edges.bottom && (a.getBoundingClientRect().top - cr.top) / k < top + b.offsetHeight
+        && (a.getBoundingClientRect().bottom - cr.top) / k > top);
+      if (top < floor || covers) b.classList.add('is-top');
     }
   }
   /**
@@ -2595,6 +2995,13 @@
         const spots = (cfg.spots || []).map((sp) => {
           const d = h('i', { class: 'wo-spot', 'data-wo-idle': '', 'data-wo-spot': sp.name });
           Object.assign(d.style, { left: pct(sp.x, W), top: pct(sp.y, H), width: pct(sp.w, W), height: pct(sp.h, H) });
+          // The light's footprint below the lamp ("cone": centre and size in art px) dims with its
+          // lamp: a child of the spot, so it ticks with it, placed in the spot's own proportions.
+          if (sp.cone) {
+            const c = sp.cone, cone = h('i', { class: 'wo-spot-cone' });
+            Object.assign(cone.style, { left: pct(c.x - c.w / 2 - (sp.x - sp.w / 2), sp.w), top: pct(c.y - c.h / 2 - (sp.y - sp.h / 2), sp.h), width: pct(c.w, sp.w), height: pct(c.h, sp.h) });
+            d.append(cone);
+          }
           return d;
         });
         el.append(h('img', { src: srcUrl, alt: '', draggable: 'false' }), ...spots);
@@ -2611,8 +3018,10 @@
   /**
    * Fills every [data-wo-text] element with a value read from its one home, so a page never writes
    * it: "project:<setting>" (project.godot, for example application/config/version, the single
-   * source of the version) or "konst:<file>:<NAME>" (a script constant such as main.gd
-   * NO_CHECKPOINT_NOTE). Throws into the problem list when the home has no such value.
+   * source of the version), "konst:<file>:<NAME>" (a script constant such as main.gd
+   * NO_CHECKPOINT_NOTE) or "token:<path>" (a token's number in its own unit: ms for a duration, px
+   * for a dimension; for example token:timing.indicator.delay). Throws into the problem list when
+   * the home has no such value.
    */
   function renderTexts(root = document) {
     for (const el of root.querySelectorAll('[data-wo-text]')) {
@@ -2621,6 +3030,7 @@
         let v;
         if (kind === 'project') v = today.project(rest.join(':'));
         else if (kind === 'konst') v = today.konst(rest[0], rest[1]);
+        else if (kind === 'token') v = fmt(num(rest.join(':')), 3);
         else throw new Error('unknown data-wo-text "' + el.dataset.woText + '"');
         el.textContent = String(v);
       } catch (e) { problem(e.message); }
@@ -2677,7 +3087,9 @@
     const extra = {
       speaker: ['speaker', 'Speaker', [['', 'name tab'], ['portrait', 'placeholder portrait']]],
       touch: ['touch', 'Phone controls', [['', 'move pad + tap'], ['tapwalk', 'tap to walk']]],
-      loading: ['loading', 'Loading', [['', 'M04'], ['m04b', 'M04b'], ['compare', 'compare']]],
+      loading: ['loading', 'Loading', [['', 'M04 (chosen)'], ['m04b', 'M04b (comparison only)'], ['compare', 'M04 vs M04b']]],
+      credit: ['credit', 'Credit line', [['', 'on title'], ['credits', 'CREDITS screen only']]],
+      menu: ['menu', 'Menu look', [['', 'rounded'], ['terminal', 'terminal']]],
       load: ['load', 'Load (s)', [['', 'measured'], ['0.003', '0.003'], ['0.8', '0.8'], ['3', '3'], ['12', '12']]],
       tip: ['tip', 'Tip', [['', 'off'], ['1', 'placeholder']]],
       art: ['art', 'Card art', [['', 'room'], ['key', 'key art']]],
@@ -3217,7 +3629,7 @@
     const k = (n) => today.konst('studio_logo.gd', n);
     const c = { swap: k('SWAP_AT'), hopS: k('BOUNCE_SECONDS'), hopPx: k('BOUNCE_PX'), nameAt: k('NAME_IN_AT'), nameS: k('NAME_IN_SECONDS'),
       fadeAt: k('FADE_AT'), fadeS: k('FADE_SECONDS'), skipRate: k('SKIP_FADE_RATE'), handS: k('HANDOVER_SECONDS'), guardS: k('INPUT_GUARD_SECONDS'),
-      sweepS: k('BAR_SWEEP_SECONDS') };
+      sweepS: k('BAR_SWEEP_SECONDS'), barIn: k('BAR_IN_SECONDS') };
     c.end = c.fadeAt + c.fadeS;
     return c;
   }
@@ -3226,36 +3638,43 @@
   /**
    * The boot plan: the whole boot as times (seconds of wall time from the logo's first frame) for
    * cfg {load, skip}: load = when the title scene has loaded; skip = when a skip press lands (null:
-   * none). Rules, from studio_logo.gd and brief 5.2 / 5.8:
+   * none). Rules, from studio_logo.gd and brief 5.1 / 5.2 / 5.8:
    * - the logo plays to FADE_AT (or jumps there on a skip) and holds whole until the title loads;
-   * - the shared indicator (indicatorSpan) begins when the logo starts to wait (holdAt);
+   * - the shared indicator (indicatorSpan) begins when the logo starts to wait (holdAt), but never
+   *   before timing.indicator.quiet minus timing.indicator.delay, so a line shows only when the
+   *   whole wait passes about 1 s (5.1) and an early skip never brings one or lengthens the wait;
    * - the fade runs FADE_SECONDS, SKIP_FADE_RATE times faster once skipping;
    * - the hand-over cover clears over HANDOVER_SECONDS; input is swallowed until
-   *   INPUT_GUARD_SECONDS after the cut; the title entrance takes motion.stagger.total.
-   * Returns {c, load, skip, holdAt, fadeStart, handover, clear, guardEnd, entranceEnd, ind:
-   * {beginAt, showAt, readyAt, hideAt, shown}}; ind.shown is how long the line is up (s).
+   *   INPUT_GUARD_SECONDS after the cut;
+   * - the title entrance takes motion.stagger.total and ends when the guard ends (never starting
+   *   before the cut), so most of it plays after the cover has cleared (principle 7).
+   * Returns {c, load, skip, holdAt, fadeStart, handover, clear, guardEnd, entranceAt, entranceEnd,
+   * ind: {beginAt, showAt, readyAt, hideAt, shown}}; ind.shown is how long the line is up (s).
    */
   function bootPlan(cfg) {
     const c = logoConsts();
     const L = Math.max(0, cfg.load), S = cfg.skip === null || cfg.skip === undefined ? null : Math.max(0, cfg.skip);
     const holdAt = S !== null && S < c.fadeAt ? S : c.fadeAt;
-    const span = indicatorSpan(holdAt * 1000, L * 1000);
-    const ind = { beginAt: L > holdAt ? holdAt : null, showAt: span ? span.on / 1000 : null, readyAt: L, hideAt: null, shown: 0 };
+    const beginAt = Math.max(holdAt, (num('timing.indicator.quiet') - num('timing.indicator.delay')) / 1000);
+    const span = indicatorSpan(beginAt * 1000, L * 1000);
+    const ind = { beginAt: L > beginAt ? beginAt : null, showAt: span ? span.on / 1000 : null, readyAt: L, hideAt: null, shown: 0 };
     const fadeStart = Math.max(holdAt, L, span ? span.off / 1000 : 0);
     let handover;
     if (S !== null && S <= fadeStart) handover = fadeStart + c.fadeS / c.skipRate;
     else if (S !== null && S < fadeStart + c.fadeS) handover = S + (1 - (S - fadeStart) / c.fadeS) * (c.fadeS / c.skipRate);
     else handover = fadeStart + c.fadeS;
     if (ind.showAt !== null) { ind.hideAt = handover; ind.shown = handover - ind.showAt; }
-    return { c, load: L, skip: S !== null && S < handover ? S : null, holdAt, fadeStart, handover, clear: handover + c.handS, guardEnd: handover + c.guardS,
-      entranceEnd: handover + num('motion.stagger.total') / 1000, ind };
+    const guardEnd = handover + c.guardS, stag = num('motion.stagger.total') / 1000;
+    const entranceAt = Math.max(handover, guardEnd - stag);
+    return { c, load: L, skip: S !== null && S < handover ? S : null, holdAt, fadeStart, handover, clear: handover + c.handS, guardEnd,
+      entranceAt, entranceEnd: entranceAt + stag, ind };
   }
   /** What the boot screen shows at wall time [w] (s) on plan [tl]; [reduced] drops the hop. */
   function bootStateAt(tl, w, reduced) {
     const c = tl.c;
     if (w < 0) return { phase: 'launch' };
     if (w >= tl.handover) {
-      return { phase: w < tl.clear ? 'handover' : w < tl.guardEnd ? 'guard' : 'title', cover: Math.min(1, Math.max(0, 1 - (w - tl.handover) / c.handS)), entrance: w - tl.handover, guard: w < tl.guardEnd };
+      return { phase: w < tl.clear ? 'handover' : w < tl.guardEnd ? 'guard' : 'title', cover: Math.min(1, Math.max(0, 1 - (w - tl.handover) / c.handS)), entrance: w - tl.entranceAt, guard: w < tl.guardEnd };
     }
     let e = tl.skip !== null && w >= tl.skip && tl.skip < c.fadeAt ? c.fadeAt : Math.min(w, c.fadeAt);
     if (w > tl.fadeStart) {
@@ -3273,18 +3692,38 @@
       grin: e >= c.swap, lift: reduced ? 0 : c.hopPx * Math.sin(Math.PI * hop),
       name: smoothstep(c.nameAt, c.nameAt + c.nameS, e), fade: Math.min(1, Math.max(0, (e - c.fadeAt) / c.fadeS)),
       bar: ind.showAt !== null && w >= ind.showAt ? (w >= ind.readyAt ? 'done' : 'running') : 'hidden', barTime: ind.showAt !== null ? w - ind.showAt : 0,
+      // The line fades in over BAR_IN_SECONDS as the game's bar_alpha does (studio_logo.gd _process).
+      barAlpha: ind.showAt !== null && w >= ind.showAt ? Math.min(1, (w - ind.showAt) / c.barIn) : 0,
     };
+  }
+  /**
+   * A named boot moment as wall time (s) on plan [tl]: "<name>", "<name>+<s>" or "<name>-<s>", for
+   * example "nameAt+0.2" or "guardEnd+0.05". Names: logo (0, its first frame), swap, hopTop (the
+   * top of the grin's hop), nameAt, fadeAt, end (studio_logo.gd), holdAt, fadeStart, handover, clear,
+   * guardEnd, entranceAt, entranceEnd, showAt, readyAt (bootPlan). So a still, a seek or a label
+   * follows the script and the tokens instead of copying a number. Throws on an unknown name, or a
+   * moment this plan lacks (showAt when no line shows).
+   */
+  function bootMoment(spec, tl) {
+    const m = /^([A-Za-z]+)([+-](?:\d+\.?\d*|\.\d+))?$/.exec(spec);
+    const named = { logo: 0, swap: tl.c.swap, hopTop: tl.c.swap + tl.c.hopS / 2, nameAt: tl.c.nameAt, fadeAt: tl.c.fadeAt, end: tl.c.end, holdAt: tl.holdAt, fadeStart: tl.fadeStart,
+      handover: tl.handover, clear: tl.clear, guardEnd: tl.guardEnd, entranceAt: tl.entranceAt, entranceEnd: tl.entranceEnd, showAt: tl.ind.showAt, readyAt: tl.ind.readyAt };
+    const base = m ? named[m[1]] : undefined;
+    if (base === undefined || base === null) throw new Error('boot moment "' + spec + '" is not in this plan');
+    return base + Number(m[2] || 0);
   }
   /** The boot page's state: its frames, the live clock (t0, skip), a frozen time from a seek, its
    *  data (<script data-wo-boot-data>: load, engine, measured) and the live frame's event log. */
   const boot = { frames: [], log: [], data: null, t0: null, skip: null, frozenAt: null, marks: {} };
-  /** A boot frame's config: its data-wo-boot ("t=0.45 load=3 skip=0.2"), then the URL (t, load,
-   *  skip), then the page data's load. A frame with t is frozen at that time. */
+  /** A boot frame's config: its data-wo-boot ("at=swap+0.14 load=3 skip=0.2"; at= is a bootMoment
+   *  on the frame's own plan, t=<s> a plain time), then the URL (t, load, skip), then the page data's
+   *  load. A frame with a time is frozen at it. */
   function bootCfg(canvas) {
     const own = Object.fromEntries((canvas.dataset.woBoot || '').split(/\s+/).filter(Boolean).map((kv) => kv.split('=')));
     const pick = (k) => (own[k] !== undefined ? Number(own[k]) : url.get(k) !== null && url.get(k) !== '' ? Number(url.get(k)) : undefined);
-    const t = pick('t'), load = pick('load'), skip = pick('skip');
-    return { frozen: t !== undefined, t, load: load !== undefined ? load : boot.data.load, skip: skip !== undefined ? skip : null };
+    const load = pick('load') !== undefined ? pick('load') : boot.data.load, skip = pick('skip') !== undefined ? pick('skip') : null;
+    const t = own.at !== undefined ? bootMoment(own.at, bootPlan({ load, skip })) : pick('t');
+    return { frozen: t !== undefined, t, load, skip };
   }
   /** Boot part [n] ([data-wo-boot-part]) of a frame canvas. */
   const bootPart = (root, n) => root.querySelector(`[data-wo-boot-part="${n}"]`);
@@ -3293,6 +3732,14 @@
   function bootDraw(canvas, st, frozen) {
     const live = ['logo', 'hold', 'fade'].includes(st.phase);
     const show = (el, on) => { if (el) el.hidden = !on; };
+    // The input guard (5.2 step 6): while presses are swallowed the title must not look ready, so the
+    // frame drops its focus ring (frameInput reads the attribute) and wo.css hides footer prompts.
+    const guarding = !live && st.phase !== 'launch' && !!st.guard;
+    if (canvas.hasAttribute('data-wo-boot-guard') !== guarding) {
+      canvas.toggleAttribute('data-wo-boot-guard', guarding);
+      const f = frames.find((x) => x.canvas === canvas);
+      if (f) frameInput(f);
+    }
     show(bootPart(canvas, 'launch'), st.phase === 'launch');
     show(bootPart(canvas, 'logo'), live);
     const title = bootPart(canvas, 'title');
@@ -3305,13 +3752,20 @@
       bootPart(canvas, 'fade').style.opacity = fmt(st.fade, 4);
       const bar = bootPart(canvas, 'bar');
       bar.style.visibility = st.bar === 'hidden' ? 'hidden' : 'visible';
+      bar.style.opacity = fmt(st.barAlpha, 3);
       bar.classList.toggle('is-running', st.bar === 'running');
       bar.classList.toggle('is-done', st.bar === 'done');
       if (frozen) seekAnimations(bar, st.barTime * 1000);
     }
     if (title && !live && st.phase !== 'launch') {
-      // The title entrance (5.2 step 7): played once live; a frozen frame seeks it to its time.
-      if (!frozen) { if (!title._woEntered) { title._woEntered = true; playAnimations(title); stagger(title); } return; }
+      // The title entrance (5.2 step 7) starts at the plan's entranceAt, after the cut. Until then a
+      // live frame holds it at its first frame (no item in yet), then plays it once; a frozen frame
+      // seeks it to its time (before entranceAt that is the first frame too).
+      if (!frozen) {
+        if (st.entrance < 0) { if (!title._woHeld) { title._woHeld = true; stagger(title); seekAnimations(title, 0); } return; }
+        if (!title._woEntered) { title._woEntered = true; playAnimations(title); stagger(title); }
+        return;
+      }
       if (title._woTau === st.entrance) return;
       title._woTau = st.entrance;
       stagger(title);
@@ -3325,7 +3779,7 @@
     boot.frozenAt = null;
     boot.log = [{ at: -boot.data.engine, what: 'launch image' }];
     boot.marks = {};
-    for (const f of boot.frames) if (!f.cfg.frozen) { const t = bootPart(f.canvas, 'title'); if (t) t._woEntered = false; }
+    for (const f of boot.frames) if (!f.cfg.frozen) { const t = bootPart(f.canvas, 'title'); if (t) t._woEntered = t._woHeld = false; }
   }
   /** Wall time on the live boot clock (s from the logo's first frame). */
   const bootNow = () => (performance.now() - boot.t0) / 1000;
@@ -3342,12 +3796,13 @@
     if (w < tl.handover) { if (boot.skip === null) { boot.skip = w; boot.log.push({ at: w, what: 'skip (' + kind + ')' }); } }
     else boot.log.push({ at: w, what: (w < tl.guardEnd ? 'swallowed by the input guard (' : 'title takes it (') + kind + ')' });
   });
-  /** Boot seek buttons: [data-wo-boot-seek="<s>"] freezes the live frames at that time; "replay"
-   *  plays the boot again from the launch image. */
+  /** Boot seek buttons: [data-wo-boot-seek="at=<moment>"] (a bootMoment on the live plan) or "<s>"
+   *  freezes the live frames at that time; "replay" plays the boot again from the launch image. */
   addEventListener('click', (e) => {
     const b = e.target.closest && e.target.closest('[data-wo-boot-seek]');
     if (!b || !boot.data) return;
-    if (b.dataset.woBootSeek === 'replay') bootStart(); else boot.frozenAt = Number(b.dataset.woBootSeek);
+    const v = b.dataset.woBootSeek;
+    if (v === 'replay') bootStart(); else boot.frozenAt = v.startsWith('at=') ? bootMoment(v.slice(3), bootLivePlan()) : Number(v);
   });
   /** One clock step: draws every live frame and logs each phase change once, then the readout. */
   function bootTick() {
@@ -3366,25 +3821,43 @@
     const does = w < 0 ? 'engine starting' : w < tl.handover ? 'a press skips' : w < tl.guardEnd ? 'presses are swallowed (input guard)' : 'the title takes input';
     out.textContent = `t ${fmt(w, 2)} s · ${st.phase}${st.bar && st.bar !== 'hidden' ? ' · sweep ' + st.bar : ''} · ${does}` + (boot.skip !== null ? ` · skipped at ${fmt(boot.skip, 2)} s` : '');
   }
+  /** At least this share of the title entrance plays after the hand-over cover has cleared (M02
+   *  review, November 11, 2026: brief 1, principle 7 spends its one orchestrated entrance here). */
+  const ENTRANCE_SEEN_MIN = 0.75;
   /** The boot's accept numbers from bootPlan (also WO.boot.check() for --eval): the unskipped and
-   *  skipped sequences, a 3 s slow load, the shortest indicator ever shown over loads 0 to 12 s and
-   *  six skip times, and the fastest repeat (sweep and reduced pulse) against 3 a second. */
+   *  skipped sequences, a 3 s slow load, the shortest indicator ever shown and the shortest load that
+   *  shows one over loads 0 to 12 s and six skip times, the cut over skip times 0 to FADE_AT at the
+   *  measured load (it must never rise as the skip comes earlier), the share of the title entrance
+   *  seen after the cover clears, and the fastest repeat (sweep and reduced pulse) against 3 a second. */
   function bootCheck() {
     const d = boot.data, c = logoConsts();
     const plain = bootPlan({ load: d.load, skip: null }), first = bootPlan({ load: d.load, skip: 0 }), slow = bootPlan({ load: 3, skip: null });
-    let minShown = Infinity, worst = null, maxSeq = 0;
+    let minShown = Infinity, worst = null, maxSeq = 0, minLoadShown = Infinity;
     for (let i = 0; i <= 1200; i++) {
       const L = i / 100;
       for (const S of [null, 0, 0.3, 1.0, 1.7, 1.9]) {
         const tl = bootPlan({ load: L, skip: S });
         if (tl.ind.showAt !== null && tl.ind.shown < minShown) { minShown = tl.ind.shown; worst = { load: L, skip: S }; }
+        if (tl.ind.showAt !== null) minLoadShown = Math.min(minLoadShown, L);
         if (L <= c.fadeAt && S === null) maxSeq = Math.max(maxSeq, tl.handover);
       }
     }
+    // Skips 10 ms apart: an earlier skip must never cut later than a later one.
+    let rises = null;
+    for (let i = 1, before = first.handover; i <= Math.round(c.fadeAt * 100); i++) {
+      const cut = bootPlan({ load: d.load, skip: i / 100 }).handover;
+      if (cut < before - 1e-9 && !rises) rises = { skip: i / 100, cut, earlierCut: before };
+      before = cut;
+    }
+    const stag = plain.entranceEnd - plain.entranceAt;
     const sweepHz = 1 / c.sweepS, pulseHz = 1000 / (2 * num('motion.reduced-pulse'));
     return {
       unskipped: { handover: plain.handover, clear: plain.clear, input: plain.guardEnd, entranceEnd: plain.entranceEnd, indicator: plain.ind.showAt !== null },
-      skippedFrame1: { handover: first.handover, input: first.guardEnd, indicatorShown: first.ind.shown },
+      skippedFrame1: { handover: first.handover, input: first.guardEnd, indicatorShown: first.ind.shown, todayMin: Math.min(...d.measured.handoverSkippedFrame1) },
+      skipNeverLater: { ok: rises === null, first: rises },
+      lineOnlyPastQuiet: { minLoad: minLoadShown === Infinity ? null : minLoadShown, quiet: num('timing.indicator.quiet') / 1000 },
+      entrance: { at: plain.entranceAt, end: plain.entranceEnd, clear: plain.clear, seen: (plain.entranceEnd - Math.max(plain.entranceAt, plain.clear)) / stag, min: ENTRANCE_SEEN_MIN },
+      soundCues: [{ name: 'grin sting', at: c.swap }],
       slow3s: { showAt: slow.ind.showAt, readyAt: slow.ind.readyAt, fadeStart: slow.fadeStart, handover: slow.handover, shown: slow.ind.shown },
       sequenceMax: maxSeq, sequenceLimit: c.end + c.handS,
       indicatorMinShown: minShown === Infinity ? null : minShown, indicatorWorst: worst, indicatorMinRule: num('timing.indicator.min-show') / 1000,
@@ -3404,14 +3877,18 @@
     el.replaceChildren(table(['Moment', 'This mockup', 'Check'], [
       ['Title loads (measured median)', s2(d.load), d.loadSource],
       ['Logo ends, cut to the title', s2(k.unskipped.handover), 'studio_logo.gd FADE_AT + FADE_SECONDS'],
-      ['Cover clear', s2(k.unskipped.clear), td(ok(k.unskipped.clear <= k.sequenceLimit + 1e-9), ' whole sequence ≤ ' + s2(k.sequenceLimit) + ' (2.0 s + 0.3 s hand-over)')],
+      ['Cover clear', s2(k.unskipped.clear), td(ok(k.unskipped.clear <= k.sequenceLimit + 1e-9), ' whole sequence ≤ ' + s2(k.sequenceLimit) + ' (studio_logo.gd END_AT + HANDOVER_SECONDS)')],
+      ['Title entrance', s2(k.entrance.at) + ' to ' + s2(k.entrance.end), td(ok(k.entrance.seen >= k.entrance.min - 1e-9), ' ' + fmt(k.entrance.seen * 100, 0) + '% plays after the cover clears at ' + s2(k.entrance.clear) + '; at least ' + fmt(k.entrance.min * 100, 0) + '%; it ends when input opens')],
       ['Title takes input', s2(k.unskipped.input), 'measured today ' + d.measured.inputUnskipped.join(' to ') + ' s (adds the hand-over frame and 1/30 s steps)'],
-      ['Skip on the first frame: cut', s2(k.skippedFrame1.handover), 'measured today ' + d.measured.handoverSkippedFrame1.join(' to ') + ' s' + (k.skippedFrame1.indicatorShown ? '; the line shows ' + s2(k.skippedFrame1.indicatorShown) : '')],
+      ['Skip on the first frame: cut', s2(k.skippedFrame1.handover), td(ok(k.skippedFrame1.handover <= k.skippedFrame1.todayMin + 1e-9 && !k.skippedFrame1.indicatorShown), ' ≤ measured today ' + d.measured.handoverSkippedFrame1.join(' to ') + ' s' + (k.skippedFrame1.indicatorShown ? '; the line shows ' + s2(k.skippedFrame1.indicatorShown) : '; no line'))],
+      ['An earlier skip never cuts later', k.skipNeverLater.ok ? 'never' : 'skip ' + s2(k.skipNeverLater.first.skip) + ' cuts at ' + s2(k.skipNeverLater.first.cut) + ', 10 ms earlier at ' + s2(k.skipNeverLater.first.earlierCut), td(ok(k.skipNeverLater.ok), ' skips 0 to ' + s2(logoConsts().fadeAt) + ', 10 ms apart, measured load')],
       ['Skip on the first frame: input', s2(k.skippedFrame1.input), 'measured today ' + d.measured.inputSkippedFrame1.join(' to ') + ' s'],
       ['Slow load 3 s: line shows', s2(k.slow3s.showAt), 'waits timing.indicator.delay after the hold at ' + s2(logoConsts().fadeAt)],
       ['Slow load 3 s: cut', s2(k.slow3s.handover), 'line up ' + s2(k.slow3s.shown)],
       ['Shortest line ever shown (loads 0 to 12 s, 6 skip times)', s2(k.indicatorMinShown), td(ok(k.indicatorMinShown === null || k.indicatorMinShown >= k.indicatorMinRule - 1e-9), ' ≥ ' + s2(k.indicatorMinRule))],
+      ['Shortest load that shows a line (same sweep)', s2(k.lineOnlyPastQuiet.minLoad), td(ok(k.lineOnlyPastQuiet.minLoad === null || k.lineOnlyPastQuiet.minLoad > k.lineOnlyPastQuiet.quiet), ' no line while the whole wait is under ' + s2(k.lineOnlyPastQuiet.quiet) + ' (timing.indicator.quiet, 5.1)')],
       ['Fastest repeat', fmt(fast, 2) + ' per s', td(ok(fast <= 3), ' sweep ' + fmt(k.flashesPerSecond.sweep, 2) + ' Hz, reduced pulse ' + fmt(k.flashesPerSecond.reducedPulse, 2) + ' Hz; limit 3')],
+      ...k.soundCues.map((q) => ['Sound cue: ' + q.name + ' (not built)', s2(q.at), 'studio_logo.gd SWAP_AT, the smirk breaks into the grin; a marker for the procedural audio pass']),
     ]));
   }
   /** Sets up the boot page on each render: its data, frames (canvases with data-wo-boot), the frozen
@@ -3422,10 +3899,19 @@
     boot.data = JSON.parse(dataEl.textContent);
     boot.frames = frames.map((f, i) => ({ i, canvas: f.canvas })).filter((f) => f.canvas.hasAttribute('data-wo-boot')).map((f) => Object.assign(f, { cfg: bootCfg(f.canvas) }));
     for (const f of boot.frames) if (f.cfg.frozen) bootDraw(f.canvas, bootStateAt(bootPlan(f.cfg), f.cfg.t, WO.motion.reduced()), true);
+    // [data-wo-boot-label="<moment> [load=<s>] [skip=<s>]"]: that moment's time (s) on that plan
+    // (default: the page data's load, no skip), so a heading or button never writes a time itself.
+    for (const el of document.querySelectorAll('[data-wo-boot-label]')) {
+      try {
+        const [spec, ...kv] = el.dataset.woBootLabel.split(/\s+/);
+        const o = Object.fromEntries(kv.map((x) => x.split('=')));
+        el.textContent = fmt(bootMoment(spec, bootPlan({ load: o.load !== undefined ? Number(o.load) : boot.data.load, skip: o.skip !== undefined ? Number(o.skip) : null })), 2);
+      } catch (e) { problem(e.message); }
+    }
     bootSheet();
     if (boot.t0 === null) { bootStart(); players.push({ name: 'boot', tick: bootTick }); }
   }
-  Object.assign(boot, { plan: bootPlan, stateAt: bootStateAt, check: bootCheck });
+  Object.assign(boot, { plan: bootPlan, stateAt: bootStateAt, check: bootCheck, moment: bootMoment });
   WO.boot = boot;
 
   // 17b. Screen changes (M04, M04b): door-led fades, resume card, loading view or card ----------
@@ -3738,7 +4224,11 @@
       sw.style.setProperty('--wo-sweep-done', fmt(done, 4));
       if (frozen && st === 'running') seekAnimations(sw, local - p.marks.indicator.on);
     }
-    for (const el of view.querySelectorAll('[data-wo-seq-percent]')) el.textContent = st === 'percent' ? ' ' + Math.floor(100 * done) + '%' : '';
+    for (const el of view.querySelectorAll('[data-wo-seq-percent]')) el.textContent = st === 'percent' ? Math.floor(100 * done) + '%' : '';
+    // From timing.loading-view.percent-after until the load ends the screen may be paused: the frame
+    // carries data-wo-seq-mark="seq-pausable", which an overlay with data-wo-overlay-when names.
+    const frame = s.el.closest('.wo-frame');
+    if (frame) frame.dataset.woSeqMark = st === 'percent' ? 'seq-pausable' : '';
   }
   /** Paints every stage at the clock's time (frozen at ?at=, else running and looping). */
   function seqRender() {
@@ -3871,10 +4361,7 @@
     s.setProperty('--wo-dialogue-backing-color', rgba(color('color.role.hud-card.bg').slice(0, 3).concat(num('dialogue.backing'))));
     // Outside frames (sheets, chrome) the current device's profile applies.
     const P = profile(device(deviceNames().includes(url.get('device')) ? url.get('device') : 'desktop'), { text: Number(url.get('text')) || 0 });
-    for (const [r, px] of Object.entries(P.roles)) s.setProperty('--wo-fs-' + r, px + 'px');
-    s.setProperty('--wo-glyph-h', P.roles.body * num('type.body.line-height') + 'px');
-    s.setProperty('--wo-density', P.density + 'px');
-    s.setProperty('--wo-hit-min', P.hitMin + 'px');
+    profileVars(s, P);
     s.setProperty('--wo-hit-margin', '0px');
     // The base canvas (project.godot) for scenes laid out at its size (.wo-scene-base, 2.5.3 step 15).
     const st = stage();
@@ -3886,6 +4373,7 @@
     html.dataset.speaker = url.get('speaker') === 'portrait' ? 'portrait' : 'tab';
     html.dataset.touchScheme = url.get('touch') === 'tapwalk' ? 'tapwalk' : 'pad';
     html.dataset.flashing = url.get('flashing') === 'reduced' ? 'reduced' : 'on';
+    html.dataset.menu = url.get('menu') === 'terminal' ? 'terminal' : 'rounded';
     html.dataset.clean = url.get('clean') === '1' ? '1' : '';
     applyScenes();
   }

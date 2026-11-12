@@ -48,9 +48,9 @@ The strip at the top sets the URL. A reload or a shared link keeps it.
 - `text=100..200` (TEXT SIZE; empty: the profile default)
 - `motion=reduced`, `hits=1`, `tune=1`
 - `clean=1` hides the strip and the Tune panel, for captures
-- Page extras: `speaker=portrait`, `touch=tapwalk`, `flashing=reduced`, `loading`, `load`, `tip`, `art`, `scene`
+- Page extras: `speaker=portrait`, `touch=tapwalk`, `flashing=reduced`, `loading`, `load`, `tip`, `art`, `scene`, `credit=credits` (M03), `menu=terminal` (M03)
 - Android only: `cutout=` and `edge=` widths in canvas px (not measured yet). They widen that frame's safe edges.
-- Still states for captures: `tab=<key>` (open a settings tab), `list=<name>` (open a list), `at=<moment>:<ms>` and `press=` (M04 clock), `t=`, `load=`, `skip=` (M02 boot clock), `reveal=<ms>` (part-typed line), `countdown=<ms>` (keep-or-revert), `bind=interact=RT` (a remap)
+- Still states for captures: `tab=<key>` (open a settings tab), `list=<name>` (open a list), `at=<moment>:<ms>` and `press=` (M04 clock), `t=`, `load=`, `skip=` (M02 boot clock; `at=<moment>` in its frames), `reveal=<ms>` (part-typed line), `countdown=<ms>` (keep-or-revert), `bind=interact=RT` (a remap)
 
 ## Shared pieces a page can use
 
@@ -68,11 +68,20 @@ Frames and templates:
 Focus, overlays and input:
 
 - `data-wo-current="<data-wo-id>"` on a `.wo-frame` names the item that holds focus. An `autofocus` in a template does the same.
+- Arrow keys and the D-pad share one path: Up and Down move focus, Left and Right step a slider (`data-wo-step`), cycle a select's list or a map's context. An open list takes Up, Down, A and B.
+- `data-wo-nav-group="<name>"` makes its own focus group: Up and Down wrap inside it, Left and Right step between groups.
+- Focus follows into view inside its own scroller (a settings body, `.wo-scroll`, the title list), never the page.
+- `data-wo-enter-order="<n>"` on a child of a `data-wo-enter` group sets its entrance slot (lower first).
 - `data-wo-overlay` on a layer makes it a pause or dialog: B, Esc and Menu close it, the pause key and Menu open it.
-- `data-wo-close` on an item closes its overlay; `data-wo-open-overlay` opens the frame's overlay.
+- `data-wo-close` on an item closes its overlay; `data-wo-open-overlay` opens the frame's overlay. Closing plays `motion.screen.out`.
+- `data-wo-close-any` on an overlay closes it on any key, pad button or press in its frame.
+- `role="alertdialog"` or `data-wo-overlay="dialog"`: the pause key and Menu never reopen it.
+- `data-wo-overlay-when="seq-pausable"` lets Menu or Esc open it only during a long load (M04).
+- `data-wo-place="bottom|top"` pins a dialogue box; otherwise it moves up when it would cover the speakers' feet or the answer cards.
 - `data-wo-guard` on an overlay swallows taps for `timing.resume-card.guard` after it opens.
 - `data-wo-open="screen"` plays the screen-open motion (`motion.screen.in`).
 - `data-wo-only="desktop handheld"` and `data-wo-only-input="touch"` show an item on those profiles or inputs only.
+- `data-wo-text="token:<path>"` writes a token's number in its own unit (ms or px), for example `token:timing.indicator.delay`.
 - `data-wo-answer="1"` and `"2"` on answer cards: X and Y, the 1 and 2 keys, A and taps all pick them.
 - Hover looks show only while the input is the mouse.
 
@@ -80,12 +89,15 @@ Settings (one shell for M08, M09, M10, M11):
 
 - `.wo-settings` on `.wo-safe.wo-terminal-panel` (handheld, phone) or `.wo-settings-card.wo-terminal-panel` (desktop).
 - Inside: `.wo-settings-head`, `.wo-tabs`, `.wo-settings-body` (scrolls), `.wo-footer`. Phones get a left tab rail.
-- `.wo-tab[data-wo-tab="audio"]` shows `[data-wo-page="audio"]`. LB, RB, clicks and taps switch tabs.
+- `.wo-tab[data-wo-tab="audio"]` shows `[data-wo-page="audio"]`. LB, RB, clicks and taps switch tabs. The up and down walk skips the tabs.
+- `data-wo-tab-open="<key>"` on a frame or its `.mk-device` opens that tab in that frame only.
+- Footer prompts are clickable: BACK goes back, an LB or RB prompt switches tabs.
+- `[data-wo-text-size]` shows the frame's TEXT SIZE.
 - `.wo-row` is label | control. The whole row is the tap target.
 - `.wo-slider` reads `aria-valuenow`, `aria-valuemin` and `aria-valuemax`.
 - `data-wo-hold` fills while held (`timing.hold-confirm`); `data-wo-value="0.6"` draws a still.
-- `.wo-popup` in a `.wo-row-control` opens under its `.wo-select` (or above it, `.is-above`). `data-wo-list="name"` names it.
-- `data-wo-countdown` counts `timing.keep-revert`; put the seconds in `[data-wo-countdown-left]`.
+- `.wo-popup` in a `.wo-row-control` opens under its `.wo-select` (or above it, `.is-above`). `data-wo-list="name"` names it. In a settings body it floats over the scroller. Picking an item writes its text into the select.
+- `data-wo-countdown` counts `timing.keep-revert`; put the seconds in `[data-wo-countdown-left]`. At zero it closes its overlay, picks the item named by `data-wo-revert` and focuses `data-wo-revert-row`.
 - `data-wo-scroll="0.15"` opens a scroller part-way down. `data-wo-min-refresh="119"` hides a choice on slower screens.
 - `data-wo-scheme="pad|tapwalk"` follows the Phone controls switch.
 - `.wo-modal` (backdrop and a centred card) and `.wo-plate` (a full-frame cover picture) are shared layers.
@@ -98,6 +110,10 @@ Worlds:
 Clocks:
 
 - M02's boot (`data-wo-boot*`) and M04's screen changes (`data-wo-seq*`) run on one clock. Both take presses from one `wo:press` event.
+- A boot frame takes `data-wo-boot="at=<moment> load=<s> skip=<s>"`. `at=` names a moment and wins over `t=`.
+- Moments: `logo`, `swap`, `hopTop`, `nameAt`, `fadeAt`, `end`, `holdAt`, `fadeStart`, `handover`, `clear`, `guardEnd`, `entranceAt`, `entranceEnd`, `showAt`, `readyAt`. Each takes an offset, for example `swap+0.14`.
+- `data-wo-boot-seek="at=<moment>"` seeks the live plan to a moment.
+- `data-wo-boot-label="<moment> [load=<s>] [skip=<s>]"` writes that moment's time in seconds.
 
 ## Tune
 

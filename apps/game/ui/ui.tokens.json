@@ -2508,6 +2508,23 @@
             "hard_min": 1000
           }
         }
+      },
+      "sweep": {
+        "$type": "duration",
+        "$value": {
+          "value": 2200,
+          "unit": "ms"
+        },
+        "$description": "How long the title rule's idle glint takes to cross the rule: about twice the logo bar's BAR_SWEEP_SECONDS (1.1 s), so an idle tick never reads as the loading sweep (M03 review).",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "brief 6.2 B8; M03 review",
+            "min": 1500,
+            "max": 4000,
+            "step": 100
+          }
+        }
       }
     },
     "reduced-pulse": {
@@ -2748,6 +2765,20 @@
             "source": "AX-CLPB"
           }
         }
+      },
+      "quiet": {
+        "$type": "duration",
+        "$value": {
+          "value": 1000,
+          "unit": "ms"
+        },
+        "$description": "No indicator while the whole wait (from the logo's first frame) is under this: a begin() waits until this minus delay at the earliest, so a skip never brings a line (5.1 'No indicator under about 1 s').",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "sourced",
+            "source": "NN-PI"
+          }
+        }
       }
     },
     "loading-view": {
@@ -2867,6 +2898,20 @@
             0.5,
             0.6
           ]
+        }
+      }
+    },
+    "pulse-peak": {
+      "$type": "number",
+      "$value": 0.6,
+      "$description": "Under REDUCED MOTION, the pulsing line's highest opacity; below 1, so a still of the pulse never looks like the finished line, which shows at full opacity (5.9).",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "brief 5.9; M02 review",
+          "min": 0.3,
+          "max": 0.9,
+          "step": 0.05
         }
       }
     }
