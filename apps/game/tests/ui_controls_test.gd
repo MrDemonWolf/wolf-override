@@ -19,6 +19,8 @@ func _run() -> void:
 	var changelog_back: Button = changelog_screen.get_node("ChangelogBackButton") as Button
 	var changelog_online: Button = changelog_screen.get_node("ChangelogOnlineButton") as Button
 	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
+	# The title's size has one home, the Display role in the UI token file, and no TEXT SIZE factor yet.
+	_expect(title_logo.get_theme_font_size(&"font_size") == UiTokens.px("type.display.size"), "the title is drawn at type.display.size (%d px)" % title_logo.get_theme_font_size(&"font_size"))
 	_expect(changelog.pressed.is_connected(Callable(game, "_show_changelog")) and changelog_online.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog opens in the game and the online button points to the public development updates")
 	var changelog_text: String = str(game.get("changelog_text"))
 	var first_heading: String = changelog_text.get_slice("\n", 0)

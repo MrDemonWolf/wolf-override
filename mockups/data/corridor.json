@@ -1,0 +1,23 @@
+{
+  "$about": "The corridor (maintenance / lockdown room), shared by every page that shows it (M01, M04, M05, M07): its plates, seal door, props and the art's back-to-front order, placed with C3's numbers (code/C3-assets-for-mockups.md section 4). Read by mockups/shared/wo.js composeWorlds through data-wo-world=\"data/corridor.json\". A page adds its actors and extras at a slot and may change a piece by its id (wo.js worldConfig). Paths are under apps/game/assets; x, y, w, h in world px.",
+  "camera": "right",
+  "framing": "auto",
+  "grade": true,
+  "pieces": [
+    {"id": "far", "src": "rooms/corridor-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
+    {"slot": "back"},
+    {"id": "door", "src": "doors/seal-back.png", "x": 724.80, "y": 311.13, "w": 94.5, "h": 144.5},
+    {"id": "wall", "src": "doors/seal-wall.png", "x": 708.43, "y": 0, "w": 91, "h": 458.5, "brightness": "door_kit.gd:WALL_LIFT"},
+    {"id": "mid", "src": "rooms/corridor-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
+    {"slot": "curtain"},
+    {"id": "head", "src": "doors/seal-head.png", "x": 706.50, "y": 294.24, "w": 91, "h": 136.5},
+    {"slot": "props"},
+    {"id": "breaker", "node": "BreakerArt", "tap": "BREAKER"},
+    {"id": "relay", "node": "RelayArt", "tap": "COOLANT RELAY"},
+    {"id": "safe", "node": "CheckpointArt", "tap": "SAFE POINT"},
+    {"id": "bypass", "src": "props/bypass-gearbox.png", "x": 682, "y": 379, "w": 22.18, "h": 29.82},
+    {"id": "wheel", "src": "props/handwheel.png", "x": 683.09, "y": 388.98, "w": 21.82, "h": 21.6},
+    {"slot": "actors"},
+    {"id": "front", "src": "doors/seal-front.png", "x": 787.96, "y": 0, "w": 86.5, "h": 477}
+  ]
+}

@@ -455,8 +455,10 @@ const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"inte
 ## and holds until then, never moving on by itself. RETRY fades to black, the last autosave comes back,
 ## the room fades in, and control returns once it has: about 1.5 s after the hit for a press at once.
 const RETRY_READY_SECONDS: float = 0.9
-const RETRY_FADE_OUT_SECONDS: float = 0.25
-const RETRY_FADE_IN_SECONDS: float = 0.35
+## The fade to black and back (timing.fade.out and timing.fade.in in the UI token file, UiTokens), read
+## at class load because a const cannot call UiTokens.
+static var RETRY_FADE_OUT_SECONDS: float = UiTokens.seconds("timing.fade.out")
+static var RETRY_FADE_IN_SECONDS: float = UiTokens.seconds("timing.fade.in")
 ## The knockdown card's prompt in the hint bar (the approved death-text set, final entries 3 to 5): the
 ## interact key or button, or TAP RETRY on touch, where the USE button reads RETRY.
 const RETRY_PROMPT: String = "%s  RETRY"
@@ -1035,6 +1037,9 @@ static func game_version() -> String:
 func _ready() -> void:
 	get_window().title = str(ProjectSettings.get_setting(NAME_SETTING, ""))
 	title_version.text = game_version()
+	# The title's size is the Display role of the type scale (type.display.size), the token file being
+	# its one home; it takes no TEXT SIZE factor, like the other menus.
+	title_logo.add_theme_font_size_override(&"font_size", UiTokens.px("type.display.size"))
 	_install_inputs()
 	_setup_settings()
 	_setup_impact()

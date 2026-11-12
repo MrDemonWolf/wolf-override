@@ -519,7 +519,6 @@ offset_top = 175.0
 offset_right = 940.0
 offset_bottom = 271.0
 theme_override_fonts/font = ExtResource("13_display")
-theme_override_font_sizes/font_size = 42
 text = "WOLF OVERRIDE"
 
 [node name="Subtitle" type="Label" parent="CanvasLayer/TitleScreen"]

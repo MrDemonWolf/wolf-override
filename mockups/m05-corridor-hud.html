@@ -1,0 +1,179 @@
+<!doctype html>
+<!--
+  M05: the corridor play HUD (design brief 7.3 "M05"; spec 6.3 HUD, dialogue and prompt; 6.4 click and
+  tap the world; 6.5 alerts as lights; 2.3-2.6 sizes, safe area and screen shape; 6.7.2 USE buffer).
+
+  What it is for: judge the play HUD over the real corridor art on every reference screen, one scene at
+  a time (?scene=, the strip's Scene control). The strip's device sets the frame; the input sets the
+  glyphs (keycap, Xbox A, none on touch); Speaker and Phone controls switch the two November 9 choices.
+
+  Markup and per-screen data only: every behaviour and look is mockups/shared/wo.js and wo.css.
+  - World: pieces at C3's placement numbers (code/C3-assets-for-mockups.md section 4), main.tscn nodes
+    read by the world composer, two camera framings (C3: right clamp 604.44; left clamp).
+  - Staging per scene (actor x) follows the build's constants named beside each scene below. A
+    literal constant is read by name ("main.gd:RELAY_STEP_BACK_X"); the rest are expressions in
+    main.gd that wo.js does not evaluate, so their value is typed with the constant named:
+    talk 404 (beside BreakerArt x 350) with WOLF one M0Actor.FOLLOW_GAP (65) behind at 469;
+    pill, usable, touch 655 = RELAY_SIDE_X (RELAY_X + RELAY_REACH - 2); lockdown 674 =
+    BYPASS_CRANK_X (BYPASS_WHEEL.x - 26). Actor y (410 engineer, 423 WOLF) is main.tscn's Human and
+    Wolf position y, which "at" replaces with the x.
+  - Proposals in this data (marked): the far plate's side bleed (2.5.3 step 8), the beacons' drop into
+    the view (B23, UNSET in the brief: 40 world px is this page's start), the USE buffer 0.1 s and the
+    planned walk speed 80 px/s (6.7.2 #4; no home in the build yet). They move to the token file
+    and data/corridor.json with the shared pieces the review asked for; until then they stay here.
+
+  Words: only lines in the build's English strings (apps/game/scripts/main.gd), no new story text:
+  - talk: RELAY_QUESTION_WORDS (WOLF, at the breaker);
+  - bark: WOLF's line in _interact_relay ("I've got the contact. Give me a moment.");
+  - hint: the hint at the breaker once it is live (_context_hint);
+  - lockdown: the second box of BYPASS_START_LINE (DialogueBoxes splits it at the sentence);
+  - pills: the verb phrase of the "%s: ..." hint templates, with the key token and full stop removed
+    (6.3: the templates go; the pill renders the glyph itself), and the station names of the scene's
+    labels; "Walk to <name>" is the brief's pointer pattern (6.3, TWP-UI);
+  - top card: the location and objective strings of main.gd (MAINTENANCE / LOCKDOWN, OPEN THE SEAL).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corridor play HUD</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-strip="scene speaker touch flashing" data-wo-scenes="talk:1 Conversation box;bark:2 Bark over WOLF;hint:3 System hint;pill:4 Prompt pill;walkto:5 Walk to (pointer);walk:6 Walking (hit areas);usable:7 Show what I can use;touch:8 Phone touch;lockdown:9 Lockdown beacons">
+<div>
+<main class="mk-stage">
+  <section class="mk-device" data-wo-device="url">
+    <div class="wo-frame">
+
+      <div class="wo-world-view" data-wo-world="data/corridor.json">
+        <script type="application/json">
+          {"cameras": {"talk": "left", "hint": "left", "walkto": "left"}, "pieces": [
+            {"id": "far", "bleed": "bottom sides"},
+            {"beacons": "CorridorDepth", "drop": 40, "slot": "back"},
+            {"id": "door", "tap": "SEAL"},
+            {"src": "doors/seal-curtain.png", "quad": [[722.4, 310.2], [791.4, 325.2], [791.4, 456.4], [722.4, 429.7]], "slot": "curtain"},
+            {"node": "PurgeTerminalArt", "id": "display", "slot": "props"},
+            {"id": "breaker", "when": {"is-usable": "usable"}},
+            {"id": "relay", "when": {"is-usable": "usable", "is-hover": "walkto"}},
+            {"id": "safe", "when": {"is-usable": "usable"}},
+            {"id": "bypass", "tap": "MANUAL BYPASS", "when": {"is-usable": "usable"}},
+            {"id": "wheel", "when": {"is-usable": "usable"}},
+            {"reach": "corridor", "y": 436, "h": 8, "buffer": 0.1, "walk": 80},
+
+            {"node": "Wolf/BodySprite", "id": "wolf", "at": [469, 423], "flip": true, "tap": "WOLF", "scene": "talk hint walkto"},
+            {"node": "Human/BodySprite", "at": [404, 410], "flip": true, "scene": "talk hint walkto"},
+
+            {"node": "Wolf/BodySprite", "id": "wolf", "at": [548, 423], "tap": "WOLF", "scene": "bark"},
+            {"node": "Human/BodySprite", "at": ["main.gd:RELAY_STEP_BACK_X", 410], "flip": true, "scene": "bark"},
+
+            {"node": "Wolf/BodySprite", "id": "wolf", "at": [455, 423], "tap": "WOLF", "scene": "walk"},
+            {"node": "Human/BodySprite", "at": [520, 410], "scene": "walk"},
+
+            {"node": "Wolf/BodySprite", "id": "wolf", "at": ["main.gd:WOLF_BYPASS_CLEAR_X", 423], "tap": "WOLF", "scene": "pill usable touch lockdown", "when": {"is-usable": "usable"}},
+            {"node": "Human/BodySprite", "at": [655, 410], "flip": true, "scene": "pill usable touch"},
+            {"node": "Human/BodySprite", "at": [674, 410], "scene": "lockdown"},
+
+            {"id": "head", "when": {"is-usable": "usable"}}
+          ]}
+        </script>
+      </div>
+
+      <!-- Order matters: the pills a scene shows come before every dialogue box, and the pill that
+           an open box hides comes right after it (wo.css hides a .wo-pill that follows a .wo-box).
+           The boxes come before the HUD for the same reason (an open box stops the move pad). -->
+
+      <!-- 4 and 8. Prompt pill over the relay (engineer at C3's x 655): glyph, verb, object; on touch
+           the pill is the button and has no glyph. -->
+      <span class="wo-pill" data-wo-at="relay" data-wo-scene="pill touch" data-wo-probe="pill"><span data-wo-glyph="interact"></span>Signal WOLF to take the contact</span>
+
+      <!-- 5. Pointer hover out of reach (engineer at the breaker): walk, then use, in one click. -->
+      <span class="wo-pill is-far" data-wo-at="relay" data-wo-scene="walkto" data-wo-probe="walkto"><span data-wo-glyph="mouse:left"></span>Walk to COOLANT RELAY</span>
+
+      <!-- 7. Show what I can use (hold View, or Tab): every usable thing outlined and named. -->
+      <span class="wo-pill is-far" data-wo-at="breaker" data-wo-scene="usable" data-wo-probe="name">BREAKER</span>
+      <span class="wo-pill is-far" data-wo-at="relay" data-wo-scene="usable" data-wo-probe="name">COOLANT RELAY</span>
+      <span class="wo-pill is-far" data-wo-at="bypass" data-wo-scene="usable" data-wo-probe="name">MANUAL BYPASS</span>
+      <span class="wo-pill is-far" data-wo-at="safe" data-wo-scene="usable" data-wo-probe="name">SAFE POINT</span>
+      <span class="wo-pill is-far" data-wo-at="wolf" data-wo-scene="usable" data-wo-probe="name">WOLF</span>
+      <!-- The seal is a tap target (its door piece), so it is named here too, locked or not: what I
+           can use and what I can tap agree. Outlined on its hood, the part of the seal in view. -->
+      <span class="wo-pill is-far" data-wo-at="head" data-wo-scene="usable" data-wo-probe="name">SEAL</span>
+
+      <!-- 8, tap to walk: the floor point a tap sends the engineer to (toggle Phone controls). -->
+      <span class="wo-walk-mark" data-wo-at="560 440" data-wo-scene="touch" data-wo-probe="walk-mark"></span>
+
+      <!-- 2. Bark (6.3): WOLF heading for the contact while the engineer steps back (RELAY_STEP_BACK_X
+           736). Timed, never takes USE; mark and colour name him. -->
+      <div class="wo-bark" data-speaker="wolf" data-wo-at="wolf" data-wo-scene="bark" data-wo-probe="bark"><span data-wo-glyph="mark:wolf"></span>I've got the contact. Give me a moment.</div>
+
+      <!-- 1. Conversation (6.3): WOLF at the breaker (engineer x 404 beside BreakerArt 350; WOLF one
+           M0Actor.FOLLOW_GAP behind). Types in at TEXT SPEED; the triangle shows once it is complete. -->
+      <div class="wo-box has-portrait" data-speaker="wolf" data-wo-scene="talk" data-wo-probe="box">
+        <div class="wo-nametab" data-wo-probe="nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
+        <div class="wo-portrait" data-wo-probe="portrait"><img src="../apps/game/assets/characters/wolf-stand.png" alt=""><span class="wo-portrait-label">placeholder crop</span></div>
+        <div class="wo-box-text" data-wo-reveal data-wo-probe="dialogue">That relay's tagged COOLANT FAULT. What happens if I touch it live?</div>
+        <span class="wo-continue"></span>
+      </div>
+      <!-- The breaker's pill is in the scene but hidden: no pill while a conversation box is open. -->
+      <span class="wo-pill" data-wo-at="breaker" data-wo-scene="talk" data-wo-probe="pill-under-box"><span data-wo-glyph="interact"></span>Arm the breaker</span>
+
+      <!-- 3. System hint (6.3): the same box, a terminal mark instead of a speaker. -->
+      <div class="wo-box" data-speaker="hint" data-wo-scene="hint" data-wo-probe="hint">
+        <span class="wo-box-mark" data-wo-glyph="mark:hint"></span>
+        <div class="wo-box-text">The breaker is live. Go to the coolant relay.</div>
+      </div>
+
+      <!-- 9. Lockdown (6.5): the beacons carry the alarm; one narration box (no name tab). The line
+           shows as the engineer steps to BYPASS_CRANK_X (main.gd _interact_bypass), so the
+           engineer stands there, just left of the wheel and facing it, covering only its rim. -->
+      <div class="wo-box" data-wo-scene="lockdown" data-wo-probe="narration">
+        <div class="wo-box-text" data-wo-reveal>Coolant hisses from the relay housing and an alarm starts to wail.</div>
+        <span class="wo-continue"></span>
+      </div>
+
+      <!-- The play HUD, anchored to the safe rect (2.5.3 step 11): top card top-left, PAUSE top-right,
+           move ring bottom-left, USE bottom-right. Touch controls show only while touch is the input. -->
+      <div class="wo-safe wo-hud">
+        <div class="wo-stack" data-wo-scene="pill touch">
+          <div class="wo-card wo-resume" data-wo-probe="topcard">
+            <span class="wo-accent"></span>
+            <span class="wo-resume-room">MAINTENANCE / LOCKDOWN</span>
+            <span class="wo-resume-goal">OPEN THE SEAL</span>
+          </div>
+        </div>
+        <div class="wo-move-zone" data-wo-probe="move-zone"></div>
+        <span class="wo-move-ring" data-wo-probe="move-ring"></span>
+        <button class="wo-touch is-use" type="button" data-wo-probe="use">USE</button>
+        <button class="wo-touch is-pause" type="button" data-wo-probe="pause">PAUSE</button>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="mk-main">
+  <p class="mk-lead">What this page is for: check the corridor HUD (box, bark, hint, pill, hit areas, touch controls, beacons) on every screen.</p>
+  <ul class="mk-note">
+    <li>Pick a scene, device and input in the strip. Glyphs follow the input.</li>
+    <li>Speaker: name tab, colour and mark by default; "placeholder portrait" shows a labelled head crop (no portrait art exists, B24).</li>
+    <li>Phone controls: move pad and tap a station or WOLF by default; "tap to walk" hides the pad and USE.</li>
+    <li>Tick "hit areas" to see each tap area, each station's reach (solid) and its 0.1 s USE buffer (light; Proposal, 6.7.2).</li>
+    <li>FLASHING LIGHTS reduced turns the beacon pulse into a steady glow.</li>
+    <li>Row length: the build still wraps dialogue at 42 characters (languages.json en.row_characters) until B31 lands. The brief's 40 is a Proposal: add lang.en.row_characters=40 to the URL, or set it in Tune.</li>
+  </ul>
+  <p class="mk-note" data-wo-scene="talk">Conversation: types in at TEXT SPEED Normal; the triangle shows once the line is complete. Click the box to complete it, again to replay. The breaker's pill is hidden while the box is open.</p>
+  <p class="mk-note" data-wo-scene="talk hint walkto">The purge display at the left: its red screen is drawn by code in the build (prop_screen.gd) and not drawn here yet, so it shows dark.</p>
+  <p class="mk-note" data-wo-scene="bark">Bark: a walk-and-talk line over WOLF. It never takes USE.</p>
+  <p class="mk-note" data-wo-scene="hint">System hint: the same box with a terminal mark, never a second box.</p>
+  <p class="mk-note" data-wo-scene="pill">Prompt pill: switch the input to keyboard, pad and touch. No keyboard glyph with a pad, none on touch.</p>
+  <p class="mk-note" data-wo-scene="walkto">Pointer hover out of reach: the relay is outlined and the pill says where a click walks to.</p>
+  <p class="mk-note" data-wo-scene="walk">Walking: tick "hit areas" for every tap area and the reach bands. A tap area is cut back clear of the shown touch controls (6.4 step 13). One whose clear part is under the minimum turns red.</p>
+  <p class="mk-note" data-wo-scene="usable">Hold View (Tab on a keyboard) to outline and name every usable thing, the locked SEAL too. Touch has no way to call this up yet (open question Q8).</p>
+  <p class="mk-note" data-wo-scene="touch">Phone: the floor sits above the touch controls; the ring rests clear of the edge strip. Android: add cutout= and edge= (canvas px). A touch that starts on a station or WOLF uses it; anywhere else in the left 40% starts the pad (6.4 step 3: an object beats the floor).</p>
+  <p class="mk-note" data-wo-scene="touch">Camera on touch: the floor keeps today's gap above the controls (2.5.3 step 6). The new controls sit lower than today's buttons, so the view rises: 16:9 y 126–526, iPhone 151–551, Pixel 8 153–553, Steam Deck 82–526. The brief's 2.5.2 table (192–592, Deck 147–592) used today's buttons. On the iPad the rise stops at the art's top: y 0–533 (table 59–592), so the floor sits 30 px above USE, not 10. Decision: keep that stop. The view stays on the paint and the beacons show; the table takes these numbers.</p>
+  <p class="mk-note" data-wo-scene="lockdown">Lockdown: the beacons pulse at alert.beacon-rate (Proposal 1 Hz, hard limit 3). Their drop into the view is B23's Proposal. The engineer cranks from the wheel's left, facing it (BYPASS_CRANK_X).</p>
+</footer>
+</div>
+</body>
+</html>

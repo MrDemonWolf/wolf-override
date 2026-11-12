@@ -1,0 +1,184 @@
+<!doctype html>
+<!--
+  M02: boot to title (design brief 7.3 M02, 5.1, 5.2, 5.8, 5.9, 2.5.3 step 15).
+  Launch image, the studio logo's beats (SWAP_AT, NAME_IN_AT, FADE_AT and the hand-over, all in
+  studio_logo.gd), the slow-load sweep, the reduced-motion pulse, the input guard and the
+  hand-over to the title.
+
+  Markup and per-screen data only. Every position comes from studio_logo.tscn (data-wo-node),
+  every time from studio_logo.gd and the timing tokens, read by mockups/shared/wo.js; the look is
+  mockups/shared/wo.css. Nothing here writes a game time: a still, a seek and a heading name a
+  boot moment (data-wo-boot="at=...", data-wo-boot-seek="at=...", data-wo-boot-label; wo.js
+  bootMoment), and prose reads token values (data-wo-text="token:..."), all from the same plan
+  that plays the screen and fills the timing table.
+  The title the logo hands over to is M03's own template (m03-title.html#m03-title), so the two
+  pages never hold two copies of the title.
+  Words: "MrDemonWolf, Inc." is the logo's own string (studio_logo.tscn CompanyName, i18n msgid).
+
+  URL keys this page reads (besides the strip's): t=<s> freezes the clock at t seconds after the
+  logo starts (negative = the launch image); load=<s> is when the title has loaded; skip=<s>
+  presses a skip at that time; splash=today shows today's black boot-splash colour.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boot to title</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-strip="load">
+
+<!-- The live screen: plays the boot in real time; any key, click, tap or pad press skips. -->
+<main class="mk-stage">
+  <section class="mk-device" data-wo-device="url" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m02-boot" data-wo-boot=""></div>
+  </section>
+</main>
+
+<main class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M02 Boot to title</h1>
+  <p class="mk-lead">What this page is for: judge the first two seconds of the game, from the launch image to a title you can use.</p>
+  <ul class="mk-note">
+    <li>The screen above plays the boot once. Press Replay to see it again.</li>
+    <li>Press any key, click, tap or pad button while it plays to skip.</li>
+    <li>Pick a slow title load in the strip (Load) to see the sweep line.</li>
+    <li>Set Motion to reduced: the hop stops and the sweep becomes a slow pulse.</li>
+    <li>The title's backdrop is provisional key art (B13 review pending). Judge the boot on its timing and the logo, not on that picture.</li>
+  </ul>
+  <!-- Seek buttons: each freezes the screen above at one beat; the readout under them prints the time. -->
+  <div class="mk-stagger-row">
+    <button class="mk-btn" type="button" data-wo-boot-seek="replay">Replay</button>
+    <button class="mk-btn" type="button" data-wo-boot-seek="at=logo-0.2">Launch image</button>
+    <button class="mk-btn" type="button" data-wo-boot-seek="at=swap">Grin</button>
+    <button class="mk-btn" type="button" data-wo-boot-seek="at=nameAt+0.2">Name</button>
+    <button class="mk-btn" type="button" data-wo-boot-seek="at=fadeAt">Fade</button>
+    <button class="mk-btn" type="button" data-wo-boot-seek="at=handover+0.15">Hand-over</button>
+    <button class="mk-btn" type="button" data-wo-boot-seek="at=guardEnd+0.1">Title</button>
+  </div>
+  <output class="mk-note" data-wo-boot-readout></output>
+
+  <section class="mk-section">
+    <h2>Timing, computed from the game's own numbers</h2>
+    <p class="mk-note">The same function plays the screen above and fills this table, so the numbers cannot drift from what plays.</p>
+    <div data-wo-boot-sheet></div>
+  </section>
+
+  <section class="mk-section">
+    <h2>The beats, side by side</h2>
+    <p class="mk-note">Each frame is frozen at one moment. The device follows the strip.</p>
+    <div class="mk-device-row">
+      <figure class="mk-device-fig"><h3>Launch image (before the engine runs)</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=logo-0.2"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>The smirk breaks into the grin at <span data-wo-boot-label="swap"></span> s (top of the hop)</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=hopTop"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>The name fades in from <span data-wo-boot-label="nameAt"></span> s</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=nameAt+0.2"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>Everything is in; the fade starts at <span data-wo-boot-label="fadeAt"></span> s</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=fadeAt"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>Cut to the title at <span data-wo-boot-label="handover"></span> s, under the cover (provisional key art, B13 review pending)</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=handover+0.15"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>The title takes input at <span data-wo-boot-label="guardEnd"></span> s (provisional key art, B13 review pending)</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=guardEnd+0.1"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="mk-section">
+    <h2>The input guard, with a pad</h2>
+    <p class="mk-note">After the cut, presses are swallowed for <span data-wo-text="konst:studio_logo.gd:INPUT_GUARD_SECONDS"></span> s, so a skip press cannot also pick NEW GAME. While the guard runs, the screen must not look ready.</p>
+    <div class="mk-device-row is-two">
+      <figure class="mk-device-fig"><h3>Guard running (<span data-wo-boot-label="clear"></span> s): no focus ring, no SELECT prompt</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width" data-wo-input="pad"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=clear"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>Guard over (<span data-wo-boot-label="guardEnd"></span> s): the ring and the prompt show</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width" data-wo-input="pad"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=guardEnd+0.05"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="mk-section">
+    <h2>A slow title load (ready at <span data-wo-boot-label="readyAt load=3"></span> s)</h2>
+    <p class="mk-note">The logo holds whole. The sweep line waits <span data-wo-text="token:timing.indicator.delay"></span> ms, then stays at least <span data-wo-text="token:timing.indicator.min-show"></span> ms. When the title is ready, the line lights fully and stops. The table above gives the times.</p>
+    <p class="mk-note">Set Motion to reduced in the strip to see these three stills under REDUCED MOTION.</p>
+    <div class="mk-device-row">
+      <figure class="mk-device-fig"><h3>Holding, no line yet</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=showAt-0.1 load=3"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>The sweep line shows at <span data-wo-boot-label="showAt load=3"></span> s</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=showAt+0.5 load=3"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+      <figure class="mk-device-fig"><h3>Loaded at <span data-wo-boot-label="readyAt load=3"></span> s: the line is lit and still</h3>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m02-boot" data-wo-boot="at=readyAt+0.1 load=3"></div></section>
+        <figcaption class="mk-device-cap"></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="mk-section">
+    <h2>What is a proposal here</h2>
+    <ul class="mk-note">
+      <li>Launch colour: the boot splash sits on the logo's navy, not black (5.2 step 1). Add splash=today to the URL for today's black.</li>
+      <li>One centred box for the logo (2.5.3 step 15), so it stays centred on wide phones.</li>
+      <li>The company name is part of the logo art, not reading text. It keeps the scene's own size (studio_logo.tscn CompanyName) on every device and TEXT SIZE, so the lockup keeps one shape and the sweep line never crosses it.</li>
+      <li>The sweep line is the shared indicator (5.8). It shows only when the whole wait passes <span data-wo-text="token:timing.indicator.quiet"></span> ms (timing.indicator.quiet, 5.1), so a skip never brings a line and never makes the wait longer.</li>
+      <li>The title's entrance ends when the input guard ends, so most of it plays after the cover has cleared (principle 7: one orchestrated entrance).</li>
+      <li>The focus ring and the SELECT prompt wait for the input guard to end, so the screen never looks ready while it swallows presses.</li>
+      <li>Under REDUCED MOTION, the finished line reads differently from the pulse, and the line fades in as the game's does (studio_logo.gd BAR_IN_SECONDS).</li>
+    </ul>
+  </section>
+
+  <section class="mk-section">
+    <h2>Choices for Nathanial</h2>
+    <ul class="mk-note">
+      <li>Title backdrop: the key art is the first full-colour picture a new player sees, and it fails the AI-tell review (6.6 F, tells 1, 3, 5, 6 and 8). The floor is wet with no water, light streaks fall from the lamps for no reason, gloss and grime are even, and a front light on the engineer comes from no lamp. Keep it until B13, or build the title backdrop in M03 from the real corridor plates and sprites (data/corridor.json)?</li>
+      <li>The brand twice: the logo shows "MrDemonWolf, Inc.", and right after it the title says "MRDEMONWOLF, INC. PRESENTS" in another face and case. Drop that line when the title follows the logo (keep it after --skip-logo), or set it in the logo's face and case? Proposal: show both in M03 with a toggle. The build's strings do not change.</li>
+      <li>The logo's face: Montserrat is a common web face (1.7, "default fonts"). That question belongs to Q6.</li>
+    </ul>
+  </section>
+</main>
+
+<!-- Per-screen data: the measured numbers this page starts from (not game values: no game file
+     holds a measurement). The boot clock reads every game constant from studio_logo.gd. -->
+<script type="application/json" data-wo-boot-data>
+{
+  "load": 0.699,
+  "loadSource": "gap-4 3.2 (brief 5.1): main.tscn loaded 679 to 745 ms after the logo starts, median 699; headless, M1 Pro",
+  "engine": 0.425,
+  "engineSource": "gap-4 3.2: engine start to the first frame 412 to 557 ms, median 425; headless, M1 Pro; not part of the 2.0 s",
+  "measured": {
+    "inputUnskipped": [2.717, 2.748],
+    "inputSkippedFrame1": [1.560, 1.609],
+    "handoverSkippedFrame1": [0.961, 1.010],
+    "source": "gap-4 3.2: title accepts input, and hand-over after a skip on frame 1; headless, M1 Pro"
+  }
+}
+</script>
+
+<template id="m02-boot">
+  <!-- The title the logo hands over to: M03's template, shown under the hand-over cover. -->
+  <div class="wo-layer" data-wo-boot-part="title" data-wo-template="m03-title.html#m03-title"></div>
+  <!-- The studio logo scene (studio_logo.tscn), its parts in one centred base box. -->
+  <div class="wo-layer wo-logo" data-wo-boot-part="logo">
+    <div class="wo-scene-base">
+      <div class="wo-logo-glow" data-wo-node="studio_logo.tscn:Glow"></div>
+      <div class="wo-logo-mascot" data-wo-node="studio_logo.tscn:Mascot" data-wo-boot-part="mascot">
+        <img src="../apps/game/assets/brand/mrdemonwolf-mascot-smirk.png" alt="">
+        <img class="wo-logo-grin" data-wo-node="studio_logo.tscn:Mascot/GrinMouth" data-wo-boot-part="grin" src="../apps/game/assets/brand/mrdemonwolf-mascot-grin-mouth.png" alt="">
+      </div>
+      <div class="wo-logo-name wo-t-h1" data-wo-node="studio_logo.tscn:CompanyName" data-wo-boot-part="name" data-wo-probe="company-name">MrDemonWolf, Inc.</div>
+      <div class="wo-sweep" data-wo-node="studio_logo.tscn:LoadBar" data-wo-boot-part="bar" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
+    </div>
+    <div class="wo-fade" data-wo-boot-part="fade"></div>
+  </div>
+  <!-- The launch image: the engine's boot splash and the iOS launch storyboard (no text). -->
+  <div class="wo-layer wo-launch" data-wo-boot-part="launch"><img src="../apps/game/assets/brand/studio-logo-boot.png" alt=""></div>
+  <!-- The hand-over cover in the fade colour; it clears over HANDOVER_SECONDS once the title is current. -->
+  <div class="wo-fade" data-wo-boot-part="cover"></div>
+</template>
+</body>
+</html>
