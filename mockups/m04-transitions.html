@@ -6,13 +6,12 @@
   stays here only so the two can be judged side by side.
 
   Markup and per-screen data only. One stage template (m04-stage) is shared by every frame on the page;
-  the shared sequence player in mockups/shared/wo.js plays it from the data block below on one clock
-  (brief 7.1 "Loading compare"). Until that player and the include reader land, the stage stays dark
-  (the title is an include) and the page says why.
-  Shared pieces this page needs (requested for the Integrate step): the sequence player
-  (data-wo-seq*), data-wo-when, templates from another page with an include set, the loading.dim
-  token, and data-wo-only-input (an item shown only for one input class, like M03's data-wo-only
-  for profiles).
+  the shared sequence player in mockups/shared/wo.js (WO.seq) plays it from the data block below on
+  one clock (brief 7.1 "Loading compare"). The page also uses these shared pieces: data-wo-when (M04,
+  M04b or both), M03's title template with an include set, the loading.dim token and
+  data-wo-only-input (an item shown only for one input class).
+  Not on this page yet, because the shared player has no lead-in: the door moving before the fade
+  (brief 5.5 step 2). The note list says so on the page.
 
   Words: the build's English strings (main.gd location card rows and objectives, the continue
   prompt "CONTINUE" / "TAP CONTINUE"); the title is M03's template, included. Two lines are
@@ -22,7 +21,8 @@
 
   The room change starts where today's build starts it: the engineer uses the SAFE POINT once it is
   reached (main.gd _interact_checkpoint, m0_state.gd enter_records), past the open seal, and arrives
-  at the Records entry, which "stands open behind them".
+  at the Records entry, which "stands open behind them" until its closer brings it shut
+  (records_room.gd close_entry_behind). So in today's build no door opens before the change.
 
   URL keys this page reads (besides the strip's): at=<moment>:<ms> stops the clock at that moment
   (the seek buttons set it); press=<moment>:<ms>[,...] presses at those times (for captures).
@@ -66,10 +66,11 @@
 </div>
 
 <main class="mk-main">
+  <!-- The M04b label comes first, right under the frame, so a full-page capture of M04b carries it
+       (clean=1 hides the strip, where Loading is picked). Shown only for loading=m04b. -->
+  <p class="mk-device-cap" data-wo-when="loading=m04b" hidden>M04b: comparison only. M04 is the chosen path.</p>
   <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M04 Continue, room change and first visit</h1>
   <p class="mk-lead">What this page is for: judge the door-led room change, the Continue resume card and the slow-load view on one clock.</p>
-  <!-- Hidden until the data-wo-when pass shows it for loading=m04b, so the default (M04) never reads as M04b. -->
-  <p class="mk-lead" data-wo-when="loading=m04b" hidden>You are looking at M04b: comparison only. M04 is the chosen path.</p>
   <ul class="mk-note">
     <li>M04 is the chosen path (Nathanial, November 9).</li>
     <li>M04b is a comparison only. Pick it, or both side by side, under Loading in the strip.</li>
@@ -79,10 +80,9 @@
     <li>Any key, or a click, tap or pad button on the screen, closes a card. A press during the short guard is ignored.</li>
     <li>Press a beat below to stop the clock there. Press Play to let it run.</li>
     <li>"RESTORING …" and the tip line are proposals, not build text.</li>
+    <!-- Delete this item in the change that adds the door beat to the shared player. -->
+    <li>Not shown yet: the door moving before the fade. The shared player has no lead-in for it yet.</li>
   </ul>
-  <!-- Shows only while wo.js has no data-wo-when pass (the player and that pass land together), so
-       today's page says why nothing plays. Delete this line in the same change that adds the player. -->
-  <p class="mk-note" data-wo-when="player=missing">Playback needs the shared sequence player and the include reader in wo.js (requested). Until they land, the screen above stays dark.</p>
 
   <!-- Beats of M04 at the measured load, in ms from each moment's start (the same plan numbers the
        Added time table states). M04b and slow loads use the same buttons; their beats move. -->
@@ -136,13 +136,17 @@
 <template id="m04-stage">
   <!-- From: the title, M03's own template (included, never copied), in the "save exists" state the
        game shows once a SAFE POINT has saved: CONTINUE enabled and pressed, and no note (main.gd
-       _refresh_continue enables the button and empties the note when a save loads). The title has
-       been open a while when CONTINUE is pressed, so its entrance is already over: the set drops
-       data-wo-enter. The set changes the included copy only (shared request: includes and include
-       sets). -->
+       _refresh_continue enables the button and empties the note when a save loads). Focus sits on
+       CONTINUE, the button being pressed: the game's first focus is NEW GAME (_title_first_button),
+       so a pad player has moved down to CONTINUE before pressing A, and the ring and the press show
+       on one button. An autofocus in an included copy is already data-wo-autofocus when the set
+       runs (wo.js fillTemplates), so the set moves that attribute. The title has been open a while
+       when CONTINUE is pressed, so its entrance is already over: the set drops data-wo-enter. The
+       set changes the included copy only. -->
   <div class="wo-layer" data-wo-seq-part="title" data-wo-template="m03-title.html#m03-title">
     <script type="application/json" data-wo-include-set>
-      {"[data-wo-probe=\"continue\"]": {"disabled": null, "class": "is-pressed"},
+      {"[data-wo-probe=\"new-game\"]": {"data-wo-autofocus": null},
+       "[data-wo-probe=\"continue\"]": {"disabled": null, "class": "is-pressed", "data-wo-autofocus": ""},
        "[data-wo-probe=\"continue-note\"]": {"hidden": ""},
        "[data-wo-enter]": {"data-wo-enter": null}}
     </script>
@@ -150,23 +154,30 @@
 
   <!-- The corridor past the open seal (C3 section 4, camera at its right clamp). The engineer stands
        at the SAFE POINT's left (x 842: within its 52 px reach of 876, right of the seal's near-end
-       column, which ends at x 824, and clear of the iPhone's right inset); WOLF follows through the
-       doorway. -->
+       column, which ends at x 824, and clear of the iPhone's right inset). WOLF stands in the open
+       doorway facing them, by Nathanial's decision of 2026-10-14 ("WOLF comes to the doorway"):
+       x 732.83 is main.gd WOLF_DOORWAY_X, 785 - 13 - M0Actor.WOLF_SNOUT (39.17), written out because
+       wo.js reads no GDScript arithmetic. His snout stops 13 px short of the near column drawn over
+       the actors, so nothing cuts his body. -->
   <div class="wo-world-view" data-wo-world="data/corridor.json" data-wo-seq-part="corridor" hidden>
     <script type="application/json">
       {"pieces": [
-        {"node": "Wolf/BodySprite", "at": [765, 423]},
+        {"node": "Wolf/BodySprite", "at": [732.83, 423]},
         {"node": "Human/BodySprite", "at": [842, 410]}
       ]}
     </script>
   </div>
 
-  <!-- Records Access at its entry: both actors where m0_state.enter_records() stands them (C3 section 5). -->
+  <!-- Records Access at its entry (C3 section 5). The engineer stands where m0_state.enter_records()
+       puts them (128). WOLF arrives at 216 and heads straight for the mirror (WOLF_MIRROR_X) at
+       M0Actor.WALK_SPEED 190 px/s, so the frame shows him about 0.45 s on, at 300: clear of the
+       purge queue's desk (right edge 226.43) by more than his tail (39.17), so he never seems to
+       stand inside the machine. -->
   <div class="wo-world-view" data-wo-world="data/records.json" data-wo-seq-part="records" hidden>
     <script type="application/json">
       {"pieces": [
         {"node": "Human/BodySprite", "at": [128, 410]},
-        {"node": "Wolf/BodySprite", "at": [216, 423]}
+        {"node": "Wolf/BodySprite", "at": [300, 423]}
       ]}
     </script>
   </div>
@@ -193,24 +204,44 @@
        picks the bits: M04's view is the status line and the sweep (5.6: the name as
        "RESTORING ..."); M04b's card adds the H1 name, the tip and the prompt (7.3 M04b layout).
        The key art bit is M04b's art=key, Continue only. Status words follow brief 5.6 (a proposal,
-       not build text). The tip is broken by hand into rows of at most 40 characters (brief 2.2), as
-       DialogueBoxes would wrap it: a ch-wide column lets a proportional row hold about 57.
+       not build text). Past 10 s the percent takes its own row under the status words, so it reads
+       as the load's progress, not as part of the room name. The tip is broken by hand into rows
+       of at most 40 characters (brief 2.2), as DialogueBoxes would wrap it: a ch-wide column lets
+       a proportional row hold about 57. It has 57 characters, the length of the longest existing
+       note (main.gd:250; the newline counts, as read_seconds counts it), and 10 words, which keeps
+       the brief's read time of 4.5 s. Its words say what it is, with no padding marks.
        The plate and the dim cover the whole screen; the words sit in .wo-safe, so a long name at
        TEXT SIZE 200% wraps inside the safe rect instead of running into the iPhone insets
        (7.3 M04b accept 9). The prompt is the build's continue prompt (main.gd _continue_prompt):
-       the interact glyph and CONTINUE, or TAP CONTINUE on touch, where no glyph shows. -->
+       the interact glyph and CONTINUE, or TAP CONTINUE on touch, where no glyph shows. Each label
+       is one text node, so no layout gap splits "TAP CONTINUE" into two labels. -->
   <div class="wo-layer" data-wo-seq-part="load" hidden>
+    <!-- The next room's plate without its actors (brief 5.6 "the next room's real lit plate";
+         7.3 M04b layout 1): the shared room file alone, so nobody stands frozen under the words
+         and the view does not read as a hung game. Each room's plate shows only in a moment that
+         goes to that room (its part) and rises with the view's words while the dark lifts under
+         it: the status line in M04, the H1 name in M04b. A bit is one element, so each room has a
+         plate per bit; the M04b status line's steps never show, because the name's plate is
+         already whole above it by then. Their tap areas sit exactly over the live room's. -->
+    <div class="wo-layer" data-wo-seq-part="corridor" hidden>
+      <div class="wo-world-view" data-wo-world="data/corridor.json" data-wo-seq-bit="status" data-wo-probe="plate-corridor"></div>
+      <div class="wo-world-view" data-wo-world="data/corridor.json" data-wo-seq-bit="name"></div>
+    </div>
+    <div class="wo-layer" data-wo-seq-part="records" hidden>
+      <div class="wo-world-view" data-wo-world="data/records.json" data-wo-seq-bit="status" data-wo-probe="plate-records"></div>
+      <div class="wo-world-view" data-wo-world="data/records.json" data-wo-seq-bit="name"></div>
+    </div>
     <div class="wo-loading-plate" data-wo-seq-bit="keyart"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
     <div class="wo-loading-dim" data-wo-seq-bit="dim"></div>
     <div class="wo-safe">
       <div class="wo-loading">
         <div class="wo-loading-name" data-wo-seq-bit="name" data-wo-seq-text="room" data-wo-probe="load-name"></div>
         <div class="wo-sweep" data-wo-seq-bit="sweep" data-wo-probe="sweep"><div class="wo-sweep-seg"></div></div>
-        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING <span data-wo-seq-text="room"></span><span data-wo-seq-percent></span></div>
-        <div class="wo-loading-tip" data-wo-seq-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip text exists<br>in the build) ......</div>
+        <div class="wo-loading-status" data-wo-seq-bit="status" data-wo-probe="load-status">RESTORING <span data-wo-seq-text="room"></span><br><span data-wo-seq-percent data-wo-probe="load-percent"></span></div>
+        <div class="wo-loading-tip" data-wo-seq-bit="tip" data-wo-probe="load-tip">TIP (placeholder: no tip wording exists<br>in the build yet)</div>
       </div>
     </div>
-    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span><span data-wo-only-input="touch">TAP</span>CONTINUE</span>
+    <span class="wo-prompt" data-wo-seq-bit="prompt" data-wo-probe="prompt"><span data-wo-glyph="interact"></span><span data-wo-only-input="touch">TAP CONTINUE</span><span data-wo-only-input="pointer keyboard pad">CONTINUE</span></span>
   </div>
 </template>
 </body>

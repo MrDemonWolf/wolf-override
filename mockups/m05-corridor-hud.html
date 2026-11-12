@@ -10,10 +10,17 @@
   Markup and per-screen data only: every behaviour and look is mockups/shared/wo.js and wo.css.
   - World: pieces at C3's placement numbers (code/C3-assets-for-mockups.md section 4), main.tscn nodes
     read by the world composer, two camera framings (C3: right clamp 604.44; left clamp).
-  - Staging per scene (actor x) follows the build's constants named beside each scene below.
+  - Staging per scene (actor x) follows the build's constants named beside each scene below. A
+    literal constant is read by name ("main.gd:RELAY_STEP_BACK_X"); the rest are expressions in
+    main.gd that wo.js does not evaluate, so their value is typed with the constant named:
+    talk 404 (beside BreakerArt x 350) with WOLF one M0Actor.FOLLOW_GAP (65) behind at 469;
+    pill, usable, touch 655 = RELAY_SIDE_X (RELAY_X + RELAY_REACH - 2); lockdown 674 =
+    BYPASS_CRANK_X (BYPASS_WHEEL.x - 26). Actor y (410 engineer, 423 WOLF) is main.tscn's Human and
+    Wolf position y, which "at" replaces with the x.
   - Proposals in this data (marked): the far plate's side bleed (2.5.3 step 8), the beacons' drop into
     the view (B23, UNSET in the brief: 40 world px is this page's start), the USE buffer 0.1 s and the
-    planned walk speed 80 px/s (6.7.2 #4; no home in the build yet).
+    planned walk speed 80 px/s (6.7.2 #4; no home in the build yet). They move to the token file
+    and data/corridor.json with the shared pieces the review asked for; until then they stay here.
 
   Words: only lines in the build's English strings (apps/game/scripts/main.gd), no new story text:
   - talk: RELAY_QUESTION_WORDS (WOLF, at the breaker);
@@ -58,14 +65,16 @@
             {"node": "Human/BodySprite", "at": [404, 410], "flip": true, "scene": "talk hint walkto"},
 
             {"node": "Wolf/BodySprite", "id": "wolf", "at": [548, 423], "tap": "WOLF", "scene": "bark"},
-            {"node": "Human/BodySprite", "at": [736, 410], "flip": true, "scene": "bark"},
+            {"node": "Human/BodySprite", "at": ["main.gd:RELAY_STEP_BACK_X", 410], "flip": true, "scene": "bark"},
 
             {"node": "Wolf/BodySprite", "id": "wolf", "at": [455, 423], "tap": "WOLF", "scene": "walk"},
             {"node": "Human/BodySprite", "at": [520, 410], "scene": "walk"},
 
-            {"node": "Wolf/BodySprite", "id": "wolf", "at": [462, 423], "tap": "WOLF", "scene": "pill usable touch lockdown", "when": {"is-usable": "usable"}},
+            {"node": "Wolf/BodySprite", "id": "wolf", "at": ["main.gd:WOLF_BYPASS_CLEAR_X", 423], "tap": "WOLF", "scene": "pill usable touch lockdown", "when": {"is-usable": "usable"}},
             {"node": "Human/BodySprite", "at": [655, 410], "flip": true, "scene": "pill usable touch"},
-            {"node": "Human/BodySprite", "at": [712, 410], "flip": true, "scene": "lockdown"}
+            {"node": "Human/BodySprite", "at": [674, 410], "scene": "lockdown"},
+
+            {"id": "head", "when": {"is-usable": "usable"}}
           ]}
         </script>
       </div>
@@ -87,6 +96,9 @@
       <span class="wo-pill is-far" data-wo-at="bypass" data-wo-scene="usable" data-wo-probe="name">MANUAL BYPASS</span>
       <span class="wo-pill is-far" data-wo-at="safe" data-wo-scene="usable" data-wo-probe="name">SAFE POINT</span>
       <span class="wo-pill is-far" data-wo-at="wolf" data-wo-scene="usable" data-wo-probe="name">WOLF</span>
+      <!-- The seal is a tap target (its door piece), so it is named here too, locked or not: what I
+           can use and what I can tap agree. Outlined on its hood, the part of the seal in view. -->
+      <span class="wo-pill is-far" data-wo-at="head" data-wo-scene="usable" data-wo-probe="name">SEAL</span>
 
       <!-- 8, tap to walk: the floor point a tap sends the engineer to (toggle Phone controls). -->
       <span class="wo-walk-mark" data-wo-at="560 440" data-wo-scene="touch" data-wo-probe="walk-mark"></span>
@@ -112,8 +124,9 @@
         <div class="wo-box-text">The breaker is live. Go to the coolant relay.</div>
       </div>
 
-      <!-- 9. Lockdown (6.5): the beacons carry the alarm; one narration box (no name tab). Engineer at
-           the MANUAL BYPASS (BYPASS_WHEEL x 700, within BYPASS_REACH). -->
+      <!-- 9. Lockdown (6.5): the beacons carry the alarm; one narration box (no name tab). The line
+           shows as the engineer steps to BYPASS_CRANK_X (main.gd _interact_bypass), so the
+           engineer stands there, just left of the wheel and facing it, covering only its rim. -->
       <div class="wo-box" data-wo-scene="lockdown" data-wo-probe="narration">
         <div class="wo-box-text" data-wo-reveal>Coolant hisses from the relay housing and an alarm starts to wail.</div>
         <span class="wo-continue"></span>
@@ -144,23 +157,22 @@
   <ul class="mk-note">
     <li>Pick a scene, device and input in the strip. Glyphs follow the input.</li>
     <li>Speaker: name tab, colour and mark by default; "placeholder portrait" shows a labelled head crop (no portrait art exists, B24).</li>
-    <li>Phone controls: move pad and tap a station by default; "tap to walk" hides the pad and USE.</li>
+    <li>Phone controls: move pad and tap a station or WOLF by default; "tap to walk" hides the pad and USE.</li>
     <li>Tick "hit areas" to see each tap area, each station's reach (solid) and its 0.1 s USE buffer (light; Proposal, 6.7.2).</li>
     <li>FLASHING LIGHTS reduced turns the beacon pulse into a steady glow.</li>
-  </ul>
-  <h3>Not wired yet</h3>
-  <ul class="mk-note">
-    <li>The scenes, world anchors, typing, beacons, reach bands and HUD corners wait for shared pieces in wo.js and wo.css (requested). Until they land, every scene shows at once.</li>
+    <li>Row length: the build still wraps dialogue at 42 characters (languages.json en.row_characters) until B31 lands. The brief's 40 is a Proposal: add lang.en.row_characters=40 to the URL, or set it in Tune.</li>
   </ul>
   <p class="mk-note" data-wo-scene="talk">Conversation: types in at TEXT SPEED Normal; the triangle shows once the line is complete. Click the box to complete it, again to replay. The breaker's pill is hidden while the box is open.</p>
+  <p class="mk-note" data-wo-scene="talk hint walkto">The purge display at the left: its red screen is drawn by code in the build (prop_screen.gd) and not drawn here yet, so it shows dark.</p>
   <p class="mk-note" data-wo-scene="bark">Bark: a walk-and-talk line over WOLF. It never takes USE.</p>
   <p class="mk-note" data-wo-scene="hint">System hint: the same box with a terminal mark, never a second box.</p>
   <p class="mk-note" data-wo-scene="pill">Prompt pill: switch the input to keyboard, pad and touch. No keyboard glyph with a pad, none on touch.</p>
   <p class="mk-note" data-wo-scene="walkto">Pointer hover out of reach: the relay is outlined and the pill says where a click walks to.</p>
-  <p class="mk-note" data-wo-scene="walk">Walking: tick "hit areas" for every tap area and the reach bands. Finding: on the iPhone the SEAL's area runs under USE. World taps must keep clear of the touch controls (6.4 step 13).</p>
-  <p class="mk-note" data-wo-scene="usable">Hold View (Tab on a keyboard) to outline and name every usable thing.</p>
-  <p class="mk-note" data-wo-scene="touch">Phone: the floor sits above the touch controls; the ring rests clear of the edge strip. Android: add cutout= and edge= (canvas px). Open question: the move pad's zone (left 40%) holds the BREAKER on a phone. A touch that starts on a station should use it, not move (6.4 step 3: an object beats the floor).</p>
-  <p class="mk-note" data-wo-scene="lockdown">Lockdown: the beacons pulse at alert.beacon-rate (Proposal 1 Hz, hard limit 3). Their drop into the view is B23's Proposal.</p>
+  <p class="mk-note" data-wo-scene="walk">Walking: tick "hit areas" for every tap area and the reach bands. A tap area is cut back clear of the shown touch controls (6.4 step 13). One whose clear part is under the minimum turns red.</p>
+  <p class="mk-note" data-wo-scene="usable">Hold View (Tab on a keyboard) to outline and name every usable thing, the locked SEAL too. Touch has no way to call this up yet (open question Q8).</p>
+  <p class="mk-note" data-wo-scene="touch">Phone: the floor sits above the touch controls; the ring rests clear of the edge strip. Android: add cutout= and edge= (canvas px). A touch that starts on a station or WOLF uses it; anywhere else in the left 40% starts the pad (6.4 step 3: an object beats the floor).</p>
+  <p class="mk-note" data-wo-scene="touch">Camera on touch: the floor keeps today's gap above the controls (2.5.3 step 6). The new controls sit lower than today's buttons, so the view rises: 16:9 y 126–526, iPhone 151–551, Pixel 8 153–553, Steam Deck 82–526. The brief's 2.5.2 table (192–592, Deck 147–592) used today's buttons. On the iPad the rise stops at the art's top: y 0–533 (table 59–592), so the floor sits 30 px above USE, not 10. Decision: keep that stop. The view stays on the paint and the beacons show; the table takes these numbers.</p>
+  <p class="mk-note" data-wo-scene="lockdown">Lockdown: the beacons pulse at alert.beacon-rate (Proposal 1 Hz, hard limit 3). Their drop into the view is B23's Proposal. The engineer cranks from the wheel's left, facing it (BYPASS_CRANK_X).</p>
 </footer>
 </div>
 </body>

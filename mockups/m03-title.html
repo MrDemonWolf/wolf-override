@@ -14,11 +14,21 @@
   - the mark sits beside the title as one lockup, so five buttons fit at 48 px on the Ally;
   - one linear button list (NEW GAME, CONTINUE, SETTINGS, CREDITS, QUIT) wraps; disabled CONTINUE
     is skipped; its reason sits beside it; QUIT shows on desktop and handheld only;
-  - CHANGELOG sits bottom-left, as today, clear of the engineer and WOLF;
+  - CHANGELOG and the version sit bottom-left, as today (2.5.3 step 14: ChangelogButton and
+    VersionLabel anchor bottom-left), clear of the engineer and WOLF;
   - a dark fade rises from the bottom edge, so the bottom row reads over the lit wet floor;
-  - the column's bottom row holds the version and the credit line, right-aligned beside the
-    footer prompt bar (3.1 step 7), over the darkest part of the veil, so they stay readable;
-    on touch only the prompts hide.
+  - the column's bottom row is a split: the credit line (right-aligned) in the left half, the
+    footer prompt bar (3.1 step 7) in the right half, over the darkest part of the veil. The
+    prompt bar holds only prompts, so on touch the whole bar goes and takes no room (the shared
+    footer rule) and the credit gets the full width on one line. That keeps the column inside the
+    safe rect on the iPhone and Android at the default TEXT SIZE. With the bar shown the credit
+    wraps after the slash onto two lines, which fit inside the prompt bar's height on the Ally.
+    The words are main.tscn Credit's; only the glue is ours: no-break spaces keep the slash with
+    its spacing and a no-break hyphen (U+2011) keeps "AI-assisted" whole.
+  - ?credit=credits hides the credit line, so Nathanial can judge a title with the version only
+    (credit kept on the CREDITS screen and the store page). Not decided; the default keeps it.
+    data-wo-strip="credit" asks for its strip control; the strip ignores the key until wo.js
+    lists "credit" among its page extras (requested from the shared step). The URL works now.
 
   Per-screen data (Proposal, tune on this page):
   - cover focus [0.3, 0.3]: the share of the overflow cropped from the left and the top. 0.3 keeps
@@ -26,6 +36,10 @@
   - spots: three lights in the art that flicker on their own idle timers (6.2 B8), as centre and
     size in the key art's own pixels, read off the art: the near ceiling lamp, the far ceiling
     lamp and the lamp over the door. Each dips dark twice per tick (a tube cutting out).
+  - cone (per spot): the light's whole footprint below the lamp, centre and size in the art's
+    pixels, read off the art: the shaft of each ceiling lamp, and the lit door face down to the
+    floor sheen for the door lamp. A flicker must dim this too, or the beam stays lit while the
+    lamp goes dark. Waiting for the shared cone layer (wo.js composeCovers); nothing draws it yet.
   - the eye: the logo mark's cyan eyes are the seventh top-level path of logo-mark.svg.
 -->
 <html lang="en">
@@ -36,7 +50,7 @@
 <link rel="stylesheet" href="shared/wo.css">
 <script src="shared/wo.js" defer></script>
 </head>
-<body class="mk-page" data-wo-nav>
+<body class="mk-page" data-wo-nav data-wo-strip="credit">
 <div class="mk-stage">
   <section class="mk-device" data-wo-device="url"><div class="wo-frame" data-wo-template="m03-title"></div></section>
 </div>
@@ -46,9 +60,9 @@
     <div class="wo-cover" data-wo-cover>
       <script type="application/json">
         {"node": "CanvasLayer/TitleScreen/CorridorArt", "focus": [0.3, 0.3], "spots": [
-          {"name": "near ceiling lamp", "x": 338, "y": 112, "w": 150, "h": 120},
-          {"name": "far ceiling lamp", "x": 220, "y": 210, "w": 84, "h": 64},
-          {"name": "door lamp", "x": 686, "y": 282, "w": 150, "h": 84}
+          {"name": "near ceiling lamp", "x": 338, "y": 112, "w": 150, "h": 120, "cone": {"x": 335, "y": 200, "w": 130, "h": 195}},
+          {"name": "far ceiling lamp", "x": 220, "y": 210, "w": 84, "h": 64, "cone": {"x": 222, "y": 255, "w": 60, "h": 90}},
+          {"name": "door lamp", "x": 686, "y": 282, "w": 150, "h": 84, "cone": {"x": 695, "y": 487, "w": 190, "h": 405}}
         ]}
       </script>
     </div>
@@ -75,17 +89,17 @@
         <button class="wo-btn" type="button" data-wo-probe="credits">CREDITS</button>
         <button class="wo-btn" type="button" data-wo-only="desktop handheld" data-wo-probe="quit">QUIT</button>
       </div>
-      <div class="wo-footer" data-wo-probe="footer">
-        <div class="wo-stack wo-title-meta">
-          <span class="wo-t-caption wo-t-muted" data-wo-text="project:application/config/version" data-wo-probe="version"></span>
-          <span class="wo-t-caption wo-t-muted" data-wo-probe="credit">Concept: Nathanial Henniges&#160; /&#160; AI-assisted development</span>
+      <div class="wo-split" data-wo-probe="bottom-row">
+        <span class="wo-t-caption wo-t-muted wo-title-meta" data-wo-when="credit=|title" hidden data-wo-probe="credit">Concept: Nathanial Henniges&#160; / &#160;AI&#8209;assisted development</span>
+        <div class="wo-footer" data-wo-probe="footer">
+          <span class="wo-footer-item" data-wo-probe="select"><span data-wo-glyph="ui_accept"></span>SELECT</span>
         </div>
-        <span class="wo-footer-item" data-wo-probe="select"><span data-wo-glyph="ui_accept"></span>SELECT</span>
       </div>
     </div>
 
-    <div class="wo-title-foot" data-wo-enter data-wo-probe="foot">
+    <div class="wo-title-foot wo-cluster" data-wo-enter data-wo-probe="foot">
       <button class="wo-btn" type="button" data-wo-probe="changelog">CHANGELOG</button>
+      <span class="wo-t-caption wo-t-muted" data-wo-text="project:application/config/version" data-wo-probe="version"></span>
     </div>
   </div>
 </template>
