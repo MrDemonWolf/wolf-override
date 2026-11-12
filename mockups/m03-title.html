@@ -27,8 +27,9 @@
     its spacing and a no-break hyphen (U+2011) keeps "AI-assisted" whole.
   - ?credit=credits hides the credit line, so Nathanial can judge a title with the version only
     (credit kept on the CREDITS screen and the store page). Not decided; the default keeps it.
-    data-wo-strip="credit" asks for its strip control; the strip ignores the key until wo.js
-    lists "credit" among its page extras (requested from the shared step). The URL works now.
+    data-wo-strip="credit menu" gives the strip its Credit line and Menu look controls.
+  - CHANGELOG is its own nav group (data-wo-nav-group): Up and Down wrap NEW GAME to QUIT, and Left
+    or Right steps to CHANGELOG and back. The lockup enters first (data-wo-enter-order).
 
   Per-screen data (Proposal, tune on this page):
   - cover focus [0.3, 0.3]: the share of the overflow cropped from the left and the top. 0.3 keeps
@@ -39,7 +40,7 @@
   - cone (per spot): the light's whole footprint below the lamp, centre and size in the art's
     pixels, read off the art: the shaft of each ceiling lamp, and the lit door face down to the
     floor sheen for the door lamp. A flicker must dim this too, or the beam stays lit while the
-    lamp goes dark. Waiting for the shared cone layer (wo.js composeCovers); nothing draws it yet.
+    lamp goes dark. wo.js composeCovers draws it inside its spot, so it flickers with the lamp.
   - the eye: the logo mark's cyan eyes are the seventh top-level path of logo-mark.svg.
 -->
 <html lang="en">
@@ -50,7 +51,7 @@
 <link rel="stylesheet" href="shared/wo.css">
 <script src="shared/wo.js" defer></script>
 </head>
-<body class="mk-page" data-wo-nav data-wo-strip="credit">
+<body class="mk-page" data-wo-nav data-wo-strip="credit menu">
 <div class="mk-stage">
   <section class="mk-device" data-wo-device="url"><div class="wo-frame" data-wo-template="m03-title"></div></section>
 </div>
@@ -73,7 +74,7 @@
       <div class="wo-title-main" data-wo-enter>
         <div class="wo-t-body wo-title-brand" data-wo-probe="brand">MRDEMONWOLF, INC. PRESENTS</div>
         <div class="wo-rule" data-wo-idle data-wo-probe="rule"></div>
-        <div class="wo-cluster wo-title-lockup">
+        <div class="wo-cluster wo-title-lockup" data-wo-enter-order="-1">
           <span class="wo-svg wo-title-mark" data-wo-svg="logo-mark.svg" data-wo-part="eye=path:nth-of-type(7)" data-wo-idle data-wo-probe="mark"></span>
           <div class="wo-stack">
             <div class="wo-t-display" role="heading" aria-level="1" data-wo-probe="title">WOLF OVERRIDE</div>
@@ -97,7 +98,7 @@
       </div>
     </div>
 
-    <div class="wo-title-foot wo-cluster" data-wo-enter data-wo-probe="foot">
+    <div class="wo-title-foot wo-cluster" data-wo-enter data-wo-nav-group="foot" data-wo-probe="foot">
       <button class="wo-btn" type="button" data-wo-probe="changelog">CHANGELOG</button>
       <span class="wo-t-caption wo-t-muted" data-wo-text="project:application/config/version" data-wo-probe="version"></span>
     </div>

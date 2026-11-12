@@ -27,34 +27,27 @@
     is data-wo-button, not data-wo-input, because M10 asks for data-wo-input to pin a frame's input
     class; one attribute keeps one meaning.
   - Both screens use the settings shell M09 and M10 use (wo-settings, -head, -body, wo-rows-head),
-    so one shell serves every settings page. The map view is a sub-view of that shell: same head
-    and footer, the map in place of the rows.
+    so one shell serves every settings page. The title key art and backdrop (m11-backdrop) and the
+    head (m11-head) are written once and nested by both views. The map view is a sub-view of that
+    shell: the same head, then only its CONTROLLER MAP row, the map and its footer.
+  - Focus: each template marks its starting item with autofocus (wo.js turns it into the frame's
+    current item); a frame that starts elsewhere names it in data-wo-current. No focus class is
+    written in the markup, so the ring shows only after a key or pad press (6.2 B7).
   - Proposals: the CONTROLLER MAP row and view on the CONTROLS page (the brief asks for a diagram
     that follows rebinding; one view per context keeps the 3.1 one-column rule), its words
-    ("CONTROLLER MAP", "BUTTONS FOR", "NOT USED HERE", "OPEN") and the short action labels, worded
-    from 4.2. Action row names are the build's (game_settings.gd ACTION_NAMES), in capitals like
-    every other row name.
+    ("CONTROLLER MAP", "NOT USED HERE", "OPEN", "CONTEXT") and the short action labels, worded
+    from 4.2 and matched to M05 ("show what I can use"). Action row names are the build's
+    (game_settings.gd ACTION_NAMES), in capitals like every other row name.
+  - The review states and checks are listed in data/m11.json.
 
-  Waiting on shared pieces (listed in the step's shared_requests, with proposed code in
-  .work/ui-mockups/scratch-m11/proposed-shared.patch). Until they land the map frames show their
-  head, selector and footer around an empty map, the remap frames look like the default ones, the
-  controller rows follow the last input instead of always showing pad glyphs, and the non-Xbox
-  families are names, not glyphs:
-  - the pad map renderer: data-wo-padmap="<source selector>" draws the Xbox pad once and places
-    the source's callouts for the frame's data-wo-padmap-context; data-wo-padmap-name gets the
-    context's name; data-wo-padmap-free words the line of unused buttons; a click on
-    data-wo-padmap-cycle shows the next context;
-  - binding overrides: data-wo-bind="interact=RT" on a frame and a ?bind= URL key, applied by the
-    bindings reader, so glyphs, rows and the map all follow one remap;
-  - data-wo-glyph-input="pad|keyboard" (an action's glyph for one input class whatever the last
-    input) and data-wo-glyph-all (every binding, not only the first; the stick is a binding too);
-  - the Guide (Xbox button) glyph and the PlayStation, Nintendo and Steam Deck glyph families
-    (Q12: Kenney CC0 or painted);
-  - the settings shell with a scrolling body (already asked for by M08, M09 and M10);
-  - a tab bar that fits the Ally: at TEXT SIZE 125% the five tabs and the LB / RB glyphs run past
-    the panel, so GENERAL and RB are cut off (M09 shows the same).
-  The map renderer keeps one callout line above the pad in every context, so the pad does not
-  jump when a context (CREDITS) has nothing above it.
+  Built in the shared step (November 11): D-pad and arrow keys on the context selector (back and
+  forward, wrapping; a click on its left half goes back) and a tab bar that fits the Ally at 125%.
+  Still waiting on shared pieces (wo.js, wo.css):
+  - a map that fits at TEXT SIZE 150% and up, and on a phone with a pad (a stacked list layout);
+  - the shared 3.2 settings rows: until then m11-controls is a hand copy of M09's CONTROLLER rows,
+    without the KEYBOARD section and the other 3.2 rows (M08 and M09 show the whole page);
+  - OPEN into the map view and back in one frame, a live pad rebind and words on a clash;
+  - the PlayStation, Nintendo and Steam Deck glyph families (Q12: Kenney CC0 or painted).
 
   Words: no story text. Row names and notes from the build (game_settings.gd, main.tscn) and
   from brief 3.2 and 4.2.
@@ -76,9 +69,13 @@
     <li>Frames 5 to 7: Settings &gt; CONTROLS, then one remap: Interact / continue moves to RT.</li>
     <li>Below the frames: the button map table, the glyph families and the inputs we never use.</li>
     <li>Device and input come from the strip. Sizes to judge: ROG Ally (2023) and desktop.</li>
-    <li>Waiting on shared: until the map renderer and binding remaps land, frames 1 to 4 and 7 show an empty map, and frame 6 still shows A.</li>
-    <li>Also waiting: the controller rows (frames 5 and 6) and the Keyboard column (section 9) follow the last input instead of showing pad buttons and keys.</li>
-    <li>Also waiting: on the Ally the tab bar runs past the panel, so GENERAL and RB are cut off (frames 5 and 6; M09 too).</li>
+  </ul>
+  <p class="mk-note">Still missing (shared code, not this page):</p>
+  <ul class="mk-note">
+    <li>PlayStation, Nintendo and Steam Deck show words, not glyphs, until Q12 is answered (section 9).</li>
+    <li>At TEXT SIZE 150% and up the map does not fit yet: labels overlap and run past the panel.</li>
+    <li>CONTROLS shows the controller rows only. KEYBOARD and the other 3.2 rows wait on the shared settings rows (see M08 and M09).</li>
+    <li>OPEN does not open the map yet, and a rebind does not redraw it live. Frames 6 and 7 show the result of one.</li>
   </ul>
   <p class="mk-note">Jump to:
     <a href="#map-play">PLAY</a> ·
@@ -99,14 +96,14 @@
   <h2>1 · CONTROLLER MAP: PLAY</h2>
   <ul class="mk-note">
     <li>Opened from Settings &gt; CONTROLS (frame 5). Proposal.</li>
-    <li>Each label sits level with its button, so no line crosses another button.</li>
+    <li>Labels sit beside their buttons; X, A and the right stick lean down so their lines pass between buttons.</li>
     <li>Buttons with nothing to do here sit in one line under the pad. The Xbox button ends that line: the system keeps it.</li>
-    <li>D-pad left and right, or a click on the arrows, switch the context.</li>
+    <li>D-pad left and right switch the context (proposal). CONTEXT in the footer says so; touch shows only BACK, and a tap on ◀ ▶ switches.</li>
   </ul>
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="map-play" data-wo-template="m11-map" data-wo-padmap-context="play"></div>
+    <div class="wo-frame" data-mk-state="map-play" data-wo-template="m11-backdrop m11-map" data-wo-padmap-context="play"></div>
   </section>
 </section>
 
@@ -116,7 +113,7 @@
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="map-dialogue" data-wo-template="m11-map" data-wo-padmap-context="dialogue"></div>
+    <div class="wo-frame" data-mk-state="map-dialogue" data-wo-template="m11-backdrop m11-map" data-wo-padmap-context="dialogue"></div>
   </section>
 </section>
 
@@ -126,7 +123,7 @@
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="map-menus" data-wo-template="m11-map" data-wo-padmap-context="menus"></div>
+    <div class="wo-frame" data-mk-state="map-menus" data-wo-template="m11-backdrop m11-map" data-wo-padmap-context="menus"></div>
   </section>
 </section>
 
@@ -136,7 +133,7 @@
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="map-credits" data-wo-template="m11-map" data-wo-padmap-context="credits"></div>
+    <div class="wo-frame" data-mk-state="map-credits" data-wo-template="m11-backdrop m11-map" data-wo-padmap-context="credits"></div>
   </section>
 </section>
 
@@ -150,7 +147,7 @@
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="controls" data-wo-template="m11-controls"></div>
+    <div class="wo-frame" data-mk-state="controls" data-wo-template="m11-backdrop m11-controls"></div>
   </section>
 </section>
 
@@ -160,12 +157,13 @@
   <h2>6 · CONTROLS after a remap: Interact / continue on RT</h2>
   <ul class="mk-note">
     <li>The player rebound Interact / continue to RT (RT does nothing in play, so there is no clash).</li>
+    <li>The rebound row holds focus.</li>
     <li>Menus still select with A: ui_accept is not remapped (C1 section 5).</li>
   </ul>
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="controls-remap" data-wo-template="m11-controls" data-wo-bind="interact=RT"></div>
+    <div class="wo-frame" data-mk-state="controls-remap" data-wo-template="m11-backdrop m11-controls" data-wo-bind="interact=RT" data-wo-current="pad-interact"></div>
   </section>
 </section>
 
@@ -178,7 +176,7 @@
 </header>
 <section class="mk-stage">
   <section class="mk-device" data-wo-device="url" data-wo-fit="width">
-    <div class="wo-frame" data-mk-state="map-play-remap" data-wo-template="m11-map" data-wo-padmap-context="play" data-wo-bind="interact=RT"></div>
+    <div class="wo-frame" data-mk-state="map-play-remap" data-wo-template="m11-backdrop m11-map" data-wo-padmap-context="play" data-wo-bind="interact=RT"></div>
   </section>
 </section>
 
@@ -192,6 +190,7 @@
       <li>Every 4.2 row appears once in each context.</li>
       <li>A callout with an action follows that action's binding; the others are fixed inputs.</li>
       <li>Hold A to crank starts on the press frame; TOGGLE HOLDS latches it (6.7.1).</li>
+      <li>Naming step: D-pad left and right change the name (cycle_name; only key I today, 4.2).</li>
     </ul>
     <table class="mk-table wo-padmap-source" id="m11-map-source">
       <thead>
@@ -214,7 +213,7 @@
         <tr data-wo-row="A">
           <th>A</th>
           <td data-wo-context="play"><span class="wo-callout" data-wo-button="A" data-wo-action="interact"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">USE / HOLD TO CRANK</span> <span class="wo-callout-note">Uses the target in reach on the press frame.</span></span></td>
-          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-button="A" data-wo-action="interact"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">FINISH LINE, THEN NEXT</span> <span class="wo-callout-note">First press shows the whole line; the next advances.</span></span></td>
+          <td data-wo-context="dialogue"><span class="wo-callout" data-wo-button="A" data-wo-action="interact"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">SHOW ALL / NEXT</span> <span class="wo-callout-note">First press shows the whole line; the next advances.</span></span></td>
           <td data-wo-context="menus"><span class="wo-callout" data-wo-button="A" data-wo-action="ui_accept"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">SELECT</span></span></td>
           <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-button="A"><span data-wo-glyph="pad:A"></span> <span class="wo-callout-label">—</span></span></td>
         </tr>
@@ -227,7 +226,7 @@
         </tr>
         <tr data-wo-row="X / Y">
           <th>X / Y</th>
-          <td data-wo-context="play"><span class="wo-callout" data-wo-button="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-button="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span> <span class="wo-callout-note">As today.</span></span></td>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-button="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-button="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span> <span class="wo-callout-note">Same keys as the current build.</span></span></td>
           <td data-wo-context="dialogue"><span class="wo-callout" data-wo-button="X" data-wo-action="choice_1"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">ANSWER 1</span></span> <span class="wo-callout" data-wo-button="Y" data-wo-action="choice_2"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">ANSWER 2</span> <span class="wo-callout-note">The answer cards are also a focusable pair: D-pad, then A.</span></span></td>
           <td data-wo-context="menus"><span class="wo-callout is-none" data-wo-button="X"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-button="Y"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">—</span> <span class="wo-callout-note">Godot's ui_select is also Y: keep menus free of it.</span></span></td>
           <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-button="X"><span data-wo-glyph="pad:X"></span> <span class="wo-callout-label">—</span></span> <span class="wo-callout is-none" data-wo-button="Y"><span data-wo-glyph="pad:Y"></span> <span class="wo-callout-label">—</span></span></td>
@@ -262,14 +261,14 @@
         </tr>
         <tr data-wo-row="View">
           <th>View</th>
-          <td data-wo-context="play"><span class="wo-callout" data-wo-button="View" data-wo-action="objective"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">OBJECTIVE / HOLD: SHOW USABLE</span> <span class="wo-callout-note">Hold outlines everything usable in the room (Q8).</span></span></td>
+          <td data-wo-context="play"><span class="wo-callout" data-wo-button="View" data-wo-action="objective"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">OBJECTIVE · HOLD: SHOW WHAT I CAN USE</span> <span class="wo-callout-note">Hold outlines everything usable in the room (Q8).</span></span></td>
           <td data-wo-context="dialogue"><span class="wo-callout is-none" data-wo-button="View"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">—</span></span></td>
           <td data-wo-context="menus"><span class="wo-callout is-none" data-wo-button="View"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">—</span></span></td>
           <td data-wo-context="credits"><span class="wo-callout is-none" data-wo-button="View"><span data-wo-glyph="pad:View"></span> <span class="wo-callout-label">—</span></span></td>
         </tr>
         <tr data-wo-row="Xbox button">
           <th>Xbox button</th>
-          <td colspan="4" data-wo-context="play dialogue menus credits"><span class="wo-callout is-system" data-wo-button="Guide"><span class="wo-callout-label">SYSTEM</span> <span class="wo-callout-note">Reserved by the system: Game Bar, app switch. The game never reads it.</span></span></td>
+          <td colspan="4" data-wo-context="play dialogue menus credits"><span class="wo-callout is-system" data-wo-button="Guide"><span class="wo-callout-label">XBOX BUTTON: SYSTEM</span> <span class="wo-callout-note">Reserved by the system: Game Bar, app switch. The game never reads it.</span></span></td>
         </tr>
       </tbody>
     </table>
@@ -284,7 +283,8 @@
       <li>The family comes from the pad's vendor ID first, its name second. Never the GUID.</li>
       <li>Godot's buttons are positional: on a Nintendo pad the south button is printed B.</li>
       <li>Keyboard glyphs show only after a key press. Touch shows no glyph: the on-screen control is the button.</li>
-      <li>PlayStation, Nintendo and Steam Deck are names until their glyphs exist (Q12: Kenney CC0 or painted).</li>
+      <li>PlayStation, Nintendo and Steam Deck are words until Q12 is answered: Kenney CC0 prompts, or a painted set.</li>
+      <li>So switching the family by vendor ID cannot be shown yet. Once the glyphs exist, these columns use them like the Xbox column.</li>
     </ul>
     <table class="mk-table">
       <thead>
@@ -292,9 +292,9 @@
           <th>Prompt</th>
           <th>Position</th>
           <th>Xbox</th>
-          <th>PlayStation</th>
-          <th>Nintendo</th>
-          <th>Steam Deck</th>
+          <th>PlayStation (text: glyphs wait on Q12)</th>
+          <th>Nintendo (text: glyphs wait on Q12)</th>
+          <th>Steam Deck (text: glyphs wait on Q12)</th>
           <th>Keyboard</th>
           <th>Touch</th>
         </tr>
@@ -423,7 +423,7 @@
         <tr>
           <td>System (never read)</td>
           <td>Logo</td>
-          <td>Xbox button</td>
+          <td><span data-wo-glyph="pad:Guide"></span> Xbox button</td>
           <td>PS button</td>
           <td>HOME</td>
           <td>Steam button</td>
@@ -454,64 +454,71 @@
   </section>
 </main>
 
-<!-- The CONTROLLER MAP view: a sub-view of Settings > CONTROLS in the same settings shell (head,
-     one row, then the map where the rows would be, footer). The context name and the map come from
-     #m11-map-source through the pad map renderer; the frame says which context. -->
-<template id="m11-map">
-  <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+<!-- The settings screen's backdrop, once for both views: the title key art under today's pause
+     backdrop (as M08 and M09). A frame stacks it first: data-wo-template="m11-backdrop m11-map". -->
+<template id="m11-backdrop">
+  <div class="wo-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
   <div class="wo-backdrop"></div>
+</template>
+
+<!-- The settings head, once for both views. THE DEN / LOCAL CONFIGURATION shows on the desktop
+     only: on a 7-inch screen that line goes to the rows instead (as M09). -->
+<template id="m11-head">
+  <div class="wo-t-h1">SYSTEM SETTINGS</div>
+  <div class="wo-t-caption wo-t-muted" data-wo-only="desktop">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
+</template>
+
+<!-- The CONTROLLER MAP view: a sub-view of Settings > CONTROLS in the same shell. Under the shared
+     head it adds only its row (the CONTROLLER MAP row the player opened, its OPEN now the context
+     selector), the map where the rows would be, and its footer. The context name and the map come
+     from #m11-map-source through the pad map renderer; the frame says which context. The selector
+     holds focus (autofocus). CONTEXT in the footer names the D-pad switch (keys ← → on a keyboard)
+     and, like the selector, switches on a click; on touch the footer shows only BACK (wo.css). -->
+<template id="m11-map">
   <div class="wo-safe wo-terminal-panel wo-settings">
-    <header class="wo-settings-head">
-      <div class="wo-t-h1" data-wo-probe="map-title">CONTROLLER MAP</div>
-      <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
-    </header>
-    <div class="wo-row is-focus"><span class="wo-row-label">BUTTONS FOR</span><span class="wo-row-control"><button class="wo-select is-focus" type="button" data-wo-focus data-wo-padmap-cycle data-wo-probe="map-context"><span aria-hidden="true">◀</span><span data-wo-padmap-name></span><span aria-hidden="true">▶</span></button></span></div>
+    <header class="wo-settings-head" data-wo-template="m11-head"></header>
+    <div class="wo-row"><span class="wo-row-label" data-wo-probe="map-title">CONTROLLER MAP</span><span class="wo-row-control"><button class="wo-select" type="button" autofocus data-wo-focus data-wo-id="map-context" data-wo-padmap-cycle data-wo-probe="map-context"><span aria-hidden="true">◀</span><span data-wo-padmap-name></span><span aria-hidden="true">▶</span></button></span></div>
     <div class="wo-padmap" data-wo-padmap="#m11-map-source" data-wo-padmap-free="NOT USED HERE" data-wo-probe="padmap"></div>
-    <div class="wo-footer">
+    <div class="wo-footer" data-wo-probe="map-footer">
+      <span class="wo-footer-item" data-wo-padmap-cycle data-wo-probe="map-footer-context"><span data-wo-glyph="pad:DPadLeft" data-wo-only-input="pad"></span><span data-wo-glyph="pad:DPadRight" data-wo-only-input="pad"></span><span data-wo-glyph="key:←" data-wo-only-input="keyboard pointer"></span><span data-wo-glyph="key:→" data-wo-only-input="keyboard pointer"></span>CONTEXT</span>
       <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
     </div>
   </div>
 </template>
 
 <!-- Settings > CONTROLS in the settings shell, controller section first (3.2 H: controller
-     bindings first). Each binding shows its current pad binding, whatever the last input
-     (data-wo-glyph-input="pad"); Move left and Move right show both of theirs (D-pad and stick).
-     The footer is M09's (SELECT, BACK): the LB and RB glyphs already sit at the ends of the tab
-     bar, and a footer TABS item would show as a bare word on a keyboard, which has no tab keys. -->
+     bindings first). Each binding shows its current pad bindings, whatever the last input
+     (data-wo-glyph-input="pad", data-wo-glyph-all: Move left and Move right show the D-pad and the
+     stick). The row ids are M09's, so a frame names the same item on both pages. CONTROLLER MAP
+     (OPEN) holds focus. The footer is M08's one copy (SELECT, BACK, TABS for a pad).
+     Until the shared 3.2 settings rows land, these rows are a hand copy of M09's CONTROLLER rows;
+     the renderer will draw this page from the one settings data file, with this page's only
+     addition, the CONTROLLER MAP row. -->
 <template id="m11-controls">
-  <div class="wo-loading-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
-  <div class="wo-backdrop"></div>
   <div class="wo-safe wo-terminal-panel wo-settings">
-    <header class="wo-settings-head">
-      <div class="wo-t-h1">SYSTEM SETTINGS</div>
-      <div class="wo-t-caption wo-t-muted">THE DEN&nbsp; /&nbsp; LOCAL CONFIGURATION</div>
-    </header>
-    <div class="wo-tabs" role="tablist">
+    <header class="wo-settings-head" data-wo-template="m11-head"></header>
+    <div class="wo-tabs" role="tablist" data-wo-probe="tabs">
       <span data-wo-glyph="tab_prev"></span>
-      <button class="wo-tab" type="button" role="tab" aria-selected="false">DISPLAY</button>
-      <button class="wo-tab" type="button" role="tab" aria-selected="false">AUDIO</button>
-      <button class="wo-tab" type="button" role="tab" aria-selected="true">CONTROLS</button>
-      <button class="wo-tab" type="button" role="tab" aria-selected="false">ACCESSIBILITY</button>
-      <button class="wo-tab" type="button" role="tab" aria-selected="false">GENERAL</button>
+      <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="display">DISPLAY</button>
+      <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="audio">AUDIO</button>
+      <button class="wo-tab" type="button" role="tab" aria-selected="true" data-wo-tab="controls">CONTROLS</button>
+      <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="accessibility">ACCESSIBILITY</button>
+      <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="general">GENERAL</button>
       <span data-wo-glyph="tab_next"></span>
     </div>
-    <div class="wo-settings-body" role="tabpanel">
-      <div class="wo-rows">
+    <div class="wo-settings-body" role="tabpanel" data-wo-probe="body">
+      <div class="wo-rows" data-wo-page="controls">
         <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">CONTROLLER</div>
-        <div class="wo-row is-focus"><span class="wo-row-label">CONTROLLER MAP</span><span class="wo-row-control"><button class="wo-btn wo-terminal is-focus" type="button" data-wo-focus data-wo-probe="map-row">OPEN</button></span></div>
-        <div class="wo-row"><span class="wo-row-label">MOVE LEFT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="move_left" data-wo-glyph-input="pad" data-wo-glyph-all data-wo-probe="bind-move-left"></span></button></span></div>
-        <div class="wo-row"><span class="wo-row-label">MOVE RIGHT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="move_right" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
-        <div class="wo-row"><span class="wo-row-label">INTERACT / CONTINUE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="interact" data-wo-glyph-input="pad" data-wo-probe="bind-interact"></span></button></span></div>
-        <div class="wo-row"><span class="wo-row-label">RESPONSE 1</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="choice_1" data-wo-glyph-input="pad"></span></button></span></div>
-        <div class="wo-row"><span class="wo-row-label">RESPONSE 2</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="choice_2" data-wo-glyph-input="pad"></span></button></span></div>
-        <div class="wo-row"><span class="wo-row-label">PAUSE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus><span data-wo-glyph="pause_game" data-wo-glyph-input="pad"></span></button></span></div>
-        <div class="wo-row"><span class="wo-row-label">BUTTON PROMPTS</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus><span aria-hidden="true">◀</span><span>AUTO (XBOX)</span><span aria-hidden="true">▶</span></button></span></div>
+        <div class="wo-row"><span class="wo-row-label">CONTROLLER MAP</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" autofocus data-wo-focus data-wo-id="map-row" data-wo-probe="map-row">OPEN</button></span></div>
+        <div class="wo-row"><span class="wo-row-label">MOVE LEFT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-move-left"><span data-wo-glyph="move_left" data-wo-glyph-input="pad" data-wo-glyph-all data-wo-probe="bind-move-left"></span></button></span></div>
+        <div class="wo-row"><span class="wo-row-label">MOVE RIGHT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-move-right"><span data-wo-glyph="move_right" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+        <div class="wo-row"><span class="wo-row-label">INTERACT / CONTINUE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-interact"><span data-wo-glyph="interact" data-wo-glyph-input="pad" data-wo-glyph-all data-wo-probe="bind-interact"></span></button></span></div>
+        <div class="wo-row"><span class="wo-row-label">RESPONSE 1</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-response-1"><span data-wo-glyph="choice_1" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+        <div class="wo-row"><span class="wo-row-label">RESPONSE 2</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-response-2"><span data-wo-glyph="choice_2" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+        <div class="wo-row"><span class="wo-row-label">PAUSE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-pause"><span data-wo-glyph="pause_game" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
       </div>
     </div>
-    <div class="wo-footer">
-      <span class="wo-footer-item"><span data-wo-glyph="ui_accept"></span>SELECT</span>
-      <span class="wo-footer-item is-back"><span data-wo-glyph="ui_cancel"></span>BACK</span>
-    </div>
+    <div class="wo-footer" data-wo-template="m08-settings-desktop.html#m08-footer" data-wo-probe="footer"></div>
   </div>
 </template>
 </body>

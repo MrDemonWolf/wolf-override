@@ -42,7 +42,7 @@
      (hidden) focus when the choice opens; with keys or a pad its ring shows (4.3 Choices). -->
 <main class="mk-stage">
   <section class="mk-device" data-wo-device="url">
-    <div class="wo-frame" data-wo-template="m06-world m06-question-top m06-answers"></div>
+    <div class="wo-frame" data-wo-template="m06-world m06-question m06-answers"></div>
   </section>
 </main>
 
@@ -104,13 +104,13 @@
   <section class="mk-section">
     <h2>Top or bottom</h2>
     <ul class="mk-note">
-      <li>This frame shows the same choice with the box where the shared rule puts it today.</li>
-      <li>At the default TEXT SIZE the speakers' feet clear the box, so it stays at the bottom.</li>
-      <li>There it covers the answer cards. That is why the live screen moves it to the top.</li>
+      <li>This frame shows the same choice with the box pinned at the bottom (data-wo-place="bottom").</li>
+      <li>At the default TEXT SIZE the speakers' feet clear the box there.</li>
+      <li>But it covers the answer cards. That is why the shared rule moves the live box to the top.</li>
     </ul>
     <div class="mk-device-row is-one">
       <figure class="mk-device-fig">
-        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m06-world m06-question m06-answers"></div></section>
+        <section class="mk-device" data-wo-device="url" data-wo-fit="width"><div class="wo-frame" data-wo-template="m06-world m06-question m06-answers"><script type="application/json" data-wo-include-set>{".wo-box": {"data-wo-place": "bottom"}}</script></div></section>
         <figcaption class="mk-device-cap"></figcaption>
       </figure>
     </div>
@@ -130,7 +130,8 @@
   </div>
 </template>
 
-<!-- The question box. Plain, it is placed by the shared rule (wo.js placeBoxes). data-wo-rows breaks
+<!-- The question box. Plain, it is placed by the shared rule (wo.js placeBoxes: up when, at the
+     bottom, it would cover the speakers' feet or the answer cards). data-wo-rows breaks
      the line at the game's row length (languages.json row_characters, the rule of DialogueBoxes),
      shown whole: the typing itself is judged on M05. -->
 <template id="m06-question">
@@ -138,16 +139,6 @@
     <div class="wo-nametab" data-wo-probe="nametab"><span data-wo-glyph="mark:wolf"></span>WOLF</div>
     <div class="wo-portrait"><img src="../apps/game/assets/characters/wolf-stand.png" alt=""><span class="wo-portrait-label">placeholder crop</span></div>
     <div class="wo-box-text" data-wo-rows data-wo-probe="question">I found the mirror index. We can use my readout or your maintenance port.</div>
-  </div>
-</template>
-
-<!-- The same box held at the top (6.3 Position: the speakers and the target stand low, and at the
-     bottom the box would cover the cards). It sits in the flow of the HUD-safe box (.wo-safe), so its
-     name tab keeps the room above it that .wo-box.is-inline leaves; .wo-box.is-top would put the tab
-     under the box. -->
-<template id="m06-question-top">
-  <div class="wo-safe" data-wo-template="m06-question">
-    <script type="application/json" data-wo-include-set>{".wo-box": {"class": "is-inline"}}</script>
   </div>
 </template>
 

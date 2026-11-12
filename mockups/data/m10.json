@@ -1,0 +1,34 @@
+{
+  "about": "M10 review stills: each is a URL state of the page's one settings frame, plus presses. Capture with mockups/tools/capture.mjs m10-settings-phone.html <devices> <outDir> --states \"<name>:<query>;...\" built from a group below. Keys starting with @ are capture actions (README, Capture). Group 'all' runs on iphone, android and ipad; group 'text200' on iphone and android (TEXT SIZE 200%, brief 7.3 M10 accept: nothing inside the insets).",
+  "groups": {
+    "all": {
+      "devices": "iphone,android,ipad",
+      "states": {
+        "controls": "tab=controls",
+        "controls-tapwalk": "tab=controls&touch=tapwalk",
+        "display-list": "tab=display&list=frame-rate",
+        "audio": "tab=audio",
+        "access": "tab=accessibility",
+        "access-end": "tab=accessibility&@eval=document.querySelector('.wo-settings-body').scrollTop=1e5",
+        "access-portrait": "tab=accessibility&speaker=portrait&@eval=document.querySelector('.wo-settings-body').scrollTop=1e5",
+        "general": "tab=general",
+        "pad": "tab=controls&input=pad",
+        "pad-down6": "tab=controls&input=pad&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@wait=400",
+        "pad-down13": "tab=controls&input=pad&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@wait=400",
+        "pad-rb": "tab=controls&input=pad&@pad=RB&@wait=400",
+        "pad-access-end": "tab=accessibility&input=pad&@eval=document.querySelector('.wo-settings-body').scrollTop=1e5",
+        "tap-audio": "tab=controls&@tap=.wo-tab[data-wo-tab=audio]"
+      }
+    },
+    "text200": {
+      "devices": "iphone,android",
+      "states": {
+        "t200-controls": "tab=controls&text=200",
+        "t200-display": "tab=display&text=200",
+        "t200-audio": "tab=audio&text=200",
+        "t200-access": "tab=accessibility&text=200",
+        "t200-general": "tab=general&text=200"
+      }
+    }
+  }
+}

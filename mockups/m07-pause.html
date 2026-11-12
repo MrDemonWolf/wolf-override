@@ -91,8 +91,8 @@
     <ul class="mk-note">
       <li>Shows when the pad in use drops during play. The game pauses over the frozen corridor.</li>
       <li>The card names every way back: reconnect, any key, or a tap.</li>
-      <li>Here B, Esc, Menu, or a click or tap anywhere on the card closes it.</li>
-      <li>Other keys and pad buttons do not close it in this mockup yet.</li>
+      <li>Here any key, any pad button, or a click or tap anywhere on the card closes it (data-wo-close-any).</li>
+      <li>It fades and drops on motion.screen.out as it closes.</li>
       <li>A reconnect alone does not resume; the next press does. A browser cannot simulate a reconnect.</li>
       <li>Brief wording, not in the build yet: QUIT TO DESKTOP, SELECT, the disconnect card (4.5).</li>
     </ul>
@@ -101,9 +101,9 @@
         <section class="mk-device" data-wo-device="url" data-wo-fit="width">
           <div class="wo-frame">
             <div class="wo-layer" data-wo-template="m07-world"></div>
-            <div class="wo-modal" data-wo-overlay data-wo-open="screen" data-wo-probe="toast-layer">
+            <div class="wo-modal" data-wo-overlay data-wo-open="screen" data-wo-close-any data-wo-probe="toast-layer">
               <div class="wo-backdrop" data-wo-probe="toast-backdrop"></div>
-              <div class="wo-panel wo-toast" role="alertdialog" aria-labelledby="m07-toast-title" data-wo-close data-wo-probe="toast">
+              <div class="wo-toast" role="alertdialog" aria-labelledby="m07-toast-title" data-wo-close data-wo-probe="toast">
                 <div class="wo-toast-title" id="m07-toast-title" data-wo-probe="toast-title">CONTROLLER DISCONNECTED</div>
                 <div class="wo-rule"></div>
                 <div class="wo-t-body" data-wo-probe="toast-body">Reconnect it, or press any key or tap to continue.</div>
@@ -158,11 +158,13 @@
     <div class="wo-panel wo-pause" role="dialog" data-wo-probe="panel">
       <div class="wo-t-h1" data-wo-probe="pause-title">SESSION PAUSED</div>
       <div class="wo-rule"></div>
-      <button class="wo-btn" type="button" autofocus data-wo-id="resume" data-wo-close data-wo-probe="resume">RESUME</button>
-      <button class="wo-btn" type="button" data-wo-id="settings" data-wo-probe="settings">SETTINGS</button>
-      <button class="wo-btn" type="button" data-wo-id="title" data-wo-probe="return">RETURN TO TITLE</button>
-      <div class="wo-t-body wo-t-muted" data-wo-probe="warning">Returning keeps your last checkpoint.<br>Unsaved progress will be lost.</div>
-      <button class="wo-btn" type="button" data-wo-id="quit" data-wo-only="desktop handheld" data-wo-probe="quit">QUIT TO DESKTOP</button>
+      <div class="wo-scroll" data-wo-probe="pause-list">
+        <button class="wo-btn" type="button" autofocus data-wo-id="resume" data-wo-close data-wo-probe="resume">RESUME</button>
+        <button class="wo-btn" type="button" data-wo-id="settings" data-wo-probe="settings">SETTINGS</button>
+        <button class="wo-btn" type="button" data-wo-id="title" data-wo-probe="return">RETURN TO TITLE</button>
+        <div class="wo-t-body wo-t-muted wo-pause-warning" data-wo-probe="warning">Returning keeps your last checkpoint.<br>Unsaved progress will be lost.</div>
+        <button class="wo-btn" type="button" data-wo-id="quit" data-wo-only="desktop handheld" data-wo-probe="quit">QUIT TO DESKTOP</button>
+      </div>
       <div class="wo-footer" data-wo-probe="footer">
         <span class="wo-footer-item" data-wo-probe="footer-select"><span data-wo-glyph="ui_accept"></span>SELECT</span>
         <span class="wo-footer-item" data-wo-close data-wo-probe="footer-resume"><span data-wo-glyph="ui_cancel"></span>RESUME</span>
