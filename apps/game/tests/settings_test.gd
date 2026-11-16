@@ -45,6 +45,7 @@ func _run() -> void:
 	_expect((game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO and Engine.time_scale == 1.0, "with Reduced Motion on, a boom leaves the camera still and skips hit-stop")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
 	_check_display_page(menu)
+	await _check_scrolling_pages(menu)
 	await _check_language_row(game, path)
 	await _check_menu_translation(game)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
@@ -228,7 +229,7 @@ func _check_hostile_settings() -> void:
 ## tablets; the V-sync sentence shows everywhere.
 func _check_display_page(menu: GameSettings) -> void:
 	menu.select_tab(0)
-	_expect(menu.pages[0].mouse_filter == Control.MOUSE_FILTER_IGNORE, "the Display container does not block pointer input to the existing controls underneath")
+	_expect(menu.pages[0] is ScrollContainer and menu.pages[0].is_ancestor_of(menu.vsync), "Display owns its controls inside the shared scrolling page")
 	var texts: Array[String] = []
 	for label: Node in menu.find_children("*", "Label", true, false):
 		if (label as Label).is_visible_in_tree():
@@ -254,6 +255,19 @@ func _check_display_page(menu: GameSettings) -> void:
 	_expect(not menu.note.text.contains("OS-managed"), "the other tabs keep their own notes")
 	menu.mobile = was_mobile
 	menu.select_tab(0)
+
+
+## Every tab uses the same scrolling page, and focus can reach Display's last row without hiding Back.
+func _check_scrolling_pages(menu: GameSettings) -> void:
+	for page: Control in menu.pages:
+		_expect(page is ScrollContainer and (page as ScrollContainer).follow_focus, "every Settings page scrolls to focused controls")
+	menu.select_tab(0)
+	menu.antialiasing.grab_focus()
+	await frames(6)
+	var scroll: ScrollContainer = menu.pages[0] as ScrollContainer
+	_expect(scroll.scroll_vertical > 0 and scroll.get_global_rect().encloses(menu.antialiasing.get_global_rect()), "focus brings the last Display row fully into view (%s; page %s; control %s)" % [scroll.scroll_vertical, scroll.get_global_rect(), menu.antialiasing.get_global_rect()])
+	_expect(not scroll.get_global_rect().intersects((menu.get_node("BackButton") as Control).get_global_rect()), "scrolling rows leave Back outside the page")
+	menu.tabs.grab_focus()
 
 
 ## LANGUAGE on the GENERAL tab (PR L6, PLAN.md and DESIGN.md "Settings: the LANGUAGE option"):

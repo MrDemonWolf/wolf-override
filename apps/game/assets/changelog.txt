@@ -79,6 +79,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - In Japanese and Chinese a two-row dialogue box breaks between whole words, after a comma where one sits near the middle; in Korean it breaks at a space, never inside a word.
 
 -- Settings --
+- All Settings pages scroll, Display uses one column, and focus stays clear of page edges; headless and rendered checks only.
 - Settings gives text size and reduced motion their own Accessibility tab; saved values are preserved. Headless checks only.
 - Display controls accept pointer input through their layout container; headless checks only.
 - Spanish (machine translation, review pending): LANGUAGE offers Español (Latinoamérica) and Español (España), each marked "traducción automática".

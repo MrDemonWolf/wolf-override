@@ -118,14 +118,13 @@ func _run() -> void:
 	_expect(resume.get_theme_stylebox("focus") == ring and resume_normal != null and resume_hover != null and ring.border_width_left > resume_normal.border_width_left and not ring.border_color.is_equal_approx(resume_hover.border_color) and resume_normal.shadow_size > 0 and resume_normal.corner_radius_top_left > 0, "pause-menu buttons share the inset ring, heavier than their border and distinct from hover")
 	_expect(title_new_game.get_theme_stylebox("normal") == resume_normal, "title and pause buttons wear the same theme style")
 	# Settings alone keeps the terminal identity: squared controls with the same ring colour and width, squared to match.
-	for bordered_path: String in ["CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions"]:
-		var bordered: Button = game.get_node(bordered_path) as Button
+	for bordered: Button in [game.get("settings_back_button"), game.get("fps_options"), game.get("resolution_options")]:
 		var bordered_focus: StyleBoxFlat = bordered.get_theme_stylebox("focus") as StyleBoxFlat
 		var bordered_normal: StyleBoxFlat = bordered.get_theme_stylebox("normal") as StyleBoxFlat
 		_expect(bordered_focus != null and bordered_normal != null and bordered_focus.border_color.is_equal_approx(ring.border_color) and bordered_focus.border_width_left == ring.border_width_left and bordered_focus.expand_margin_left == 0.0 and bordered_focus.bg_color.a == 0.0 and bordered_focus.corner_radius_top_left == 0 and bordered_normal.corner_radius_top_left == 0 and bordered_normal.border_width_left < bordered_focus.border_width_left, "%s keeps a squared terminal ring inside its border" % bordered.name)
 	# LANGUAGE (PR L6) is a Settings row like FPS: the same squared ring and style, with the list's own
 	# font chain (I18n.picker_font over Montserrat Semibold) on the button and in the open list.
-	var fps_options: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as Button
+	var fps_options: Button = game.get("fps_options") as Button
 	var language: OptionButton = shared_settings.language
 	var list_font: Font = language.get_theme_font("font")
 	_expect(language.get_theme_stylebox("focus") == fps_options.get_theme_stylebox("focus") and language.get_theme_stylebox("normal") == fps_options.get_theme_stylebox("normal"), "LANGUAGE wears the Settings rows' squared terminal style and ring")
@@ -193,7 +192,7 @@ func _run() -> void:
 	TextSize.factor = 2.0
 	game.call("_apply_text_size")
 	return_action.grab_focus()
-	game.call("_follow_menu_focus", pause_scroll)
+	UIMotion.follow_focus(pause_scroll)
 	for layout_frame: int in 6:
 		await process_frame
 	_expect(resume.get_theme_font_size(&"font_size") == 42 and pause_scroll.scroll_vertical > 0, "paused actions scale to 200% and scroll to the focused return action")
@@ -209,7 +208,7 @@ func _run() -> void:
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
-	var fps: OptionButton = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as OptionButton
+	var fps: OptionButton = game.get("fps_options") as OptionButton
 	fps.select(0)
 	game.call("_on_fps_selected", 0)
 	var config: ConfigFile = ConfigFile.new()

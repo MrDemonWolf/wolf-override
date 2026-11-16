@@ -267,14 +267,6 @@ msgid "SYSTEM SETTINGS"
 msgstr ""
 
 #: scenes/main.tscn
-msgid "FPS LIMIT"
-msgstr ""
-
-#: scenes/main.tscn
-msgid "WINDOW SIZE"
-msgstr ""
-
-#: scenes/main.tscn
 msgid "FULLSCREEN"
 msgstr ""
 
@@ -544,181 +536,189 @@ msgctxt "key name"
 msgid "Section"
 msgstr ""
 
-#: scripts/game_settings.gd:274
+#: scripts/game_settings.gd:271
 msgid "THE DEN  /  LOCAL CONFIGURATION"
 msgstr ""
 
-#: scripts/game_settings.gd:286
+#: scripts/game_settings.gd:283
 msgid "DISPLAY"
 msgstr ""
 
-#: scripts/game_settings.gd:286
+#: scripts/game_settings.gd:283
 msgid "AUDIO"
 msgstr ""
 
-#: scripts/game_settings.gd:286
+#: scripts/game_settings.gd:283
 msgid "CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:286
+#: scripts/game_settings.gd:283
 msgid "ACCESSIBILITY"
 msgstr ""
 
-#: scripts/game_settings.gd:286
+#: scripts/game_settings.gd:283
 msgid "GENERAL"
 msgstr ""
 
-#: scripts/game_settings.gd:305
+#: scripts/game_settings.gd:289
+msgid "FPS LIMIT"
+msgstr ""
+
+#: scripts/game_settings.gd:289
+msgid "WINDOW SIZE"
+msgstr ""
+
+#: scripts/game_settings.gd:293
 msgid "V-SYNC"
 msgstr ""
 
-#: scripts/game_settings.gd:311
+#: scripts/game_settings.gd:297
 msgid "EDGE SMOOTHING"
 msgstr ""
 
-#: scripts/game_settings.gd:311
+#: scripts/game_settings.gd:297
 msgid "OFF"
 msgstr ""
 
-#: scripts/game_settings.gd:311
+#: scripts/game_settings.gd:297
 msgid "2× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:311
+#: scripts/game_settings.gd:297
 msgid "4× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:311
+#: scripts/game_settings.gd:297
 msgid "8× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:318
+#: scripts/game_settings.gd:301
 msgid "REDUCED MOTION"
 msgstr ""
 
-#: scripts/game_settings.gd:319
+#: scripts/game_settings.gd:302
 msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr ""
 
-#: scripts/game_settings.gd:328
+#: scripts/game_settings.gd:309
 msgid "TEXT SIZE"
 msgstr ""
 
-#: scripts/game_settings.gd:329
-#: scripts/game_settings.gd:608
+#: scripts/game_settings.gd:310
+#: scripts/game_settings.gd:577
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
-#: scripts/game_settings.gd:352
+#: scripts/game_settings.gd:324
 msgid "ACTION"
 msgstr ""
 
-#: scripts/game_settings.gd:352
+#: scripts/game_settings.gd:324
 msgid "KEYBOARD"
 msgstr ""
 
-#: scripts/game_settings.gd:352
+#: scripts/game_settings.gd:324
 msgid "CONTROLLER"
 msgstr ""
 
-#: scripts/game_settings.gd:372
+#: scripts/game_settings.gd:344
 msgid "Stick deadzone"
 msgstr ""
 
-#: scripts/game_settings.gd:376
+#: scripts/game_settings.gd:348
 msgid "TOGGLE HOLDS"
 msgstr ""
 
-#: scripts/game_settings.gd:377
+#: scripts/game_settings.gd:349
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
 msgstr ""
 
-#: scripts/game_settings.gd:382
+#: scripts/game_settings.gd:354
 msgid "RESTORE DEFAULT CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:404
+#: scripts/game_settings.gd:376
 msgid "CANCEL REBIND"
 msgstr ""
 
-#: scripts/game_settings.gd:422
+#: scripts/game_settings.gd:389
 msgid "LANGUAGE"
 msgstr ""
 
-#: scripts/game_settings.gd:604
+#: scripts/game_settings.gd:573
 msgid "Window size is OS-managed on mobile."
 msgstr ""
 
-#: scripts/game_settings.gd:604
-#: scripts/game_settings.gd:606
+#: scripts/game_settings.gd:573
+#: scripts/game_settings.gd:575
 msgid "V-sync may limit the FPS cap."
 msgstr ""
 
-#: scripts/game_settings.gd:608
+#: scripts/game_settings.gd:577
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
 msgstr ""
 
-#: scripts/game_settings.gd:608
+#: scripts/game_settings.gd:577
 msgid "Select a binding, then press a key, controller button or move a stick."
 msgstr ""
 
-#: scripts/game_settings.gd:608
+#: scripts/game_settings.gd:577
 msgid "Until you choose a language, the game uses your system's."
 msgstr ""
 
-#: scripts/game_settings.gd:662
+#: scripts/game_settings.gd:631
 msgid "Press a keyboard input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:662
+#: scripts/game_settings.gd:631
 msgid "Press a controller input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:684
+#: scripts/game_settings.gd:653
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:699
+#: scripts/game_settings.gd:668
 msgid "Already used by %s. Choose another input or cancel."
 msgstr ""
 
-#: scripts/game_settings.gd:705
+#: scripts/game_settings.gd:674
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:787
+#: scripts/game_settings.gd:756
 msgid "Left stick"
 msgstr ""
 
-#: scripts/game_settings.gd:787
+#: scripts/game_settings.gd:756
 msgid "Axis %d"
 msgstr ""
 
-#: scripts/game_settings.gd:816
+#: scripts/game_settings.gd:785
 msgid "AXIS %d %s"
 msgstr ""
 
-#: scripts/game_settings.gd:867
+#: scripts/game_settings.gd:836
 msgid "START"
 msgstr ""
 
-#: scripts/game_settings.gd:868
+#: scripts/game_settings.gd:837
 msgid "D-pad left"
 msgstr ""
 
-#: scripts/game_settings.gd:869
+#: scripts/game_settings.gd:838
 msgid "D-pad right"
 msgstr ""
 
-#: scripts/game_settings.gd:870
+#: scripts/game_settings.gd:839
 msgid "BUTTON %d"
 msgstr ""
 
-#: scripts/game_settings.gd:906
+#: scripts/game_settings.gd:875
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:934
+#: scripts/game_settings.gd:903
 #: scripts/main.gd:2204
 msgid "Settings could not be saved."
 msgstr ""
@@ -1115,7 +1115,7 @@ msgid "Exit sealed until the purge order and mirror timestamp are copied."
 msgstr ""
 
 #: scripts/main.gd:2980
-#: scripts/main.gd:5558
+#: scripts/main.gd:5540
 msgid "Mirror copied. Head for the exit."
 msgstr ""
 
@@ -1319,7 +1319,7 @@ msgid "SERVICE JUNCTION"
 msgstr ""
 
 #: scripts/main.gd:4932
-#: scripts/main.gd:5715
+#: scripts/main.gd:5697
 msgid "SERVICE LINE CLEARED"
 msgstr ""
 
@@ -1379,328 +1379,328 @@ msgstr ""
 msgid "%s  CONTINUE"
 msgstr ""
 
-#: scripts/main.gd:5537
-#: scripts/main.gd:5552
-#: scripts/main.gd:5593
+#: scripts/main.gd:5519
+#: scripts/main.gd:5534
+#: scripts/main.gd:5575
 msgid "%s: continue."
 msgstr ""
 
-#: scripts/main.gd:5538
-#: scripts/main.gd:5681
+#: scripts/main.gd:5520
+#: scripts/main.gd:5663
 msgid "%s: leave through the door."
 msgstr ""
 
-#: scripts/main.gd:5538
+#: scripts/main.gd:5520
 msgid "%s: inspect the next source."
 msgstr ""
 
-#: scripts/main.gd:5552
+#: scripts/main.gd:5534
 msgid "%s: follow the service line toward Archive."
 msgstr ""
 
-#: scripts/main.gd:5553
+#: scripts/main.gd:5535
 msgid "The exit is open. Head right to follow the service line."
 msgstr ""
 
-#: scripts/main.gd:5555
+#: scripts/main.gd:5537
 msgid "%s: copy the purge-order trace."
 msgstr ""
 
-#: scripts/main.gd:5555
+#: scripts/main.gd:5537
 msgid "Purge order copied. Find the mirror port."
 msgstr ""
 
-#: scripts/main.gd:5559
+#: scripts/main.gd:5541
 msgid "%s: examine the mirror port."
 msgstr ""
 
-#: scripts/main.gd:5559
+#: scripts/main.gd:5541
 msgid "Copy the purge order first."
 msgstr ""
 
-#: scripts/main.gd:5562
+#: scripts/main.gd:5544
 msgid "%s: secure the first copy in the container."
 msgstr ""
 
-#: scripts/main.gd:5562
+#: scripts/main.gd:5544
 msgid "Preserve both traces before leaving."
 msgstr ""
 
-#: scripts/main.gd:5565
+#: scripts/main.gd:5547
 msgid "%s: enter records access. The Director's purge is still running."
 msgstr ""
 
-#: scripts/main.gd:5565
-#: scripts/main.gd:5573
+#: scripts/main.gd:5547
+#: scripts/main.gd:5555
 msgid "%s: read the Director's purge display."
 msgstr ""
 
-#: scripts/main.gd:5565
+#: scripts/main.gd:5547
 msgid "Return to the safe point to enter records access."
 msgstr ""
 
-#: scripts/main.gd:5568
+#: scripts/main.gd:5550
 msgid "The seal is opening."
 msgstr ""
 
-#: scripts/main.gd:5570
+#: scripts/main.gd:5552
 msgid "%s: save at the safe point."
 msgstr ""
 
-#: scripts/main.gd:5571
+#: scripts/main.gd:5553
 msgid "The seal is open. Move to the safe point."
 msgstr ""
 
-#: scripts/main.gd:5575
+#: scripts/main.gd:5557
 msgid "WOLF is moving to the contact."
 msgstr ""
 
-#: scripts/main.gd:5578
+#: scripts/main.gd:5560
 msgid "The bypass is dead. Arm the breaker first."
 msgstr ""
 
-#: scripts/main.gd:5580
+#: scripts/main.gd:5562
 msgid "%s: crank the manual bypass, %d of %d."
 msgstr ""
 
 #. TRANSLATORS: %s is the key or button to hold. "Yourself" must not show the engineer's gender (no сам/сама, sam/sama): rephrase.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:5585
+#: scripts/main.gd:5567
 msgid "%s: crank it yourself, or let WOLF take the relay."
 msgstr ""
 
-#: scripts/main.gd:5586
+#: scripts/main.gd:5568
 msgid "%s: crank on, %d of %d, or let WOLF take the relay."
 msgstr ""
 
-#: scripts/main.gd:5589
+#: scripts/main.gd:5571
 msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
 msgstr ""
 
-#: scripts/main.gd:5589
+#: scripts/main.gd:5571
 msgid "The breaker is live. Go to the coolant relay."
 msgstr ""
 
-#: scripts/main.gd:5594
+#: scripts/main.gd:5576
 msgid "%s: talk to WOLF about the relay."
 msgstr ""
 
-#: scripts/main.gd:5594
+#: scripts/main.gd:5576
 msgid "%s: arm the breaker."
 msgstr ""
 
-#: scripts/main.gd:5597
+#: scripts/main.gd:5579
 msgid "The relay is dark. Return to the breaker first."
 msgstr ""
 
-#: scripts/main.gd:5598
+#: scripts/main.gd:5580
 msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
 msgstr ""
 
-#: scripts/main.gd:5598
+#: scripts/main.gd:5580
 msgid "%s: signal WOLF to take the contact."
 msgstr ""
 
-#: scripts/main.gd:5600
+#: scripts/main.gd:5582
 msgid "Go to the MANUAL BYPASS beside the relay."
 msgstr ""
 
-#: scripts/main.gd:5600
+#: scripts/main.gd:5582
 msgid "Go to the coolant relay. WOLF is ready for the contact."
 msgstr ""
 
-#: scripts/main.gd:5602
+#: scripts/main.gd:5584
 msgid "Return to the breaker and arm power."
 msgstr ""
 
-#: scripts/main.gd:5603
+#: scripts/main.gd:5585
 msgid "Find the breaker. WOLF will follow your lead."
 msgstr ""
 
-#: scripts/main.gd:5626
+#: scripts/main.gd:5608
 msgid "The vent is about to blow. Get off the grate now."
 msgstr ""
 
-#: scripts/main.gd:5626
+#: scripts/main.gd:5608
 msgid "Relief vent. Get off the grate before the gauge peaks."
 msgstr ""
 
-#: scripts/main.gd:5630
+#: scripts/main.gd:5612
 msgid "%s: arm the overload breaker."
 msgstr ""
 
-#: scripts/main.gd:5632
+#: scripts/main.gd:5614
 msgid "%s: reset the breaker. The vent let go."
 msgstr ""
 
-#: scripts/main.gd:5634
+#: scripts/main.gd:5616
 msgid "The line is live. Get to the valve by the door."
 msgstr ""
 
-#: scripts/main.gd:5636
+#: scripts/main.gd:5618
 msgid "%s: crank the valve, %d of %d turns."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:5638
+#: scripts/main.gd:5620
 #: scripts/story_text.gd:163
 msgid "Fuse lit. Get clear of the door."
 msgstr ""
 
-#: scripts/main.gd:5640
+#: scripts/main.gd:5622
 msgid "The valve is dead. Arm the breaker by the entrance."
 msgstr ""
 
-#: scripts/main.gd:5642
+#: scripts/main.gd:5624
 msgid "Relief vent. It lets go when the gauge peaks."
 msgstr ""
 
-#: scripts/main.gd:5645
+#: scripts/main.gd:5627
 msgid "The line is building. Crank the valve by the door."
 msgstr ""
 
-#: scripts/main.gd:5647
+#: scripts/main.gd:5629
 msgid "The breaker tripped. Reset it by the entrance."
 msgstr ""
 
-#: scripts/main.gd:5649
+#: scripts/main.gd:5631
 msgid "Arm the breaker by the entrance, then crank the valve by the door."
 msgstr ""
 
-#: scripts/main.gd:5649
+#: scripts/main.gd:5631
 msgid "Get through the sealed door."
 msgstr ""
 
-#: scripts/main.gd:5670
+#: scripts/main.gd:5652
 msgid "The door is open."
 msgstr ""
 
-#: scripts/main.gd:5675
+#: scripts/main.gd:5657
 msgid "%s: pop the exit bolt."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:5677
+#: scripts/main.gd:5659
 #: scripts/story_text.gd:226
 msgid "The bolt is taking the charge."
 msgstr ""
 
-#: scripts/main.gd:5679
-#: scripts/main.gd:5683
+#: scripts/main.gd:5661
+#: scripts/main.gd:5665
 msgid "The door is opening."
 msgstr ""
 
-#: scripts/main.gd:5681
-#: scripts/main.gd:5684
+#: scripts/main.gd:5663
+#: scripts/main.gd:5666
 msgid "The door is open. Leave through it."
 msgstr ""
 
-#: scripts/main.gd:5684
+#: scripts/main.gd:5666
 msgid "The sentry is down. Pop the exit bolt by the door."
 msgstr ""
 
-#: scripts/main.gd:5686
+#: scripts/main.gd:5668
 msgid "Coolant cloud. Get out of it."
 msgstr ""
 
-#: scripts/main.gd:5688
+#: scripts/main.gd:5670
 msgid "It's after you. Get back over the rubble."
 msgstr ""
 
-#: scripts/main.gd:5693
+#: scripts/main.gd:5675
 msgid "Wait for WOLF to park it on the mark."
 msgstr ""
 
-#: scripts/main.gd:5693
+#: scripts/main.gd:5675
 msgid "%s: drop the tank. It's parked on the mark."
 msgstr ""
 
-#: scripts/main.gd:5694
+#: scripts/main.gd:5676
 msgid "%s: drop the tank. Land it with the sentry on the mark."
 msgstr ""
 
-#: scripts/main.gd:5696
+#: scripts/main.gd:5678
 msgid "The tank is falling."
 msgstr ""
 
-#: scripts/main.gd:5698
+#: scripts/main.gd:5680
 msgid "The winch is hauling the tank back up. Wait for the clamp."
 msgstr ""
 
-#: scripts/main.gd:5700
+#: scripts/main.gd:5682
 msgid "Stay back over the rubble until it gives up."
 msgstr ""
 
-#: scripts/main.gd:5702
+#: scripts/main.gd:5684
 msgid "You're in its sights. Hide at the TANK RELEASE or the rubble."
 msgstr ""
 
-#: scripts/main.gd:5704
+#: scripts/main.gd:5686
 msgid "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
 msgstr ""
 
-#: scripts/main.gd:5706
+#: scripts/main.gd:5688
 msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
 msgstr ""
 
-#: scripts/main.gd:5707
+#: scripts/main.gd:5689
 msgid "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
 msgstr ""
 
-#: scripts/main.gd:5717
+#: scripts/main.gd:5699
 msgid "POP THE EXIT BOLT"
 msgstr ""
 
-#: scripts/main.gd:5720
+#: scripts/main.gd:5702
 msgid "DROP THE TANK"
 msgstr ""
 
-#: scripts/main.gd:5720
+#: scripts/main.gd:5702
 msgid "GO THROUGH THE DOOR"
 msgstr ""
 
-#: scripts/main.gd:5723
+#: scripts/main.gd:5705
 msgid "CRANK THE VALVE"
 msgstr ""
 
-#: scripts/main.gd:5725
+#: scripts/main.gd:5707
 msgid "GET CLEAR OF THE DOOR"
 msgstr ""
 
-#: scripts/main.gd:5726
-#: scripts/main.gd:5742
+#: scripts/main.gd:5708
+#: scripts/main.gd:5724
 msgid "ARM THE BREAKER"
 msgstr ""
 
-#: scripts/main.gd:5729
+#: scripts/main.gd:5711
 msgid "FIRST COPY SECURED"
 msgstr ""
 
-#: scripts/main.gd:5731
+#: scripts/main.gd:5713
 msgid "COPY PURGE ORDER"
 msgstr ""
 
-#: scripts/main.gd:5733
+#: scripts/main.gd:5715
 msgid "COPY MIRROR INDEX"
 msgstr ""
 
-#: scripts/main.gd:5734
+#: scripts/main.gd:5716
 msgid "REACH EXIT"
 msgstr ""
 
-#: scripts/main.gd:5736
+#: scripts/main.gd:5718
 msgid "SAFE POINT REACHED"
 msgstr ""
 
-#: scripts/main.gd:5738
+#: scripts/main.gd:5720
 msgid "REACH SAFE POINT"
 msgstr ""
 
-#: scripts/main.gd:5740
+#: scripts/main.gd:5722
 msgid "OPEN THE SEAL"
 msgstr ""
 
-#: scripts/main.gd:5743
+#: scripts/main.gd:5725
 msgid "CHECK THE BREAKER"
 msgstr ""
 

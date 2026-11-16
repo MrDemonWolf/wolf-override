@@ -877,42 +877,23 @@ theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 31
 text = "SYSTEM SETTINGS"
 
-[node name="FPSLabel" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
-offset_left = 45.0
-offset_top = 125.0
-offset_right = 203.0
-offset_bottom = 157.0
-theme_override_font_sizes/font_size = 19
-text = "FPS LIMIT"
-
 [node name="FPSOptions" type="OptionButton" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 215.0
 offset_top = 115.0
 offset_right = 400.0
 offset_bottom = 163.0
-theme_override_font_sizes/font_size = 18
-
-[node name="ResolutionLabel" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
-offset_left = 45.0
-offset_top = 195.0
-offset_right = 203.0
-offset_bottom = 227.0
-theme_override_font_sizes/font_size = 19
-text = "WINDOW SIZE"
 
 [node name="ResolutionOptions" type="OptionButton" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 215.0
 offset_top = 185.0
 offset_right = 400.0
 offset_bottom = 233.0
-theme_override_font_sizes/font_size = 18
 
 [node name="FullscreenToggle" type="CheckButton" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 45.0
 offset_top = 254.0
 offset_right = 400.0
 offset_bottom = 299.0
-theme_override_font_sizes/font_size = 18
 text = "FULLSCREEN"
 
 [node name="SettingsNote" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
@@ -929,5 +910,4 @@ offset_left = 45.0
 offset_top = 336.0
 offset_right = 400.0
 offset_bottom = 378.0
-theme_override_font_sizes/font_size = 18
 text = "BACK"

@@ -92,7 +92,6 @@ var hold_toggle: CheckButton
 var cancel_button: Button
 var capture_action: StringName = &""
 var capture_kind: String = ""
-var display_nodes: Array[CanvasItem] = []
 var pages: Array[Control] = []
 ## A phone or tablet build (iOS or Android): the window is the OS's, and the Display note says so.
 var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
@@ -259,10 +258,8 @@ static func apply_saved_window(window: Window, config: ConfigFile) -> void:
 		window.mode = Window.MODE_FULLSCREEN
 
 
-## Builds every control of the menu in code, once, from configure: the backdrop panel, the tab bar and
-## the four pages (DISPLAY, AUDIO, CONTROLS, GENERAL), the note under the tabs and CANCEL REBIND. Each
-## control is connected to apply its change and save the file at once (_save_extra). Positions are
-## menu px.
+## Builds the backdrop, tabs, five scrolling pages, note and CANCEL REBIND once from configure. Each
+## control is connected to apply its change and save the file at once (_save_extra).
 func _build_menu() -> void:
 	var surface: Panel = Panel.new()
 	surface.position = Vector2(24, 126)
@@ -287,65 +284,40 @@ func _build_menu() -> void:
 		tabs.add_tab(caption)
 	add_child(tabs)
 	tabs.tab_changed.connect(select_tab)
-	var display: Control = Control.new()
-	# Existing display controls are siblings underneath this container; leave their pointer hits clear.
-	display.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	display.position = Vector2(32, 126)
-	display.size = Vector2(696, 240)
-	add_child(display)
-	pages.append(display)
-	for node_name: String in ["FPSLabel", "FPSOptions", "ResolutionLabel", "ResolutionOptions", "FullscreenToggle"]:
-		display_nodes.append(get_node(node_name) as CanvasItem)
-	$FPSLabel.position = Vector2(40, 144)
-	$FPSOptions.position = Vector2(215, 138)
-	$ResolutionLabel.position = Vector2(40, 206)
-	$ResolutionOptions.position = Vector2(215, 200)
-	$FullscreenToggle.position = Vector2(40, 260)
+	var display: VBoxContainer = _page_box()
+	pages.append(display.get_parent().get_parent())
+	for row: Array in [["FPSOptions", I18n.KEY.tr("FPS LIMIT")], ["ResolutionOptions", I18n.KEY.tr("WINDOW SIZE")], ["FullscreenToggle", ""]]:
+		var control: Control = get_node(row[0]) as Control
+		_control_row(display, control, row[1])
 	vsync = CheckButton.new()
 	vsync.text = "V-SYNC"
-	vsync.position = Vector2(404, 14)
-	vsync.size = Vector2(272, 44)
-	display.add_child(vsync)
+	_control_row(display, vsync)
 	vsync.disabled = DisplayServer.get_name() == "headless"
 	vsync.toggled.connect(func(_value: bool) -> void: _apply_graphics(); _save_extra())
-	antialiasing = _option_row(display, I18n.KEY.tr("EDGE SMOOTHING"), Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), [I18n.KEY.tr("OFF"), I18n.KEY.tr("2× MSAA"), I18n.KEY.tr("4× MSAA"), I18n.KEY.tr("8× MSAA")])
+	antialiasing = _option_row(display, I18n.KEY.tr("EDGE SMOOTHING"), [I18n.KEY.tr("OFF"), I18n.KEY.tr("2× MSAA"), I18n.KEY.tr("4× MSAA"), I18n.KEY.tr("8× MSAA")])
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
-	var accessibility: Control = Control.new()
-	accessibility.position = display.position
-	accessibility.size = display.size
-	add_child(accessibility)
+	var accessibility: VBoxContainer = _page_box()
 	reduced_motion = CheckButton.new()
 	reduced_motion.text = "REDUCED MOTION"
 	reduced_motion.tooltip_text = "No camera shake or hit-stop; screen flashes are shorter."
-	reduced_motion.position = Vector2(8, 70)
-	reduced_motion.size = Vector2(272, 40)
-	accessibility.add_child(reduced_motion)
+	_control_row(accessibility, reduced_motion)
 	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
 	# TEXT SIZE scales the play HUD's words and the station names, 100% to 200% (TextSize).
 	var size_captions: Array[String] = []
 	for step: float in TextSize.STEPS:
 		size_captions.append("%d%%" % roundi(step * 100.0))
-	text_size = _option_row(accessibility, I18n.KEY.tr("TEXT SIZE"), Rect2(8, 12, 160, 40), Rect2(183, 12, 160, 40), size_captions)
+	text_size = _option_row(accessibility, I18n.KEY.tr("TEXT SIZE"), size_captions)
 	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
 	var audio: VBoxContainer = _page_box()
-	pages.append(audio)
+	pages.append(audio.get_parent().get_parent())
 	for index: int in BUSES.size():
 		var bus: String = BUSES[index]
 		var slider: HSlider = _slider_row(audio, BUS_CAPTIONS[index], 0, 100, 1)
 		volumes[bus] = slider
 		slider.value_changed.connect(func(value: float) -> void: _apply_volume(bus, value); _save_extra())
-	var controls_scroll: ScrollContainer = ScrollContainer.new()
-	controls_scroll.position = Vector2(40, 128)
-	controls_scroll.size = Vector2(680, 234)
-	controls_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	controls_scroll.follow_focus = true
-	add_child(controls_scroll)
-	pages.append(controls_scroll)
-	var controls: VBoxContainer = VBoxContainer.new()
-	controls.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	controls.add_theme_constant_override("separation", 6)
-	controls_scroll.add_child(controls)
+	var controls: VBoxContainer = _page_box()
+	pages.append(controls.get_parent().get_parent())
 	var header: HBoxContainer = HBoxContainer.new()
 	controls.add_child(header)
 	for index: int in 3:
@@ -383,7 +355,7 @@ func _build_menu() -> void:
 	reset.custom_minimum_size.y = 40
 	controls.add_child(reset)
 	reset.pressed.connect(reset_controls)
-	pages.append(accessibility)
+	pages.append(accessibility.get_parent().get_parent())
 	_build_general_page()
 	$Title.size.x = 690
 	$BackButton.position = Vector2(32, 414)
@@ -407,19 +379,14 @@ func _build_menu() -> void:
 	cancel_button.pressed.connect(cancel_capture)
 
 
-## The GENERAL page (pages[GENERAL_TAB]), laid out like DISPLAY's left column: the LANGUAGE caption, its
+## The GENERAL page (pages[GENERAL_TAB]), using the shared scrolling rows: the LANGUAGE caption, its
 ## list and the tag note under it. The list and the note draw with I18n.picker_font, so every name and
 ## tag draws in any language, and never translate (I18n.OWN_LANGUAGE_META marks them for the pseudo
 ## audit). [method refresh_languages] fills the list.
 func _build_general_page() -> void:
-	var general: Control = Control.new()
-	general.position = Vector2(32, 126)
-	general.size = Vector2(696, 240)
-	add_child(general)
-	pages.append(general)
-	# The list takes the longest name's width (fit_to_longest_item), at least 300 px: "Español
-	# (Latinoamérica)" is about 250 px, the width DISPLAY could not give (D10).
-	language = _option_row(general, I18n.KEY.tr("LANGUAGE"), Rect2(8, 12, 160, 40), Rect2(183, 12, 300, 40), [])
+	var general: VBoxContainer = _page_box()
+	pages.append(general.get_parent().get_parent())
+	language = _option_row(general, I18n.KEY.tr("LANGUAGE"), [])
 	var font: FontVariation = I18n.picker_font(CONTROL_FONT)
 	language.add_theme_font_override(&"font", font)
 	var popup: PopupMenu = language.get_popup()
@@ -430,8 +397,7 @@ func _build_general_page() -> void:
 	for side: StringName in [&"labeled_separator_left", &"labeled_separator_right"]:
 		popup.add_theme_stylebox_override(side, StyleBoxEmpty.new())
 	language_note = _label("", TAG_FONT_PX)
-	language_note.position = Vector2(183, 56)
-	language_note.size = Vector2(300, 20)
+	language_note.custom_minimum_size.y = 20
 	language_note.modulate = MUTED_TEXT
 	language_note.add_theme_font_override(&"font", font)
 	general.add_child(language_note)
@@ -493,17 +459,44 @@ func _notification(what: int) -> void:
 		_show_translated_note()
 
 
-## A page laid out as a column of rows (AUDIO's four volume rows): 680 px wide from (40, 138), as tall
-## as those four 48 px rows and their three 12 px gaps (228 px), so the column fits the rect it is
-## given and the overflow check (I18n.overflows) judges it by a true size; it ends at y 366, above the
-## note at 372.
+## A shared scrolling Settings page at (40, 128), 680×234 canvas px; returns its row column.
+## The caller adds the enclosing ScrollContainer to pages in tab order; padding keeps focus motion clear.
 func _page_box() -> VBoxContainer:
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.position = Vector2(40, 128)
+	scroll.size = Vector2(680, 234)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	add_child(scroll)
+	var margin: MarginContainer = MarginContainer.new()
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for side: String in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 8)
+	scroll.add_child(margin)
 	var box: VBoxContainer = VBoxContainer.new()
-	box.position = Vector2(40, 138)
-	box.size = Vector2(680, 228)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 12)
-	add_child(box)
+	margin.add_child(box)
 	return box
+
+
+## Adds a 48 canvas px row to parent, with an optional shared-width label and an expanding control.
+## Existing controls are reparented, so their bindings, signals and saved preferences stay intact.
+func _control_row(parent: Control, control: Control, caption: String = "") -> HBoxContainer:
+	var row: HBoxContainer = HBoxContainer.new()
+	row.custom_minimum_size.y = 48
+	parent.add_child(row)
+	if not caption.is_empty():
+		var label: Label = _label(caption, 16)
+		label.custom_minimum_size.x = 220
+		row.add_child(label)
+	if control.get_parent() != null:
+		control.reparent(row)
+	else:
+		row.add_child(control)
+	control.custom_minimum_size.y = 48
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return row
 
 
 ## A new, unparented Label reading [param caption] at [param font_size] (px), centred vertically.
@@ -515,43 +508,26 @@ func _label(caption: String, font_size: int) -> Label:
 	return label
 
 
-## A captioned drop-down on [param page]: a 16 px label reading [param caption] at
-## [param label_rect]'s position (and at its size, unless that is zero, when the label keeps its own),
-## then an OptionButton at [param option_rect] (page px) holding [param items] in order, label first in
-## the tree. Returns the OptionButton; the caller connects it and sets anything else. The DISPLAY
-## page's EDGE SMOOTHING and TEXT SIZE rows and the GENERAL page's LANGUAGE row are made with it.
-func _option_row(page: Control, caption: String, label_rect: Rect2, option_rect: Rect2, items: Array[String]) -> OptionButton:
-	var label: Label = _label(caption, 16)
-	label.position = label_rect.position
-	if label_rect.size != Vector2.ZERO:
-		label.size = label_rect.size
-	page.add_child(label)
+## Adds a labelled option row to page, holding items in order; returns its OptionButton.
+func _option_row(page: Control, caption: String, items: Array[String]) -> OptionButton:
 	var option: OptionButton = OptionButton.new()
-	option.position = option_rect.position
-	option.size = option_rect.size
+	_control_row(page, option, caption)
 	for item: String in items:
 		option.add_item(item)
-	page.add_child(option)
 	return option
 
 
 ## Adds a row to [param parent]: a 220 px caption, an HSlider from [param minimum] to [param maximum] in
 ## [param step]s, and a label showing the value as a percentage (the value itself on a 0..100 slider,
 ## the value x 100 otherwise). Returns the slider; the caller connects it and sets its value.
-func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
-	var row: HBoxContainer = HBoxContainer.new()
-	row.custom_minimum_size.y = 48
-	parent.add_child(row)
-	var label: Label = _label(caption, 17)
-	label.custom_minimum_size.x = 220
-	row.add_child(label)
+func _slider_row(parent: Control, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
 	var slider: HSlider = HSlider.new()
+	var row: HBoxContainer = _control_row(parent, slider, caption)
 	slider.min_value = minimum
 	slider.max_value = maximum
 	slider.step = step
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(slider)
 	var value_label: Label = _label("", 16)
 	value_label.custom_minimum_size.x = 64
 	row.add_child(value_label)
@@ -583,11 +559,6 @@ func apply_theme() -> void:
 	menu_theme.set_font("font", "TabBar", CONTROL_FONT)
 	menu_theme.set_font_size("font_size", "TabBar", 16)
 	theme = menu_theme
-	for label: Label in [$FPSLabel, $ResolutionLabel]:
-		label.add_theme_font_size_override("font_size", 16)
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	for button: Button in [$FPSOptions, $ResolutionOptions, $FullscreenToggle, $BackButton]:
-		button.add_theme_font_size_override("font_size", 16)
 
 
 ## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 ACCESSIBILITY, 4 GENERAL) and its note, hiding the others,
@@ -596,8 +567,6 @@ func select_tab(index: int) -> void:
 	cancel_capture()
 	for page_index: int in pages.size():
 		pages[page_index].visible = page_index == index
-	for node: CanvasItem in display_nodes:
-		node.visible = index == 0
 	if index == 0:
 		# The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
 		if mobile:

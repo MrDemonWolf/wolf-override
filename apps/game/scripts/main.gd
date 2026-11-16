@@ -5193,30 +5193,12 @@ func _apply_text_size() -> void:
 				item.set_meta(&"menu_minimum_base", item.custom_minimum_size.y)
 			item.add_theme_font_size_override(&"font_size", TextSize.px(int(item.get_meta(&"menu_font_base"))))
 			item.custom_minimum_size.y = TextSize.px(int(item.get_meta(&"menu_minimum_base")))
-		_follow_menu_focus(scroll)
+		UIMotion.follow_focus(scroll)
 	_refit_station_labels()
 	dialogue_key = ""
 	_layout_hud()
 	if is_inside_tree():
 		_refresh_ui()
-
-
-## Waits for container layout after a text-size change, then reveals the current focus inside [param scroll].
-## Reads the focus after the wait so closing a menu cannot scroll to a stale action.
-func _follow_menu_focus(scroll: ScrollContainer) -> void:
-	await get_tree().process_frame
-	await get_tree().process_frame
-	var focused: Control = get_viewport().gui_get_focus_owner()
-	if focused != null and scroll.is_ancestor_of(focused):
-		scroll.ensure_control_visible(focused)
-		# Godot reveals the layout rectangle; leave room for the shared focus lift as well.
-		var margin: float = ceilf(focused.size.y * (UIMotion.LIFT_SCALE.y - 1.0) * 0.5)
-		var rect: Rect2 = focused.get_global_rect().grow(margin)
-		var viewport_rect: Rect2 = scroll.get_global_rect()
-		if rect.end.y > viewport_rect.end.y:
-			scroll.scroll_vertical += ceili(rect.end.y - viewport_rect.end.y)
-		elif rect.position.y < viewport_rect.position.y:
-			scroll.scroll_vertical -= ceili(viewport_rect.position.y - rect.position.y)
 
 
 ## Every room's station names fitted to their size and to their words in the language shown, and

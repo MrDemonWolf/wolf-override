@@ -34,6 +34,12 @@ static func _centre_pivot(button: BaseButton) -> void:
 
 ## Rest slightly lifted while hovered or focused, otherwise return to the normal size.
 static func _settle(button: BaseButton) -> void:
+	if button.has_focus():
+		var parent: Node = button.get_parent()
+		while parent != null and not parent is ScrollContainer:
+			parent = parent.get_parent()
+		if parent is ScrollContainer:
+			follow_focus(parent as ScrollContainer)
 	var raised: bool = button.is_hovered() or button.has_focus()
 	_scale_to(button, LIFT_SCALE if raised else Vector2.ONE, LIFT_SECONDS)
 
@@ -52,3 +58,24 @@ static func _scale_to(button: BaseButton, target: Vector2, seconds: float) -> vo
 	var tween: Tween = button.create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(button, "scale", target, seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	button.set_meta(&"ui_motion_tween", tween)
+
+
+## Waits for container layout after a text-size change, then reveals the current focus inside [param scroll].
+## Reads the focus after the wait so closing a menu cannot scroll to a stale action.
+static func follow_focus(scroll: ScrollContainer) -> void:
+	var tree: SceneTree = scroll.get_tree()
+	await tree.process_frame
+	await tree.process_frame
+	if not is_instance_valid(scroll) or not scroll.is_inside_tree():
+		return
+	var focused: Control = scroll.get_viewport().gui_get_focus_owner()
+	if focused != null and scroll.is_ancestor_of(focused):
+		scroll.ensure_control_visible(focused)
+		# Godot reveals the layout rectangle; leave room for the shared focus lift as well.
+		var margin: float = ceilf(focused.size.y * (UIMotion.LIFT_SCALE.y - 1.0) * 0.5)
+		var rect: Rect2 = focused.get_global_rect().grow(margin)
+		var viewport_rect: Rect2 = scroll.get_global_rect()
+		if rect.end.y > viewport_rect.end.y:
+			scroll.scroll_vertical += ceili(rect.end.y - viewport_rect.end.y)
+		elif rect.position.y < viewport_rect.position.y:
+			scroll.scroll_vertical -= ceili(viewport_rect.position.y - rect.position.y)
