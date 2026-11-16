@@ -990,11 +990,14 @@ func _check_prompts_clear(path: String, code: String = I18n.FALLBACK) -> void:
 ## on the canvas, over no station name, neither actor, the box, a top card that shows (one leaving
 ## goes at once when the prompt takes its place), PAUSE, DEBUG or the touch buttons, and
 ## over at most Main.TUTORIAL_ART_OVERLAP of its area of the machines. Where it waits hidden behind a
-## box, the hint bar is empty too. Only in English ([param english]) is the prompt's line itself read.
+## box, the tutorial and hint bar both hide. Only in English ([param english]) is the prompt's line itself read.
 func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String, english: bool) -> void:
 	context += ", box up" if box_up else ", no box yet"
+	if box_up:
+		_expect(not fresh.tutorial_prompt.visible and not (fresh.get_node("CanvasLayer/ContextHint") as Control).visible, "%s: dialogue hides both the tutorial and routine hint" % context)
+		return
 	if not fresh.tutorial_prompt.visible:
-		_expect(box_up and fresh.tutorial_prompt_slot == &"waiting" and not (fresh.get_node("CanvasLayer/ContextHint") as Control).visible, "%s: the tutorial prompt is hidden only while it waits behind a box, with the hint bar empty (%s)" % [context, fresh.tutorial_prompt_slot])
+		_expect(false, "%s: the tutorial remains available without dialogue" % context)
 		return
 	var prompt: Rect2 = fresh.tutorial_prompt.get_global_rect()
 	# A long frame under load can carry the engineer past the display, where the prompt only points on.
@@ -1024,8 +1027,8 @@ func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String
 		_expect(not prompt.intersects(other.get_global_rect()), "%s: the tutorial prompt stays clear of %s (%s vs %s)" % [context, other.name, prompt, other.get_global_rect()])
 
 
-## On touch at [param percent] in [param code]: a box, with a name or without, stays clear of ◀ ▶ and
-## USE, and the corridor's names and the COOLANT FAULT tag stay clear of PAUSE.
+## On touch at [param percent] in [param code], ordinary dialogue hides redundant movement/USE controls,
+## while the corridor names and COOLANT FAULT tag stay clear of PAUSE.
 func _check_touch_layout(percent: int, code: String) -> void:
 	game.debug_tools.actions.jump(&"corridor_start")
 	game.touch_enabled = true
@@ -1036,8 +1039,7 @@ func _check_touch_layout(percent: int, code: String) -> void:
 		await process_frame
 		var box: Rect2 = bar.get_global_rect()
 		_expect(bar.visible, "%s, %d%%, touch: the box shows (%s)" % [code, percent, line])
-		for button: Control in [game.touch_left, game.touch_right, game.touch_use]:
-			_expect(not box.intersects(button.get_global_rect()), "%s, %d%%, touch: the box stays clear of %s (%s vs %s)" % [code, percent, (button as Button).text, box, button.get_global_rect()])
+		_expect(not game.touch_move_pad.is_visible_in_tree() and not game.touch_use.is_visible_in_tree(), "%s, %d%%, touch: ordinary dialogue hides movement and the extra USE control" % [code, percent])
 		var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 		if hint_panel.visible:
 			_expect(not hint_panel.get_global_rect().intersects(box), "%s, %d%%, touch: the hint bar stays clear of the box" % [code, percent])

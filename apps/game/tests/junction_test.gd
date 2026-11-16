@@ -241,10 +241,10 @@ func _check_scene() -> void:
 	var autosave_a: M0State = State.load_from_disk(path)
 	_expect(autosave_a != null and autosave_a.chapter_id == "junction" and not autosave_a.door_blown and autosave_a.memory == state.memory, "autosave A is written on entry with the relay memory")
 	var a_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
-	# Audit 15: a save that worked says so in the hint bar, briefly, in the same word the title uses.
+	# A successful save keeps its confirmation text, but entry dialogue hides routine notifications.
 	var hint_text: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	game.call("_refresh_ui")
-	_expect(hint_text.text == "Checkpoint saved." and (game.get_node("CanvasLayer/ContextHint") as Control).visible, "autosave A says Checkpoint saved. in the hint bar")
+	_expect(hint_text.text == "Checkpoint saved." and not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "autosave A confirms its result without covering the entry dialogue")
 	game.set("waiting_for_choice", true)
 	game.call("_refresh_ui")
 	_expect(not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "the checkpoint note never shows over an open choice")
@@ -253,7 +253,7 @@ func _check_scene() -> void:
 	game.call("_process", 2.1)
 	_expect(hint_text.text != "Checkpoint saved.", "the checkpoint note gives way to the room's own hint after about two seconds")
 	_expect(room.sentry.visual.dormant and room.sentry.visual.body.modulate == Sentry.DORMANT_TINT and not room.sentry.visual.is_lit(), "behind the sealed door the sentry stands powered down: dimmed, eye dark")
-	_expect(game.call("_objective") == "ARM THE BREAKER" and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE JUNCTION"), "entry shows the junction card and first objective")
+	_expect(game.call("_objective") == "ARM THE BREAKER" and not (game.get_node("CanvasLayer/TopBar") as Control).visible and not str(game.call("_shown_box")).is_empty(), "entry preserves the breaker objective while dialogue owns attention")
 	_expect(game.get("wolf_scouting") and wolf.autonomous_target_x == JunctionRoom.WOLF_SEAM_X, "WOLF runs ahead to the valve on his own")
 	# Round 3 item 3: there is no floor at the sealed door (the valve stands in front of it), so the line
 	# says what the picture shows: WOLF at the valve, reading its LINE gauge.
