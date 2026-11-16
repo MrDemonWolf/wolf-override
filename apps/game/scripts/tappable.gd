@@ -34,6 +34,16 @@ func setup(target_id: StringName, rooms: PackedStringArray, items: Array[CanvasI
 	_base = regions[0].self_modulate
 
 
+## Live art/label bounds in canvas px, shared by hit testing and HUD avoidance; unsupported items return empty.
+## Visibility and minimum hit areas belong to the caller, so this never changes authored geometry.
+static func canvas_rect(item: CanvasItem) -> Rect2:
+	if item is Control:
+		return item.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, item.size)
+	if item is Sprite2D:
+		return item.get_global_transform_with_canvas() * item.get_rect()
+	return Rect2()
+
+
 ## Distance score for a visible region under [param point] (canvas px), or INF when none is hit.
 ## Actual art/label bounds win over a neighbouring target's enlarged touch margin.
 func hit_score(point: Vector2, touch: bool) -> float:
@@ -41,13 +51,9 @@ func hit_score(point: Vector2, touch: bool) -> float:
 	for item: CanvasItem in regions:
 		if not is_instance_valid(item) or not item.is_visible_in_tree() or item.modulate.a < 0.05 or item.self_modulate.a < 0.05:
 			continue
-		var rect: Rect2
-		if item is Control:
-			rect = item.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, (item as Control).size)
-		elif item is Sprite2D:
-			rect = item.get_global_transform_with_canvas() * (item as Sprite2D).get_rect()
-		else:
+		if not (item is Control or item is Sprite2D):
 			continue
+		var rect: Rect2 = canvas_rect(item)
 		var size: Vector2 = rect.size.max(Vector2.ONE * (TOUCH_MIN if touch else MOUSE_MIN))
 		var expanded: Rect2 = Rect2(rect.get_center() - size * 0.5, size)
 		if expanded.has_point(point):

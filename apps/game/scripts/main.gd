@@ -6037,7 +6037,7 @@ func _covers_station_name(rect: Rect2) -> bool:
 	if bypass_handle == null:
 		return false
 	for label: Label in _corridor_station_labels():
-		if label.is_visible_in_tree() and label.modulate.a > 0.05 and rect.intersects(label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)):
+		if label.is_visible_in_tree() and label.modulate.a > 0.05 and rect.intersects(Tappable.canvas_rect(label)):
 			return true
 	return false
 
@@ -6048,7 +6048,7 @@ func _station_art_overlap(rect: Rect2) -> float:
 	var area: float = 0.0
 	for art: Sprite2D in [purge_terminal_art, breaker_art, relay_art] as Array[Sprite2D]:
 		if art.is_visible_in_tree():
-			area += rect.intersection(art.get_global_transform_with_canvas() * art.get_rect()).get_area()
+			area += rect.intersection(Tappable.canvas_rect(art)).get_area()
 	return area
 
 
