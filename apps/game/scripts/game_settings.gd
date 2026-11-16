@@ -460,6 +460,7 @@ func _notification(what: int) -> void:
 		_show_language()
 		_refresh_bindings()
 		_show_translated_note()
+		call_deferred("layout_for_device")
 
 
 ## A shared scrolling Settings page at (40, 128), 680×234 canvas px; returns its row column.
@@ -589,8 +590,17 @@ func layout_for_device() -> void:
 	tabs.size.y = maxf(TextSize.px(38), tabs.get_combined_minimum_size().y)
 	var top: float = $BackButton.position.y + $BackButton.size.y + 12 if mobile else tabs.position.y + tabs.size.y + 8
 	var bottom: float = minf(cancel_button.position.y, size.y - 12) if mobile else minf($BackButton.position.y, cancel_button.position.y)
-	# At 200%, 320 canvas px fits ACCESSIBILITY on one line while leaving room for page controls.
-	var rail_width: float = minf(320, 200 * TextSize.factor)
+	# Fit whole translated words, rather than splitting long captions midway through a word.
+	# The 45% cap leaves the majority of the card for page controls; both columns still scroll.
+	var rail_width: float = 200
+	var rail_margin: MarginContainer = tab_rail.get_node("PageMargin") as MarginContainer
+	var rail_chrome: float = rail_margin.get_theme_constant("margin_left") + rail_margin.get_theme_constant("margin_right") + tab_rail.get_v_scroll_bar().get_combined_minimum_size().x
+	for button: Button in tab_buttons:
+		var font: Font = button.get_theme_font("font")
+		var padding: float = button.get_theme_stylebox("normal").get_minimum_size().x
+		for word: String in button.tr(button.text).split(" "):
+			rail_width = maxf(rail_width, ceilf(font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, button.get_theme_font_size("font_size")).x + padding + rail_chrome) + 2)
+	rail_width = minf(rail_width, size.x * 0.45)
 	var body_left: float = 48 + rail_width if mobile else 40
 	var body: Rect2 = Rect2(body_left, top, size.x - body_left - 32, bottom - 12 - top)
 	tab_rail.position = Vector2(32, top)

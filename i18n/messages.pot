@@ -605,7 +605,7 @@ msgid "TEXT SIZE"
 msgstr ""
 
 #: scripts/game_settings.gd:315
-#: scripts/game_settings.gd:659
+#: scripts/game_settings.gd:669
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
@@ -641,80 +641,80 @@ msgstr ""
 msgid "LANGUAGE"
 msgstr ""
 
-#: scripts/game_settings.gd:655
+#: scripts/game_settings.gd:665
 msgid "Window size is OS-managed on mobile."
 msgstr ""
 
-#: scripts/game_settings.gd:655
-#: scripts/game_settings.gd:657
+#: scripts/game_settings.gd:665
+#: scripts/game_settings.gd:667
 msgid "V-sync may limit the FPS cap."
 msgstr ""
 
-#: scripts/game_settings.gd:659
+#: scripts/game_settings.gd:669
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
 msgstr ""
 
-#: scripts/game_settings.gd:659
+#: scripts/game_settings.gd:669
 msgid "Select a binding, then press a key, controller button or move a stick."
 msgstr ""
 
-#: scripts/game_settings.gd:659
+#: scripts/game_settings.gd:669
 msgid "Until you choose a language, the game uses your system's."
 msgstr ""
 
-#: scripts/game_settings.gd:715
+#: scripts/game_settings.gd:725
 msgid "Press a keyboard input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:715
+#: scripts/game_settings.gd:725
 msgid "Press a controller input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:737
+#: scripts/game_settings.gd:747
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:752
+#: scripts/game_settings.gd:762
 msgid "Already used by %s. Choose another input or cancel."
 msgstr ""
 
-#: scripts/game_settings.gd:758
+#: scripts/game_settings.gd:768
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:840
+#: scripts/game_settings.gd:850
 msgid "Left stick"
 msgstr ""
 
-#: scripts/game_settings.gd:840
+#: scripts/game_settings.gd:850
 msgid "Axis %d"
 msgstr ""
 
-#: scripts/game_settings.gd:869
+#: scripts/game_settings.gd:879
 msgid "AXIS %d %s"
 msgstr ""
 
-#: scripts/game_settings.gd:920
+#: scripts/game_settings.gd:930
 msgid "START"
 msgstr ""
 
-#: scripts/game_settings.gd:921
+#: scripts/game_settings.gd:931
 msgid "D-pad left"
 msgstr ""
 
-#: scripts/game_settings.gd:922
+#: scripts/game_settings.gd:932
 msgid "D-pad right"
 msgstr ""
 
-#: scripts/game_settings.gd:923
+#: scripts/game_settings.gd:933
 msgid "BUTTON %d"
 msgstr ""
 
-#: scripts/game_settings.gd:959
+#: scripts/game_settings.gd:969
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:987
+#: scripts/game_settings.gd:997
 #: scripts/main.gd:2204
 msgid "Settings could not be saved."
 msgstr ""

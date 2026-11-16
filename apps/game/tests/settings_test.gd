@@ -338,6 +338,20 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 			menu.antialiasing.grab_focus()
 			await frames(8)
 			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%s 200%% mobile=%s: focused control fits (%s; %s)" % [code, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
+			if mobile_layout:
+				for button: Button in menu.tab_buttons:
+					var font: Font = button.get_theme_font("font")
+					var padding: float = button.get_theme_stylebox("normal").get_minimum_size().x
+					for word: String in button.tr(button.text).split(" "):
+						var word_width: float = font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, button.get_theme_font_size("font_size")).x
+						_expect(word_width + padding <= button.size.x, "%s: mobile tab keeps %s whole at 200%% (word %.1f, padding %.1f, button %.1f, rail %.1f)" % [code, word, word_width, padding, button.size.x, menu.tab_rail.size.x])
+
+	I18n.apply_for_checks("en")
+	await frames(4)
+	var english_width: float = menu.tab_rail.size.x
+	I18n.apply_for_checks("de")
+	await frames(4)
+	_expect(menu.tab_rail.size.x > english_width, "a language change reflows the rail without changing text size again")
 	I18n.apply_for_checks(locale)
 	menu.text_size.select(0)
 	menu.text_size.item_selected.emit(0)
