@@ -3439,3 +3439,52 @@ msgstr "目標を表示"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "VIEW"
 msgstr "ビュー"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "TEXT SPEED"
+msgstr "文字表示速度"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Slow"
+msgstr "遅い"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Normal"
+msgstr "標準"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Fast"
+msgstr "速い"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Instant"
+msgstr "即時"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "AUTO-ADVANCE"
+msgstr "自動送り"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "DIALOGUE BACKING"
+msgstr "会話の背景"

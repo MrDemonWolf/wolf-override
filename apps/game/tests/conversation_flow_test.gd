@@ -7,6 +7,8 @@ func _run() -> void:
 	check_name = "Conversation flow"
 	_check_bark_placement()
 	var game: Main = await start_game("conversation-flow", keep_running) as Main
+	# These probes isolate page ownership; dialogue_reveal_test covers Normal and its first-press reveal.
+	game.settings_menu.text_speed.select(3)
 	game.call("_new_game")
 	game.call("_finish_intro")
 	game.call("_drop_box_queue")

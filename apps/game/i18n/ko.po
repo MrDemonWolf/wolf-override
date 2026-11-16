@@ -3439,3 +3439,52 @@ msgstr "목표 표시"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "VIEW"
 msgstr "보기"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "TEXT SPEED"
+msgstr "텍스트 속도"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Slow"
+msgstr "느리게"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Normal"
+msgstr "보통"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Fast"
+msgstr "빠르게"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Instant"
+msgstr "즉시"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "AUTO-ADVANCE"
+msgstr "자동 진행"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "DIALOGUE BACKING"
+msgstr "대화 배경"

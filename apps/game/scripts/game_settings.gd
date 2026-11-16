@@ -86,6 +86,10 @@ var vsync: CheckButton
 var antialiasing: OptionButton
 var reduced_motion: CheckButton
 var text_size: OptionButton
+## Reading preferences share the existing saved Settings file; index 3 reveals instantly.
+var text_speed: OptionButton
+var auto_advance: CheckButton
+var dialogue_backing: HSlider
 ## LANGUAGE on the GENERAL tab: one item per offered language, named in its own language (never
 ## translated), each item's metadata its I18n code; an unreviewed language's tag follows as a labelled
 ## separator, so it is a second, smaller row nobody can select.
@@ -145,6 +149,9 @@ func configure(path: String) -> void:
 	refresh_languages()
 	TextSize.factor = TextSize.nearest_step(number(config, "video", "text_size", 1.0))
 	text_size.select(TextSize.STEPS.find(TextSize.factor))
+	text_speed.select(clampi(int(number(config, "dialogue", "text_speed", 1)), 0, 3))
+	auto_advance.set_pressed_no_signal(boolean(config, "dialogue", "auto_advance", false))
+	dialogue_backing.set_value_no_signal(clampf(number(config, "dialogue", "backing", UiTokens.number("dialogue.backing")), 0.0, 1.0))
 	_apply_graphics()
 	for bus: String in BUSES:
 		if AudioServer.get_bus_index(bus) < 0:
@@ -317,6 +324,14 @@ func _build_menu() -> void:
 	text_size = _option_row(accessibility, I18n.KEY.tr("TEXT SIZE"), size_captions)
 	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
+	text_speed = _option_row(accessibility, I18n.KEY.tr("TEXT SPEED"), [I18n.KEY.tr("Slow"), I18n.KEY.tr("Normal"), I18n.KEY.tr("Fast"), I18n.KEY.tr("Instant")])
+	text_speed.item_selected.connect(func(_index: int) -> void: _save_extra())
+	auto_advance = CheckButton.new()
+	auto_advance.text = "AUTO-ADVANCE"
+	_control_row(accessibility, auto_advance)
+	auto_advance.toggled.connect(func(_enabled: bool) -> void: _save_extra())
+	dialogue_backing = _slider_row(accessibility, I18n.KEY.tr("DIALOGUE BACKING"), 0.0, 1.0, 0.05)
+	dialogue_backing.value_changed.connect(func(_value: float) -> void: _save_extra())
 	var audio: VBoxContainer = _page_box()
 	pages.append(audio.get_parent().get_parent())
 	for index: int in BUSES.size():
@@ -669,6 +684,9 @@ func select_tab(index: int) -> void:
 	else:
 		show_note([I18n.KEY.tr("Volume changes apply immediately."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Scales the dialogue, hints, cards and station names."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
 
+	# A newly shown page has no settled scroll range when native focus first arrives.
+	UIMotion.follow_focus(pages[index] as ScrollContainer)
+
 
 ## Shows [param message] (English) in the note under the tabs, in the current language: tr(message), with
 ## [param inserts] (English messages too: action names, sentences) each translated and filled in by
@@ -996,6 +1014,9 @@ func _save_extra() -> bool:
 	config.set_value("video", "msaa_2d", antialiasing.selected)
 	config.set_value("video", "reduced_motion", reduced_motion.button_pressed)
 	config.set_value("video", "text_size", TextSize.factor)
+	config.set_value("dialogue", "text_speed", text_speed.selected)
+	config.set_value("dialogue", "auto_advance", auto_advance.button_pressed)
+	config.set_value("dialogue", "backing", dialogue_backing.value)
 	if not _picked_language.is_empty():
 		config.set_value(I18n.CONFIG_SECTION, I18n.CONFIG_KEY, _picked_language)
 	for bus: String in BUSES:

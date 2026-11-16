@@ -132,7 +132,9 @@ func _run() -> void:
 	other.pressed = false
 	root.push_input(other, true)
 	await tap_touch(game.bottom_bar.get_global_rect().get_center())
-	_expect(game.dialogue_cleared, "tapping the dialogue still dismisses its final page without USE")
+	_expect(game.dialogue_reveal.done() and not game.dialogue_cleared, "first dialogue tap reveals its final page without USE")
+	await tap_touch(game.bottom_bar.get_global_rect().get_center())
+	_expect(game.dialogue_cleared, "the next dialogue tap dismisses its final page without USE")
 	game.status_line = ""
 	game.call("_refresh_ui")
 	_expect(game.touch_use.visible, "USE returns when exploration resumes")

@@ -3509,3 +3509,52 @@ msgstr "Mostrar objetivo"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "VIEW"
 msgstr "EXIBIR"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "TEXT SPEED"
+msgstr "VELOCIDADE DO TEXTO"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Slow"
+msgstr "Lenta"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Normal"
+msgstr "Normal"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Fast"
+msgstr "Rápida"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Instant"
+msgstr "Instantânea"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "AUTO-ADVANCE"
+msgstr "AVANÇO AUTOMÁTICO"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "DIALOGUE BACKING"
+msgstr "FUNDO DO DIÁLOGO"

@@ -76,6 +76,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
 
 -- Accessibility --
+- Reading controls add text speed, optional automatic story progress and dialogue backing opacity. Focused headless and rendered checks; full regression pending, not played by hand.
 - Large translated menu actions wrap inside their scrolling columns. Headless and rendered checks only; not played by hand.
 - Already-read dialogue stays dismissed when phone controls return, so USE reaches the next interaction. Headless checks only; not played by hand.
 - Timed walk-and-talk keeps phone controls clear of text, including at 200%; stopped conversations use dialogue taps. Headless and rendered checks; physical touch unverified.

@@ -285,7 +285,12 @@ func _run() -> void:
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
 	await process_frame
-	_expect(game.get("intro_active") and game.get("intro_step") == 1, "remapped B continues the intro instead of triggering native menu cancel")
+	_expect(game.get("intro_active") and game.get("intro_step") == 0 and (game.get("dialogue_reveal") as DialogueReveal).done(), "remapped B reveals the intro instead of triggering native menu cancel")
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
+	await process_frame
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
+	await settle(2)
+	_expect(game.get("intro_active") and game.get("intro_step") == 1, "the next remapped B advances the revealed intro")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	game.call("_finish_intro")

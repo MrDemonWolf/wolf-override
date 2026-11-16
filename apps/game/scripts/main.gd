@@ -945,6 +945,15 @@ var story_wrap_key: String = ""
 ## run to the column, with the row break DialogueBoxes.keep_words chooses (Korean), so a label's text
 ## is never what decides when it is measured again.
 var story_words: String = ""
+## Per-page visibility only; pagination and story progression remain owned by Main.
+var dialogue_reveal: DialogueReveal = DialogueReveal.new()
+## Seconds of reading-input guard after automatic progress; movement, Pause and station USE remain live.
+var dialogue_input_guard: float = 0.0
+## A repeated authored line after dismissal is a new reading occurrence.
+var dialogue_generation: int = 0
+## The dialogue alone owns this copy; changing its opacity must not change other HudCards.
+var dialogue_backing_style: StyleBoxFlat
+
 ## At first control the opening lines wait (TEACH-7): the name card and the move prompt come first,
 ## the rest of the tutorial after the first step, and the lines once the name card has gone.
 var opening_lines_held: bool = false
@@ -1460,7 +1469,9 @@ func _start_gameplay_camera() -> void:
 	intro_camera.reset_smoothing()
 
 
+## Advances game-time clocks in seconds and routes play input; paused menus process independently.
 func _process(delta: float) -> void:
+	dialogue_input_guard = maxf(dialogue_input_guard - delta, 0.0)
 	world_input.advance(delta)
 	if world_input.objective_pressed:
 		_show_top_card(_objective_card_message(), OBJECTIVE_CARD_SECONDS)
@@ -1574,6 +1585,8 @@ func _use_pressed() -> bool:
 ## Explicitly reading a bubble advances a page/queued line, then dismisses its last page; never uses a station.
 ## A choice question keeps its final page until answered; reading never selects an answer.
 func _read_pointer_dialogue() -> void:
+	if dialogue_input_guard > 0.0:
+		return
 	if waiting_for_choice:
 		_next_box()
 		return
@@ -1886,6 +1899,9 @@ func _advance_box_queue(delta: float) -> void:
 	# The line up may itself show as several boxes (DialogueBoxes.split): the next line waits until its
 	# last box is up, and then for that box's reading time (not the whole line's again).
 	_sync_dialogue_boxes()
+	_sync_dialogue_reveal()
+	if not dialogue_reveal.done():
+		return
 	if dialogue_index < dialogue_boxes.size() - 1:
 		box_queue_seconds = _box_seconds_of(dialogue_boxes.size() - 1)
 		return
@@ -2031,6 +2047,7 @@ func _ask_relay() -> void:
 ## starts from a fresh state and plays the opening.
 func _new_game() -> void:
 	world_input.cancel()
+	_reset_dialogue_reading()
 	get_tree().paused = false
 	pause_overlay.hide()
 	Tweens.kill(intro_tween)
@@ -2724,7 +2741,8 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		elif event.is_action_pressed(&"interact"):
 			_sync_dialogue_boxes()
-			if dialogue_index < dialogue_boxes.size() - 1:
+			_sync_dialogue_reveal()
+			if dialogue_input_guard > 0.0 or not dialogue_reveal.done() or dialogue_index < dialogue_boxes.size() - 1:
 				# Reserve Interact for reading; the process tick consumes it once, before GUI confirmation.
 				get_viewport().set_input_as_handled()
 
@@ -2798,6 +2816,7 @@ func _load_game() -> void:
 	if loaded == null:
 		status_line = I18n.KEY.tr("No valid checkpoint save found. Current game was not changed.")
 		return
+	_reset_dialogue_reading()
 	_drop_box_queue()
 	title_open = false
 	title_screen.hide()
@@ -5432,11 +5451,6 @@ func _set_dialogue(hint: String) -> void:
 	var tags: Array[String] = _shown_speaker_tags()
 	var name: String = DialogueBoxes.tag_of(box, tags)
 	speaker.text = name
-	var words: String = DialogueBoxes.words_of(box, tags)
-	# Set only when the words change: _story_wrap_width may have put a row break into the label's text.
-	if words != story_words:
-		story_words = words
-		story.text = words
 	var has_speaker: bool = not name.is_empty()
 	speaker.visible = has_speaker
 	var id: String = String(names.find_key(name)) if names.values().has(name) else name
@@ -5459,7 +5473,7 @@ func _set_dialogue(hint: String) -> void:
 		tutorial_prompt.hide()
 	context_hint_text.text = hint
 	world_input.show_station_names(not bottom_bar.visible and not intro_active and not chapter_close_active or _live_hazard())
-	_layout_hud()
+	_sync_dialogue_reveal()
 
 
 ## The speaker tags a box can open with, in English: WOLF, the Director (and his purge display) and the
@@ -5533,6 +5547,7 @@ func _sync_dialogue_boxes() -> void:
 	_layout_hud()
 	dialogue_boxes = DialogueBoxes.split(line, _shown_speaker_tags(), _dialogue_fits)
 	if dialogue_restart:
+		dialogue_generation += 1
 		dialogue_restart = false
 		dialogue_index = 0
 		dialogue_age = 0.0
@@ -5550,13 +5565,65 @@ func _dialogue_fits(words: String) -> bool:
 	return DialogueBoxes.fits(words, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), _dialogue_column_width())
 
 
+## New games and valid loads discard the prior page clock and its remaining input guard (seconds).
+## Loads call this only after checkpoint validation; failed loads keep the same reading owner.
+func _reset_dialogue_reading() -> void:
+	dialogue_key = ""
+	dialogue_restart = true
+	dialogue_reveal = DialogueReveal.new()
+	dialogue_input_guard = 0.0
+
+
+## Prepares the actual drawn page before reading input, including Korean row breaks. Native shaping
+## keeps the full page's geometry while only complete composite characters become visible.
+func _sync_dialogue_reveal() -> void:
+	var words: String = DialogueBoxes.words_of(_shown_box(), _shown_speaker_tags())
+	if words != story_words:
+		story_words = words
+		story.text = words
+	_layout_hud()
+	dialogue_reveal.sync("%d|%d" % [dialogue_generation, dialogue_index], story.text, settings_menu.text_speed.selected == 3 or impact.reduce_motion or _live_hazard() or not save_error.is_empty())
+	story.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
+	story.visible_characters = dialogue_reveal.characters()
+	if dialogue_backing_style == null:
+		dialogue_backing_style = bottom_bar.get_theme_stylebox(&"panel").duplicate() as StyleBoxFlat
+		bottom_bar.add_theme_stylebox_override(&"panel", dialogue_backing_style)
+	dialogue_backing_style.bg_color.a = settings_menu.dialogue_backing.value
+	(bottom_bar.get_node("Sheen") as Panel).modulate.a = settings_menu.dialogue_backing.value
+
+
 ## Ages the page by delta seconds. Timed feedback advances by reading time and clears when walking on.
-## Conversations, choice questions, opening/closing scenes and investigation pages wait for explicit input.
+## Stopped speech waits for input unless Auto-advance is enabled; choice answers always stay explicit.
 func _tick_dialogue(delta: float) -> void:
 	_sync_dialogue_boxes()
+	_sync_dialogue_reveal()
 	if opening_lines_held or dialogue_boxes.is_empty():
 		return
-	dialogue_age += delta
+	var speeds: Array[String] = ["slow", "normal", "fast"]
+	var speed: float = 0.0 if settings_menu.text_speed.selected == 3 else UiTokens.number("dialogue.text-speed.%s" % speeds[settings_menu.text_speed.selected])
+	dialogue_reveal.tick(delta, speed, UiTokens.seconds("dialogue.punctuation-pause"))
+	story.visible_characters = dialogue_reveal.characters()
+	if not dialogue_reveal.done():
+		return
+	dialogue_age = dialogue_reveal.reading_age
+	var question_page: bool = waiting_for_choice and dialogue_index < dialogue_boxes.size() - 1
+	var stopped_reading: bool = question_page or not waiting_for_choice and (intro_active or chapter_close_active or _conversation_active())
+	if settings_menu.auto_advance.button_pressed and dialogue_input_guard <= 0.0 and not dialogue_cleared and stopped_reading:
+		var hold_seconds: float = maxf(UiTokens.seconds("dialogue.auto-advance.min-hold"), float(story.text.length()) / DialogueBoxes.reading_cps())
+		if dialogue_reveal.reading_age >= hold_seconds:
+			# Use the same authored routes as explicit reading; never select an answer or use a station.
+			if question_page:
+				_next_box()
+			elif intro_active:
+				if not _next_box():
+					_advance_intro()
+			elif chapter_close_active:
+				if not _next_box():
+					_finish_chapter_close()
+			else:
+				_read_pointer_dialogue()
+			dialogue_input_guard = UiTokens.seconds("dialogue.auto-advance.input-guard")
+			return
 	if intro_active or chapter_close_active or waiting_for_choice or _conversation_active() or state.chapter_id == "investigation":
 		return
 	if dialogue_index < dialogue_boxes.size() - 1:
@@ -5568,8 +5635,16 @@ func _tick_dialogue(delta: float) -> void:
 
 ## Advances an unread page and resets its age; a cleared line stays read after layout reflow.
 func _next_box() -> bool:
+	if dialogue_input_guard > 0.0:
+		return true
 	_sync_dialogue_boxes()
-	if opening_lines_held or dialogue_cleared or dialogue_index >= dialogue_boxes.size() - 1:
+	if opening_lines_held or dialogue_cleared:
+		return false
+	_sync_dialogue_reveal()
+	if dialogue_reveal.complete():
+		story.visible_characters = dialogue_reveal.characters()
+		return true
+	if dialogue_index >= dialogue_boxes.size() - 1:
 		return false
 	dialogue_index += 1
 	dialogue_age = 0.0
@@ -5614,13 +5689,17 @@ func _opening_lines_playing() -> bool:
 	return (not opening_lines_held or tutorial_step >= 1) and status_line in opening_lines and state.chapter_id == "lockdown" and (not box_queue.is_empty() or not _dialogue_read())
 
 
-## Records' closing lines are up and have a box still to show, or wait behind an aside that cut into
-## them (_aside).
+## Records' closing text remains unread while pages or their reveal remain, including an aside's queue.
+## Prepares the current drawn page so the final reveal press cannot also start walking through the exit.
 func _records_close_unread() -> bool:
 	var close: String = _records_close_line()
 	if _queued_next(close):
 		return true
-	return status_line == close and not dialogue_cleared and dialogue_index < dialogue_boxes.size() - 1
+	if status_line != close or dialogue_cleared:
+		return false
+	_sync_dialogue_boxes()
+	_sync_dialogue_reveal()
+	return not dialogue_reveal.done() or dialogue_index < dialogue_boxes.size() - 1
 
 
 ## The first step takes the name card off at once (it fades as usual).

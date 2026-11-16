@@ -592,6 +592,7 @@ func _check_first_control() -> void:
 func _check_corridor() -> void:
 	game.debug_tools.actions.set_relay(&"press")
 	game.debug_tools.actions.jump(&"relay_question")
+	_expect(game.waiting_for_choice, "relay-question jump reaches an actual question before measuring its controls")
 	await process_frame
 	_expect(game.waiting_for_choice and speaker.text == "WOLF" and story.text.contains("COOLANT FAULT"), "the relay question stands in WOLF's box")
 	_measure_shown("relay question")
@@ -764,7 +765,7 @@ func _check_touch(code: String = I18n.FALLBACK) -> void:
 	var choice_2: Button = game.get_node("CanvasLayer/TouchControls/Choice2") as Button
 	if english:
 		_expect(choice_1.visible and not choice_1.text.begins_with("1") and not choice_2.text.begins_with("2") and choice_1.text == M0State.CHOICE_TEXT[M0State.DISCLOSE], "touch answers carry no number (%s / %s)" % [choice_1.text, choice_2.text])
-	_expect(choice_1.position.y > 300.0 and choice_2.position.y > 300.0 and choice_1.get_global_rect().end.y <= bar.get_global_rect().position.y and choice_1.position.x < 100.0 and choice_2.get_global_rect().end.x > 860.0, "%s: touch answers sit at the bottom corners, just above the question (%s, %s)" % [code, choice_1.get_global_rect(), choice_2.get_global_rect()])
+	_expect(choice_1.position.y > 300.0 and choice_2.position.y > 300.0 and choice_1.get_global_rect().end.y <= bar.get_global_rect().position.y and choice_1.position.x < 100.0 and choice_2.get_global_rect().end.x > 860.0, "%s: touch answers sit at the bottom corners, just above the question (%s, %s; kind %s, touch %s)" % [code, choice_1.get_global_rect(), choice_2.get_global_rect(), game.input_mode.kind, game.touch_enabled])
 	_expect(not choice_1.get_global_rect().intersects(choice_2.get_global_rect()), "%s: the two answers do not overlap" % code)
 	game.call("_answer_choice", 1)
 	# At the valve the hint names CRANK, the button on screen, and stays clear of USE.

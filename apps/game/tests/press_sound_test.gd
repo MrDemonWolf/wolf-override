@@ -180,14 +180,15 @@ func _records(mirror_route: String) -> void:
 	await _read_on(830.0)
 
 
-## Presses USE through the boxes of the line on screen (no state changes) up to its last one, with the
-## engineer first placed at [param at_x] when it is 0 or more (see _press). At most 6 presses: more
-## than any line here has boxes, so the cap only keeps a stuck line from hanging the suite.
+## Finishes stopped speech, or reveals a closing shot's last page before its state-changing USE.
+## The old fixture ceiling was six pages: allow reveal + advance per page and one final dismissal.
 func _read_on(at_x: float = -1.0) -> void:
-	for _box: int in 6:
-		if int(game.get("dialogue_index")) >= (game.get("dialogue_boxes") as Array).size() - 1:
+	for _box: int in 6 * 2 + 1:
+		var last_read: bool = int(game.get("dialogue_index")) >= (game.get("dialogue_boxes") as Array).size() - 1 and (game.get("dialogue_reveal") as DialogueReveal).done()
+		if game.get("dialogue_cleared") or last_read and not game.call("_conversation_active"):
 			return
 		await _press(&"interact", "reading on", at_x, false)
+	_expect(false, "the reading helper finishes the authored speech before its fixture ceiling")
 
 
 ## WOLF asks at the rubble line how to bring the sentry down, and [param response] answers.
