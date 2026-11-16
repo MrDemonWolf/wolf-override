@@ -12,16 +12,19 @@ description: Find the right page for playing the current WOLF OVERRIDE source bu
 
 ## Choose a topic
 
-| I want to… | Page |
-| --- | --- |
-| Start playing | [First steps](/docs/controls/first-steps/) |
-| See every key, button and touch control | [Controls](/docs/controls/input/) |
-| Change display, sound or controls | [Settings](/docs/controls/settings/) |
-| Find options for motion, text size or holding buttons | [Accessibility](/docs/accessibility/) |
-| Understand saving, Continue and retrying | [Saving and retrying](/docs/controls/saves/) |
-| Fix a problem | [Troubleshooting](/docs/controls/troubleshooting/) |
-| Get a quick answer or look up a word | [FAQ and glossary](/docs/faq/) |
-| Get past a puzzle (spoilers) | [Walkthrough](/docs/walkthrough/) |
+<LinkCards
+  label="Choose a topic"
+  links={[
+    { href: '/docs/controls/first-steps/', title: 'First steps', description: 'Start playing' },
+    { href: '/docs/controls/input/', title: 'Controls', description: 'See every key, button and touch control' },
+    { href: '/docs/controls/settings/', title: 'Settings', description: 'Change display, sound or controls' },
+    { href: '/docs/accessibility/', title: 'Accessibility', description: 'Find options for motion, text size or holding buttons' },
+    { href: '/docs/controls/saves/', title: 'Saving and retrying', description: 'Understand saving, Continue and retrying' },
+    { href: '/docs/controls/troubleshooting/', title: 'Troubleshooting', description: 'Fix a problem' },
+    { href: '/docs/faq/', title: 'FAQ and glossary', description: 'Get a quick answer or look up a word' },
+    { href: '/docs/walkthrough/', title: 'Walkthrough', description: 'Get past a puzzle (spoilers)' },
+  ]}
+/>
 
 <Callout title="No packaged download yet">
   See [Get the game](/docs/get-game/) for the source build, which runs with Godot 4.7.2.
