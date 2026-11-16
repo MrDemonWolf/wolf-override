@@ -2188,9 +2188,19 @@ func _setup_touch_controls() -> void:
 	settings_menu.apply_theme()
 
 
+## Binds a visible touch button to an action; hiding a held touch press releases the action.
 func _bind_touch_button(button: Button, action: StringName) -> void:
-	button.button_down.connect(func() -> void: Input.action_press(action))
-	button.button_up.connect(func() -> void: Input.action_release(action))
+	var held: Dictionary = {"down": false}
+	button.button_down.connect(func() -> void:
+		held["down"] = true
+		Input.action_press(action))
+	button.button_up.connect(func() -> void:
+		held["down"] = false
+		Input.action_release(action))
+	button.visibility_changed.connect(func() -> void:
+		if not button.is_visible_in_tree() and held["down"]:
+			held["down"] = false
+			Input.action_release(action))
 
 
 func _setup_settings() -> void:
@@ -5285,6 +5295,8 @@ func _set_dialogue(hint: String) -> void:
 	# Reading has one focus; danger keeps the engineer’s escape control available.
 	if bottom_bar.visible and not _live_hazard():
 		touch_move_pad.hide()
+		if not intro_active and not chapter_close_active and not fail_active:
+			touch_use.hide()
 	dialogue_continue.visible = bottom_bar.visible and not waiting_for_choice and not fail_active and not hatch_exit_walking
 	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
 	context_hint.visible = not hint.is_empty() and (not bottom_bar.visible and not intro_active and not chapter_close_active or _urgent_context_hint())

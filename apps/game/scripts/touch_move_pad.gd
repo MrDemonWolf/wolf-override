@@ -95,6 +95,6 @@ func _draw() -> void:
 	if radius <= 0.0:
 		return
 	var centre: Vector2 = origin if finger != NO_FINGER else Vector2(zone.get_center().x, zone.end.y - radius * 2.0)
-	draw_circle(centre, radius, Color(0.03, 0.07, 0.12, 0.7))
-	draw_arc(centre, radius, 0.0, TAU, 48, get_theme_color(&"font_color", &"Button"), 2.0, true)
-	draw_circle(centre + offset, radius * THUMB_RATIO, get_theme_color(&"font_color", &"Button"))
+	draw_circle(centre, radius, UiTokens.color("color.role.touch.bg"))
+	draw_arc(centre, radius, 0.0, TAU, 48, UiTokens.color("color.role.touch.border"), 2.0, true)
+	draw_circle(centre + offset, radius * THUMB_RATIO, UiTokens.color("color.role.touch.border"))

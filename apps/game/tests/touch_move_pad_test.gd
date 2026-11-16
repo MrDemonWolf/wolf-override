@@ -109,11 +109,32 @@ func _run() -> void:
 	other.pressed = false
 	root.push_input(other, true)
 	_expect(not Input.is_action_pressed(&"interact") and game.human.touch_axis > 0.0, "releasing USE leaves the movement thumb held")
+	await settle(2)
+	game.stakes_spoken = true
+	game.call("_drop_box_queue")
+	game.status_line = ""
+	game.call("_refresh_ui")
+	other.position = game.touch_use.get_global_rect().get_center()
+	other.pressed = true
+	root.push_input(other, true)
+	_expect(Input.is_action_pressed(&"interact"), "USE is held before dialogue takes over")
 	game.status_line = "WOLF: Test reading focus."
 	game.call("_refresh_ui")
 	_expect(not game.touch_move_pad.visible and game.human.touch_axis == 0.0, "ordinary dialogue hides and releases the pad")
+	_expect(not game.touch_use.visible and game.dialogue_continue.visible, "ordinary dialogue keeps one continue cue instead of a second USE button")
+	_expect(not Input.is_action_pressed(&"interact"), "hiding a held USE button releases its action")
+	other.pressed = false
+	root.push_input(other, true)
+	touch.position = game.bottom_bar.get_global_rect().get_center()
+	touch.pressed = true
+	root.push_input(touch, true)
+	touch.pressed = false
+	root.push_input(touch, true)
+	await settle(2)
+	_expect(game.dialogue_cleared, "tapping the dialogue still dismisses its final page without USE")
 	game.status_line = ""
 	game.call("_refresh_ui")
+	_expect(game.touch_use.visible, "USE returns when exploration resumes")
 	game.call("_pause_game")
 	_expect(game.human.touch_axis == 0.0 and game.touch_move_pad.finger == PAD.NO_FINGER, "pausing cancels the live thumb immediately")
 	game.call("_resume_game")
