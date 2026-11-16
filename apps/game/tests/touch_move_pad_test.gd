@@ -62,6 +62,35 @@ func _run() -> void:
 	pad.observe(drag)
 	pad.hide()
 	_expect(pad.axis == 0.0 and pad.finger == PAD.NO_FINGER, "hiding the overlay cannot retain a moving thumb")
+	var game: Main = await start_game("touch-pad-movement", keep_running) as Main
+	game.call("_new_game")
+	game.call("_finish_intro")
+	pad.show()
+	pad.axis_changed.connect(func(value: float) -> void: game.human.touch_axis = value)
+	touch.position = Vector2(100, 400)
+	touch.pressed = true
+	pad.begin(touch)
+	drag.position = touch.position + Vector2(90, 0)
+	pad.observe(drag)
+	var start_x: float = game.human.position.x
+	game.human.pointer_target_x = start_x + 100.0
+	await frames(6)
+	_expect(game.human.position.x > start_x and is_inf(game.human.pointer_target_x), "thumb movement uses the actor's live movement path and replaces pointer navigation")
+	Input.action_press(&"move_left")
+	_expect(game.human.player_axis() == -1.0, "physical movement takes priority over a held thumb")
+	Input.action_press(&"move_right")
+	_expect(game.human.player_axis() == 0.0 and game.human.has_move_input(), "opposing physical inputs stay neutral without losing held-input bookkeeping")
+	Input.action_release(&"move_right")
+	Input.action_release(&"move_left")
+	game.human.touch_axis = INF
+	_expect(game.human.touch_axis == 0.0, "non-finite thumb input cannot reach movement")
+	game.human.touch_axis = -2.0
+	_expect(game.human.touch_axis == -1.0, "thumb input is bounded to the movement axis")
+	game.human.controlled = false
+	_expect(game.human.touch_axis == 0.0, "an authored control lock clears the local thumb axis")
+	pad.cancel()
 	pad.queue_free()
+	await settle(2)
+	await end_game(game)
 	await settle(2)
 	finish("Touch move pad checks passed")

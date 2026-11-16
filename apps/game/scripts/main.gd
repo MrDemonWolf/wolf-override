@@ -1516,7 +1516,7 @@ func _process(delta: float) -> void:
 	elif state.chapter_id == "lockdown":
 		_tick_corridor(delta, held_ticks)
 	_show_hold()
-	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right") or not is_inf(human.pointer_target_x)):
+	if tutorial_step == 0 and (human.has_move_input() or not is_inf(human.pointer_target_x)):
 		tutorial_step = 1
 		# The first step takes the name card away; the opening lines follow once it has faded.
 		_dismiss_name_card()
@@ -1565,7 +1565,7 @@ func _crank_held(station: StringName) -> bool:
 	if not hold_toggle:
 		crank_latched = false
 		return human.controlled and (Input.is_action_pressed(&"interact") or world_input.holding(station))
-	if station.is_empty() or waiting_for_choice or not is_inf(human.pointer_target_x) or Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right"):
+	if station.is_empty() or waiting_for_choice or not is_inf(human.pointer_target_x) or human.has_move_input():
 		crank_latched = false
 	elif _use_pressed():
 		crank_latched = not crank_latched
@@ -3701,7 +3701,7 @@ func _door_use(x: float) -> bool:
 func _track_door_face() -> void:
 	if _at_door_face(human.position.x):
 		door_faced = true
-	elif not human.controlled or human.body_sprite.flip_h or Input.get_axis(&"move_left", &"move_right") != 0.0:
+	elif not human.controlled or human.body_sprite.flip_h or human.player_axis() != 0.0:
 		door_faced = false
 
 
@@ -3727,7 +3727,7 @@ func _blink_box() -> void:
 ## Walking into the sealed door bumps it once per push: held against its face with right held, it
 ## thuds; stepping off (or letting go) lets the next push bump again.
 func _check_door_bump() -> void:
-	var pushing: bool = human.controlled and not state.door_blown and Input.get_axis(&"move_left", &"move_right") > 0.0 \
+	var pushing: bool = human.controlled and not state.door_blown and human.player_axis() > 0.0 \
 		and human.position.x + M0State.HUMAN_HALF_WIDTH >= M0State.JUNCTION_DOOR_LEFT_X - DOOR_BUMP_SLOP
 	if pushing and not door_bump_latched:
 		_door_bump()
@@ -5421,7 +5421,7 @@ func _dialogue_read() -> bool:
 
 ## The engineer is walking on their own, with control, and nothing waits on an answer.
 func _moving_on() -> bool:
-	return human.controlled and not waiting_for_choice and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right") or not is_inf(human.pointer_target_x))
+	return human.controlled and not waiting_for_choice and (human.has_move_input() or not is_inf(human.pointer_target_x))
 
 
 ## The box on screen, or "" while there is none (held, cleared or nothing said).
