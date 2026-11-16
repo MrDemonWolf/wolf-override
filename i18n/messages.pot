@@ -25,6 +25,7 @@
 # res://scripts/m0_actor.gd
 # res://scripts/m0_state.gd
 # res://scripts/main.gd
+# res://scripts/menu_navigation.gd
 # res://scripts/opening.gd
 # res://scripts/pause_overlay.gd
 # res://scripts/pressure_line.gd
@@ -670,51 +671,51 @@ msgstr ""
 msgid "Press a controller input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:747
+#: scripts/game_settings.gd:764
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:762
+#: scripts/game_settings.gd:779
 msgid "Already used by %s. Choose another input or cancel."
 msgstr ""
 
-#: scripts/game_settings.gd:768
+#: scripts/game_settings.gd:785
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:850
+#: scripts/game_settings.gd:867
 msgid "Left stick"
 msgstr ""
 
-#: scripts/game_settings.gd:850
+#: scripts/game_settings.gd:867
 msgid "Axis %d"
 msgstr ""
 
-#: scripts/game_settings.gd:879
+#: scripts/game_settings.gd:896
 msgid "AXIS %d %s"
 msgstr ""
 
-#: scripts/game_settings.gd:930
+#: scripts/game_settings.gd:947
 msgid "START"
 msgstr ""
 
-#: scripts/game_settings.gd:931
+#: scripts/game_settings.gd:948
 msgid "D-pad left"
 msgstr ""
 
-#: scripts/game_settings.gd:932
+#: scripts/game_settings.gd:949
 msgid "D-pad right"
 msgstr ""
 
-#: scripts/game_settings.gd:933
+#: scripts/game_settings.gd:950
 msgid "BUTTON %d"
 msgstr ""
 
-#: scripts/game_settings.gd:969
+#: scripts/game_settings.gd:986
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:997
+#: scripts/game_settings.gd:1014
 #: scripts/main.gd:2204
 msgid "Settings could not be saved."
 msgstr ""

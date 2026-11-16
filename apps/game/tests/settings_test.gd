@@ -48,6 +48,7 @@ func _run() -> void:
 	await _check_scrolling_pages(menu)
 	await _check_mobile_chrome(menu)
 	await _check_settings_scaling(game, menu)
+	await _check_controller_tabs(game, menu)
 	await _check_language_row(game, path)
 	await _check_menu_translation(game)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
@@ -360,6 +361,37 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 	menu.select_tab(0)
 	menu.tabs.grab_focus()
 	await frames(4)
+
+
+## Shoulder presses change pages, wrap and skip hidden tabs through native input dispatch on both layouts.
+func _check_controller_tabs(game: Node2D, menu: GameSettings) -> void:
+	for mobile_layout: bool in [false, true]:
+		menu.mobile = mobile_layout
+		game.set("touch_enabled", mobile_layout)
+		game.call("_show_settings")
+		for scenario: Array in [[0, JOY_BUTTON_RIGHT_SHOULDER, 1, false], [0, JOY_BUTTON_LEFT_SHOULDER, 4, false], [4, JOY_BUTTON_RIGHT_SHOULDER, 0, false], [3, JOY_BUTTON_RIGHT_SHOULDER, 0, true], [0, JOY_BUTTON_LEFT_SHOULDER, 3, true]]:
+			menu.tabs.set_tab_hidden(GameSettings.GENERAL_TAB, scenario[3])
+			menu.select_tab(scenario[0])
+			for pressed: bool in [true, false]:
+				Input.parse_input_event(controller_button(scenario[1], pressed))
+				await frames(2)
+			_expect(menu.tabs.current_tab == scenario[2] and root.gui_get_focus_owner() == menu.tab_focus_target(), "mobile=%s: shoulder %s changes tab %s to %s and focuses the visible tab" % [mobile_layout, scenario[1], scenario[0], scenario[2]])
+			_expect(game.get("controller_active"), "Settings tab navigation records controller input")
+	var before_capture: int = menu.tabs.current_tab
+	menu.begin_capture(&"interact", "controller")
+	for pressed: bool in [true, false]:
+		Input.parse_input_event(controller_button(JOY_BUTTON_RIGHT_SHOULDER, pressed))
+		await frames(2)
+	_expect(menu.tabs.current_tab == before_capture and InputMap.action_has_event(&"interact", controller_button(JOY_BUTTON_RIGHT_SHOULDER, true)), "rebinding captures a shoulder button instead of changing tabs")
+	menu.reset_controls()
+	menu.tabs.set_tab_hidden(GameSettings.GENERAL_TAB, false)
+	menu.mobile = false
+	game.set("touch_enabled", false)
+	for pressed: bool in [true, false]:
+		Input.parse_input_event(key_event(KEY_SHIFT, pressed))
+		await frames(2)
+	menu.select_tab(0)
+	game.call("_show_settings")
 
 
 ## LANGUAGE on the GENERAL tab (PR L6, PLAN.md and DESIGN.md "Settings: the LANGUAGE option"):

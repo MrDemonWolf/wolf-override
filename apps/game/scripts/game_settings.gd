@@ -735,6 +735,23 @@ func cancel_capture() -> void:
 		cancel_button.hide()
 
 
+## Changes Settings tabs on LB/RB after Main has noted the active input device; capture keeps priority.
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_visible_in_tree() or not capture_action.is_empty():
+		return
+	var step: int = MenuNavigation.tab_step(event)
+	if step == 0:
+		return
+	var index: int = tabs.current_tab
+	for attempt: int in pages.size():
+		index = wrapi(index + step, 0, pages.size())
+		if not tabs.is_tab_hidden(index):
+			select_tab(index)
+			tab_focus_target().grab_focus()
+			get_viewport().set_input_as_handled()
+			return
+
+
 ## During a rebind (begin_capture), takes the next press of the captured kind ([param event]: a key, a
 ## controller button, or a stick pushed at least 0.65 of the way) and binds it to the action, unless
 ## another action already uses it, which the note names instead. Escape cancels. Bound presses are

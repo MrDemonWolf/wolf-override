@@ -490,12 +490,11 @@ func _input(event: InputEvent) -> void:
 		close()
 		get_viewport().set_input_as_handled()
 		return
-	if event is InputEventJoypadButton and event.pressed:
-		var index: int = (event as InputEventJoypadButton).button_index
-		if index == JOY_BUTTON_LEFT_SHOULDER or index == JOY_BUTTON_RIGHT_SHOULDER:
-			step_page(1 if index == JOY_BUTTON_RIGHT_SHOULDER else -1)
-			get_viewport().set_input_as_handled()
-			return
+	var step: int = MenuNavigation.tab_step(event)
+	if step != 0:
+		step_page(step)
+		get_viewport().set_input_as_handled()
+		return
 	# After touch nothing has focus: the first key or controller press gives it to the page's tab, and
 	# does nothing else.
 	var navigation: bool = event is InputEventKey and event.pressed or event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.45
