@@ -249,11 +249,9 @@ func _run() -> void:
 	game.call("_finish_intro")
 	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the lock boom settles")
 
-	game.queue_free()
-	# The mixer releases a stopped clip a few steps later; give it that time before quitting.
-	await create_timer(0.1).timeout
+	# The shared teardown stops voices and waits in real time for mixer/loader threads before exit.
+	await end_game(game)
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	finish("Impact checks passed")
 
 

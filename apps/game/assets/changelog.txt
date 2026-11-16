@@ -212,6 +212,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Play overview no longer says there is no packaged download; it points to the test build and the source game, as Get the game does.
 
 -- Development --
+- The impact suite uses the shared audio-aware teardown instead of a separate short timer. Focused headless rerun passed without a reported leak.
 - Choice-card checks expect the new controller glyphs and retain their layout assertions. The affected suite passed headlessly.
 - The guide site uses Next.js 16.4.5, which includes the November security fixes. Types, unit tests, static export and phone/desktop browser checks passed; not deployed.
 - Station hit tests and HUD avoidance share live art/label bounds, preparing the compact prompt port. Headless checks passed; visible prompt port incomplete.
