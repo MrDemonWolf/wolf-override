@@ -5447,7 +5447,7 @@ func _set_dialogue(hint: String) -> void:
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
 	bottom_bar.visible = not box.is_empty()
-	dialogue_continue.visible = bottom_bar.visible and (not waiting_for_choice or dialogue_index < dialogue_boxes.size() - 1) and not fail_active and not hatch_exit_walking
+	dialogue_continue.visible = bottom_bar.visible and (not waiting_for_choice or dialogue_index < dialogue_boxes.size() - 1) and not fail_active and not hatch_exit_walking and _bark_actor() == null
 	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
 	context_hint.visible = not hint.is_empty() and (not bottom_bar.visible and not intro_active and not chapter_close_active or _urgent_context_hint())
 	if bottom_bar.visible or intro_active or chapter_close_active:
@@ -5681,6 +5681,21 @@ func _touch_hint_span() -> Vector2:
 	return Vector2(touch_move_pad.gesture_rect().end.x + 12.0, touch_use.position.x - 12.0)
 
 
+## Timed exploration dialogue can follow its speaker; stopped scenes and hazard recovery keep their reading layout.
+func _bark_allowed() -> bool:
+	return not (intro_active or chapter_close_active or waiting_for_choice or dialogue_is_conversation or fail_active or state.chapter_id == "investigation")
+
+
+## The current page's visible speaker, or null for narration and remote voices. _shown_box reads the
+## existing pages without resplitting, so mixed-speaker messages follow the speaker actually on screen.
+func _bark_actor() -> M0Actor:
+	if not _bark_allowed():
+		return null
+	var tag: String = DialogueBoxes.tag_of(_shown_box(), _shown_speaker_tags())
+	var actor: M0Actor = wolf if tag == "WOLF" else (human if tag == _first_name().to_upper() else null)
+	return actor if actor != null and actor.body_sprite.is_visible_in_tree() else null
+
+
 ## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
 func _dialogue_column_width() -> float:
 	var wanted: float = DIALOGUE_COLUMN_WIDTH * TextSize.factor
@@ -5730,7 +5745,7 @@ func _story_wrap_width(column: float) -> float:
 
 
 ## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
-## tab above the words; narration without a tab), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
+## tab above the words; timed speech follows its visible speaker), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
 func _layout_hud() -> void:
 	var safe: Rect2 = screen_shape.safe_rect
 	# Authored offsets stay inside the safe rect; no scene or input-mode copy of the inset arithmetic.
@@ -5761,10 +5776,17 @@ func _layout_hud() -> void:
 	var between: bool = _box_between_touch_buttons()
 	var centre_x: float = span_centre if between else safe.get_center().x
 	# Speaker tabs sit outside the text panel, so narration and speech share one words column.
-	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column
-	ScreenShape.set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
+	var bark_actor: M0Actor = _bark_actor()
+	if bark_actor != null:
+		var compact: float = minf(column, DIALOGUE_COLUMN_WIDTH * TextSize.factor * UiTokens.number("dialogue.bark.width-ratio"))
+		# Keep authored clauses and page boundaries; only compact a page that still fits in two rows.
+		if DialogueBoxes.fits(story_words, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), compact):
+			column = compact
+	var words_width: float = _story_wrap_width(column)
+	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + (maxf(words_width, minf(names, column)) if bark_actor != null else column)
+	ScreenShape.set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(words_width, story.size.y))
 	var line_height: float = story.get_line_height()
-	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
+	var text_height: float = line_height * maxi(story.get_line_count(), 1 if bark_actor != null else DialogueBoxes.MAX_ROWS)
 	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + text_height
 	ScreenShape.set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), dialogue_bottom - bar_height), Vector2(bar_width, bar_height))
 	ScreenShape.set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), text_height))
@@ -5826,6 +5848,20 @@ func _layout_hud() -> void:
 	ScreenShape.set_rect(tutorial_prompt.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(4.0, tutorial_size.y - 2.0))
 	if waiting_for_choice:
 		_layout_choices(touch_layout, top_card.position.y + card_height + 10.0)
+	if bark_actor != null and bottom_bar.visible:
+		var body: Sprite2D = bark_actor.body_sprite
+		var other_body: Sprite2D = human.body_sprite if bark_actor == wolf else wolf.body_sprite
+		var obstacles: Array[Rect2] = [other_body.get_global_transform_with_canvas() * other_body.get_rect()]
+		for control: Control in [pause_button, top_card, context_hint]:
+			if control.is_visible_in_tree():
+				obstacles.append(control.get_global_rect())
+		if touch_move_pad.visible:
+			obstacles.append(touch_move_pad.gesture_rect())
+		if touch_use.visible:
+			obstacles.append(touch_use.get_global_rect())
+		var placed: Rect2 = DialogueBark.place(bottom_bar.size, tab_height, body.get_global_transform_with_canvas() * body.get_rect(), safe, obstacles, DIALOGUE_PADDING.y)
+		if placed.has_area():
+			ScreenShape.set_rect(bottom_bar, placed.position, placed.size)
 
 
 ## True while the DEBUG button shows at the top right (DebugTools shows it only when the debug tools

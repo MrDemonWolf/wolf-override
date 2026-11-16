@@ -585,7 +585,7 @@ func _check_first_control() -> void:
 	await _play(14.0, "opening lines")
 	_expect(speaker.text in ["WOLF", (game.call("_first_name") as String).to_upper()] or game.status_line == Main.STAKES_LINE, "WOLF and the engineer each get their own boxes")
 	if not speaker.text.is_empty():
-		_expect(is_equal_approx(bar.size.x, narration_width) and speaker.position.y + speaker.size.y <= 0.5, "a speaker tab sits above the shared words panel")
+		_expect(bar.size.x <= narration_width + 0.5 and speaker.position.y + speaker.size.y <= 0.5, "a speaker tab sits above its compact or full-width words panel")
 
 
 ## The stakes and the relay question at the breaker; a box per speaker as WOLF answers.

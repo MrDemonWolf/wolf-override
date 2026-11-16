@@ -5,12 +5,48 @@ extends "res://tests/support/game_suite.gd"
 ## Exercises real pages, input and fallback state with an isolated save; teardown removes the game and files.
 func _run() -> void:
 	check_name = "Conversation flow"
+	_check_bark_placement()
 	var game: Main = await start_game("conversation-flow", keep_running) as Main
 	game.call("_new_game")
 	game.call("_finish_intro")
 	game.call("_drop_box_queue")
 	game.stakes_spoken = true
 	game.tutorial_step = 2
+	game.opening_lines_held = false
+	game.name_card_remaining = 0.0
+	game.debug_place(Main.RELAY_STEP_BACK_X, Main.RELAY_CONTACT_X)
+	game.call("_tell", "WOLF: Open. I'm with you.")
+	game.call("_refresh_ui")
+	var compact_width: float = Main.DIALOGUE_COLUMN_WIDTH * UiTokens.number("dialogue.bark.width-ratio")
+	_expect(game.story.get_line_count() <= DialogueBoxes.MAX_ROWS and game.bottom_bar.size.x <= compact_width + Main.DIALOGUE_PADDING.x * 2.0, "a short bark uses the compact column without adding rows")
+	game.call("_tell", "WOLF: I've got the contact. Give me a moment.")
+	await settle(2)
+	game.intro_camera.reset_smoothing()
+	await settle(2)
+	game.call("_refresh_ui")
+	_expect(game.call("_bark_actor") == game.wolf and not game.dialogue_continue.visible and game.human.controlled, "timed WOLF speech anchors to him without a continue cue or movement lock")
+	var body: Sprite2D = game.wolf.body_sprite
+	var painted: Rect2 = body.get_global_transform_with_canvas() * body.get_rect()
+	_expect(game.bottom_bar.get_global_rect().end.y < painted.position.y, "the timed panel stays above WOLF's body")
+	var anchored: Vector2 = game.bottom_bar.position
+	game.wolf.position.x += 20.0
+	game.call("_layout_hud")
+	_expect(game.bottom_bar.position.x > anchored.x, "the bark follows its speaker rather than staying in the HUD")
+	game.wolf.body_sprite.hide()
+	game.call("_refresh_ui")
+	_expect(game.call("_bark_actor") == null, "a hidden speaker cannot acquire an on-screen anchor")
+	game.wolf.body_sprite.show()
+	game.call("_tell", "WOLF: Wait. DIRECTOR: Stop.")
+	game.call("_refresh_ui")
+	game.dialogue_index = game.dialogue_boxes.size() - 1
+	game.call("_refresh_ui")
+	_expect(game.speaker.text == "DIRECTOR" and game.call("_bark_actor") == null, "a mixed-speaker message does not attach a remote voice to WOLF")
+	var clause: String = "Then we get through maintenance before he reaches that witness."
+	game.call("_tell", "%s: %s" % [(game.call("_first_name") as String).to_upper(), clause])
+	game.call("_refresh_ui")
+	_expect(game.story_words == clause and game.story.get_line_count() <= DialogueBoxes.MAX_ROWS and game.story.size.x > compact_width, "a longer authored clause keeps its words and two readable rows instead of forcing the compact width")
+
+
 	game.debug_place(game.pointer_use_x(&"purge_display"), game.wolf.position.x)
 	await tap(&"interact")
 	_expect(game.call("_conversation_active") and not game.human.controlled, "reading the optional purge display holds its important exchange")
@@ -124,3 +160,24 @@ func _check_records(game: Main) -> void:
 		_expect(game.state.mirror_trace_preserved and game.state.mirror_route == route and game.call("_conversation_active") and not game.human.controlled, "the chosen mirror result waits to be read (%s)" % route)
 		await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES)
 		_expect(game.human.controlled and not game.wolf.controlled, "reading the mirror result returns engineer control without controlling WOLF (%s)" % route)
+
+
+## Pure canvas geometry cases cover edges, hidden speakers and blocked/oversized placements without a second layout implementation.
+func _check_bark_placement() -> void:
+	var safe: Rect2 = Rect2(20.0, 10.0, 900.0, 500.0)
+	var body: Rect2 = Rect2(400.0, 300.0, 80.0, 60.0)
+	var size: Vector2 = Vector2(260.0, 70.0)
+	var placed: Rect2 = DialogueBark.place(size, 24.0, body, safe, [], 12.0)
+	_expect(placed.has_area() and safe.encloses(placed) and placed.end.y == 288.0, "a bark fits above its speaker with the authored gap")
+	var edge: Rect2 = DialogueBark.place(size, 24.0, Rect2(10.0, 300.0, 40.0, 60.0), safe, [], 12.0)
+	_expect(edge.position.x == safe.position.x, "a speaker at the left edge keeps all text inside the safe area")
+	var fractional_safe: Rect2 = Rect2(20.4, 10.0, 900.0, 500.0)
+	var fractional: Rect2 = DialogueBark.place(size, 24.0, Rect2(10.0, 300.0, 40.0, 60.0), fractional_safe, [], 12.0)
+	_expect(fractional.has_area() and fractional_safe.encloses(fractional), "fractional OS insets survive pixel rounding")
+	_expect(not DialogueBark.place(size, 24.0, Rect2(-300.0, 300.0, 40.0, 60.0), safe, [], 12.0).has_area(), "an off-screen speaker uses the lower reading position")
+	_expect(not DialogueBark.place(size, 24.0, Rect2(400.0, 50.0, 80.0, 60.0), safe, [], 12.0).has_area(), "the name tab cannot be clipped above the safe area")
+	_expect(not DialogueBark.place(size, 24.0, body, safe, [safe], 12.0).has_area(), "a warning that leaves no room blocks an anchored placement")
+	var neighbour: Rect2 = Rect2(470.0, 230.0, 40.0, 130.0)
+	var raised: Rect2 = DialogueBark.place(size, 24.0, body, safe, [neighbour], 12.0)
+	_expect(raised.has_area() and raised.end.y <= neighbour.position.y - 12.0, "a taller companion's head stays clear of the bark")
+	_expect(not DialogueBark.place(Vector2(1000.0, 70.0), 24.0, body, safe, [], 12.0).has_area(), "oversized text uses the existing bounded reading position")

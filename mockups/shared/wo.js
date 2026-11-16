@@ -1781,6 +1781,7 @@
     s.setProperty('--wo-touch-use', (P.useSize || today.rect('main.tscn', 'CanvasLayer/TouchControls/Use').h) + 'px');
     s.setProperty('--wo-touch-pause', (P.pauseSize || today.rect('main.tscn', 'CanvasLayer/PauseButton').h) + 'px');
     s.setProperty('--wo-row-ch', langField('en', 'row_characters') + 'ch');
+    s.setProperty('--wo-bark-width-ratio', num('dialogue.bark.width-ratio'));
     s.setProperty('--wo-move-zone', num('profile.phone.move-zone') * 100 + '%');
     // Phone targets keep the 8 dp gap between them (2.3: density.gap-phone-dp), so every gap built
     // on --wo-density-gap (answer cards, rows, tabs) is at least that on a phone.

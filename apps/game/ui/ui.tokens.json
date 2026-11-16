@@ -3084,6 +3084,17 @@
     },
     "bark": {
       "$description": "Walk-and-talk lines as a bubble over the speaker; timed; never take USE.",
+      "width-ratio": {
+        "$type": "number",
+        "$value": 0.6,
+        "$description": "Barks target 60% of the conversation column, matching the reviewed corridor mockup; longer clauses keep their readable width.",
+        "$extensions": {
+          "com.mrdemonwolf.wolfoverride": {
+            "status": "proposal",
+            "source": "Reviewed corridor mockup m05, bark state (November 16, 2026)"
+          }
+        }
+      },
       "min-hold": {
         "$type": "duration",
         "$value": {

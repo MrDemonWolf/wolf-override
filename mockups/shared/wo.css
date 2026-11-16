@@ -754,7 +754,7 @@ html[data-speaker="portrait"] .wo-portrait { display: block; }
   width: max-content;
   /* A bark is a short aside: about 24 characters a row (0.6 of the 40-character row), two short
      rows at most, in a rounder bubble than the conversation box, so the two never read alike. */
-  max-width: calc(var(--wo-row-ch) * 0.6);
+  max-width: calc(var(--wo-row-ch) * var(--wo-bark-width-ratio));
   padding: var(--wo-density-gap) var(--wo-density-label-gap);
   font-family: var(--wo-type-dialogue-face);
   font-size: var(--wo-fs-dialogue);
