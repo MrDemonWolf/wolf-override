@@ -662,6 +662,7 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 ## The version number under CHANGELOG (the number only, no wording; auto-translate off in the scene).
 @onready var title_version: Label = $CanvasLayer/TitleScreen/VersionLabel
 @onready var credits_button: Button = $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/CreditsButton
+@onready var quit_button: Button = $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/QuitButton
 @onready var credits_screen: ColorRect = $CanvasLayer/TitleScreen/CreditsScreen
 @onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
 @onready var credits_back_button: Button = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton
@@ -1137,6 +1138,9 @@ func _ready() -> void:
 	new_game_button.pressed.connect(_new_game)
 	continue_button.pressed.connect(_on_continue_pressed)
 	credits_button.pressed.connect(_show_credits)
+	# Desktop handhelds need an exit reachable without a keyboard or window controls.
+	quit_button.visible = not settings_menu.mobile and not OS.has_feature("web")
+	quit_button.pressed.connect(get_tree().quit)
 	credits_back_button.pressed.connect(_hide_credits)
 	credits_pause_button.pressed.connect(_toggle_credits_pause)
 	credits_body.gui_input.connect(_on_credits_body_input)

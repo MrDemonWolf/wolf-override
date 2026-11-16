@@ -3487,3 +3487,7 @@ msgstr "Контроллер отключён. Продолжи, когда за
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "Изменения громкости применяются сразу."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "ВЫХОД"

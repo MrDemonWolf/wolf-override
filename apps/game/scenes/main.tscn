@@ -574,6 +574,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "CREDITS"
 
+[node name="QuitButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "QUIT"
+
 [node name="ChangelogButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 48.0
 offset_top = 451.0

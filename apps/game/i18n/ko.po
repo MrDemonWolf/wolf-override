@@ -3427,3 +3427,7 @@ msgstr "컨트롤러 연결이 끊어졌습니다. 준비되면 재개하세요.
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "음량 변경은 즉시 적용됩니다."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "종료"

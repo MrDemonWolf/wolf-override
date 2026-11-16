@@ -3501,3 +3501,7 @@ msgstr "Manette déconnectée. Reprends quand tu veux."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "Les changements de volume sont appliqués immédiatement."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "QUITTER"

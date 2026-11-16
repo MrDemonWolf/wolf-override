@@ -3427,3 +3427,7 @@ msgstr "コントローラーが切断されました。準備ができたら再
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "音量の変更はすぐに反映されます。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "終了"

@@ -3430,3 +3430,7 @@ msgstr "手柄已断开连接。准备好后可继续游戏。"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "音量更改立即生效。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "退出"

@@ -3445,3 +3445,7 @@ msgstr "控制器已中斷連線。準備好後可繼續遊戲。"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "音量變更立即生效。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "離開"

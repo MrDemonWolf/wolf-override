@@ -15,7 +15,10 @@ func _run() -> void:
 	var first: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	var title_scroll: ScrollContainer = game.get_node("CanvasLayer/TitleScreen/MenuScroll") as ScrollContainer
 	var base_font: int = first.get_theme_font_size(&"font_size")
-	var last: Button = first.get_parent().get_node("CreditsButton") as Button
+	var quit_button: Button = first.get_parent().get_node("QuitButton") as Button
+	_expect(quit_button.visible == (not (game.get("settings_menu") as GameSettings).mobile and not OS.has_feature("web")), "Quit is available on desktop and handheld PC, leaving mobile and web exit to the system")
+	_expect(quit_button.pressed.is_connected(Callable(self, "quit")), "Quit closes the running tree through the native engine action")
+	var last: Button = quit_button if quit_button.visible else first.get_parent().get_node("CreditsButton") as Button
 	last.grab_focus()
 	TextSize.factor = 2.0
 	game.call("_apply_text_size")

@@ -3496,3 +3496,7 @@ msgstr "Controller getrennt. Setze das Spiel fort, wenn du möchtest."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "Lautstärkeänderungen werden sofort angewendet."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "BEENDEN"

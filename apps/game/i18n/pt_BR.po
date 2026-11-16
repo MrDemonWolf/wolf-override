@@ -3497,3 +3497,7 @@ msgstr "Controle desconectado. Retome quando quiser."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "Volume changes apply immediately."
 msgstr "As alterações de volume são aplicadas imediatamente."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "SAIR"
