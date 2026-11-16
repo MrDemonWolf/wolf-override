@@ -9,6 +9,8 @@ const State = preload("res://scripts/m0_state.gd")
 func _run() -> void:
 	check_name = "Chapter scene"
 	var game: Node2D = open_game("chapter-scene-test")
+	# Scene transitions use Instant; Normal reveal-before-exit is checked in dialogue_reveal_test.
+	(game.get("settings_menu") as GameSettings).text_speed.select(3)
 	var path: String = str(game.get("save_path"))
 	game.call("_new_game")
 	game.call("_finish_intro")
