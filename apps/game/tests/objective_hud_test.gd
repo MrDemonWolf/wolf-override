@@ -39,14 +39,23 @@ func _run() -> void:
 	await settle(3)
 	_expect(game.speaker.visible and game.bottom_bar.visible and game.dialogue_continue.visible and not game.context_hint.visible and not game.top_card.visible and not game.tutorial_prompt.visible, "dialogue owns the HUD without routine hints, objectives or tutorial panels")
 	_expect(not game.dialogue_continue.get_global_rect().intersects(game.story.get_global_rect()), "the continue cue stays outside translated story text")
+	var breaker_label: Label = game.get_node("BreakerLabel") as Label
+	_expect(breaker_label.self_modulate.a == 0.0, "ordinary station names do not compete with dialogue")
+	_expect(game.bypass_handle.fault_tag.self_modulate.a == 1.0, "the live coolant-fault warning keeps its own visibility")
+	var label_point: Vector2 = breaker_label.get_global_transform_with_canvas() * (breaker_label.size * 0.5)
+	for target: Tappable in game.world_input.targets:
+		if target.id == &"breaker" and "lockdown" in target.chapters:
+			_expect(is_inf(target.hit_score(label_point, false)), "a hidden station name does not remain an invisible click target")
 	game.save_error = "Test save failure"
 	game.call("_set_dialogue", game.save_error)
 	_expect(game.context_hint.visible and game.context_hint_text.text == game.save_error, "save failures remain visible during story dialogue")
+	_expect(breaker_label.self_modulate.a == 0.0, "a save failure does not bring unrelated station names back")
 	game.save_error = ""
 	game.dialogue_cleared = true
 	game.call("_refresh_ui")
 	await settle(3)
 	_expect(game.top_card.visible and not game.bottom_bar.visible, "the deferred goal returns after the story box clears")
+	_expect(breaker_label.self_modulate.a == 1.0, "station names return when exploration resumes")
 	game.dialogue_cleared = false
 	game.state.chapter_id = "junction"
 	game.pressure_line.state = &"building"

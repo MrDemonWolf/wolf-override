@@ -5232,9 +5232,13 @@ func _refresh_ui() -> void:
 ## True only for a save failure, recovery state or an actual live hazard. These hints must remain
 ## readable during dialogue; routine directions and repeated CONTINUE instructions can wait.
 func _urgent_context_hint() -> bool:
-	if not save_error.is_empty() or fail_active:
-		return true
-	if state.chapter_id != "junction":
+	return not save_error.is_empty() or fail_active or _live_hazard()
+
+
+## Live danger retains both action warnings and station names needed to follow them. Save errors
+## are urgent too, but do not justify bringing unrelated room labels back over the story.
+func _live_hazard() -> bool:
+	if fail_active or state.chapter_id != "junction":
 		return false
 	var x: float = human.position.x
 	if not state.door_blown:
@@ -5278,6 +5282,7 @@ func _set_dialogue(hint: String) -> void:
 	if bottom_bar.visible or intro_active or chapter_close_active:
 		tutorial_prompt.hide()
 	context_hint_text.text = hint
+	world_input.show_station_names(not bottom_bar.visible and not intro_active and not chapter_close_active or _live_hazard())
 	_layout_hud()
 
 

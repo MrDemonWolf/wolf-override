@@ -39,7 +39,7 @@ func setup(target_id: StringName, rooms: PackedStringArray, items: Array[CanvasI
 func hit_score(point: Vector2, touch: bool) -> float:
 	var best: float = INF
 	for item: CanvasItem in regions:
-		if not is_instance_valid(item) or not item.is_visible_in_tree() or item.modulate.a < 0.05:
+		if not is_instance_valid(item) or not item.is_visible_in_tree() or item.modulate.a < 0.05 or item.self_modulate.a < 0.05:
 			continue
 		var rect: Rect2
 		if item is Control:

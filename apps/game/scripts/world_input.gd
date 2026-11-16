@@ -169,6 +169,18 @@ func advance(delta: float) -> void:
 		target.feedback(target == hovered and game.input_mode.pointer_focus and _available(target), not active.is_empty() and active["target"] == target and not active["cancelled"], game.impact.reduce_motion)
 
 
+## Hides ordinary station-name glyphs during story reading. Self alpha preserves the room's edge fade;
+## the fault tag has its own warning/fade owner and must never be treated as an ordinary name.
+func show_station_names(show: bool) -> void:
+	var alpha: float = 1.0 if show else 0.0
+	for target: Tappable in targets:
+		if target.kind != Tappable.Kind.WORLD:
+			continue
+		for region: CanvasItem in target.regions:
+			if region is Label and region != game.bypass_handle.fault_tag and not is_equal_approx(region.self_modulate.a, alpha):
+				region.self_modulate.a = alpha
+
+
 ## True only while the same world crank's press is still held; slide-off and GUI releases stop it.
 func holding(station: StringName) -> bool:
 	return not active.is_empty() and not active["cancelled"] and active["fired"] and active["hold"] == station
