@@ -10,7 +10,7 @@ import path from 'node:path';
  */
 
 /** app/global.css, from the docs app folder that `next build` and the docs scripts run in. */
-export const globalCssFile = path.join(process.cwd(), 'app', 'global.css');
+const globalCssFile = path.join(process.cwd(), 'app', 'global.css');
 
 /** One swatch on the page: the CSS custom property it comes from and what it is for. */
 export type BrandColor = {
@@ -32,7 +32,7 @@ export type BrandColor = {
  * The swatches, in page order. The first six are the landing palette (the game's own dark look);
  * the last is the guide's light-theme cyan, used where the bright cyan would be too faint on white.
  */
-export const brandColors: BrandColor[] = [
+const brandColors: BrandColor[] = [
   { name: 'Ink', token: 'color-ink', use: 'Page background, the darkest navy', against: 'color-text' },
   { name: 'Panel navy', token: 'color-panel', use: 'Header bar; MrDemonWolf core navy', against: 'color-text' },
   { name: 'Surface', token: 'color-surface', use: 'Cards and raised panels', against: 'color-text' },
@@ -54,7 +54,7 @@ export function readToken(css: string, token: string): string {
 }
 
 /** WCAG 2.2 relative luminance of a #rrggbb colour (0 for black to 1 for white). */
-export function luminance(hex: string): number {
+function luminance(hex: string): number {
   const channel = (offset: number) => {
     const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
     return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;

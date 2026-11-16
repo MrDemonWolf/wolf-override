@@ -18,7 +18,7 @@ import * as kit from '@/lib/press-kit';
 import { buildZip, type ZipEntry } from '@/lib/zip';
 
 /** The zip on disk, relative to the docs app folder this script runs in. */
-export const pressKitFile = path.join(process.cwd(), 'public', kit.pressKitPath);
+const pressKitFile = path.join(process.cwd(), 'public', kit.pressKitPath);
 
 /** 25 MB: the size budget for the whole download. */
 const maxBytes = 25 * 1024 * 1024;
@@ -29,7 +29,7 @@ const heading = (text: string) => `${text}\n${'='.repeat(text.length)}\n`;
 const bullets = (lines: readonly string[]) => lines.map((line) => `- ${line}`).join('\n');
 
 /** The text of each generated file, keyed by its zip path. Every value comes from lib/press-kit.ts. */
-export function pressTexts(): Record<(typeof kit.pressTextFiles)[number]['zipPath'], string> {
+function pressTexts(): Record<(typeof kit.pressTextFiles)[number]['zipPath'], string> {
   const linkLines = kit.pressLinks.map((link) => `${link.label}: ${link.url}`);
   const contactLines = kit.pressContact.map((contact) => `${contact.label}: ${contact.url} (${contact.note})`);
   return {
@@ -83,7 +83,7 @@ export function pressTexts(): Record<(typeof kit.pressTextFiles)[number]['zipPat
 }
 
 /** Every zip entry, in order: the three text files first (they explain the rest), then `pressFiles`. */
-export function pressKitEntries(): ZipEntry[] {
+function pressKitEntries(): ZipEntry[] {
   const texts = pressTexts();
   return [
     ...kit.pressTextFiles.map(({ zipPath }) => ({ name: zipPath, data: Buffer.from(texts[zipPath], 'utf8') })),
