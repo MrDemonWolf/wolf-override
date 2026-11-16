@@ -681,6 +681,8 @@ html[data-motion="reduced"] .wo-toast[data-wo-close] { transform: none; }
      its left and right limits, never wider than they allow: a short line no longer sits in a
      screen-wide banner (M05 review). An inline or docked box stretches instead (below). */
   width: fit-content;
+  /* Respect both insets when accessibility text makes the preferred column wider. */
+  max-width: stretch;
   margin-inline: auto;
   display: flex;
   align-items: center;
@@ -697,6 +699,7 @@ html[data-speaker="portrait"] .wo-box.has-portrait { min-height: var(--wo-dialog
    (wo.js nameTabRoom sets --wo-nametab-h from the laid-out tab). */
 .wo-box.is-inline { position: relative; left: auto; right: auto; bottom: auto; align-self: stretch; width: auto; margin-inline: 0; margin-top: var(--wo-nametab-h, 0); }
 .wo-box-text {
+  min-width: 0;
   max-width: var(--wo-row-ch);
   font-family: var(--wo-type-dialogue-face);
   font-weight: var(--wo-type-dialogue-weight);
