@@ -25,6 +25,7 @@ func _run() -> void:
 	_check_corpus()
 	_check_cjk_samples()
 	await _check_opening()
+	_check_stopped_pages()
 	await _check_first_control()
 	await _check_corridor()
 	await _check_records_exit()

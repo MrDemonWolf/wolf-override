@@ -515,6 +515,29 @@ func _check_opening() -> void:
 	_expect(not game.intro_active, "the last press fades into play")
 
 
+## Simulated reading time never advances stopped cinematic pages; the existing advance handler still does.
+## Uses the live game's page splitter and advance handler, then restores process and cinematic flags.
+func _check_stopped_pages() -> void:
+	game.set_process(false)
+	game.call("_drop_box_queue")
+	for phase: StringName in [&"intro_active", &"chapter_close_active"]:
+		game.intro_active = phase == &"intro_active"
+		game.chapter_close_active = phase == &"chapter_close_active"
+		game.status_line = ""
+		game.status_line = Main.OPENING_EXCHANGE % str(game.call("_first_name")).to_upper()
+		game.call("_refresh_ui")
+		_expect(game.dialogue_boxes.size() > 1, "%s fixture has multiple real pages" % phase)
+		game.call("_tick_dialogue", 60.0)
+		_expect(game.dialogue_index == 0, "%s first page waits for input after a minute of reading time" % phase)
+		_expect(game.call("_next_box"), "%s still accepts explicit page advancement" % phase)
+		game.call("_tick_dialogue", 60.0)
+		_expect(game.dialogue_index == 1, "%s next page also waits for input" % phase)
+	game.intro_active = false
+	game.chapter_close_active = false
+	game.status_line = ""
+	game.set_process(true)
+
+
 ## P0-8 (TEACH-7): the first controllable frame shows one text element and one prompt, then the
 ## tutorial after the first step, then the lines.
 func _check_first_control() -> void:

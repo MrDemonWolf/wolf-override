@@ -5398,13 +5398,13 @@ func _dialogue_fits(words: String) -> bool:
 
 ## Runs the box on screen: each stays up for its reading time and gives way to the next; the last one
 ## clears once it has been read and the engineer moves on (STORY-8). The opening and the closing
-## shots also go on at a press (_next_box); a question stays up until it is answered.
+## shots wait for a press on every page (_next_box); a question stays up until it is answered.
 func _tick_dialogue(delta: float) -> void:
 	_sync_dialogue_boxes()
 	if opening_lines_held or dialogue_boxes.is_empty():
 		return
 	dialogue_age += delta
-	if state.chapter_id == "investigation":
+	if intro_active or chapter_close_active or state.chapter_id == "investigation":
 		return
 	if dialogue_index < dialogue_boxes.size() - 1:
 		if dialogue_age >= _box_seconds():
