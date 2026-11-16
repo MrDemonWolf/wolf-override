@@ -675,6 +675,7 @@ var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var settings_path: String = "user://settings.cfg"
 var input_mode: InputMode = InputMode.new()
+var menu_repeat: MenuRepeat = MenuRepeat.new()
 ## Legacy script properties delegate to the shared owner, so tooling keeps its existing API.
 var touch_enabled: bool:
 	get: return input_mode.touch_enabled
@@ -1058,6 +1059,8 @@ func _ready() -> void:
 	title_logo.add_theme_font_size_override(&"font_size", UiTokens.px("type.display.size"))
 	_install_inputs()
 	_setup_settings()
+	menu_repeat.context = _menu_repeat_context
+	add_child(menu_repeat)
 	_setup_impact()
 	var pads: Array[int] = Input.get_connected_joypads()
 	if not pads.is_empty():
@@ -2604,6 +2607,21 @@ func _grab_menu_focus(control: Control) -> void:
 		control.grab_focus(mouse_active)
 
 
+## Identifies one active menu/page for held navigation; a context change discards its held direction.
+func _menu_repeat_context() -> Control:
+	if not settings_menu.capture_action.is_empty():
+		return null
+	if debug_tools != null and debug_tools.menu_open:
+		return debug_tools.menu.panel
+	if settings_menu.is_visible_in_tree():
+		return settings_menu.pages[settings_menu.tabs.current_tab]
+	if pause_overlay.visible:
+		return pause_menu
+	if title_open and not credits_screen.visible and not changelog_screen.visible:
+		return title_screen
+	return null
+
+
 ## The menu control a keyboard or controller press should land on when nothing has focus.
 func _menu_focus_target() -> Control:
 	if end_card_active:
@@ -2790,6 +2808,7 @@ func _on_input_mode_changed() -> void:
 ## Observes input even when menus consume it; this method applies the shared owner's state to focus and UI.
 func _note_input_device(event: InputEvent) -> void:
 	var navigation_press: bool = input_mode.observe(event)
+	menu_repeat.observe(event)
 	Input.mouse_mode = input_mode.cursor_mode
 	if mouse_active:
 		var focused: Control = get_viewport().gui_get_focus_owner()

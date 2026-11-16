@@ -29,6 +29,7 @@
 # res://scripts/m0_actor.gd
 # res://scripts/m0_state.gd
 # res://scripts/main.gd
+# res://scripts/menu_repeat.gd
 # res://scripts/opening.gd
 # res://scripts/pause_overlay.gd
 # res://scripts/pressure_line.gd
@@ -85,7 +86,7 @@ msgid "SAFE POINT"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:5344
+#: scripts/main.gd:5364
 msgid "PAUSE"
 msgstr ""
 
@@ -114,7 +115,7 @@ msgid "NEW GAME"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:1192
+#: scripts/main.gd:1195
 msgid "CONTINUE"
 msgstr ""
 
@@ -234,8 +235,8 @@ msgid "BACK TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2201
-#: scripts/main.gd:2248
+#: scripts/main.gd:2204
+#: scripts/main.gd:2251
 msgid "PAUSE SCROLL"
 msgstr ""
 
@@ -270,7 +271,7 @@ msgid ""
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2539
+#: scripts/main.gd:2542
 msgid "RETURN TO TITLE"
 msgstr ""
 
@@ -283,7 +284,7 @@ msgid "FULLSCREEN"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2324
+#: scripts/main.gd:2327
 msgid "Window size applies on desktop."
 msgstr ""
 
@@ -791,7 +792,7 @@ msgid "Default controls restored."
 msgstr ""
 
 #: scripts/game_settings.gd:1075
-#: scripts/main.gd:2373
+#: scripts/main.gd:2376
 msgid "Settings could not be saved."
 msgstr ""
 
@@ -903,851 +904,851 @@ msgid ""
 "I made my call. You cranked the bypass anyway. I stayed."
 msgstr ""
 
-#: scripts/main.gd:1192
+#: scripts/main.gd:1195
 msgid "PLAY AGAIN"
 msgstr ""
 
-#: scripts/main.gd:1196
+#: scripts/main.gd:1199
 msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
 msgstr ""
 
-#: scripts/main.gd:1198
+#: scripts/main.gd:1201
 msgid "Saved checkpoint could not be read."
 msgstr ""
 
-#: scripts/main.gd:1198
+#: scripts/main.gd:1201
 msgid "No checkpoint yet. Saving starts at the first SAFE POINT."
 msgstr ""
 
-#: scripts/main.gd:1221
+#: scripts/main.gd:1224
 msgid "LINK UNAVAILABLE"
 msgstr ""
 
-#: scripts/main.gd:1245
+#: scripts/main.gd:1248
 msgid "The changelog text is missing from this build. Open the full changelog online."
 msgstr ""
 
 #. TRANSLATORS: Opens the in-game changelog in every language but English: the changelog itself is not translated.
-#: scripts/main.gd:1248
+#: scripts/main.gd:1251
 msgid "These development updates are written in English only."
 msgstr ""
 
 #. TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name.
 #. i18n: speaker=WOLF engineer=name
-#: scripts/main.gd:1567
+#: scripts/main.gd:1570
 msgid "%s. That name sounds like you."
 msgstr ""
 
 #. TRANSLATORS: Heading over the AI disclosure in the credits, in the same capitals as the other headings.
-#: scripts/main.gd:2214
+#: scripts/main.gd:2217
 msgid "AI DISCLOSURE"
 msgstr ""
 
 #. TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
-#: scripts/main.gd:2216
+#: scripts/main.gd:2219
 msgid "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
 msgstr ""
 
 #. TRANSLATORS: Asset credit only; keep Kenney, univeous, CC0 and MIT unchanged.
-#: scripts/main.gd:2218
+#: scripts/main.gd:2221
 msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
 msgstr ""
 
-#: scripts/main.gd:2248
-#: scripts/main.gd:2255
+#: scripts/main.gd:2251
+#: scripts/main.gd:2258
 msgid "RESUME SCROLL"
 msgstr ""
 
-#: scripts/main.gd:2304
+#: scripts/main.gd:2307
 msgid "30 FPS"
 msgstr ""
 
-#: scripts/main.gd:2305
+#: scripts/main.gd:2308
 msgid "60 FPS"
 msgstr ""
 
-#: scripts/main.gd:2306
+#: scripts/main.gd:2309
 msgid "UNCAPPED"
 msgstr ""
 
-#: scripts/main.gd:2307
+#: scripts/main.gd:2310
 msgid "90 FPS"
 msgstr ""
 
-#: scripts/main.gd:2308
+#: scripts/main.gd:2311
 msgid "120 FPS"
 msgstr ""
 
-#: scripts/main.gd:2309
+#: scripts/main.gd:2312
 msgid "144 FPS"
 msgstr ""
 
-#: scripts/main.gd:2324
+#: scripts/main.gd:2327
 msgid "Window size is managed by iOS/Android."
 msgstr ""
 
-#: scripts/main.gd:2539
+#: scripts/main.gd:2542
 msgid "SKIP OPENING"
 msgstr ""
 
-#: scripts/main.gd:2555
+#: scripts/main.gd:2558
 msgid "Controller disconnected. Resume when ready."
 msgstr ""
 
-#: scripts/main.gd:2559
+#: scripts/main.gd:2562
 msgid "TAP RESUME TO RETURN"
 msgstr ""
 
-#: scripts/main.gd:2559
+#: scripts/main.gd:2562
 msgid "%s  RESUME"
 msgstr ""
 
-#: scripts/main.gd:2824
+#: scripts/main.gd:2844
 msgid "No valid checkpoint save found. Current game was not changed."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2882
+#: scripts/main.gd:2902
 msgid ""
 "Service junction restored. The sentry\n"
 "is down; pop the exit bolt by the door."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2885
+#: scripts/main.gd:2905
 msgid ""
 "Service junction restored. The door is\n"
 "down. The sentry patrols past the rubble."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2898
+#: scripts/main.gd:2918
 msgid "The first copy is safe. Use the exit to follow the service line."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2901
+#: scripts/main.gd:2921
 msgid "Records access restored. Both traces are copied; head for the exit."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2904
+#: scripts/main.gd:2924
 msgid "Records access restored. The purge order is copied; copy the mirror index next."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2907
+#: scripts/main.gd:2927
 msgid "Records access restored. Copy the purge-order trace first; WOLF is checking the mirror."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:2911
+#: scripts/main.gd:2931
 msgid "Safe point restored."
 msgstr ""
 
 #. TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records worker is the witness; no gendered form for them.
 #. i18n: story speaker=DIRECTOR
-#: scripts/main.gd:3041
+#: scripts/main.gd:3061
 msgid "Records worker's archive marked for deletion."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3043
+#: scripts/main.gd:3063
 msgid "They want the source record gone. We need to preserve it."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3054
+#: scripts/main.gd:3074
 msgid "No station in reach. Follow the labeled breaker, relay, bypass or safe point."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3097
+#: scripts/main.gd:3117
 msgid "Power is already on. The relay is farther down the hall."
 msgstr ""
 
 #. TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:3112
+#: scripts/main.gd:3132
 msgid "Thank you for telling me. I'll take the relay. Arm the breaker."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3116
+#: scripts/main.gd:3136
 msgid "No. I won't take that risk blind. Use the manual bypass."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3129
+#: scripts/main.gd:3149
 msgid "The relay is dark. Arm the breaker first."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3133
-#: scripts/main.gd:3176
+#: scripts/main.gd:3153
+#: scripts/main.gd:3196
 msgid "The seal is open. The safe point is just beyond it."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3139
+#: scripts/main.gd:3159
 msgid "I said no. I won't touch it blind. The bypass is right beside it."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3151
+#: scripts/main.gd:3171
 msgid "I've got the contact. Give me a moment."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3163
+#: scripts/main.gd:3183
 msgid "WOLF takes the surge through the live contact. The red seal opens."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3179
+#: scripts/main.gd:3199
 msgid "The bypass handle won't move. The breaker has to be on first."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3240
+#: scripts/main.gd:3260
 msgid "The bypass locks over and the alarm cuts out. The red seal opens."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3242
+#: scripts/main.gd:3262
 msgid "Open. I'm with you."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3255
+#: scripts/main.gd:3275
 msgid "The safe point is past the sealed door."
 msgstr ""
 
 #. TRANSLATORS: WOLF, after the engineer pressed him at the relay without warning.
 #. i18n: story speaker=WOLF
-#: scripts/main.gd:3269
+#: scripts/main.gd:3289
 msgid "I refused the live relay; I'm still here."
 msgstr ""
 
 #. TRANSLATORS: WOLF to the engineer, who told him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:3272
+#: scripts/main.gd:3292
 msgid "I took the relay because you told me the truth."
 msgstr ""
 
 #. TRANSLATORS: WOLF to the engineer, who cranked the manual bypass after he offered to take the relay. Avoid a past tense that shows the engineer's gender ("you cranked").
 #. i18n: story speaker=WOLF engineer=you
-#: scripts/main.gd:3275
+#: scripts/main.gd:3295
 msgid "I offered the relay; you cranked the bypass. Still with you."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3278
+#: scripts/main.gd:3298
 msgid "Take the purge queue. I'll inspect the mirror."
 msgstr ""
 
-#: scripts/main.gd:3287
+#: scripts/main.gd:3307
 msgid "The safe point could not save. Press %s here again."
 msgstr ""
 
-#: scripts/main.gd:3287
+#: scripts/main.gd:3307
 msgid "The safe point could not save. Tap USE here again."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3298
+#: scripts/main.gd:3318
 msgid "Safe point saved."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3301
+#: scripts/main.gd:3321
 msgid "Safe point saved. WOLF remembers the same choice."
 msgstr ""
 
 #. TRANSLATORS: %s is the engineer's first name. The worker is the records worker, the witness; no gendered form for them.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/main.gd:3313
+#: scripts/main.gd:3333
 msgid "The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3316
+#: scripts/main.gd:3336
 msgid "The purge-order trace is already copied. The mirror port may confirm when the source existed."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3322
+#: scripts/main.gd:3342
 msgid "The mirror index has no context yet. Copy the purge-order trace first."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3325
+#: scripts/main.gd:3345
 msgid "The mirror timestamp is already preserved. The exit is to the right."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:3334
+#: scripts/main.gd:3354
 msgid "I found the mirror index. We can use my readout or your maintenance port."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3363
+#: scripts/main.gd:3383
 msgid "Exit sealed until the purge order and mirror timestamp are copied."
 msgstr ""
 
-#: scripts/main.gd:3400
-#: scripts/main.gd:6161
+#: scripts/main.gd:3420
+#: scripts/main.gd:6181
 msgid "Mirror copied. Head for the exit."
 msgstr ""
 
-#: scripts/main.gd:3402
+#: scripts/main.gd:3422
 msgid "Follow the station lights: mirror port, then exit."
 msgstr ""
 
-#: scripts/main.gd:3403
+#: scripts/main.gd:3423
 msgid "Follow the station lights: purge queue, mirror port, then exit."
 msgstr ""
 
 #. TRANSLATORS: WOLF, still walking to the mirror. %s is the key or button for the manual port.
 #. i18n: story speaker=WOLF slot=key
-#: scripts/main.gd:3627
+#: scripts/main.gd:3647
 msgid "I'm still checking the drive. Wait for me, or press %s for the manual port."
 msgstr ""
 
 #. TRANSLATORS: WOLF, still walking to the mirror, touch form. USE MANUAL PORT is the answer button's text: use its translation here.
 #. i18n: story speaker=WOLF
-#: scripts/main.gd:3630
+#: scripts/main.gd:3650
 msgid "I'm still checking the drive. Wait for me, or tap USE MANUAL PORT."
 msgstr ""
 
 #. TRANSLATORS: The worker is the records worker, the witness; no gendered form for them.
 #. i18n: story speaker=narrator
-#: scripts/main.gd:3643
+#: scripts/main.gd:3663
 msgid "WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order."
 msgstr ""
 
 #. TRANSLATORS: %s is the engineer's first name.
 #. i18n: story speaker=narrator engineer=name
-#: scripts/main.gd:3647
+#: scripts/main.gd:3667
 msgid "%s copies the timestamp through the maintenance port. WOLF keeps watch."
 msgstr ""
 
-#: scripts/main.gd:3664
+#: scripts/main.gd:3684
 msgid "Save failed. Use a station to try again."
 msgstr ""
 
-#: scripts/main.gd:3732
+#: scripts/main.gd:3752
 msgid "Maintenance annex. Read the surviving transfer fragment, then compare the lift readout and escort record."
 msgstr ""
 
-#: scripts/main.gd:3783
+#: scripts/main.gd:3803
 msgid "READ TRANSFER FRAGMENT"
 msgstr ""
 
-#: scripts/main.gd:3785
+#: scripts/main.gd:3805
 msgid "COMPARE LIFT READOUT"
 msgstr ""
 
-#: scripts/main.gd:3787
+#: scripts/main.gd:3807
 msgid "READ ESCORT RECORD"
 msgstr ""
 
-#: scripts/main.gd:3788
+#: scripts/main.gd:3808
 msgid "FIND THE INVESTIGATOR"
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3807
+#: scripts/main.gd:3827
 msgid "The overload breaker catches and the line starts to build. If the LINE gauge peaks, the relief vent lets go."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3822
+#: scripts/main.gd:3842
 msgid "The wheel is stiff. Three full turns charge the door."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3831
+#: scripts/main.gd:3851
 msgid "Relief vent. It lets go when the gauge peaks; don't be standing on it."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3840
+#: scripts/main.gd:3860
 msgid ""
 "No station in reach. The exit bolt is\n"
 "by the door."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3843
+#: scripts/main.gd:3863
 msgid ""
 "No station in reach. The TANK RELEASE\n"
 "is past the rubble."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:3846
+#: scripts/main.gd:3866
 msgid "No station in reach. The breaker is by the entrance, the valve by the door."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:4020
+#: scripts/main.gd:4040
 msgid "The clamp lets go."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:4116
+#: scripts/main.gd:4136
 msgid "SERVICE LINE CLEARED."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:4118
+#: scripts/main.gd:4138
 msgid "It's quiet now. The line runs on toward Archive."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=engineer engineer=self
-#: scripts/main.gd:4120
+#: scripts/main.gd:4140
 msgid "Then that's where we go."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=WOLF
-#: scripts/main.gd:4387
+#: scripts/main.gd:4407
 msgid "It passes under that tank on every patrol. How do we bring it down?"
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:4503
+#: scripts/main.gd:4523
 msgid "The winch has the tank back on the clamp. The TANK RELEASE is ready again."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:4538
+#: scripts/main.gd:4558
 msgid "FUSE LIT. Back away from the door, past the valve."
 msgstr ""
 
 #. TRANSLATORS: The valve's turns so far and the turns needed (3).
 #. i18n: story speaker=narrator
-#: scripts/main.gd:4542
+#: scripts/main.gd:4562
 msgid "The valve gives. %d of %d turns."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:4562
+#: scripts/main.gd:4582
 msgid "The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time."
 msgstr ""
 
-#: scripts/main.gd:5355
+#: scripts/main.gd:5375
 msgid "RETRY"
 msgstr ""
 
-#: scripts/main.gd:5355
+#: scripts/main.gd:5375
 msgctxt "touch button"
 msgid "CONTINUE"
 msgstr ""
 
-#: scripts/main.gd:5355
+#: scripts/main.gd:5375
 msgid "CRANK"
 msgstr ""
 
-#: scripts/main.gd:5355
+#: scripts/main.gd:5375
 msgid "DROP"
 msgstr ""
 
-#: scripts/main.gd:5355
-#: scripts/main.gd:5366
+#: scripts/main.gd:5375
+#: scripts/main.gd:5386
 msgid "USE"
 msgstr ""
 
-#: scripts/main.gd:5365
+#: scripts/main.gd:5385
 msgid "%s  MOVE"
 msgstr ""
 
-#: scripts/main.gd:5365
+#: scripts/main.gd:5385
 msgid "STICK / D-PAD MOVE"
 msgstr ""
 
-#: scripts/main.gd:5366
+#: scripts/main.gd:5386
 msgid "%s  READ DISPLAY (optional)"
 msgstr ""
 
-#: scripts/main.gd:5370
+#: scripts/main.gd:5390
 msgid "Head right to the breaker."
 msgstr ""
 
-#: scripts/main.gd:5375
+#: scripts/main.gd:5395
 msgid "Or head right to the breaker."
 msgstr ""
 
 #. TRANSLATORS: The engineer's name card: %s is their full name in capitals, then their job on its own row. The engineer is non-binary: use a job word with no gender (a department or field noun), never a masculine or feminine one.
 #. i18n: engineer=name,third keep-breaks
-#: scripts/main.gd:5410
+#: scripts/main.gd:5430
 msgid ""
 "%s\n"
 "MAINTENANCE ENGINEER"
 msgstr ""
 
-#: scripts/main.gd:5424
+#: scripts/main.gd:5444
 msgid "Checkpoint saved."
 msgstr ""
 
-#: scripts/main.gd:5429
+#: scripts/main.gd:5449
 msgid "TAP RETRY"
 msgstr ""
 
-#: scripts/main.gd:5429
+#: scripts/main.gd:5449
 msgid "%s  RETRY"
 msgstr ""
 
 #. TRANSLATORS: The Director's name over his lines, in capitals.
-#: scripts/main.gd:5503
+#: scripts/main.gd:5523
 msgctxt "speaker"
 msgid "DIRECTOR"
 msgstr ""
 
 #. TRANSLATORS: The name over the purge display's line: the Director's name, a slash and the display's name, in capitals.
-#: scripts/main.gd:5505
+#: scripts/main.gd:5525
 msgctxt "speaker"
 msgid "DIRECTOR / PURGE"
 msgstr ""
 
-#: scripts/main.gd:5536
+#: scripts/main.gd:5556
 msgid "HOLD %s"
 msgstr ""
 
-#: scripts/main.gd:5545
+#: scripts/main.gd:5565
 msgid "TAP CONTINUE"
 msgstr ""
 
-#: scripts/main.gd:5545
+#: scripts/main.gd:5565
 msgid "%s  CONTINUE"
 msgstr ""
 
-#: scripts/main.gd:6140
-#: scripts/main.gd:6155
-#: scripts/main.gd:6196
+#: scripts/main.gd:6160
+#: scripts/main.gd:6175
+#: scripts/main.gd:6216
 msgid "%s: continue."
 msgstr ""
 
-#: scripts/main.gd:6141
-#: scripts/main.gd:6288
+#: scripts/main.gd:6161
+#: scripts/main.gd:6308
 msgid "%s: leave through the door."
 msgstr ""
 
-#: scripts/main.gd:6141
+#: scripts/main.gd:6161
 msgid "%s: inspect the next source."
 msgstr ""
 
-#: scripts/main.gd:6155
+#: scripts/main.gd:6175
 msgid "%s: follow the service line toward Archive."
 msgstr ""
 
-#: scripts/main.gd:6156
+#: scripts/main.gd:6176
 msgid "The exit is open. Head right to follow the service line."
 msgstr ""
 
-#: scripts/main.gd:6158
+#: scripts/main.gd:6178
 msgid "%s: copy the purge-order trace."
 msgstr ""
 
-#: scripts/main.gd:6158
+#: scripts/main.gd:6178
 msgid "Purge order copied. Find the mirror port."
 msgstr ""
 
-#: scripts/main.gd:6162
+#: scripts/main.gd:6182
 msgid "%s: examine the mirror port."
 msgstr ""
 
-#: scripts/main.gd:6162
+#: scripts/main.gd:6182
 msgid "Copy the purge order first."
 msgstr ""
 
-#: scripts/main.gd:6165
+#: scripts/main.gd:6185
 msgid "%s: secure the first copy in the container."
 msgstr ""
 
-#: scripts/main.gd:6165
+#: scripts/main.gd:6185
 msgid "Preserve both traces before leaving."
 msgstr ""
 
-#: scripts/main.gd:6168
+#: scripts/main.gd:6188
 msgid "%s: enter records access. The Director's purge is still running."
 msgstr ""
 
-#: scripts/main.gd:6168
-#: scripts/main.gd:6176
+#: scripts/main.gd:6188
+#: scripts/main.gd:6196
 msgid "%s: read the Director's purge display."
 msgstr ""
 
-#: scripts/main.gd:6168
+#: scripts/main.gd:6188
 msgid "Return to the safe point to enter records access."
 msgstr ""
 
-#: scripts/main.gd:6171
+#: scripts/main.gd:6191
 msgid "The seal is opening."
 msgstr ""
 
-#: scripts/main.gd:6173
+#: scripts/main.gd:6193
 msgid "%s: save at the safe point."
 msgstr ""
 
-#: scripts/main.gd:6174
+#: scripts/main.gd:6194
 msgid "The seal is open. Move to the safe point."
 msgstr ""
 
-#: scripts/main.gd:6178
+#: scripts/main.gd:6198
 msgid "WOLF is moving to the contact."
 msgstr ""
 
-#: scripts/main.gd:6181
+#: scripts/main.gd:6201
 msgid "The bypass is dead. Arm the breaker first."
 msgstr ""
 
-#: scripts/main.gd:6183
+#: scripts/main.gd:6203
 msgid "%s: crank the manual bypass, %d of %d."
 msgstr ""
 
 #. TRANSLATORS: %s is the key or button to hold. "Yourself" must not show the engineer's gender (no сам/сама, sam/sama): rephrase.
 #. i18n: speaker=hint engineer=you slot=key
-#: scripts/main.gd:6188
+#: scripts/main.gd:6208
 msgid "%s: crank it yourself, or let WOLF take the relay."
 msgstr ""
 
-#: scripts/main.gd:6189
+#: scripts/main.gd:6209
 msgid "%s: crank on, %d of %d, or let WOLF take the relay."
 msgstr ""
 
-#: scripts/main.gd:6192
+#: scripts/main.gd:6212
 msgid "The breaker is live. Go to the MANUAL BYPASS by the relay."
 msgstr ""
 
-#: scripts/main.gd:6192
+#: scripts/main.gd:6212
 msgid "The breaker is live. Go to the coolant relay."
 msgstr ""
 
-#: scripts/main.gd:6197
+#: scripts/main.gd:6217
 msgid "%s: talk to WOLF about the relay."
 msgstr ""
 
-#: scripts/main.gd:6197
+#: scripts/main.gd:6217
 msgid "%s: arm the breaker."
 msgstr ""
 
-#: scripts/main.gd:6200
+#: scripts/main.gd:6220
 msgid "The relay is dark. Return to the breaker first."
 msgstr ""
 
-#: scripts/main.gd:6201
+#: scripts/main.gd:6221
 msgid "WOLF refused the live contact. Use the MANUAL BYPASS beside it."
 msgstr ""
 
-#: scripts/main.gd:6201
+#: scripts/main.gd:6221
 msgid "%s: signal WOLF to take the contact."
 msgstr ""
 
-#: scripts/main.gd:6203
+#: scripts/main.gd:6223
 msgid "Go to the MANUAL BYPASS beside the relay."
 msgstr ""
 
-#: scripts/main.gd:6203
+#: scripts/main.gd:6223
 msgid "Go to the coolant relay. WOLF is ready for the contact."
 msgstr ""
 
-#: scripts/main.gd:6205
+#: scripts/main.gd:6225
 msgid "Return to the breaker and arm power."
 msgstr ""
 
-#: scripts/main.gd:6206
+#: scripts/main.gd:6226
 msgid "Find the breaker. WOLF will follow your lead."
 msgstr ""
 
-#: scripts/main.gd:6231
+#: scripts/main.gd:6251
 msgid "The vent is about to blow. Get off the grate now."
 msgstr ""
 
-#: scripts/main.gd:6231
+#: scripts/main.gd:6251
 msgid "Relief vent. Get off the grate before the gauge peaks."
 msgstr ""
 
-#: scripts/main.gd:6235
+#: scripts/main.gd:6255
 msgid "%s: arm the overload breaker."
 msgstr ""
 
-#: scripts/main.gd:6237
+#: scripts/main.gd:6257
 msgid "%s: reset the breaker. The vent let go."
 msgstr ""
 
-#: scripts/main.gd:6239
+#: scripts/main.gd:6259
 msgid "The line is live. Get to the valve by the door."
 msgstr ""
 
-#: scripts/main.gd:6241
+#: scripts/main.gd:6261
 msgid "%s: crank the valve, %d of %d turns."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:6243
+#: scripts/main.gd:6263
 #: scripts/story_text.gd:163
 msgid "Fuse lit. Get clear of the door."
 msgstr ""
 
-#: scripts/main.gd:6245
+#: scripts/main.gd:6265
 msgid "The valve is dead. Arm the breaker by the entrance."
 msgstr ""
 
-#: scripts/main.gd:6247
+#: scripts/main.gd:6267
 msgid "Relief vent. It lets go when the gauge peaks."
 msgstr ""
 
-#: scripts/main.gd:6250
+#: scripts/main.gd:6270
 msgid "The line is building. Crank the valve by the door."
 msgstr ""
 
-#: scripts/main.gd:6252
+#: scripts/main.gd:6272
 msgid "The breaker tripped. Reset it by the entrance."
 msgstr ""
 
-#: scripts/main.gd:6254
+#: scripts/main.gd:6274
 msgid "Arm the breaker by the entrance, then crank the valve by the door."
 msgstr ""
 
-#: scripts/main.gd:6254
+#: scripts/main.gd:6274
 msgid "Get through the sealed door."
 msgstr ""
 
-#: scripts/main.gd:6277
+#: scripts/main.gd:6297
 msgid "The door is open."
 msgstr ""
 
-#: scripts/main.gd:6282
+#: scripts/main.gd:6302
 msgid "%s: pop the exit bolt."
 msgstr ""
 
 #. TRANSLATORS: i18n: story speaker=narrator
-#: scripts/main.gd:6284
+#: scripts/main.gd:6304
 #: scripts/story_text.gd:226
 msgid "The bolt is taking the charge."
 msgstr ""
 
-#: scripts/main.gd:6286
-#: scripts/main.gd:6290
+#: scripts/main.gd:6306
+#: scripts/main.gd:6310
 msgid "The door is opening."
 msgstr ""
 
-#: scripts/main.gd:6288
-#: scripts/main.gd:6291
+#: scripts/main.gd:6308
+#: scripts/main.gd:6311
 msgid "The door is open. Leave through it."
 msgstr ""
 
-#: scripts/main.gd:6291
+#: scripts/main.gd:6311
 msgid "The sentry is down. Pop the exit bolt by the door."
 msgstr ""
 
-#: scripts/main.gd:6293
+#: scripts/main.gd:6313
 msgid "Coolant cloud. Get out of it."
 msgstr ""
 
-#: scripts/main.gd:6295
+#: scripts/main.gd:6315
 msgid "It's after you. Get back over the rubble."
 msgstr ""
 
-#: scripts/main.gd:6300
+#: scripts/main.gd:6320
 msgid "Wait for WOLF to park it on the mark."
 msgstr ""
 
-#: scripts/main.gd:6300
+#: scripts/main.gd:6320
 msgid "%s: drop the tank. It's parked on the mark."
 msgstr ""
 
-#: scripts/main.gd:6301
+#: scripts/main.gd:6321
 msgid "%s: drop the tank. Land it with the sentry on the mark."
 msgstr ""
 
-#: scripts/main.gd:6303
+#: scripts/main.gd:6323
 msgid "The tank is falling."
 msgstr ""
 
-#: scripts/main.gd:6305
+#: scripts/main.gd:6325
 msgid "The winch is hauling the tank back up. Wait for the clamp."
 msgstr ""
 
-#: scripts/main.gd:6307
+#: scripts/main.gd:6327
 msgid "Stay back over the rubble until it gives up."
 msgstr ""
 
-#: scripts/main.gd:6309
+#: scripts/main.gd:6329
 msgid "You're in its sights. Hide at the TANK RELEASE or the rubble."
 msgstr ""
 
-#: scripts/main.gd:6311
+#: scripts/main.gd:6331
 msgid "WOLF is drawing the sentry onto the mark. Get to the TANK RELEASE."
 msgstr ""
 
-#: scripts/main.gd:6313
+#: scripts/main.gd:6333
 msgid "WOLF has broken off. Time the drop on its patrol from the TANK RELEASE."
 msgstr ""
 
-#: scripts/main.gd:6314
+#: scripts/main.gd:6334
 msgid "The sentry patrols past the rubble. The TANK RELEASE hides you from it."
 msgstr ""
 
-#: scripts/main.gd:6323
+#: scripts/main.gd:6343
 msgid "SERVICE LINE CLEARED"
 msgstr ""
 
-#: scripts/main.gd:6325
+#: scripts/main.gd:6345
 msgid "POP THE EXIT BOLT"
 msgstr ""
 
-#: scripts/main.gd:6328
+#: scripts/main.gd:6348
 msgid "DROP THE TANK"
 msgstr ""
 
-#: scripts/main.gd:6328
+#: scripts/main.gd:6348
 msgid "GO THROUGH THE DOOR"
 msgstr ""
 
-#: scripts/main.gd:6331
+#: scripts/main.gd:6351
 msgid "CRANK THE VALVE"
 msgstr ""
 
-#: scripts/main.gd:6333
+#: scripts/main.gd:6353
 msgid "GET CLEAR OF THE DOOR"
 msgstr ""
 
-#: scripts/main.gd:6334
-#: scripts/main.gd:6350
+#: scripts/main.gd:6354
+#: scripts/main.gd:6370
 msgid "ARM THE BREAKER"
 msgstr ""
 
-#: scripts/main.gd:6337
+#: scripts/main.gd:6357
 msgid "FIRST COPY SECURED"
 msgstr ""
 
-#: scripts/main.gd:6339
+#: scripts/main.gd:6359
 msgid "COPY PURGE ORDER"
 msgstr ""
 
-#: scripts/main.gd:6341
+#: scripts/main.gd:6361
 msgid "COPY MIRROR INDEX"
 msgstr ""
 
-#: scripts/main.gd:6342
+#: scripts/main.gd:6362
 msgid "REACH EXIT"
 msgstr ""
 
-#: scripts/main.gd:6344
+#: scripts/main.gd:6364
 msgid "SAFE POINT REACHED"
 msgstr ""
 
-#: scripts/main.gd:6346
+#: scripts/main.gd:6366
 msgid "REACH SAFE POINT"
 msgstr ""
 
-#: scripts/main.gd:6348
+#: scripts/main.gd:6368
 msgid "OPEN THE SEAL"
 msgstr ""
 
-#: scripts/main.gd:6351
+#: scripts/main.gd:6371
 msgid "CHECK THE BREAKER"
 msgstr ""
 
