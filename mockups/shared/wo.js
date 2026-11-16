@@ -2039,6 +2039,13 @@
   }
   /** Scrolls tab strip [bar] (canvas px) so [tab] is whole beside its sticky end glyphs. */
   function tabIntoView(bar, tab) {
+    // Phone tab rails scroll vertically; keep the selected tab inside that rail only.
+    if (bar.scrollHeight > bar.clientHeight) {
+      const br = bar.getBoundingClientRect(), tr = tab.getBoundingClientRect();
+      const scale = br.height / bar.offsetHeight || 1;
+      if (tr.top < br.top) bar.scrollTop += (tr.top - br.top) / scale;
+      else if (tr.bottom > br.bottom) bar.scrollTop += (tr.bottom - br.bottom) / scale;
+    }
     if (bar.scrollWidth <= bar.clientWidth) return;
     const lead = bar.querySelector(':scope > [data-wo-glyph]:first-child'), tail = bar.querySelector(':scope > [data-wo-glyph]:last-child');
     const gap = parseFloat(getComputedStyle(bar).columnGap) || 0;

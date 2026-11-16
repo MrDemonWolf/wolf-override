@@ -448,17 +448,21 @@ html[data-touch-scheme="pad"] [data-wo-scheme="tapwalk"], html[data-touch-scheme
 .wo-frame[data-profile="phone"] .wo-settings {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr);
   column-gap: var(--wo-density-edge-pad);
   row-gap: var(--wo-density-gap);
 }
 .wo-frame[data-profile="phone"] .wo-settings-head { grid-column: 1 / -1; grid-row: 1; align-self: center; }
-.wo-frame[data-profile="phone"] .wo-settings > .wo-footer { grid-column: 2; grid-row: 1; justify-self: end; align-self: center; margin-top: 0; }
-.wo-frame[data-profile="phone"] .wo-settings > .wo-tabs { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: var(--wo-density-gap); overflow: visible; }
+/* Phone settings reserve space for controls; the heading still follows the selected text scale. */
+.wo-frame[data-profile="phone"] .wo-settings-head > .wo-t-h1 { font-size: var(--wo-fs-h3); }
+.wo-frame[data-profile="phone"] .wo-settings-head > .wo-t-caption { display: none; }
+/* Back gets its own row so enlarged headings never paint underneath it. */
+.wo-frame[data-profile="phone"] .wo-settings > .wo-footer { grid-column: 1 / -1; grid-row: 2; justify-self: end; align-self: center; margin-top: 0; }
+.wo-frame[data-profile="phone"] .wo-settings > .wo-tabs { grid-column: 1; grid-row: 3; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: var(--wo-density-gap); min-height: 0; overflow-y: auto; overflow-x: hidden; }
 .wo-frame[data-profile="phone"] .wo-settings > .wo-tabs > .wo-tab { grid-column: 1 / -1; }
 .wo-frame[data-profile="phone"] .wo-settings > .wo-tabs > .wo-glyph:first-child { position: static; grid-row: 1; grid-column: 1; justify-self: start; }
 .wo-frame[data-profile="phone"] .wo-settings > .wo-tabs > .wo-glyph:last-child { position: static; grid-row: 1; grid-column: 2; justify-self: end; }
-.wo-frame[data-profile="phone"] .wo-settings-body { grid-column: 2; grid-row: 2; }
+.wo-frame[data-profile="phone"] .wo-settings-body { grid-column: 2; grid-row: 3; }
 
 /* Rows: label | control, one control column per page (density.control-share of the row, a
    proposal), so every control and slider starts at the same x. A note runs under both. */
