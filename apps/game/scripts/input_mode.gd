@@ -32,6 +32,9 @@ var controller_device: int:
 			changed.emit()
 ## Mouse motion can hide a focus ring without replacing controller or keyboard prompts.
 var pointer_focus: bool = false
+## Native cursor policy follows pad use but lets real mouse motion reveal the pointer without changing prompts.
+var cursor_mode: Input.MouseMode:
+	get: return Input.MOUSE_MODE_HIDDEN if controller_active and not pointer_focus else Input.MOUSE_MODE_VISIBLE
 ## Existing Main/test properties remain views of this owner, not separate state.
 var touch_enabled: bool:
 	get: return kind == Kind.TOUCH

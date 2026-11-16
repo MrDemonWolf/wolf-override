@@ -20,8 +20,10 @@ func _run() -> void:
 	_expect(not mode.observe(stick) and mode.kind == InputMode.Kind.KEYBOARD, "small stick drift never changes the input class")
 	stick.axis_value = 0.46
 	_expect(mode.observe(stick) and mode.controller_active and mode.controller_device == 7 and not mode.pointer_focus, "a deliberate stick input selects the actual pad and restores focus")
+	_expect(mode.cursor_mode == Input.MOUSE_MODE_HIDDEN, "deliberate pad use hides the native cursor")
 	mode.observe(mouse)
 	_expect(mode.controller_active, "mouse motion does not replace controller prompts")
+	_expect(mode.cursor_mode == Input.MOUSE_MODE_VISIBLE, "mouse motion reveals the cursor while controller prompts stay selected")
 	var tap: InputEventScreenTouch = InputEventScreenTouch.new()
 	tap.pressed = true
 	mode.observe(tap)
@@ -31,6 +33,7 @@ func _run() -> void:
 	click.device = InputEvent.DEVICE_ID_EMULATION
 	mode.observe(click)
 	_expect(mode.touch_layout() and not mode.pointer_focus, "the emulated mouse press after touch cannot undo touch mode")
+	_expect(mode.cursor_mode == Input.MOUSE_MODE_VISIBLE, "touch and its emulated click do not leave desktop cursor state hidden")
 	mode.observe(key_event(KEY_E))
 	_expect(mode.kind == InputMode.Kind.KEYBOARD and not mode.touch_layout(), "keyboard input switches away from touch")
 	click.device = 0
@@ -40,6 +43,7 @@ func _run() -> void:
 	pad.device = 11
 	mode.observe(pad)
 	_expect(mode.controller_device == 11 and mode.controller_active, "switching pads updates identity even within controller mode")
+	_expect(mode.cursor_mode == Input.MOUSE_MODE_HIDDEN, "a new pad press hides the mouse pointer again")
 	pad.pressed = false
 	_expect(not mode.observe(pad) and mode.controller_device == 11, "release events leave identity unchanged")
 	_expect(InputMode.binding_kind(key_event(KEY_Q)) == "keyboard" and InputMode.binding_kind(stick) == "controller" and InputMode.binding_kind(tap).is_empty(), "bindings share the input type classification without accepting touch")

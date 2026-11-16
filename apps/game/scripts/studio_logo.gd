@@ -13,7 +13,7 @@ extends Control
 ## whose scripts preload assets while compiling on a worker thread leaks the engine's load tokens at exit.
 ## While the logo is up it also draws each of the game's canvas shaders once, unseen (warm_shaders), so the
 ## title and the first room do not stall compiling them on their first frame (SMOOTH-6).
-## Any key, mouse button, controller button or touch skips to the title as soon as it has loaded, and
+## Any key, mouse button, controller button, deliberate stick push or touch skips to the title as soon as it has loaded, and
 ## presses are swallowed for a moment after the cut so a player still mashing to skip never picks a
 ## title option unseen. A saved window size and fullscreen apply on the first frame, not at the title.
 ## Closing the window while a background load runs waits for it, so no load is cut off mid-way.
@@ -195,7 +195,7 @@ func _process(delta: float) -> void:
 		_hand_over()
 
 
-## Any key, mouse button, controller button or touch press skips to the closing fade (skip) and is
+## Any key, mouse button, controller button, deliberate stick push or touch press skips to the closing fade (skip) and is
 ## marked handled. Ignored after the hand-over or under manual_clock.
 func _input(event: InputEvent) -> void:
 	if handed_over or manual_clock:
@@ -205,6 +205,9 @@ func _input(event: InputEvent) -> void:
 		pressed = event.pressed and not event.is_echo()
 	elif event is InputEventMouseButton or event is InputEventJoypadButton or event is InputEventScreenTouch:
 		pressed = event.is_pressed()
+	elif event is InputEventJoypadMotion:
+		# Brief4.3: stick travel beyond the shared deliberate-input threshold skips; triggers and drift do not.
+		pressed = event.axis in [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y, JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y] and absf(event.axis_value) > InputMode.CAPTURE_THRESHOLD
 	if pressed:
 		skip()
 		get_viewport().set_input_as_handled()

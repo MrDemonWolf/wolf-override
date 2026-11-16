@@ -2790,6 +2790,7 @@ func _on_input_mode_changed() -> void:
 ## Observes input even when menus consume it; this method applies the shared owner's state to focus and UI.
 func _note_input_device(event: InputEvent) -> void:
 	var navigation_press: bool = input_mode.observe(event)
+	Input.mouse_mode = input_mode.cursor_mode
 	if mouse_active:
 		var focused: Control = get_viewport().gui_get_focus_owner()
 		if focused != null:

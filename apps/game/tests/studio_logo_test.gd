@@ -201,7 +201,7 @@ func _check_skip_waits_for_load() -> void:
 	await _leave_title()
 
 
-## Which presses (touch, click, controller button, key) skip the logo, and when.
+## Which native presses and stick deflections skip the logo; releases, drift and triggers never do.
 func _check_skip_inputs() -> void:
 	var logo: StudioLogo = _add_logo(false)
 	logo.hold_load = true
@@ -216,6 +216,12 @@ func _check_skip_inputs() -> void:
 	var echo: InputEventKey = key_event(KEY_ENTER, true)
 	echo.echo = true
 	var cases: Dictionary = {"a key press": [key_event(KEY_ENTER, true), true], "a touch": [touch, true], "a mouse button": [click, true], "a controller button": [pad, true], "a key release": [key_event(KEY_ENTER, false), false], "a held key's repeat": [echo, false]}
+	for axis: int in [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y, JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y, JOY_AXIS_TRIGGER_LEFT, JOY_AXIS_TRIGGER_RIGHT]:
+		for value: float in [0.0, 0.64, 0.65, 0.66, -0.66]:
+			var motion: InputEventJoypadMotion = InputEventJoypadMotion.new()
+			motion.axis = axis
+			motion.axis_value = value
+			cases["axis%d at%.2f" % [axis, value]] = [motion, axis <= JOY_AXIS_RIGHT_Y and absf(value) > 0.65]
 	for label: String in cases.keys():
 		logo.skipping = false
 		logo.seek(0.0)
