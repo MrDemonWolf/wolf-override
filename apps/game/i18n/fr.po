@@ -3562,3 +3562,94 @@ msgstr "AVANCE AUTOMATIQUE"
 #: scripts/game_settings.gd
 msgid "DIALOGUE BACKING"
 msgstr "FOND DES DIALOGUES"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Cross"
+msgstr "Croix"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Circle"
+msgstr "Rond"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Square"
+msgstr "Carré"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Triangle"
+msgstr "Triangle"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Create"
+msgstr "Création"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "View"
+msgstr "Affichage"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Options"
+msgstr "Options"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Menu"
+msgstr "Menu"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Left stick press"
+msgstr "Appuyer sur le stick gauche"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Right stick press"
+msgstr "Appuyer sur le stick droit"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "D-pad up"
+msgstr "Croix directionnelle haut"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "D-pad down"
+msgstr "Croix directionnelle bas"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
+msgstr "Icônes de manette : Kenney (CC0), conversion en police par univeous (MIT)."

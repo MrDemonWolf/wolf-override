@@ -2214,7 +2214,9 @@ func _fill_credits() -> void:
 	var heading: String = tr(AI_DISCLOSURE_HEADING)
 	# TRANSLATORS: The AI disclosure Nathanial Henniges approved word for word (October 19, 2026). Translate it faithfully and in full; do not shorten, soften or add to it. Keep WOLF OVERRIDE, Nathanial Henniges and MrDemonWolf, Inc. as written.
 	var disclosure: String = tr(AI_DISCLOSURE)
-	credits_body.text = "[center][color=#73DDF5]%s[/color]\n%s[/center]\n\n\n%s" % [heading, disclosure, tr(_credits_english)]
+	# TRANSLATORS: Asset credit only; keep Kenney, univeous, CC0 and MIT unchanged.
+	var prompt_credit: String = I18n.KEY.tr("Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT).")
+	credits_body.text = "[center][color=#73DDF5]%s[/color]\n%s[/center]\n\n\n%s\n\n%s" % [heading, disclosure, tr(_credits_english), tr(prompt_credit)]
 
 
 ## Closes the credits and returns the focus to the title's credits button.
@@ -2555,6 +2557,7 @@ func _show_pause_hint(tapped: bool) -> void:
 		hint.text = HudText.card(_objective_card_message())
 	else:
 		hint.text = tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)])
+	hint.accessibility_name = settings_menu.describe_prompts(hint.text)
 	# The useful context stays above Resume, including when the action list scrolls at 200%.
 	hint.get_parent().move_child(hint, 0 if controller_disconnected or has_goal else hint.get_parent().get_child_count() - 1)
 
@@ -2761,7 +2764,10 @@ func _answer_choice(response: int) -> void:
 ## Losing the pad actually in use pauses live play; other pads and reconnects never change menu state.
 ## Device IDs come from Input's connection signal and may be nonzero. Existing pause releases held actions.
 func _on_joy_connection_changed(device: int, connected: bool) -> void:
-	if connected or device != input_mode.controller_device:
+	if device != input_mode.controller_device:
+		return
+	if connected:
+		input_mode.refresh_controller_family()
 		return
 	impact.stop_rumble()
 	if controller_active and not title_open and not end_card_active and not get_tree().paused:
@@ -2771,6 +2777,7 @@ func _on_joy_connection_changed(device: int, connected: bool) -> void:
 
 ## Applies a shared input-class or pad change to rumble routing and every open menu's prompts.
 func _on_input_mode_changed() -> void:
+	settings_menu.show_controller_family(input_mode.controller_family)
 	if input_mode.controller_device >= 0:
 		impact.rumble_device = input_mode.controller_device
 	_refresh_ui()
@@ -5329,6 +5336,7 @@ func _refresh_ui() -> void:
 		for hud_part: CanvasItem in [pause_button, touch_controls, tutorial_prompt, top_card, context_hint, bottom_bar]:
 			hud_part.hide()
 		end_card_button.text = _continue_prompt(touch_layout)
+		end_card_button.accessibility_name = settings_menu.describe_prompts(end_card_button.text)
 		return
 	pause_button.visible = touch_layout and not title_open and not pause_overlay.visible
 	# PAUSE is one whole message, so the button translates itself (auto-translate); the mark is for the
@@ -5474,6 +5482,8 @@ func _set_dialogue(hint: String) -> void:
 	context_hint_text.text = hint
 	world_input.show_station_names(not bottom_bar.visible and not intro_active and not chapter_close_active or _live_hazard())
 	_sync_dialogue_reveal()
+	story.accessibility_name = settings_menu.describe_prompts(story.text)
+	context_hint_text.accessibility_name = settings_menu.describe_prompts(hint)
 
 
 ## The speaker tags a box can open with, in English: WOLF, the Director (and his purge display) and the
@@ -6045,6 +6055,8 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 		var text: String = answer if touch_layout else "%s  %s" % [key, answer]
 		if button.text != text:
 			button.text = text
+		button.accessibility_name = answer
+		button.accessibility_description = "" if touch_layout else settings_menu.describe_prompts(key)
 		if button.autowrap_mode != TextServer.AUTOWRAP_WORD_SMART:
 			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if touch_layout:

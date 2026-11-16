@@ -280,6 +280,8 @@ static func use_fallback(language: String) -> void:
 		if code != language and path is String:
 			others.append(path as String)
 	var own: Font = fallback_font(language)
+	# Common glyphs stay behind both base fonts when language-specific fallbacks change.
+	var prompts: Font = load(ControllerGlyphs.FONT_PATH) as Font
 	if own == null and not font_chain_complete(language):
 		push_warning("I18n: the %s fallback font is not in the build: %s" % [language, _row(language)["fallback_font"]])
 	for path: String in BASE_FONT_PATHS:
@@ -290,6 +292,8 @@ static func use_fallback(language: String) -> void:
 		for font: Font in base.fallbacks:
 			if not others.has(font.resource_path) and font != own:
 				chain.append(font)
+		if prompts != null and not chain.has(prompts):
+			chain.append(prompts)
 		if own != null:
 			chain.append(own)
 		if chain != base.fallbacks:

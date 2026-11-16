@@ -3488,3 +3488,94 @@ msgstr "自動送り"
 #: scripts/game_settings.gd
 msgid "DIALOGUE BACKING"
 msgstr "会話の背景"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Cross"
+msgstr "クロス"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Circle"
+msgstr "丸"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Square"
+msgstr "四角"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Triangle"
+msgstr "三角"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Create"
+msgstr "クリエイト"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "View"
+msgstr "ビュー"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Options"
+msgstr "オプション"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Menu"
+msgstr "メニュー"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Left stick press"
+msgstr "左スティック押し込み"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Right stick press"
+msgstr "右スティック押し込み"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "D-pad up"
+msgstr "十字キー上"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "D-pad down"
+msgstr "十字キー下"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
+msgstr "コントローラーアイコン：Kenney（CC0）。フォント変換：univeous（MIT）。"

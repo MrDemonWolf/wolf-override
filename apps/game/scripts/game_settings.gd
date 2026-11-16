@@ -20,6 +20,8 @@ const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"
 ## names can carry the I18n.KEY.tr() marks the translation template is extracted from (a const
 ## initialiser cannot call a method).
 static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr("Move right"), I18n.KEY.tr("Interact / continue"), I18n.KEY.tr("Response 1"), I18n.KEY.tr("Response 2"), I18n.KEY.tr("Pause"), I18n.KEY.tr("Show objective")]
+## Spoken face-button names follow physical SDL positions; Steam uses the Xbox letter fallback.
+static var PAD_FACE_NAMES: Dictionary = {&"xbox": ["A", "B", "X", "Y"], &"playstation": [I18n.KEY.tr("Cross"), I18n.KEY.tr("Circle"), I18n.KEY.tr("Square"), I18n.KEY.tr("Triangle")], &"nintendo": ["B", "A", "Y", "X"]}
 ## Display names of the other actions a rebind can clash with (Main's _install_inputs), so the "Already
 ## used by" note never shows an id. The English is the id with "_" as a space, as the note showed before.
 static var OTHER_ACTION_NAMES: Dictionary = {&"cycle_name": I18n.KEY.tr("cycle name")}
@@ -116,6 +118,8 @@ var _pad_prompts: Dictionary = {}
 ## NOTIFICATION_TRANSLATION_CHANGED: the notification reaches Main before this child, so Main's own
 ## handler (Pause's hint) would still read the old language's names.
 var _prompts_language: String = ""
+## Cached presentation identity from Main's shared InputMode; never a saved input mapping.
+var _controller_family: StringName = &"xbox"
 ## The language the player picked (or the file held), written back as [general] language; "" while
 ## none was chosen, so the game keeps following the OS (DESIGN.md: no "follow the system" entry; the
 ## first run follows the OS, and a pick is kept).
@@ -872,16 +876,16 @@ func _decode_binding(data: Dictionary) -> InputEvent:
 
 ## Every [param kind] ("keyboard" or "controller") binding of [param action] by name in the current
 ## language, joined by " / ", as the CONTROLS page's buttons show them; "" when it has none.
-func binding_label(action: StringName, kind: String) -> String:
+func binding_label(action: StringName, kind: String, icons: bool = true) -> String:
 	var labels: PackedStringArray = []
 	for event: InputEvent in InputMap.action_get_events(action):
 		if InputMode.binding_kind(event) == kind:
 			if event is InputEventKey:
 				labels.append(key_name(event))
 			elif event is InputEventJoypadButton:
-				labels.append(_button_label(event.button_index))
+				labels.append(_button_label(event.button_index, icons))
 			elif event is InputEventJoypadMotion:
-				labels.append("%s %s" % [tr("Left stick") if event.axis == JOY_AXIS_LEFT_X else I18n.fill(I18n.KEY.tr("Axis %d"), [event.axis]), "−" if event.axis_value < 0 else "+"])
+				labels.append(_axis_label(event.axis, event.axis_value, icons))
 	return " / ".join(labels)
 
 
@@ -910,7 +914,7 @@ func _prompt_label(action: StringName, controller: bool) -> String:
 		if controller and event is InputEventJoypadButton:
 			return _button_label(event.button_index)
 		if controller and event is InputEventJoypadMotion:
-			return I18n.fill(I18n.KEY.tr("AXIS %d %s"), [event.axis, "−" if event.axis_value < 0 else "+"])
+			return _axis_label(event.axis, event.axis_value, true)
 	return "?"
 
 
@@ -953,19 +957,54 @@ func key_label_name(physical: Key, label: Key) -> String:
 	return tr(name, KEY_NAME_CONTEXT) if I18n.has_words(name) else name
 
 
-## The name of controller button [param index], in the current language: the face buttons keep their
-## printed letters (A, B, X, Y), the rest are translated.
-func _button_label(index: int) -> String:
+## Returns the active family's icon, or its spoken name when [param icons] is false; unknowns keep a number.
+func _button_label(index: int, icons: bool = true) -> String:
+	var glyph: String = ControllerGlyphs.button(_controller_family, index)
+	if icons and not glyph.is_empty():
+		return glyph
+	if index >= JOY_BUTTON_A and index <= JOY_BUTTON_Y:
+		return tr(PAD_FACE_NAMES.get(_controller_family, PAD_FACE_NAMES[&"xbox"])[index])
 	match index:
-		JOY_BUTTON_A: return "A"
-		JOY_BUTTON_B: return "B"
-		JOY_BUTTON_X: return "X"
-		JOY_BUTTON_Y: return "Y"
-		JOY_BUTTON_START: return tr("START")
-		JOY_BUTTON_BACK: return tr("VIEW")
+		JOY_BUTTON_BACK: return tr("Create") if _controller_family == &"playstation" else ("−" if _controller_family == &"nintendo" else tr("View"))
+		JOY_BUTTON_START: return tr("Options") if _controller_family in [&"playstation", &"steam_deck"] else ("+" if _controller_family == &"nintendo" else tr("Menu"))
+		JOY_BUTTON_LEFT_STICK: return tr("Left stick press")
+		JOY_BUTTON_RIGHT_STICK: return tr("Right stick press")
+		JOY_BUTTON_LEFT_SHOULDER: return "L" if _controller_family == &"nintendo" else ("L1" if _controller_family in [&"playstation", &"steam_deck"] else "LB")
+		JOY_BUTTON_RIGHT_SHOULDER: return "R" if _controller_family == &"nintendo" else ("R1" if _controller_family in [&"playstation", &"steam_deck"] else "RB")
+		JOY_BUTTON_DPAD_UP: return tr("D-pad up")
+		JOY_BUTTON_DPAD_DOWN: return tr("D-pad down")
 		JOY_BUTTON_DPAD_LEFT: return tr("D-pad left")
 		JOY_BUTTON_DPAD_RIGHT: return tr("D-pad right")
 	return I18n.fill(I18n.KEY.tr("BUTTON %d"), [index])
+
+
+## Shared axis presentation for bindings, HUD and spoken descriptions; [param value] is a signed axis half.
+func _axis_label(index: int, value: float, icons: bool) -> String:
+	var glyph: String = ControllerGlyphs.axis(_controller_family, index, value)
+	if icons and not glyph.is_empty():
+		return glyph
+	return "%s %s" % [tr("Left stick") if index == JOY_AXIS_LEFT_X else I18n.fill(I18n.KEY.tr("Axis %d"), [index]), "−" if value < 0.0 else "+"]
+
+
+## Expands visible private-use glyphs to translated names for native accessibility and tooltips.
+## Does not change the drawn words, their wrapping, bindings or story state.
+func describe_prompts(words: String) -> String:
+	for button: int in ControllerGlyphs.BUTTON_KEYS:
+		words = words.replace(ControllerGlyphs.button(_controller_family, button), _button_label(button, false))
+	for axis: int in ControllerGlyphs.AXIS_KEYS:
+		for direction: float in [-1.0, 1.0]:
+			var glyph: String = ControllerGlyphs.axis(_controller_family, axis, direction)
+			if not glyph.is_empty():
+				words = words.replace(glyph, _axis_label(axis, direction, false))
+	return words
+
+
+## Refreshes both binding rows and HUD prompt caches when the active pad's presentation family changes.
+## The caller supplies InputMode's identity; this never remaps physical inputs or writes a preference.
+func show_controller_family(family: StringName) -> void:
+	if family != _controller_family:
+		_controller_family = family
+		_refresh_bindings()
 
 
 ## Drops the remembered prompt labels, so the next prompt call works them out again.
@@ -987,7 +1026,8 @@ func _refresh_bindings() -> void:
 			# the CONTROLS page scrolls.
 			button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			button.tooltip_text = button.text
+			button.tooltip_text = binding_label(action, kind, false)
+			button.accessibility_name = "%s: %s" % [tr(ACTION_NAMES[ACTIONS.find(action)]), button.tooltip_text]
 
 
 ## Puts every action in ACTIONS back to the project's default bindings and the dead zone back to 0.25,

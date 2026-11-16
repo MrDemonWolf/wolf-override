@@ -160,7 +160,7 @@ func _run() -> void:
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	# Native input is buffered; allow its dispatch before checking the capture result.
 	await settle(2)
-	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation (prompt=%s paused=%s visible=%s capture=%s)" % [menu.prompt(&"choice_1", true), paused, menu.is_visible_in_tree(), menu.capture_action])
+	_expect(menu.prompt(&"choice_1", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_B) and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation (prompt=%s paused=%s visible=%s capture=%s)" % [menu.prompt(&"choice_1", true), paused, menu.is_visible_in_tree(), menu.capture_action])
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	menu.begin_capture(&"move_left", "controller")
@@ -168,14 +168,14 @@ func _run() -> void:
 	axis.axis = JOY_AXIS_RIGHT_X
 	axis.axis_value = -0.8
 	menu._input(axis)
-	_expect(menu.prompt(&"move_left", true) == "AXIS 2 −", "stick direction can be rebound")
+	_expect(menu.prompt(&"move_left", true) == ControllerGlyphs.axis(&"xbox", JOY_AXIS_RIGHT_X, -1.0), "stick direction can be rebound")
 	menu.deadzone.value = 0.4
 	_expect(is_equal_approx(InputMap.action_get_deadzone(&"move_left"), 0.4), "stick deadzone applies to gameplay")
 	config.load(path)
 	_expect(config.get_value("bindings", "interact_keyboard").code == KEY_Q and config.get_value("audio", "Effects") == 37.0, "remapping preserves audio and display settings")
 	var saved: ConfigFile = config
 	menu.reset_controls()
-	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", true) == "X", "reset restores keyboard and controller defaults")
+	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_X), "reset restores keyboard and controller defaults")
 	var reset_config: ConfigFile = ConfigFile.new()
 	reset_config.load(path)
 	_expect(not reset_config.has_section_key("bindings", "interact_keyboard"), "reset clears saved overrides")
@@ -188,7 +188,7 @@ func _run() -> void:
 	reloaded.set("settings_path", path)
 	root.add_child(reloaded)
 	var restored: GameSettings = reloaded.get("settings_menu") as GameSettings
-	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == "B" and restored.prompt(&"move_left", true) == "AXIS 2 −", "reopening restores key, button and stick bindings")
+	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_B) and restored.prompt(&"move_left", true) == ControllerGlyphs.axis(&"xbox", JOY_AXIS_RIGHT_X, -1.0), "reopening restores key, button and stick bindings")
 	_expect((restored.volumes["Effects"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
 	_expect((reloaded.get("resolution_options") as OptionButton).selected == 0, "a saved 960×540 window size still wins over the 1280×720 default")
 	_expect(restored.reduced_motion.button_pressed and (reloaded.get("impact") as Impact).reduce_motion, "reopening restores Reduced Motion and applies it to the impact kit")
@@ -219,7 +219,7 @@ func _run() -> void:
 	root.add_child(swapped_game)
 	var swapped: GameSettings = swapped_game.get("settings_menu") as GameSettings
 	_expect(swapped.prompt(&"interact", false) == "1" and swapped.prompt(&"choice_1", false) == "E", "legitimate saved keyboard swaps survive whole-map validation")
-	_expect(swapped.prompt(&"choice_2", true) == "Y", "invalid saved controller code retains its default")
+	_expect(swapped.prompt(&"choice_2", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_Y), "invalid saved controller code retains its default")
 	_expect(swapped.prompt(&"move_left", false) != swapped.prompt(&"move_right", false) and (swapped.prompt(&"move_left", false) == "A" or swapped.prompt(&"move_right", false) == "D"), "conflicting loaded overrides cannot bind opposing movement to one key")
 	swapped.reset_controls()
 	swapped_game.queue_free()
@@ -511,11 +511,11 @@ func _check_menu_translation(game: Node2D) -> void:
 	catalog.add_message("Press a controller input for %s. Menu cancels.", "Pressione um botão para %d. Esc cancela.")
 	catalog.add_message("Minus", "Menos", GameSettings.KEY_NAME_CONTEXT)
 	TranslationServer.add_translation(catalog)
-	_expect(menu.prompt(&"pause_game", true) == "START" and menu.prompt(&"pause_game", false) == "Escape", "in English the Pause prompts read START and Escape (and are remembered)")
+	_expect(menu.prompt(&"pause_game", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_START) and menu.prompt(&"pause_game", false) == "Escape", "in English Pause uses the Menu glyph and Escape (and they are remembered)")
 	menu.begin_capture(&"pause_game", "keyboard")
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
-	_expect(menu.prompt(&"pause_game", true) == "INÍCIO" and menu.prompt(&"pause_game", false) == "Escape-pt", "a language change forgets the remembered prompts (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
+	_expect(menu.prompt(&"pause_game", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_START) and menu.prompt(&"pause_game", false) == "Escape-pt", "a language change updates key names and preserves pad glyphs (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
 	var keyboard: Button = menu.binding_buttons["pause_game_keyboard"]
 	_expect(keyboard.text == "Escape-pt" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
 	_expect(menu.note.text == "Pressione uma tecla para Pausa (ação). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)

@@ -14,6 +14,8 @@ const NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down
 
 var _kind: Kind = Kind.TOUCH if OS.has_feature("ios") or OS.has_feature("android") else Kind.KEYBOARD
 var _controller_device: int = -1
+## Prompt-art family of the last active pad; unknown/unavailable metadata uses the brief's Xbox fallback.
+var controller_family: StringName = &"xbox"
 ## Script overrides notify the same views as native input; observe coalesces its two field changes.
 var kind: Kind:
 	get: return _kind
@@ -26,6 +28,7 @@ var controller_device: int:
 	set(value):
 		if _controller_device != value:
 			_controller_device = value
+			controller_family = _native_pad_family(value)
 			changed.emit()
 ## Mouse motion can hide a focus ring without replacing controller or keyboard prompts.
 var pointer_focus: bool = false
@@ -53,6 +56,8 @@ func observe(event: InputEvent) -> bool:
 	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > SWITCH_THRESHOLD:
 		_kind = Kind.CONTROLLER
 		_controller_device = event.device
+		if previous_pad != controller_device:
+			controller_family = _native_pad_family(controller_device)
 	elif event is InputEventKey and event.pressed:
 		_kind = Kind.KEYBOARD
 	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag:
@@ -91,3 +96,46 @@ static func tab_step(event: InputEvent) -> int:
 		if event.button_index == JOY_BUTTON_RIGHT_SHOULDER:
 			return 1
 	return 0
+
+
+## Classifies native pad metadata for prompt art only; it never changes physical action mappings.
+## Vendor IDs follow approved brief4.4 (USB decimal IDs). SDL names cover platforms without metadata.
+## shortcut: unknown pads use the approved Xbox fallback; add a name only after observing a real device.
+static func pad_family(info: Dictionary, mapped_name: String) -> StringName:
+	var raw: Variant = info.get("raw_name", "")
+	var name: String = (mapped_name + " " + (raw if raw is String else "")).to_lower()
+	# Steam Input's explicit virtual Xbox layout takes priority over a Valve manufacturer ID.
+	if name.contains("steam virtual gamepad"):
+		return &"xbox"
+	var vendor: Variant = info.get("vendor_id", 0)
+	if vendor is String and vendor.is_valid_int():
+		vendor = int(vendor)
+	if vendor is int:
+		match vendor:
+			1118, 2821: return &"xbox"
+			1356: return &"playstation"
+			1406: return &"nintendo"
+			10462: return &"steam_deck"
+	for word: String in ["playstation", "dualsense", "dualshock", "sony", "ps3", "ps4", "ps5"]:
+		if name.contains(word):
+			return &"playstation"
+	if name.contains("nintendo") or name.contains("switch"):
+		return &"nintendo"
+	if name.contains("steam deck") or name.contains("steam controller"):
+		return &"steam_deck"
+	return &"xbox"
+
+
+## Refreshes metadata after the active device reconnects, without changing input class or menu state.
+func refresh_controller_family() -> void:
+	var family: StringName = _native_pad_family(controller_device)
+	if family != controller_family:
+		controller_family = family
+		changed.emit()
+
+
+## Reads only an actually connected pad; synthetic test IDs and disconnected pads keep a safe fallback.
+static func _native_pad_family(device: int) -> StringName:
+	if not Input.get_connected_joypads().has(device):
+		return &"xbox"
+	return pad_family(Input.get_joy_info(device), Input.get_joy_name(device))
