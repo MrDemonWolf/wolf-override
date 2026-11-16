@@ -121,11 +121,13 @@ print()
 private = sorted(n for n in methods if n.startswith("_"))
 print(f"Private methods (leading underscore) tests call ({len(private)}): " + ", ".join(f"`{n}`" for n in private))
 print()
-# The critique of the plan (section A4) named these 15; every one must stay readable on Main.
-critique_15 = ["BYPASS_CRANK_X", "BYPASS_WHEEL", "CORRIDOR_DOOR_LEFT_X", "CORRIDOR_STATIONS", "INTRO_LINES",
+# The earlier plan kept these constants readable. Responsive camera geometry now has live methods.
+required_constants = ["BYPASS_CRANK_X", "BYPASS_WHEEL", "CORRIDOR_DOOR_LEFT_X", "CORRIDOR_STATIONS", "INTRO_LINES",
                "JUNCTION_STATIONS", "RECORDS_STATIONS", "RELAY_X", "STATION_OVERLAP", "WOLF_BYPASS_CLEAR_X",
-               "WOLF_MIRROR_X", "GAMEPLAY_ZOOM", "GAMEPLAY_CAMERA_Y_TOUCH", "VALVE_CRANK_X", "BOLT_WHINE_SECONDS"]
-print("The critique's 15 constants: " + ", ".join(f"`{n}` ({'read by tests' if n in consts else 'not read in test code now'}, {'defined' if n in defs['const'] else 'MISSING'})" for n in critique_15))
+               "WOLF_MIRROR_X", "GAMEPLAY_ZOOM", "VALVE_CRANK_X", "BOLT_WHINE_SECONDS"]
+print("Required constants: " + ", ".join(f"`{n}` ({'read by tests' if n in consts else 'not read in test code now'}, {'defined' if n in defs['const'] else 'MISSING'})" for n in required_constants))
+required_camera = ["gameplay_view_width", "gameplay_camera_y", "gameplay_camera_limits"]
+print("Responsive camera methods: " + ", ".join(f"`{n}` ({'defined' if n in defs['func'] else 'MISSING'})" for n in required_camera))
 print()
 missing = sorted((set(methods) | set(gets) | set(sets) | set(consts) | set(direct)) - all_main)
 print("Used by tests but not defined at the top level of main.gd (inherited or a bug): " + (", ".join(f"`{m}`" for m in missing) or "none"))
