@@ -27,6 +27,7 @@ func _run() -> void:
 	finish()
 
 
+## When the logo is skipped (the --skip-logo flag, a headless run) and what a launch does meanwhile.
 func _check_skip_rules() -> void:
 	_expect(StudioLogo.wants_skip(PackedStringArray(["--skip-logo"]), "macOS"), "--skip-logo skips the logo on a normal display")
 	_expect(StudioLogo.wants_skip(PackedStringArray(), "headless"), "a headless run skips the logo")
@@ -57,6 +58,7 @@ func _check_launch_skip() -> void:
 	await _leave_title()
 
 
+## The logo's beats on its manual clock (seconds from the first frame), each checked at its time.
 func _check_timeline() -> void:
 	var logo: StudioLogo = _add_logo(false)
 	logo.manual_clock = true
@@ -127,6 +129,7 @@ func _check_shader_warmup(logo: StudioLogo) -> void:
 	_expect(blends == every_mode, "the warm-up draws every CanvasItemMaterial blend mode once")
 
 
+## With Reduced Motion saved in the settings file, the logo swaps to the grin without the hop.
 func _check_reduced_motion() -> void:
 	var text: String = "[video]\nreduced_motion=true\nvsync=false\n"
 	_expect(write_text(settings_path, text), "test file opens for writing: " + settings_path)
@@ -198,6 +201,7 @@ func _check_skip_waits_for_load() -> void:
 	await _leave_title()
 
 
+## Which presses (touch, click, controller button, key) skip the logo, and when.
 func _check_skip_inputs() -> void:
 	var logo: StudioLogo = _add_logo(false)
 	logo.hold_load = true
@@ -235,6 +239,8 @@ func _check_safe_layout() -> void:
 	await _free_logo(logo)
 
 
+## Adds the studio logo scene as the current scene, reading this run's settings file.
+## [param launch_skip] is whether it honours the launch skip (a headless run would always skip).
 func _add_logo(launch_skip: bool) -> StudioLogo:
 	var logo: StudioLogo = LOGO_SCENE.instantiate() as StudioLogo
 	logo.settings_path = settings_path
@@ -259,10 +265,12 @@ func _freed(node: Node) -> Callable:
 	return func() -> bool: return ref.get_ref() == null
 
 
+## True once the current scene is the game's main scene (the title).
 func _on_title() -> bool:
 	return current_scene != null and current_scene.scene_file_path == StudioLogo.MAIN_SCENE
 
 
+## Frees the current scene and waits two process frames for it to go.
 func _leave_title() -> void:
 	if current_scene != null:
 		current_scene.queue_free()

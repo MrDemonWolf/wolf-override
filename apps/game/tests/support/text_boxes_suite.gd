@@ -163,6 +163,10 @@ func _check_corpus() -> void:
 	_expect(boxes > messages.size() * 3, "every line was measured as boxes (%d)" % boxes)
 
 
+## One dialogue box against the text-box rules: one speaker, at most MAX_ROWS rows of at most
+## MAX_ROW_CHARACTERS, fewer than LONG_LINE_WORDS words, and long enough on screen to read.
+## [param box] is the box's text with [param tags] its speaker tags; [param font], [param size] (px)
+## and [param width] (px) are what the game draws it with; [param source] names it in messages.
 func _check_box(box: String, tags: Array[String], font: Font, size: int, width: float, source: String) -> void:
 	var words: String = DialogueBoxes.words_of(box, tags)
 	var rows: Array[String] = DialogueBoxes.row_texts(words, font, size, DialogueBoxes.wrap_width(words, font, size, width, DialogueBoxes.MAX_ROW_CHARACTERS))
@@ -443,6 +447,8 @@ func _corpus() -> Array[String]:
 	return out
 
 
+## [param text] with its format marks filled in, so its length is measured as shown: "%s:" becomes a
+## speaker tag, "%s" a name and "%d" a digit.
 static func _fill(text: String) -> String:
 	return text.replace("%s:", "{NAME}:").replace("%s", "{name}").replace("%d", "8")
 

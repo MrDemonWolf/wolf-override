@@ -141,6 +141,8 @@ func _check_beam_rule() -> void:
 	_expect(Sentry.beam_gap(SentryBrain.PATROL_MAX_X, -1.0) == Vector2.ZERO, "from the far end the beam stops short of the alcove, with no break")
 
 
+## The rooms' lights in the running game, played from the title to the END OF SLICE card: which room's
+## lights run, and what each room's beacons and lamps show at each step.
 func _check_scene() -> void:
 	var game: Node2D = await start_game("room-lights-test", keep_running)
 	var path: String = str(game.get("save_path"))
@@ -436,5 +438,6 @@ func _beacons_settled(depth: RoomDepth) -> bool:
 	return _lens(depth).is_equal_approx(depth.warning_color.darkened(RoomDepth.SETTLED_LENS_DARKEN))
 
 
+## The colour of [param depth]'s first beacon lens right now.
 func _lens(depth: RoomDepth) -> Color:
 	return depth.beacons[0].get("lens")
