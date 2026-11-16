@@ -5194,6 +5194,7 @@ func _wolf_follow_min_x() -> float:
 	return M0Actor.MIN_X
 
 
+## Refreshes HUD visibility and labels; stopped conversations use the dialogue itself to advance.
 func _refresh_ui() -> void:
 	_hud_drawn = true
 	var touch_layout: bool = input_mode.touch_layout()
@@ -5210,12 +5211,12 @@ func _refresh_ui() -> void:
 	# template.
 	pause_button.text = I18n.KEY.tr("PAUSE")
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
-	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active
+	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active and not _conversation_active()
 	touch_left.hide()
 	touch_right.hide()
 	touch_move_pad.visible = touch_layout and touch_move
 	touch_move_pad.enabled = touch_move_pad.is_visible_in_tree() and human.controlled
-	touch_use.visible = touch_layout and not waiting_for_choice and not hatch_exit_walking
+	touch_use.visible = touch_layout and not waiting_for_choice and not hatch_exit_walking and not _conversation_active()
 	# Translated here (its auto-translate is off in main.tscn) so CONTINUE can carry its own context: on
 	# this button it goes on through lines, unlike the title's CONTINUE, which resumes a save. The hint
 	# fills its key token with this word, so both read the same.
@@ -5346,12 +5347,6 @@ func _set_dialogue(hint: String) -> void:
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
 	bottom_bar.visible = not box.is_empty()
-	# Reading has one focus; danger keeps the engineer’s escape control available.
-	if bottom_bar.visible and not _live_hazard():
-		touch_move_pad.hide()
-		# A crank remains actionable while its feedback line is up.
-		if not intro_active and not chapter_close_active and not fail_active and _hold_station().is_empty():
-			touch_use.hide()
 	dialogue_continue.visible = bottom_bar.visible and (not waiting_for_choice or dialogue_index < dialogue_boxes.size() - 1) and not fail_active and not hatch_exit_walking
 	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
 	context_hint.visible = not hint.is_empty() and (not bottom_bar.visible and not intro_active and not chapter_close_active or _urgent_context_hint())
@@ -5581,9 +5576,9 @@ func _dialogue_bottom() -> float:
 	return screen_shape.safe_rect.end.y - DIALOGUE_BOTTOM_INSET
 
 
-## Inner edges of the touch movement/use buttons, with the existing 12 px reading gap.
+## Reserves the entire pad gesture and USE, with the authored 12 canvas-px reading gap.
 func _touch_hint_span() -> Vector2:
-	return Vector2(touch_right.position.x + touch_right.size.x + 12.0, touch_use.position.x - 12.0)
+	return Vector2(touch_move_pad.gesture_rect().end.x + 12.0, touch_use.position.x - 12.0)
 
 
 ## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
@@ -5600,10 +5595,10 @@ func _dialogue_room(between: bool) -> float:
 	return span.y - span.x if between else screen_shape.safe_rect.size.x - HUD_SIDE_MARGIN * 2.0
 
 
-## Above 100% a box under the touch buttons would rise into ◀ ▶ and USE (their bottoms at y 435), so
-## while they show it stands between them instead, in the hint bar's span (PHONE-7).
+## Timed dialogue leaves touch actions available; its panel stays outside the whole pad gesture area.
+## A stopped conversation has no extra USE button and can use the full reading width.
 func _box_between_touch_buttons() -> bool:
-	return input_mode.touch_layout() and touch_use.visible and TextSize.factor > 1.0
+	return input_mode.touch_layout() and touch_use.visible
 
 
 ## Measures only the speaker currently shown; reserving the longest possible tag made short names

@@ -26,6 +26,7 @@ func _run() -> void:
 	pad.observe(drag)
 	_expect(pad.axis == 1.0 and pad.offset.x == pad.radius, "long drags clamp to full right movement")
 	_expect(pad.visual_rect().size.x > pad.radius * 2.0, "visual bounds include the thumb protruding past the ring")
+	_expect(pad.gesture_rect().encloses(pad.visual_rect()), "the stable gesture area includes a fully deflected thumb")
 	other.pressed = false
 	pad.observe(other)
 	_expect(pad.axis == 1.0, "another finger's release cannot stop the owner's movement")
@@ -119,10 +120,14 @@ func _run() -> void:
 	other.pressed = true
 	root.push_input(other, true)
 	_expect(Input.is_action_pressed(&"interact"), "USE is held before dialogue takes over")
-	game.status_line = "WOLF: Test reading focus."
+	game.status_line = "WOLF: Open. I'm with you."
 	game.call("_refresh_ui")
-	_expect(not game.touch_move_pad.visible and game.human.touch_axis == 0.0, "ordinary dialogue hides and releases the pad")
-	_expect(not game.touch_use.visible and game.dialogue_continue.visible, "ordinary dialogue keeps one continue cue instead of a second USE button")
+	_expect(game.touch_move_pad.visible and game.touch_use.visible, "a timed walk-and-talk keeps phone movement and USE available")
+	_expect(Input.is_action_pressed(&"interact"), "a timed bark does not cancel a held USE button")
+	game.call("_converse", "WOLF: Test reading focus.")
+	game.call("_refresh_ui")
+	_expect(not game.touch_move_pad.visible and game.human.touch_axis == 0.0, "a stopped conversation hides and releases the pad")
+	_expect(not game.touch_use.visible and game.dialogue_continue.visible, "a stopped conversation keeps one continue cue instead of a second USE button")
 	_expect(not Input.is_action_pressed(&"interact"), "hiding a held USE button releases its action")
 	other.pressed = false
 	root.push_input(other, true)
@@ -136,6 +141,17 @@ func _run() -> void:
 	game.call("_pause_game")
 	_expect(game.human.touch_axis == 0.0 and game.touch_move_pad.finger == PAD.NO_FINGER, "pausing cancels the live thumb immediately")
 	game.call("_resume_game")
+	var original_size: Vector2i = root.size
+	root.size = Vector2i(2796, 1290)
+	await settle(2)
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	game.call("_tell", "WOLF: Open. I'm with you.")
+	game.call("_refresh_ui")
+	var reading: Rect2 = game.bottom_bar.get_global_rect().merge(game.speaker.get_global_rect())
+	_expect(game.touch_move_pad.visible and game.touch_use.visible and not reading.intersects(game.touch_move_pad.gesture_rect()) and not reading.intersects(game.touch_use.get_global_rect()), "wide phone dialogue at 200 percent stays clear of every possible pad position and USE")
+	TextSize.factor = 1.0
+	root.size = original_size
 	pad.cancel()
 	pad.queue_free()
 	await settle(2)

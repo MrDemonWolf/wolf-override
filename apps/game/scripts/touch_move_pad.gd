@@ -7,6 +7,8 @@ signal axis_changed(value: float)
 
 ## The reviewed mockup thumb occupies 40 percent of its ring diameter.
 const THUMB_RATIO: float = 0.4
+## The authored ring outline is two canvas px wide.
+const RING_WIDTH: float = 2.0
 
 ## Touch indices are nonnegative; -1 means the pad has no owner.
 const NO_FINGER: int = -1
@@ -101,7 +103,12 @@ func visual_rect() -> Rect2:
 		return Rect2()
 	var centre: Vector2 = _centre()
 	var thumb_radius: float = radius * THUMB_RATIO
-	return Rect2(centre - Vector2.ONE * radius, Vector2.ONE * radius * 2.0).merge(Rect2(centre + offset - Vector2.ONE * thumb_radius, Vector2.ONE * thumb_radius * 2.0)).grow(1.0)
+	return Rect2(centre - Vector2.ONE * radius, Vector2.ONE * radius * 2.0).merge(Rect2(centre + offset - Vector2.ONE * thumb_radius, Vector2.ONE * thumb_radius * 2.0)).grow(RING_WIDTH * 0.5)
+
+
+## All possible ring/thumb bounds in local canvas px; HUD layout reserves this without moving as a thumb drags.
+func gesture_rect() -> Rect2:
+	return zone.grow(radius * (1.0 + THUMB_RATIO) + RING_WIDTH * 0.5)
 
 
 ## Draws a quiet idle ring, then follows the owning thumb; positions and radii use canvas px.
@@ -110,5 +117,5 @@ func _draw() -> void:
 		return
 	var centre: Vector2 = _centre()
 	draw_circle(centre, radius, UiTokens.color("color.role.touch.bg"))
-	draw_arc(centre, radius, 0.0, TAU, 48, UiTokens.color("color.role.touch.border"), 2.0, true)
+	draw_arc(centre, radius, 0.0, TAU, 48, UiTokens.color("color.role.touch.border"), RING_WIDTH, true)
 	draw_circle(centre + offset, radius * THUMB_RATIO, UiTokens.color("color.role.touch.border"))

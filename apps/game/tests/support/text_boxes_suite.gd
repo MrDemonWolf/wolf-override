@@ -593,12 +593,14 @@ func _check_corridor() -> void:
 	_expect(bar.visible and story.text.contains("COOLANT FAULT"), "a question stays up until it is answered")
 	game.call("_answer_choice", 2)
 	await _play(6.0, "WOLF refuses")
-	# Standing still, the read line stays; walking on clears it (STORY-8).
-	_expect(bar.visible, "a read line stays while the engineer stands")
+	_expect(bar.visible and not game.human.controlled, "WOLF's reply waits for input after its reading time")
 	Input.action_press(&"move_right")
 	await _play(0.2, "walking on")
 	Input.action_release(&"move_right")
-	_expect(not bar.visible, "a read line clears once the engineer moves on")
+	_expect(bar.visible and not game.human.controlled, "movement does not dismiss a stopped reply")
+	_expect(await continue_until(game, func() -> bool: return game.dialogue_cleared and game.human.controlled, TALK_FRAMES), "every reply page can be read before movement returns")
+	await process_frame
+	_expect(not bar.visible, "reading the final reply clears its panel")
 	var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 	var hint_rect: Rect2 = hint_panel.get_global_rect()
 	_expect(hint_panel.visible and absf(hint_rect.end.y - float(game.call("_dialogue_bottom"))) <= 0.5, "with no box up the hint bar takes the box's place at the bottom (%s)" % hint_rect)
@@ -726,12 +728,15 @@ func _check_story_kept() -> void:
 	game.call("_interact")
 	await process_frame
 	_expect(str(game.status_line).begins_with("DIRECTOR / PURGE") and game.box_queue == [Main.STAKES_LINE], "the purge display cuts in and WOLF's stakes line waits behind it")
-	# The display's text shows as two boxes; the stakes follow once both have been up their time.
+	# The stopped display exchange preserves the stakes until every page is explicitly read.
 	var display_seconds: float = 0.0
 	for box: String in game.dialogue_boxes:
 		display_seconds += DialogueBoxes.read_seconds(DialogueBoxes.words_of(box, game.call("_speaker_tags")))
 	await _play(display_seconds + 0.2, "stakes kept")
-	_expect(game.status_line == Main.STAKES_LINE, "the stakes line comes back after the display's text (%.1f s)" % display_seconds)
+	_expect(str(game.status_line).begins_with("DIRECTOR / PURGE"), "the display waits for input beyond its former reading timer")
+	for _page: int in game.dialogue_boxes.size():
+		await tap(&"interact")
+	_expect(game.status_line == Main.STAKES_LINE and not game.human.controlled, "reading the display restores the stopped stakes line")
 	# Held back again, USE at the breaker brings it back before WOLF asks about the relay.
 	game.call("_interact")
 	game.debug_place(350.0, 270.0)
@@ -1050,22 +1055,29 @@ func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String
 		_expect(not prompt.intersects(other.get_global_rect()), "%s: the tutorial prompt stays clear of %s (%s vs %s)" % [context, other.name, prompt, other.get_global_rect()])
 
 
-## On touch at [param percent] in [param code], ordinary dialogue hides redundant movement/USE controls,
+## On touch at [param percent] in [param code], stopped conversations hide redundant movement/USE controls,
 ## while the corridor names and COOLANT FAULT tag stay clear of PAUSE.
 func _check_touch_layout(percent: int, code: String) -> void:
 	game.debug_tools.actions.jump(&"corridor_start")
 	game.touch_enabled = true
 	game.controller_active = false
 	for line: String in [Main.STAKES_LINE, Main.JUNCTION_CLEARED_LINE]:
-		game.status_line = line
+		game.call("_converse", line)
 		await process_frame
 		await process_frame
 		var box: Rect2 = bar.get_global_rect()
 		_expect(bar.visible, "%s, %d%%, touch: the box shows (%s)" % [code, percent, line])
-		_expect(not game.touch_move_pad.is_visible_in_tree() and not game.touch_use.is_visible_in_tree(), "%s, %d%%, touch: ordinary dialogue hides movement and the extra USE control" % [code, percent])
+		_expect(not game.touch_move_pad.is_visible_in_tree() and not game.touch_use.is_visible_in_tree(), "%s, %d%%, touch: stopped dialogue hides movement and the extra USE control" % [code, percent])
 		var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 		if hint_panel.visible:
 			_expect(not hint_panel.get_global_rect().intersects(box), "%s, %d%%, touch: the hint bar stays clear of the box" % [code, percent])
+	game.call("_tell", "WOLF: Open. I'm with you.")
+	await process_frame
+	await process_frame
+	_expect(game.touch_move_pad.is_visible_in_tree() and game.touch_use.is_visible_in_tree(), "%s, %d%%, touch: timed walk-and-talk keeps exploration controls" % [code, percent])
+	var reading: Rect2 = bar.get_global_rect().merge(speaker.get_global_rect())
+	var pad_rect: Rect2 = game.touch_move_pad.get_global_transform() * game.touch_move_pad.gesture_rect()
+	_expect(not reading.intersects(pad_rect) and not reading.intersects(game.touch_use.get_global_rect()), "%s, %d%%, touch: bark text stays clear of the live pad and USE" % [code, percent])
 	var pause: Rect2 = game.pause_button.get_global_rect()
 	for label: Label in [game.get_node("RelayLabel"), game.bypass_handle.fault_tag] as Array[Label]:
 		var on_screen: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)
