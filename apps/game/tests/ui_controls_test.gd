@@ -219,7 +219,7 @@ func _run() -> void:
 	controller_event.button_index = JOY_BUTTON_RIGHT_SHOULDER
 	controller_event.pressed = true
 	game.call("_input", controller_event)
-	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with("X  ") and second_choice.text.begins_with("Y  "), "controller choices use compact stacked cards with action prompts")
+	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with(ControllerGlyphs.button(&"xbox", JOY_BUTTON_X) + "  ") and second_choice.text.begins_with(ControllerGlyphs.button(&"xbox", JOY_BUTTON_Y) + "  "), "controller choices use compact stacked cards with action prompts")
 	_expect(not right.visible and not use.visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "controller input hides on-screen touch movement and Pause controls")
 	var touch_event: InputEventScreenTouch = InputEventScreenTouch.new()
 	touch_event.pressed = true
