@@ -120,10 +120,12 @@ func is_warning() -> bool:
 	return state == &"building" and gauge >= WARN_GAUGE - EPSILON
 
 
+## True when an engineer at world [param x] (px) stands inside the door blast (BLAST_MIN_X..BLAST_MAX_X).
 static func is_in_blast(x: float) -> bool:
 	return x >= BLAST_MIN_X and x <= BLAST_MAX_X
 
 
+## True when an engineer at world [param x] (px) has any part of their body over the vent grate.
 static func is_on_vent(x: float) -> bool:
 	return x >= VENT_MIN_X and x <= VENT_MAX_X
 

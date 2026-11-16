@@ -159,6 +159,7 @@ static func _hazards(data: Dictionary) -> String:
 	return "%s  %s" % [_key("HAZARDS"), " · ".join(armed) if not armed.is_empty() else NONE]
 
 
+## Shows [param text] (BBCode) as the page, [param width] px wide, and shrinks the panel to fit it.
 func _show(width: float, text: String) -> void:
 	body.custom_minimum_size.x = width
 	body.text = text
@@ -166,14 +167,18 @@ func _show(width: float, text: String) -> void:
 	reset_size()
 
 
+## A page's first line (BBCode): "DEBUG", the [param page] name and the two debug keys (F3 steps the
+## overlay's pages, F12 saves a bug capture).
 static func _header(page: String) -> String:
 	return "[b][color=%s]DEBUG  %s[/color][/b]  [color=%s]F3 · F12[/color]" % [ACCENT, page, MUTED]
 
 
+## [param caption] in the accent colour (BBCode): the name in front of a value on a page.
 static func _key(caption: String) -> String:
 	return "[color=%s]%s[/color]" % [ACCENT, caption]
 
 
+## [param value] as text, or the dash (NONE) when that text is empty.
 static func _or_none(value: Variant) -> String:
 	var text: String = str(value)
 	return NONE if text.is_empty() else text

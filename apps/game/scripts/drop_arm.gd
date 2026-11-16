@@ -122,10 +122,12 @@ static func footprint() -> Vector2:
 	return Vector2(MARK_X - HIT_RANGE, MARK_X + HIT_RANGE)
 
 
+## Seconds since the missed tank landed and the rewind began (0 to REWIND_SECONDS).
 func _rewind_elapsed() -> float:
 	return REWIND_SECONDS - rewind_remaining
 
 
+## True while the cloud a landed tank threw up still hangs in the lane.
 func cloud_active() -> bool:
 	return cloud_remaining > 0.0
 

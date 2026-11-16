@@ -1,5 +1,16 @@
 extends Node2D
 class_name RecordsRoom
+## Records Access, the second 960 px room (after the corridor's safe point), and the same room again
+## for the investigation chapter ([member investigation]). It builds itself in _ready from its
+## layered set (RoomDepth), two stations (the purge queue and the mirror port, with live PropScreens),
+## the security container and a door at each end (DoorKit and SwingLeaf).
+## It holds no game rules: Main mirrors the state in ([member purge_trace_preserved],
+## [member mirror_trace_preserved], [member chapter_complete]) and calls [method refresh_state], and
+## the room draws what follows: station lights, screens, name labels, lamps and the exit's swing.
+## Main also calls [method set_active] (only the room on screen keeps its floor reflections and sparks
+## running), [method open_exit],
+## [method close_entry_behind] and [method refit_labels] (TEXT SIZE or the language changed).
+## Positions are world px unless a constant says metres. JunctionRoom is its sibling for the next room.
 
 const RECORDS_FAR: Texture2D = preload("res://assets/rooms/records-far.png")
 const RECORDS_MID: Texture2D = preload("res://assets/rooms/records-mid.png")

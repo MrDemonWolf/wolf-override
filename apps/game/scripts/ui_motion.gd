@@ -17,6 +17,9 @@ static var LIFT_SECONDS: float = UiTokens.seconds("motion.focus.in")
 static var PRESS_SECONDS: float = UiTokens.seconds("motion.press.duration")
 
 
+## Gives [param button] the shared motion: it lifts while hovered or focused, shrinks while held and
+## settles back after. Call once per button, after it is made; the button's own signals drive it, so
+## nothing needs freeing. Its pivot follows its size, so it scales about its centre.
 static func attach(button: BaseButton) -> void:
 	_centre_pivot(button)
 	button.resized.connect(_centre_pivot.bind(button))
@@ -28,6 +31,7 @@ static func attach(button: BaseButton) -> void:
 	button.button_up.connect(_settle.bind(button))
 
 
+## Keeps [param button]'s pivot at its centre, so scale grows it evenly instead of from the top left.
 static func _centre_pivot(button: BaseButton) -> void:
 	button.pivot_offset = button.size * 0.5
 
@@ -44,6 +48,8 @@ static func _settle(button: BaseButton) -> void:
 	_scale_to(button, LIFT_SCALE if raised else Vector2.ONE, LIFT_SECONDS)
 
 
+## Tweens [param button]'s scale to [param target] over [param seconds], replacing a tween already
+## moving it (kept in the button's ui_motion_tween meta). Outside the tree it sets the scale at once.
 static func _scale_to(button: BaseButton, target: Vector2, seconds: float) -> void:
 	var previous: Tween = button.get_meta(&"ui_motion_tween") as Tween if button.has_meta(&"ui_motion_tween") else null
 	if previous != null and previous.is_running():
