@@ -170,6 +170,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
 
 -- Development --
+- Short lamp-flicker and response checks use fixed frames so a busy machine cannot skip the sampled animation.
 - The dock-bay camera-speed check uses fixed frames so CPU load cannot distort its measurement; its speed limit stays unchanged.
 - Phone Settings mockups keep Back clear of the heading and scroll enlarged tabs inside the safe area; browser checks only.
 - HTML dialogue mockups keep enlarged text inside the available screen width; checked in browser captures, not in the game.

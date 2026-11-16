@@ -75,8 +75,12 @@ func _run() -> void:
 	await _check_trust_boxes()
 	await _check_junction_entry()
 	_check_ladder()
+	# Measure the short responses before later blast checks intentionally slow game time.
+	var clock: GameClock = start_clock()
 	await _check_refusals()
 	await _check_door_bump()
+	_expect_fixed_fps(clock)
+	clock.free()
 	await _check_after_blast()
 	await _check_knockdown_boxes()
 	await _check_blast_boxes()

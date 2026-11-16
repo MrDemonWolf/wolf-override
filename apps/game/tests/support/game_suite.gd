@@ -92,7 +92,8 @@ func _initialize() -> void:
 ## `--fixed-fps 60`, for a suite whose bounds are finer than a frame on a loaded machine (see
 ## [method start_clock]). Reported as a failed check, so a run without the flag says how to fix it
 ## instead of failing a timing check for no fault of the game. Users: opening_timing_test and
-## opening_early_press_test and dock_bay_test, which check-game.sh lists in fixed_fps_suites.
+## opening_early_press_test, dock_bay_test and the short-response section of approved_wording_test,
+## which check-game.sh lists in fixed_fps_suites.
 func _expect_fixed_fps(clock: GameClock) -> bool:
 	var even: bool = is_equal_approx(clock.largest_step, 1.0 / 60.0) and is_equal_approx(clock.smallest_step, 1.0 / 60.0)
 	return _expect(even, "every frame was 1/60 s of game time (%.4f to %.4f s): run it as check-game.sh does, with --fixed-fps 60" % [clock.smallest_step, clock.largest_step])
