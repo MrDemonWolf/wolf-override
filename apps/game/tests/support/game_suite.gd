@@ -439,7 +439,7 @@ static func controller_button(button: JoyButton, pressed: bool) -> InputEventJoy
 ## suites that hand the game a settings, script or save file of their own. Returns whether the file
 ## opened for writing; callers report it (`_expect(write_text(...), "...")`), because a fixture that
 ## was never written would let the check after it pass or fail for the wrong reason. Users:
-## m0_state_test, settings_test and studio_logo_test.
+## m0_state_test, sentry_test, settings_test and studio_logo_test.
 static func write_text(path: String, text: String) -> bool:
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
 	if file == null:
@@ -662,6 +662,21 @@ static func patrolling_sentry(x: float, facing: float) -> SentryBrain:
 	brain.x = x
 	brain.facing = facing
 	return brain
+
+
+## Every file under [param dir] (at any depth) whose extension, without the dot, is in
+## [param extensions], as res:// paths. A folder named in [param skip_folders] is left out with all
+## it holds, at whatever depth it sits. Reads the folders only. Users: companion_rules_test, i18n_test
+## and sfx_bank_test, which scan the game's scripts and scenes for words and calls.
+static func files_under(dir: String, extensions: Array[String], skip_folders: Array[String] = []) -> Array[String]:
+	var found: Array[String] = []
+	for file: String in DirAccess.get_files_at(dir):
+		if file.get_extension() in extensions:
+			found.append(dir.path_join(file))
+	for sub: String in DirAccess.get_directories_at(dir):
+		if sub not in skip_folders:
+			found.append_array(files_under(dir.path_join(sub), extensions, skip_folders))
+	return found
 
 
 ## Deletes the user:// (or absolute) file at [param path] if there is one.

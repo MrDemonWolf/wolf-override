@@ -46,7 +46,8 @@ func _check_no_urgency() -> void:
 	var lines: Array[String] = []
 	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
 	var next_speaker: RegEx = RegEx.create_from_string("^(%s|[A-Z][A-Za-z]+): |^[0-9]  ")
-	for file: String in _scripts("res://scripts"):
+	# The debug tools are left out: their labels name WOLF's spots, not lines he says.
+	for file: String in files_under("res://scripts", ["gd"], ["debug"]):
 		var source: String = FileAccess.get_file_as_string(file)
 		for found: RegExMatch in literal.search_all(source):
 			var wolf_speaking: bool = false
@@ -71,18 +72,6 @@ func _check_no_urgency() -> void:
 	for line: String in lines:
 		for word: String in URGENCY:
 			_expect(not line.to_lower().contains(word), "WOLF never hurries the engineer: \"%s\" says \"%s\"" % [line, word])
-
-
-## The game's scripts, without the debug tools (their labels name WOLF's spots, not lines he says).
-func _scripts(folder: String) -> Array[String]:
-	var found: Array[String] = []
-	for file: String in DirAccess.get_files_at(folder):
-		if file.ends_with(".gd"):
-			found.append(folder.path_join(file))
-	for sub: String in DirAccess.get_directories_at(folder):
-		if sub != "debug":
-			found.append_array(_scripts(folder.path_join(sub)))
-	return found
 
 
 # --- WOLF-6 ---------------------------------------------------------------------------------------
