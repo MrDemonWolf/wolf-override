@@ -2,6 +2,17 @@
 
 The game is called WOLF OVERRIDE, two words with no slashes, by Nathanial's decision (October 17, 2026). Write that name in code, game text, art, the website, docs and Notion; the old "WOLF//OVERRIDE" stays only as an alternative name for listings such as IGDB or inside quotes of history. The repository name `wolf-override`, the domain, URLs and file names do not change.
 
+Each area has its own short `AGENTS.md` with the rules that apply only there. Read the one for the folder you work in, after this file:
+
+| Folder | Guide |
+|---|---|
+| `apps/game` | [apps/game/AGENTS.md](apps/game/AGENTS.md): Godot project, tests, where game code lives |
+| `apps/docs` | [apps/docs/AGENTS.md](apps/docs/AGENTS.md): public site, page rules, site checks |
+| `scripts` | [scripts/AGENTS.md](scripts/AGENTS.md): check, export and translation scripts |
+| `tools/render` | [tools/render/AGENTS.md](tools/render/AGENTS.md): rendered captures without a window |
+
+This repository has no `CLAUDE.md` or other tool-specific instruction file; every agent reads these `AGENTS.md` files. A rule that applies everywhere lives in this file only.
+
 Read [AGENT.md](AGENT.md) before game, site or README work. It is the shared, public guide for playable quality, credits, asset provenance and honest test claims. Write or change a page in `apps/docs` by the [docs style guide](apps/docs/content/docs/development/style-guide.mdx): one "What this page is for" line, one idea per bullet, numbered steps, short sections, plain words, one home per fact, spoiler-free, story wording untouched.
 
 Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` before story or gameplay changes; the current story canon is the section "Story canon (October 26, 2026)" in `docs/decisions.md`; research, design notes, reviews and plans go to Notion through Codex, with the repo keeping rules, decisions, the manifest, credits and [docs/NOTES.md](docs/NOTES.md). They hold provisional story and design decisions and are tracked in this repository by Nathanial's decision (October 11, 2026), so they are public. Keep spoiler-heavy material out of the website, in-game text and build output. The latest explicit user decision wins.
