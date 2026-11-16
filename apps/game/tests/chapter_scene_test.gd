@@ -82,7 +82,7 @@ func _run() -> void:
 	var closing_story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
 	var closing_speaker: Label = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	_require(closing_story.text == "FIRST COPY SECURED." and closing_speaker.text.is_empty(), "the closing lines start with their own first box (%s)" % closing_story.text)
-	_require((game.get_node("CanvasLayer/PauseButton") as Button).visible, "the closing lines keep the pause button available")
+	_require((game.get_node("CanvasLayer/PauseButton") as Button).visible == bool(game.get("touch_enabled")), "closing lines show the Pause button only for touch input")
 	await tap(&"pause_game")
 	_require(paused and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible, "pause opens over the closing lines")
 	var paused_age: float = float(game.get("dialogue_age"))

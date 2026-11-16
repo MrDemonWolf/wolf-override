@@ -875,10 +875,10 @@ func _check_zones_keep_clear() -> void:
 		var names: Array[String] = []
 		for entry: Dictionary in clear["controls_and_text"]:
 			names.append(str(entry["name"]))
-		var expected: Array[String] = ["pause_button", "context_hint_text text", "story text"]
+		var expected: Array[String] = ["context_hint_text text", "story text"]
 		if layout == "touch":
-			expected.append_array(["touch_left", "touch_right", "touch_use"])
-		_expect(expected.all(func(name: String) -> bool: return names.has(name)), "the %s layout protects PAUSE, the hint and dialogue text%s (%s)" % [layout, " and the touch controls" if layout == "touch" else "", names])
+			expected.append_array(["pause_button", "touch_left", "touch_right", "touch_use"])
+		_expect(expected.all(func(name: String) -> bool: return names.has(name)), "the %s layout protects the hint and dialogue text%s (%s)" % [layout, " and the touch controls including Pause" if layout == "touch" else "", names])
 		var hint_text: Rect2 = DebugZones.text_rect(game.get_node("CanvasLayer/ContextHint/Text") as Label)
 		var hint_box: Rect2 = (game.get_node("CanvasLayer/ContextHint/Text") as Control).get_global_rect()
 		_expect(hint_text.has_area() and hint_text.size.x < hint_box.size.x, "the hint's protected area is its text, not its whole box (%s in %s)" % [hint_text, hint_box])
