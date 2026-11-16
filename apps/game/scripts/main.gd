@@ -5282,6 +5282,9 @@ func _set_dialogue(hint: String) -> void:
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
 	bottom_bar.visible = not box.is_empty()
+	# Reading has one focus; danger keeps the engineer’s escape control available.
+	if bottom_bar.visible and not _live_hazard():
+		touch_move_pad.hide()
 	dialogue_continue.visible = bottom_bar.visible and not waiting_for_choice and not fail_active and not hatch_exit_walking
 	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
 	context_hint.visible = not hint.is_empty() and (not bottom_bar.visible and not intro_active and not chapter_close_active or _urgent_context_hint())

@@ -189,7 +189,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
 
 -- Development --
-- A floating phone move pad shares the engineer’s movement path and cancels on Pause; simultaneous MOVE + USE passed headless checks. Rendered and device checks remain unfinished.
+- A floating phone move pad shares the engineer’s movement path and cancels on Pause; simultaneous MOVE + USE passed headless checks. The pad hides during ordinary dialogue; phone stills checked at 100% and 200%. Device checks remain unfinished.
 - The capture timeout test counts process frames, matching the renderer wait instead of counting physics ticks.
 - Settings UI tests wait for input and layout frames instead of physics ticks; checked at normal and coarse frame rates.
 - Headless layout fixtures start at the configured window size; camera coverage checks exercise actual phone, tablet and ultrawide canvases.

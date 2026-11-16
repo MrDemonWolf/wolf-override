@@ -89,6 +89,9 @@ func _run() -> void:
 	game.human.controlled = false
 	_expect(game.human.touch_axis == 0.0, "an authored control lock clears the local thumb axis")
 	game.human.controlled = true
+	game.call("_drop_box_queue")
+	game.status_line = ""
+	game.tutorial_step = 2
 	touch.position = Vector2(100, 200)
 	game.call("_note_input_device", touch)
 	await settle(3)
@@ -102,12 +105,15 @@ func _run() -> void:
 	other.pressed = true
 	other.position = game.touch_use.get_global_rect().get_center()
 	root.push_input(other, true)
-	await settle(1)
 	_expect(Input.is_action_pressed(&"interact") and game.touch_move_pad.finger == touch.index, "the native USE button accepts a second finger while MOVE stays held")
 	other.pressed = false
 	root.push_input(other, true)
-	await settle(1)
 	_expect(not Input.is_action_pressed(&"interact") and game.human.touch_axis > 0.0, "releasing USE leaves the movement thumb held")
+	game.status_line = "WOLF: Test reading focus."
+	game.call("_refresh_ui")
+	_expect(not game.touch_move_pad.visible and game.human.touch_axis == 0.0, "ordinary dialogue hides and releases the pad")
+	game.status_line = ""
+	game.call("_refresh_ui")
 	game.call("_pause_game")
 	_expect(game.human.touch_axis == 0.0 and game.touch_move_pad.finger == PAD.NO_FINGER, "pausing cancels the live thumb immediately")
 	game.call("_resume_game")
