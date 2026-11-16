@@ -112,7 +112,7 @@ func _run() -> void:
 	_expect(tab_ring != null and tab_ring.border_width_left == 2 and tab_ring.expand_margin_left == -4.0, "settings tabs keep their inset focus ring")
 	# The theme pass gave title, pause and HUD buttons one lifted style: the ring rides over the state fill
 	# instead of replacing it, so it stays wider than the button border and keeps a colour hover never uses.
-	var resume: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button
+	var resume: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button
 	var resume_normal: StyleBoxFlat = resume.get_theme_stylebox("normal") as StyleBoxFlat
 	var resume_hover: StyleBoxFlat = resume.get_theme_stylebox("hover") as StyleBoxFlat
 	_expect(resume.get_theme_stylebox("focus") == ring and resume_normal != null and resume_hover != null and ring.border_width_left > resume_normal.border_width_left and not ring.border_color.is_equal_approx(resume_hover.border_color) and resume_normal.shadow_size > 0 and resume_normal.corner_radius_top_left > 0, "pause-menu buttons share the inset ring, heavier than their border and distinct from hover")
@@ -188,12 +188,26 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	game.call("_pause_game")
 	var overlay: PauseOverlay = game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay
+	var pause_scroll: ScrollContainer = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll") as ScrollContainer
+	var return_action: Button = pause_scroll.get_node("MenuMargin/MenuList/TitleButton") as Button
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	return_action.grab_focus()
+	game.call("_follow_menu_focus", pause_scroll)
+	for layout_frame: int in 6:
+		await process_frame
+	_expect(resume.get_theme_font_size(&"font_size") == 42 and pause_scroll.scroll_vertical > 0, "paused actions scale to 200% and scroll to the focused return action")
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
+	root.gui_release_focus()
+	for layout_frame: int in 3:
+		await process_frame
 	_expect(paused and overlay.visible, "pause freezes the game and opens the menu")
 	_expect(root.gui_get_focus_owner() == null, "pause opened in touch mode leaves no focused button")
 	await send_key(KEY_DOWN, true)
 	await send_key(KEY_DOWN, false)
-	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
+	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
 	var fps: OptionButton = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as OptionButton
 	fps.select(0)
@@ -249,7 +263,7 @@ func _run() -> void:
 	await process_frame
 	menu.reset_controls()
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	_expect(not paused and game.get("title_open") and not overlay.visible and not (game.get_node("Human") as M0Actor).controlled and new_game.has_focus(), "Return to Title hides the pause menu and focuses New Game with actor control stopped")
 	_expect((game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
@@ -261,7 +275,7 @@ func _run() -> void:
 	await process_frame
 	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	_expect(paused and overlay.visible, "Back during play opens Pause")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	_expect(paused and (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu") as Control).visible and not settings_menu.visible, "Back in Settings returns to Pause")
 	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
@@ -278,7 +292,7 @@ func _run() -> void:
 	await process_frame
 	await _send_escape(true)
 	await _send_escape(false)
-	var title_button: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button
+	var title_button: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button
 	_expect(paused and game.get("intro_active") and title_button.text == "SKIP OPENING", "Pause during the opening keeps the opening and offers Skip Opening")
 	title_button.pressed.emit()
 	_expect(not paused and not game.get("intro_active"), "Skip Opening resumes into play")

@@ -358,7 +358,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	_expect(menu.key_name(letter) == "E" and menu.key_label_name(KEY_1, KEY_AMPERSAND) == "&", "a letter and a layout's symbol are never sent through tr() (%s, %s)" % [menu.key_name(letter), menu.key_label_name(KEY_1, KEY_AMPERSAND)])
 	TranslationServer.pseudolocalization_enabled = false
 	var pause_menu: Control = game.get("pause_menu") as Control
-	var hint: Label = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint") as Label
+	var hint: Label = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/PauseHint") as Label
 	game.call("_show_pause_hint", false)
 	_expect(hint.text == "Escape-pt  CONTINUAR" and hint.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "Pause's hint fills the translated template with the key's name (%s)" % hint.text)
 	var was_visible: bool = pause_menu.visible

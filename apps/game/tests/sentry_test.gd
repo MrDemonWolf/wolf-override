@@ -803,7 +803,7 @@ func _check_scene() -> void:
 	_write(path, crafted)
 	_expect(State.load_from_disk(path) == null, "a v4 save with the sentry down but the door sealed is rejected")
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	_expect(continue_button.disabled and (game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label).text == "Saved checkpoint could not be read.", "the title refuses to continue from it")
 	remove_file(path)
 	remove_file("%s-settings.cfg" % path)

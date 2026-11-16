@@ -807,49 +807,60 @@ theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 31
 text = "SESSION PAUSED"
 
-[node name="ResumeButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 50.0
-offset_top = 133.0
-offset_right = 400.0
-offset_bottom = 189.0
+[node name="MenuScroll" type="ScrollContainer" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
+offset_left = 32.0
+offset_top = 112.0
+offset_right = 418.0
+offset_bottom = 420.0
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="MenuMargin" type="MarginContainer" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MenuList" type="VBoxContainer" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ResumeButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "RESUME"
 
-[node name="SettingsButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 50.0
-offset_top = 204.0
-offset_right = 400.0
-offset_bottom = 260.0
+[node name="SettingsButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "SETTINGS"
 
-[node name="PauseHint" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-auto_translate_mode = 2
-offset_left = 50.0
-offset_top = 343.0
-offset_right = 400.0
-offset_bottom = 365.0
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
-theme_override_font_sizes/font_size = 16
-
-[node name="TitleButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 50.0
-offset_top = 275.0
-offset_right = 400.0
-offset_bottom = 331.0
-theme_override_font_sizes/font_size = 19
-text = "RETURN TO TITLE"
-
-[node name="ReturnWarning" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 36.0
-offset_top = 375.0
-offset_right = 414.0
-offset_bottom = 420.0
+[node name="ReturnWarning" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+layout_mode = 2
+autowrap_mode = 3
 theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
 theme_override_font_sizes/font_size = 14
 text = "Returning keeps your last checkpoint.\nUnsaved progress will be lost."
 horizontal_alignment = 1
+
+[node name="TitleButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "RETURN TO TITLE"
+
+[node name="PauseHint" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+layout_mode = 2
+autowrap_mode = 3
+auto_translate_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
+theme_override_font_sizes/font_size = 16
 
 [node name="SettingsMenu" type="Control" parent="CanvasLayer/PauseOverlay/Panel"]
 visible = false

@@ -493,7 +493,7 @@ func _check_scene() -> void:
 	_expect(corridor_door.disabled, "the corridor door stays open in the junction")
 	# Return to Title and New Game leave the junction's collision and loops off.
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	game.call("_new_game")
 	game.call("_finish_intro")
 	await physics_frame

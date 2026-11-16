@@ -68,8 +68,8 @@ const TEXT_PATHS: Array[String] = [
 	"CanvasLayer/TouchControls/Use",
 	"CanvasLayer/TouchControls/Choice1",
 	"CanvasLayer/TouchControls/Choice2",
-	"CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton",
-	"CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint",
+	"CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton",
+	"CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/PauseHint",
 	"CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton",
 	"CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote",
 ]
@@ -299,7 +299,7 @@ func _route_1() -> void:
 	await _action_event(&"pause_game")
 	await _raw(40)
 	await _shot("pause-opening")
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton")
 	await _raw(60)
 	await _shot("opening-skipped")
 	await _walk_to(BREAKER_X)
@@ -311,14 +311,14 @@ func _route_1() -> void:
 	await _action_event(&"pause_game")
 	await _raw(40)
 	await _shot("pause-play")
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton")
 	await _raw(40)
 	await _shot("pause-settings")
 	_press("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton")
 	await _raw(30)
 	await _shot("pause-after-settings")
 	_write_save(Kit.safe_point_state())
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton")
 	await _raw(60)
 	await _shot("title-with-save")
 	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
@@ -356,7 +356,7 @@ func _route_2() -> void:
 	await _action_event(&"pause_game")
 	await _raw(60)
 	await _shot("paused-during-card")
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton")
 	await _raw(40)
 	await _shot("first-control")
 	# Play starts in the corridor, past the dock bay's cross-wall (Main._finish_intro places the
@@ -469,7 +469,7 @@ func _route_3() -> void:
 	await _action_event(&"pause_game")
 	await _raw(30)
 	_write_save(Kit.after_purge_state())
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton")
 	await _raw(40)
 	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
 	await _raw(60)
@@ -498,7 +498,7 @@ func _route_3() -> void:
 	await _action_event(&"pause_game")
 	await _raw(60)
 	await _shot("chapter-close-paused")
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton")
 	await _raw(40)
 	await _shot("chapter-close-settled")
 	await _tap(&"interact")
@@ -534,7 +534,7 @@ func _route_4() -> void:
 	await _action_event(&"pause_game")
 	await _raw(60)
 	await _shot("vent-knockdown-paused")
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton")
 	await _raw(20)
 	await _shot("vent-knockdown-card")
 	await _retry_and_shoot("vent-restored")
@@ -679,13 +679,13 @@ func _sentry_walking_back() -> bool:
 func _new_run_skipping_opening() -> void:
 	await _action_event(&"pause_game")
 	await _raw(30)
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton")
 	await _raw(40)
 	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton")
 	await _raw(30)
 	await _action_event(&"pause_game")
 	await _raw(30)
-	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
+	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton")
 	await _raw(50)
 	if bool(game.get("intro_active")):
 		_fail("SKIP OPENING left the opening running")

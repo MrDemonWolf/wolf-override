@@ -384,7 +384,7 @@ func _run() -> void:
 	game.call("_new_game")
 	await tap(&"pause_game")
 	_expect(paused and game.get("intro_active"), "Pause during the opening pauses instead of skipping")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	state = game.get("state") as M0State
 	_expect(state.memory.is_empty() and not state.door_open and human.position == state.human_position, "New Game clears current play")
 	game.call("_load_game")

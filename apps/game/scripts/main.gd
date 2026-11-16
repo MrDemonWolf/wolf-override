@@ -647,8 +647,8 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var menu_panel: Panel = $CanvasLayer/PauseOverlay/Panel
 @onready var pause_menu: Control = $CanvasLayer/PauseOverlay/Panel/PauseMenu
 @onready var settings_menu: GameSettings = $CanvasLayer/PauseOverlay/Panel/SettingsMenu
-@onready var resume_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton
-@onready var settings_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton
+@onready var resume_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton
+@onready var settings_button: Button = $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton
 @onready var settings_back_button: Button = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton
 @onready var fps_options: OptionButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions
 @onready var resolution_options: OptionButton = $CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions
@@ -1047,7 +1047,7 @@ func _ready() -> void:
 	pause_overlay.input_seen.connect(_note_input_device)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
-	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton.pressed.connect(_on_title_button)
 	$CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
 	_build_end_card()
@@ -2280,8 +2280,8 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
 	pause_menu.show()
-	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.text = I18n.KEY.tr("SKIP OPENING") if intro_active else I18n.KEY.tr("RETURN TO TITLE")
-	$CanvasLayer/PauseOverlay/Panel/PauseMenu/ReturnWarning.visible = not intro_active
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton.text = I18n.KEY.tr("SKIP OPENING") if intro_active else I18n.KEY.tr("RETURN TO TITLE")
+	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ReturnWarning.visible = not intro_active
 	_show_pause_hint(touch_enabled and not controller_active)
 	_reveal_menu()
 	_grab_menu_focus(resume_button)
@@ -2294,7 +2294,7 @@ func _show_pause_menu() -> void:
 ## way, when the language changes while Pause is open.
 func _show_pause_hint(tapped: bool) -> void:
 	_pause_hint_tapped = tapped
-	var hint: Label = $CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint
+	var hint: Label = $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/PauseHint
 	hint.text = tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)])
 
 
@@ -5182,17 +5182,18 @@ func _dismiss_name_card() -> void:
 	top_card_tween.tween_callback(top_card.hide)
 
 
-## TEXT SIZE changed (or the game started): title actions and station names take the new size,
-## dialogue is split again, and the title scroll follows its focused action after layout.
+## TEXT SIZE changed (or the game started): title/pause actions and station names take the new size,
+## dialogue is split again, and menu scrolling follows the focused action after layout.
 func _apply_text_size() -> void:
-	# Cache the authored size once so changing the setting never compounds the previous scale.
-	for item: Control in $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList.get_children():
-		if not item.has_meta(&"title_font_base"):
-			item.set_meta(&"title_font_base", item.get_theme_font_size(&"font_size"))
-			item.set_meta(&"title_minimum_base", item.custom_minimum_size.y)
-		item.add_theme_font_size_override(&"font_size", TextSize.px(int(item.get_meta(&"title_font_base"))))
-		item.custom_minimum_size.y = TextSize.px(int(item.get_meta(&"title_minimum_base")))
-	_follow_title_focus()
+	# Both menus use the same authored-size cache and focus-following path.
+	for scroll: ScrollContainer in [$CanvasLayer/TitleScreen/MenuScroll, $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll]:
+		for item: Control in scroll.get_node("MenuMargin/MenuList").get_children():
+			if not item.has_meta(&"menu_font_base"):
+				item.set_meta(&"menu_font_base", item.get_theme_font_size(&"font_size"))
+				item.set_meta(&"menu_minimum_base", item.custom_minimum_size.y)
+			item.add_theme_font_size_override(&"font_size", TextSize.px(int(item.get_meta(&"menu_font_base"))))
+			item.custom_minimum_size.y = TextSize.px(int(item.get_meta(&"menu_minimum_base")))
+		_follow_menu_focus(scroll)
 	_refit_station_labels()
 	dialogue_key = ""
 	_layout_hud()
@@ -5200,12 +5201,11 @@ func _apply_text_size() -> void:
 		_refresh_ui()
 
 
-## Waits for container layout after a text-size change, then reveals the current title focus.
+## Waits for container layout after a text-size change, then reveals the current focus inside [param scroll].
 ## Reads the focus after the wait so closing a menu cannot scroll to a stale action.
-func _follow_title_focus() -> void:
+func _follow_menu_focus(scroll: ScrollContainer) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
-	var scroll: ScrollContainer = $CanvasLayer/TitleScreen/MenuScroll
 	var focused: Control = get_viewport().gui_get_focus_owner()
 	if focused != null and scroll.is_ancestor_of(focused):
 		scroll.ensure_control_visible(focused)

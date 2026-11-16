@@ -252,14 +252,14 @@ msgid "RESUME"
 msgstr ""
 
 #: scenes/main.tscn
-#: scripts/main.gd:2283
-msgid "RETURN TO TITLE"
-msgstr ""
-
-#: scenes/main.tscn
 msgid ""
 "Returning keeps your last checkpoint.\n"
 "Unsaved progress will be lost."
+msgstr ""
+
+#: scenes/main.tscn
+#: scripts/main.gd:2283
+msgid "RETURN TO TITLE"
 msgstr ""
 
 #: scenes/main.tscn

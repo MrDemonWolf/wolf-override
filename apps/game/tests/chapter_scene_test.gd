@@ -160,7 +160,7 @@ func _run() -> void:
 	var loaded: M0State = State.load_from_disk(path)
 	_require(state.chapter_complete and loaded != null and loaded.mirror_route == "manual", "manual chapter completion saves for Continue")
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button
 	_require(game.get("title_open") and not paused and not human.controlled and not continue_button.disabled, "Return to Title refreshes Continue availability after completing the chapter")
 	continue_button.pressed.emit()

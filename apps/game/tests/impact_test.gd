@@ -206,7 +206,7 @@ func _run() -> void:
 	await process_frame
 	game.call("_pause_game")
 	_expect(paused and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible and Engine.time_scale == 1.0, "Pause works during a knockdown and clears the dip")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	_expect(game.get("title_open") and not game.get("fail_active") and intro_fade.color.a == 0.0 and human.body_sprite.rotation_degrees == 0.0, "Return to Title cancels the knockdown")
 
 	# Before any checkpoint the beat snapshot stands in, so the relay memory still survives.
