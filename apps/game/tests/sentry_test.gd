@@ -56,6 +56,8 @@ func _run() -> void:
 	finish("Sentry checks passed")
 
 
+## SentryBrain on its own (no scene): where it can see the engineer, and how it patrols, locks on,
+## chases, loses its mark and holds while paused.
 func _check_brain() -> void:
 	for x: float in [SentryBrain.LANE_ENTRY_X, SentryBrain.COVER_MIN_X, JunctionRoom.ARM_X, SentryBrain.COVER_MAX_X, 500.0]:
 		_expect(not SentryBrain.is_exposed(x), "%.0f is out of the sentry's sight" % x)
@@ -353,6 +355,8 @@ func _check_lock_on() -> void:
 	_expect(dropped.state == &"patrol", "and it gives up the usual 2.5 s later")
 
 
+## DropArm on its own (no scene): the hit window over the floor brackets is the tank's footprint, and
+## the tank's fall, hit, miss and rewind follow from it.
 func _check_arm() -> void:
 	# One rule the floor shows: the brackets are the tank's footprint, and a hit is the sentry's body
 	# over them when the tank lands.
@@ -409,6 +413,8 @@ func _check_arm() -> void:
 	_expect(DropArm.in_cloud(DropArm.MARK_X + DropArm.CLOUD_HALF_WIDTH + M0State.HUMAN_HALF_WIDTH) and not DropArm.in_cloud(DropArm.MARK_X + DropArm.CLOUD_HALF_WIDTH + M0State.HUMAN_HALF_WIDTH + 1.0), "the cloud reaches an engineer whose body touches it")
 
 
+## M0State refuses the lane's events out of order: no drop before the door blows, no clear while the
+## sentry is live, and each happens only once.
 func _check_state_guards() -> void:
 	var state: M0State = completed_records_state(State.DISCLOSE)
 	_expect(not state.drop_sentry() and not state.clear_junction(), "nothing in the lane happens outside the junction")
@@ -423,6 +429,7 @@ func _check_state_guards() -> void:
 	_expect(state.wolf_will_bait() and not completed_records_state(State.PRESS).wolf_will_bait(), "WOLF offers to draw the sentry only with the relay risk disclosed")
 
 
+## The whole lane in the running game, from the sentry's first patrol to the finished save's title.
 func _check_scene() -> void:
 	var game: Node2D = await start_game("sentry-test")
 	var path: String = str(game.get("save_path"))
@@ -798,10 +805,10 @@ func _check_scene() -> void:
 	crafted["positions"]["human"] = [120.0, 410.0]
 	crafted["positions"]["wolf"] = [64.0, 423.0]
 	crafted["door_blown"] = false
-	_write(path, crafted)
+	_expect(write_text(path, JSON.stringify(crafted)), "the crafted save opens for writing")
 	_expect(State.load_from_disk(path) != null, "the crafted save's positions and flags are otherwise valid")
 	crafted["sentry_down"] = true
-	_write(path, crafted)
+	_expect(write_text(path, JSON.stringify(crafted)), "the crafted save opens for writing")
 	_expect(State.load_from_disk(path) == null, "a v4 save with the sentry down but the door sealed is rejected")
 	game.call("_pause_game")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
@@ -1473,6 +1480,8 @@ func _close_cuts_no_label(camera: Camera2D, room: JunctionRoom) -> bool:
 	return true
 
 
+## Holds move_right until the game asks a choice, for at most 300 physics frames (5 s of game time);
+## releases the action and returns whether the choice came.
 func _walk_until_choice(game: Node2D) -> bool:
 	Input.action_press(&"move_right")
 	var asked: bool = await wait_until(func() -> bool: return game.get("waiting_for_choice"), 300)
@@ -1536,12 +1545,6 @@ func _check_drop_window() -> void:
 	windows.sort()
 	_expect(not windows.is_empty() and windows[0] >= 0.5, "pressed at any moment of a patrol pass, the drop hits through a window of at least 0.5 s (%s)" % str(windows))
 	print("Tank window: %.2f s per straight crossing at patrol speed, %.2f s at chase speed, press windows on patrol %s" % [straight, 2.0 * DropArm.HIT_REACH / SentryBrain.CHASE_SPEED, str(windows)])
-
-
-func _write(path: String, data: Dictionary) -> void:
-	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-	file.store_string(JSON.stringify(data))
-	file.close()
 
 
 ## WOLF crosses the lane from the rubble to the far end, answering at many points of the patrol (the

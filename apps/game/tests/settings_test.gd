@@ -215,6 +215,8 @@ func _run() -> void:
 	finish("Settings persistence and rebinding checks passed")
 
 
+## A settings file someone tampered with (an Object payload naming a script, a truncated file and the
+## other cases listed below) never runs code from the file.
 func _check_hostile_settings() -> void:
 	var pid: int = OS.get_process_id()
 	var path: String = "user://settings-hostile-%s.cfg" % pid

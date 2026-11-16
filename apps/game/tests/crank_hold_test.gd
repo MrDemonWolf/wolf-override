@@ -223,6 +223,7 @@ func _at_valve(game: Node2D) -> void:
 	await frames(3)
 
 
+## The settings file of this run's game: [member base] (unique per process) plus ".cfg".
 func _settings_path() -> String:
 	return base + ".cfg"
 

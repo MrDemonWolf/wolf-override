@@ -1077,6 +1077,7 @@ func _labels_clear(geometry: Dictionary) -> String:
 	return ""
 
 
+## How many zones and hitboxes in [param geometry] (a capture's geometry block) have a name drawn.
 func _drawn_names(geometry: Dictionary) -> int:
 	var count: int = 0
 	for list: String in ["zones", "hitboxes"]:
@@ -1086,6 +1087,7 @@ func _drawn_names(geometry: Dictionary) -> int:
 	return count
 
 
+## A Rect2 from a capture's [x, y, width, height] array (screen px).
 func _rect(values: Array) -> Rect2:
 	return Rect2(float(values[0]), float(values[1]), float(values[2]), float(values[3]))
 
@@ -1858,6 +1860,7 @@ func _frame_probe() -> Node:
 	return probe
 
 
+## Deletes this run's save file and its .tmp sidecar.
 func _clean_save() -> void:
 	for path: String in [base + "-save.json", base + "-save.json.tmp"]:
 		remove_file(path)
@@ -1889,12 +1892,15 @@ func _edges_match(game: Node2D, rule: StringName, range: Variant, half_open: boo
 	return bool(game.call(rule, low)) and bool(game.call(rule, inside_high)) and not bool(game.call(rule, low - 0.5)) and not bool(game.call(rule, outside_high))
 
 
+## True when [param rule] (a Callable taking a world x) holds at both ends of [param range]
+## ([low, high], world px) and fails half a px outside each: the drawn zone and the rule agree.
 func _edges_match_static(rule: Callable, range: Variant) -> bool:
 	var low: float = float(range[0])
 	var high: float = float(range[1])
 	return rule.call(low) and rule.call(high) and not rule.call(low - 0.5) and not rule.call(high + 0.5)
 
 
+## Counts each time the tools ask for the menu (connected to their signal).
 func _on_menu_requested() -> void:
 	menu_requests += 1
 
@@ -1922,10 +1928,12 @@ func _show_capture_note(game: Node2D, tools: DebugTools, touch: bool) -> void:
 	await process_frame
 
 
+## [param game]'s debug tools.
 func _tools(game: Node2D) -> DebugTools:
 	return game.get("debug_tools") as DebugTools
 
 
+## The settings file of this run's game: [member base] (unique per process) plus ".cfg".
 func _settings_path() -> String:
 	return base + ".cfg"
 
@@ -1948,6 +1956,7 @@ func _junction_state(door_blown: bool) -> M0State:
 	return state
 
 
+## Types [param word] one key tap per letter, as the unlock codes are typed.
 func _type(word: String) -> void:
 	for letter: String in word:
 		await tap_key(OS.find_keycode_from_string(letter))
@@ -1985,6 +1994,7 @@ func _send_letter(letter: String, shift: bool) -> void:
 		await process_frame
 
 
+## Sends controller button [param index] pressed or released and waits one process frame.
 func _send_pad(index: JoyButton, pressed: bool) -> void:
 	var event: InputEventJoypadButton = InputEventJoypadButton.new()
 	event.button_index = index
@@ -1993,6 +2003,7 @@ func _send_pad(index: JoyButton, pressed: bool) -> void:
 	await process_frame
 
 
+## Presses and releases controller button [param index], a frame each.
 func _tap_pad(index: JoyButton) -> void:
 	await _send_pad(index, true)
 	await _send_pad(index, false)

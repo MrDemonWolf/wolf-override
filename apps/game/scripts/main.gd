@@ -1169,6 +1169,8 @@ func _ready() -> void:
 	_on_screen_shape_changed.call_deferred(screen_shape.visible_rect, screen_shape.safe_rect)
 
 
+## Sets up the title's CONTINUE and NEW GAME buttons from the save on disk: CONTINUE is off without a
+## valid save, and a finished slice turns it into PLAY AGAIN with NEW GAME hidden.
 func _refresh_continue() -> void:
 	var loaded: M0State = M0State.load_from_disk(save_path)
 	var saved: bool = loaded != null
@@ -1210,6 +1212,8 @@ func _open_changelog() -> void:
 		changelog_online_button.text = "LINK UNAVAILABLE"
 
 
+## Reads the packed changelog (CHANGELOG_PATH, exported by scripts/export_changelog.py) into
+## changelog_text, empty when the file is missing, and fills the changelog screen with it.
 func _load_changelog() -> void:
 	changelog_text = ""
 	if FileAccess.file_exists(CHANGELOG_PATH):
@@ -1251,6 +1255,8 @@ static func _changelog_bbcode(text: String) -> String:
 	return "\n".join(lines)
 
 
+## Opens the title's changelog screen at its top, refilled first if the language changed since it was
+## filled, and gives its Back button the focus.
 func _show_changelog() -> void:
 	if _changelog_stale:
 		_changelog_stale = false
@@ -1260,6 +1266,7 @@ func _show_changelog() -> void:
 	_grab_menu_focus(changelog_back_button)
 
 
+## Closes the changelog screen and returns the focus to the title's changelog button.
 func _hide_changelog() -> void:
 	_hide_title_overlay(changelog_screen)
 	_grab_menu_focus(changelog_button)
@@ -1443,6 +1450,8 @@ func _view_right() -> float:
 	return 960.0
 
 
+## Puts the camera in play: GAMEPLAY_ZOOM, on the engineer at once (no glide from where it was), then
+## smoothed as it follows them.
 func _start_gameplay_camera() -> void:
 	intro_camera.zoom = Vector2.ONE * GAMEPLAY_ZOOM
 	_update_gameplay_camera()
@@ -2018,6 +2027,8 @@ func _ask_relay() -> void:
 	status_line = "%s\n1  \"%s\"\n2  \"%s\"" % [RELAY_QUESTION, M0State.CHOICE_TEXT[M0State.DISCLOSE], M0State.CHOICE_TEXT[M0State.PRESS]]
 
 
+## NEW GAME (or PLAY AGAIN): drops whatever was running (pause, tweens, a knockdown, the end card),
+## starts from a fresh state and plays the opening.
 func _new_game() -> void:
 	world_input.cancel()
 	get_tree().paused = false
@@ -2118,6 +2129,9 @@ func wolf_pose(pose: StringName, lift: float = 0.0) -> void:
 		wolf_lights.pose = pose
 
 
+## Ends the opening, after its last press or a skip, and hands control to the player in the corridor.
+## [param keep_fade] true leaves the opening's fade running (the last press); false clears it at once
+## (a skip).
 func _finish_intro(keep_fade: bool = false) -> void:
 	intro_active = false
 	intro_step = 0
@@ -2160,6 +2174,8 @@ func _finish_intro(keep_fade: bool = false) -> void:
 	_refresh_ui()
 
 
+## Opens the title's credits at their top with the scroll running, refilled first if the language
+## changed since they were filled, and gives their Back button the focus.
 func _show_credits() -> void:
 	if _credits_stale:
 		_credits_stale = false
@@ -2184,6 +2200,7 @@ func _fill_credits() -> void:
 	credits_body.text = "[center][color=#73DDF5]%s[/color]\n%s[/center]\n\n\n%s" % [heading, disclosure, tr(_credits_english)]
 
 
+## Closes the credits and returns the focus to the title's credits button.
 func _hide_credits() -> void:
 	_hide_title_overlay(credits_screen)
 	_grab_menu_focus(credits_button)
@@ -2198,6 +2215,7 @@ func _show_title_overlay(overlay: Control) -> void:
 	overlay.show()
 
 
+## Hides [param overlay] (the credits or the changelog screen) and shows the title's own parts again.
 func _hide_title_overlay(overlay: Control) -> void:
 	overlay.hide()
 	for child: Node in title_screen.get_children():
@@ -2205,11 +2223,13 @@ func _hide_title_overlay(overlay: Control) -> void:
 			(child as CanvasItem).show()
 
 
+## The credits' PAUSE SCROLL / RESUME SCROLL button: flips the auto-scroll and the button's caption.
 func _toggle_credits_pause() -> void:
 	credits_paused = not credits_paused
 	credits_pause_button.text = I18n.KEY.tr("RESUME SCROLL") if credits_paused else I18n.KEY.tr("PAUSE SCROLL")
 
 
+## A click or tap on the credits text pauses their auto-scroll, so a player can read or drag them.
 func _on_credits_body_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		credits_paused = true
@@ -2229,6 +2249,7 @@ func _on_changelog_body_input(event: InputEvent) -> void:
 		changelog_body.accept_event()
 
 
+## Wires the on-screen touch buttons to their input actions and applies the Settings theme.
 func _setup_touch_controls() -> void:
 	touch_controls.add_child(touch_move_pad)
 	touch_move_pad.axis_changed.connect(func(value: float) -> void: human.touch_axis = value)
@@ -2257,6 +2278,9 @@ func _bind_touch_button(button: Button, action: StringName) -> void:
 			Input.action_release(action))
 
 
+## Fills the frame-rate and window-size lists, applies the saved video settings (frame cap, window
+## size and fullscreen; phones and tablets keep the OS's window) and connects the Settings controls.
+## Runs once, from _ready.
 func _setup_settings() -> void:
 	fps_options.add_item("30 FPS", 30)
 	fps_options.add_item("60 FPS", 60)
@@ -2291,27 +2315,36 @@ func _setup_settings() -> void:
 	settings_menu.configure(settings_path)
 
 
+## The window size (px) for entry [param index] of the window-size list (GameSettings.window_size;
+## an unknown index gives the default). Tests call it by name.
 func _resolution_size(index: int) -> Vector2i:
 	return GameSettings.window_size(index)
 
 
+## The frame-rate list changed: caps the engine at the chosen rate (0 is uncapped) and saves it.
 func _on_fps_selected(index: int) -> void:
 	Engine.max_fps = fps_options.get_item_id(index)
 	_save_settings()
 
 
+## The window-size list changed: resizes the window and saves it. Ignored where the list is disabled
+## (phones and tablets).
 func _on_resolution_selected(index: int) -> void:
 	if not resolution_options.disabled:
 		get_window().size = _resolution_size(index)
 		_save_settings()
 
 
+## The fullscreen switch changed: sets the window mode and saves it. Ignored where it is disabled
+## (phones and tablets).
 func _on_fullscreen_toggled(enabled: bool) -> void:
 	if not fullscreen_toggle.disabled:
 		get_window().mode = Window.MODE_FULLSCREEN if enabled else Window.MODE_WINDOWED
 		_save_settings()
 
 
+## Writes the three video settings into the settings file, keeping everything else in it; shows a
+## note in Settings when the file cannot be written.
 func _save_settings() -> void:
 	var config: ConfigFile = GameSettings.load_config(settings_path)
 	config.set_value("video", "fps_limit", fps_options.get_selected_id())
@@ -2321,10 +2354,13 @@ func _save_settings() -> void:
 		settings_menu.show_note(I18n.KEY.tr("Settings could not be saved."))
 
 
+## The HUD's Pause button was pressed.
 func _on_pause_button() -> void:
 	_pause_game()
 
 
+## Opens Pause: lets go of every gameplay action, a held crank and the rumble, shows the pause menu
+## over a dimmed game and pauses the tree.
 func _pause_game() -> void:
 	world_input.cancel()
 	impact.stop_rumble()
@@ -2342,6 +2378,7 @@ func _pause_game() -> void:
 	_grab_menu_focus(resume_button)
 
 
+## Closes Pause or Settings and goes back to play (or to the title, when Settings was opened there).
 func _resume_game() -> void:
 	controller_disconnected = false
 	settings_menu.cancel_capture()
@@ -2352,6 +2389,8 @@ func _resume_game() -> void:
 	_refresh_ui()
 
 
+## Swaps the pause card's menu for the Settings pages, laid out for the device in use, and focuses
+## the current tab.
 func _show_settings() -> void:
 	pause_menu.hide()
 	_layout_settings_card()
@@ -2373,6 +2412,7 @@ func _layout_settings_card() -> void:
 	settings_menu.size = menu_panel.size
 
 
+## Settings from the title: shows the pause overlay over it, pauses the tree and opens Settings.
 func _show_title_settings() -> void:
 	pause_overlay.show()
 	_fade_backdrop()
@@ -2389,6 +2429,7 @@ func _fade_backdrop() -> void:
 	backdrop_tween.tween_property(pause_overlay, "modulate:a", 1.0, MENU_REVEAL_SECONDS)
 
 
+## Slides the menu card in from MENU_REVEAL_OFFSET and fades it up over MENU_REVEAL_SECONDS.
 func _reveal_menu() -> void:
 	Tweens.kill(menu_tween)
 	var resting: Vector2 = menu_panel.position
@@ -2464,6 +2505,8 @@ func _on_screen_shape_changed(_visible: Rect2, _safe: Rect2) -> void:
 			_layout_pause_card()
 
 
+## Shows the pause card's own menu (Resume, Settings, Return to title) in place of Settings. From the
+## title's Settings it closes the overlay instead and returns the focus to the title's Settings button.
 func _show_pause_menu() -> void:
 	if title_open and pause_overlay.visible:
 		_resume_game()
@@ -2494,6 +2537,8 @@ func _show_pause_hint(tapped: bool) -> void:
 	hint.get_parent().move_child(hint, 0 if controller_disconnected else hint.get_parent().get_child_count() - 1)
 
 
+## Leaves play for the title: stops the opening, tweens, a knockdown and every loop, and shows the
+## title with its buttons set from the save. The save file is not touched.
 func _return_to_title() -> void:
 	world_input.cancel()
 	_resume_game()
@@ -2632,6 +2677,7 @@ func _handle_back() -> void:
 		_pause_game()
 
 
+## The pause menu's last button: SKIP OPENING during the opening, else RETURN TO TITLE.
 func _on_title_button() -> void:
 	if intro_active:
 		_resume_game()
@@ -2640,6 +2686,8 @@ func _on_title_button() -> void:
 		_return_to_title()
 
 
+## Settings' Back: returns to the pause menu (focus on its Settings button) or, from the title, to the
+## title.
 func _on_settings_back() -> void:
 	_show_pause_menu()
 	if not title_open:
@@ -2734,6 +2782,8 @@ func _note_input_device(event: InputEvent) -> void:
 					break
 
 
+## CONTINUE, and a retry after a knockdown: loads the save from disk and rebuilds the scene from it.
+## Without a valid save it says so in the status line and changes nothing else.
 func _load_game() -> void:
 	world_input.cancel()
 	get_tree().paused = false
@@ -2991,6 +3041,8 @@ func _relay_refused() -> bool:
 	return relay_refused or state.memory.get("choice_id") == M0State.PRESS
 
 
+## USE at the corridor's breaker: first the stakes and WOLF's question about the relay, then arming
+## the breaker once the choice is made.
 func _interact_breaker() -> void:
 	if state.memory.is_empty() and not stakes_spoken:
 		# Reached before the opening box was read: the stakes come first (decision C), then the question.
@@ -3014,6 +3066,8 @@ func _interact_breaker() -> void:
 		_aside(I18n.KEY.tr("Power is already on. The relay is farther down the hall."))
 
 
+## Records the relay answer [param choice_id] (M0State.DISCLOSE or the rushed one) and plays WOLF's
+## response. Does nothing when the state refuses the choice.
 func _choose(choice_id: String) -> void:
 	if not state.record_choice(choice_id):
 		return
@@ -3110,6 +3164,8 @@ func _start_bypass_vent() -> void:
 	_update_controls()
 
 
+## Ends the bypass's venting: its hiss loops (only if the bypass started them), its alarm and the
+## handle's venting look.
 func _stop_bypass_vent() -> void:
 	# Only a bypass that was venting owns the hiss loops; the junction's pressure line uses them too.
 	if bypass_venting:
@@ -3140,6 +3196,8 @@ func _bypass_cranked() -> void:
 		status_line = BYPASS_HALF_LINE
 
 
+## The last crank turn of the manual bypass: the engineer powers the seal alone (the engineer-only
+## fallback), the alarm stops and the seal opens.
 func _finish_bypass() -> void:
 	if state.activate_power("human") != "fallback":
 		return
@@ -3158,6 +3216,8 @@ func _finish_bypass() -> void:
 	_mark_beat()
 
 
+## USE at the safe point: refused while the seal is shut; the first use saves, a later one goes on
+## into Records Access.
 func _interact_checkpoint() -> void:
 	if not state.door_open:
 		# TRANSLATORS: i18n: story speaker=narrator
@@ -3210,6 +3270,8 @@ func _interact_checkpoint() -> void:
 		status_line = I18n.KEY.tr("Safe point saved. WOLF remembers the same choice.")
 
 
+## USE in Records Access at world x [param x] (px): the purge queue, the mirror port or the exit,
+## whichever station is in reach.
 func _interact_records(x: float) -> void:
 	var target: StringName = interaction_target_at(x)
 	if target == &"purge":
@@ -3454,6 +3516,8 @@ func _end_card_recap_rows() -> Array[String]:
 	return [relay, mirror, lane]
 
 
+## Shows the END OF SLICE card: stops the chapter's tweens, walks and loops, fills the card's rows and
+## fades it in over END_CARD_FADE_SECONDS.
 func _show_end_card() -> void:
 	Tweens.kill(chapter_tween)
 	chapter_close_active = false
@@ -3515,11 +3579,14 @@ func _close_end_card() -> void:
 	_return_to_title()
 
 
+## Hides the END OF SLICE card and clears its flag.
 func _hide_end_card() -> void:
 	end_card_active = false
 	end_card.hide()
 
 
+## Answers the mirror question by [param route_id]: "wolf" (his readout, once he stands at the mirror
+## port) or the manual port.
 func _choose_mirror(route_id: String) -> void:
 	if route_id == "wolf" and absf(wolf.position.x - WOLF_MIRROR_X) > 42.0:
 		# Each form is marked on its own line: Godot's generator gives a comment to every message on the
@@ -3551,6 +3618,7 @@ func _choose_mirror(route_id: String) -> void:
 	_save_progress()
 
 
+## Autosaves: marks a new beat (the snapshot a knockdown restores) and writes it to disk.
 func _save_progress() -> void:
 	# Every autosave starts a beat: the snapshot matches it even when the write fails.
 	_mark_beat()
@@ -3569,6 +3637,8 @@ func _write_beat() -> void:
 	save_error_context = _context_hint()
 
 
+## Copies where the engineer and WOLF stand into the state before a save, kept inside the room's
+## floor, and at the spot the engineer is stepping to when they are mid-step.
 func _capture_positions() -> void:
 	# A save taken as the engineer steps out (beside a station, clear of the relay, to a crank spot)
 	# keeps the spot they are stepping to, so Continue never puts them back over the machine.
@@ -3687,6 +3757,9 @@ func _investigation_objective() -> String:
 	return I18n.KEY.tr("FIND THE INVESTIGATOR")
 
 
+## USE in the Service Junction at world x [param x] (px): the breaker, the valve, the vent, the
+## sealed door, the TANK RELEASE or the exit, whichever is in reach; with none in reach, a line that
+## says where the next station is.
 func _interact_junction(x: float) -> void:
 	var target: StringName = interaction_target_at(x)
 	if target == &"breaker":
@@ -3886,6 +3959,8 @@ func _wolf_drawing_x() -> float:
 	return JunctionRoom.WOLF_BAIT_X if wolf_baiting and wolf.position.x + M0Actor.WOLF_REACH > SentryBrain.LANE_ENTRY_X else -1.0
 
 
+## USE at the TANK RELEASE panel: drops the tank when it hangs ready, and refuses with the reason
+## otherwise (the sentry is already down, WOLF is not in place, the tank is still being rehung).
 func _use_arm_panel() -> void:
 	if state.sentry_down:
 		_refuse(REFUSE_RELEASE_SPENT, &"release")
@@ -3941,6 +4016,7 @@ func _use_exit(x: float) -> void:
 					_leave_junction()
 
 
+## Starts the exit bolt's charge: its whine runs for BOLT_WHINE_SECONDS before the bolt goes.
 func _pop_bolt() -> void:
 	bolt_state = &"charging"
 	bolt_charge_remaining = BOLT_WHINE_SECONDS
@@ -4226,6 +4302,8 @@ func _lane_sound() -> void:
 		sfx_bank.stop(&"coolant_cloud")
 
 
+## The sentry's brain changed state from [param before]: retargets WOLF, sounds the alarm on a lock
+## and tells the player what happened. Says nothing during a knockdown.
 func _sentry_changed(before: StringName) -> void:
 	# Locking on sends a drawing WOLF back to his spot by the valve until the chase ends.
 	wolf.autonomous_target_x = _wolf_target_x()
@@ -4384,6 +4462,8 @@ func _pace_miss_turn() -> void:
 		box_queue.pop_front()
 
 
+## The winch has the missed tank back on its clamp: the clank, and the line that says the release is
+## ready again (after any boxes still telling the miss).
 func _tank_rehung() -> void:
 	sfx_bank.play(&"clank", -6.0, 1.1)
 	if not fail_active:
@@ -4404,11 +4484,14 @@ func _fade_servo() -> void:
 	servo_tween.tween_callback(sfx_bank.stop.bind(&"servo"))
 
 
+## Stops the servo sound's tween and forgets it.
 func _kill_servo_tween() -> void:
 	Tweens.kill(servo_tween)
 	servo_tween = null
 
 
+## Stops every looping sound (SfxBank.LOOPS) and the servo tween: on the way to the title or the end
+## card, and whenever the junction is set up again.
 func _stop_junction_loops() -> void:
 	_kill_servo_tween()
 	sfx_bank.stop_each(SfxBank.LOOPS)
@@ -4448,6 +4531,7 @@ func _vent_trips() -> void:
 		status_line = I18n.KEY.tr("The relief vent lets go and the breaker trips. Reset the breaker and crank faster this time.")
 
 
+## WOLF finishes reading the junction's door: he pulls back, growls and warns about it.
 func _wolf_reads_seam() -> void:
 	wolf_scouting = false
 	_react_as_wolf(false)
@@ -4480,6 +4564,7 @@ func _door_blast() -> void:
 	_save_progress()
 
 
+## The door blast as the player feels it: the hiss stops, then the boom, flash, shake and rumble.
 func _blast_feedback() -> void:
 	sfx_bank.stop_each(SfxBank.HISS_GAUGE)
 	sfx_bank.play(&"boom", 0.0)
@@ -4703,6 +4788,9 @@ func _end_retry_fade() -> void:
 	_update_controls()
 
 
+## After a knockdown's fade: puts play back at the start of the current beat, from the save on disk
+## or, before the first checkpoint or after a failed write, from the beat's snapshot. [param reason]
+## is the knockdown's card, shown with the line that says where play resumed.
 func _restore_beat(reason: String) -> void:
 	fail_active = false
 	retrying = false
@@ -4751,6 +4839,7 @@ func _cancel_door_recoil() -> void:
 	human.body_sprite.position.x = HUMAN_SPRITE_REST.x
 
 
+## Stops the knockdown's tween and forgets it.
 func _cancel_fail_tween() -> void:
 	Tweens.kill(fail_tween)
 	fail_tween = null
@@ -4789,6 +4878,9 @@ func _door_lands() -> void:
 	impact.burst(door_dust)
 
 
+## Rebuilds everything on screen from [member state]: which room shows, where the actors stand, the
+## doors, lamps and stations. Called after a load, a new game, a room change and a restored beat;
+## anything that belongs to the moment and not the save is reset here.
 func _sync_scene() -> void:
 	# Walked out through the hatch, the actors faded; any new scene shows them again.
 	hatch_exit_walking = false
@@ -4887,6 +4979,8 @@ func _sync_junction_room() -> void:
 	_stop_junction_loops()
 
 
+## WOLF answers with his body: he leans in when [param accepting], pulls back when not, with his
+## actuators' whir, then returns to rest.
 func _react_as_wolf(accepting: bool) -> void:
 	Tweens.kill(wolf_reaction_tween)
 	wolf.body_sprite.position = WOLF_SPRITE_REST
@@ -4937,6 +5031,9 @@ func _flash_relay_spark(from_wolf: bool) -> void:
 	impact.burst(relay_sparks)
 
 
+## Shows or hides Records Access and the corridor-only dressing for the current chapter and mirrors
+## the state's Records flags into the room. [param animate_exit] true swings the exit open when the
+## first copy has just been secured.
 func _sync_records_room(animate_exit: bool = false) -> void:
 	records_room.visible = state.chapter_id in ["records", "investigation"]
 	records_room.investigation = state.chapter_id == "investigation"
@@ -5001,6 +5098,9 @@ func _set_seal_lamp(color: Color) -> void:
 	seal_lamp.color = color
 
 
+## Decides who walks: whether the player controls the engineer right now, and where the engineer and
+## WOLF walk on their own. Call after any change to the flags it reads (title, opening, choice,
+## knockdown, walk-outs).
 func _update_controls() -> void:
 	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and not retry_fading_in and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held and not records_exit_walking and not _conversation_active()
 	# Stepping back from the relay, the engineer walks on their own for a moment; leaving the junction
@@ -5850,16 +5950,20 @@ static func _set_font_size(control: Control, font_size: int) -> void:
 		control.add_theme_font_size_override(&"font_size", font_size)
 
 
+## Sets [param control]'s font colour override only when it differs, so a _refresh_ui that changes
+## nothing writes nothing.
 static func _set_font_color(control: Control, color: Color) -> void:
 	if not control.has_theme_color_override(&"font_color") or control.get_theme_color(&"font_color") != color:
 		control.add_theme_color_override(&"font_color", color)
 
 
+## Sets [param item]'s modulate only when it differs (see _set_font_color).
 static func _set_modulate(item: CanvasItem, tint: Color) -> void:
 	if item.modulate != tint:
 		item.modulate = tint
 
 
+## Sets [param rect]'s colour only when it differs (see _set_font_color).
 static func _set_color(rect: ColorRect, color: Color) -> void:
 	if rect.color != color:
 		rect.color = color
@@ -5982,6 +6086,8 @@ func _hold_hint(template: String, counts: Array = []) -> String:
 	return HudText.key(template, [HudText.HOLD_USE] + counts)
 
 
+## The context hint for an engineer at world x [param x] (px) in the Service Junction: the vent's
+## warning first, then the station in reach; after the door blows, the lane's hints.
 func _junction_hint(x: float) -> String:
 	var line: StringName = pressure_line.state
 	var fuse_lit: bool = line == &"charged" or line == &"fuse"
@@ -6032,6 +6138,8 @@ func _drop_ready() -> bool:
 	return state.chapter_id == "junction" and state.door_blown and not state.sentry_down and drop_arm.state == &"hung" and _at_arm_panel(human.position.x) and not _drop_waits_for_wolf()
 
 
+## The context hint in the junction's lane (after the door blows) for an engineer at world x
+## [param x] (px): the exit, the bolt, the tank release or the sentry, by what is left to do.
 func _lane_hint(x: float) -> String:
 	if state.junction_cleared:
 		return I18n.KEY.tr("The door is open.")
@@ -6074,6 +6182,7 @@ func _lane_hint(x: float) -> String:
 	return I18n.KEY.tr("The sentry patrols past the rubble. The TANK RELEASE hides you from it.")
 
 
+## The current objective's text for the HUD, in the current language, from the chapter and its flags.
 func _objective() -> String:
 	if state.chapter_id == "investigation":
 		return _investigation_objective()
@@ -6110,6 +6219,8 @@ func _objective() -> String:
 	return I18n.KEY.tr("CHECK THE BREAKER")
 
 
+## Adds the game's input actions with their default keys, controller buttons and stick, where the
+## InputMap does not have them yet. Runs from _ready, before _setup_settings.
 func _install_inputs() -> void:
 	_add_action(&"move_left", KEY_A, KEY_LEFT)
 	_add_action(&"move_right", KEY_D, KEY_RIGHT)
@@ -6132,6 +6243,8 @@ func _install_inputs() -> void:
 	_add_joy_button(&"ui_accept", JOY_BUTTON_A)
 
 
+## Adds [param action] with physical key [param key] (and [param alternate], if any) unless the
+## action already exists. Physical keys: the position on the keyboard, whatever the layout.
 func _add_action(action: StringName, key: Key, alternate: Key = KEY_NONE) -> void:
 	if InputMap.has_action(action):
 		return
@@ -6145,6 +6258,7 @@ func _add_action(action: StringName, key: Key, alternate: Key = KEY_NONE) -> voi
 		InputMap.action_add_event(action, secondary)
 
 
+## Binds controller button [param button_index] to [param action] unless it is bound already.
 func _add_joy_button(action: StringName, button_index: JoyButton) -> void:
 	var event: InputEventJoypadButton = InputEventJoypadButton.new()
 	event.button_index = button_index
@@ -6152,6 +6266,8 @@ func _add_joy_button(action: StringName, button_index: JoyButton) -> void:
 		InputMap.action_add_event(action, event)
 
 
+## Binds the left stick's x axis toward [param value] (-1 left, 1 right) to [param action] unless it
+## is bound already.
 func _add_joy_axis(action: StringName, value: float) -> void:
 	var event: InputEventJoypadMotion = InputEventJoypadMotion.new()
 	event.axis = JOY_AXIS_LEFT_X
@@ -6166,6 +6282,7 @@ func _add_joy_axis(action: StringName, value: float) -> void:
 var debug_tools: DebugTools
 
 
+## Adds the debug tools node (scripts/debug) and hands it this game. The tools stay idle until unlocked.
 func _setup_debug_tools() -> void:
 	debug_tools = DebugTools.new()
 	debug_tools.name = "DebugTools"
@@ -6218,6 +6335,7 @@ func debug_answer_lane(response: int) -> void:
 	_choose_lane(response)
 
 
+## For the debug tools and tests: shows the END OF SLICE card now.
 func debug_show_end_card() -> void:
 	_show_end_card()
 
@@ -6273,6 +6391,7 @@ func debug_save_changed() -> void:
 		_refresh_continue()
 
 
+## For the debug tools and tests: redraws the HUD now.
 func debug_refresh_ui() -> void:
 	_refresh_ui()
 
@@ -6336,6 +6455,8 @@ func debug_snapshot(include_state: bool = true) -> Dictionary:
 	return snapshot
 
 
+## For the debug overlay and captures: the current beat as a short English label ("title",
+## "opening 2/5", "walking out").
 func debug_beat() -> String:
 	if title_open:
 		return "title"
@@ -6354,6 +6475,7 @@ func debug_beat() -> String:
 	return "play"
 
 
+## For the debug overlay: what the engineer is doing, as a short English label.
 func _debug_engineer_state() -> String:
 	if not human.visible:
 		return "hidden"

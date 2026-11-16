@@ -7,6 +7,7 @@ extends RefCounted
 ## go first. Advanced with real delta so timing tests are frame-independent; a room sets
 ## [member paused] during a choice.
 
+## Seconds the gauge takes to climb from empty to full once the breaker arms the line.
 const BUILD_SECONDS: float = 6.0
 ## Long enough for someone who starts moving on the klaxon to clear the blast zone (Nathanial's
 ## decision Q13, October 13, 2026: about 2.5 s, to be tuned down by play).
@@ -120,15 +121,12 @@ func is_warning() -> bool:
 	return state == &"building" and gauge >= WARN_GAUGE - EPSILON
 
 
-## True while the fuse is lit and the door is about to go.
-func is_dangerous() -> bool:
-	return state == &"fuse" or state == &"charged"
-
-
+## True when an engineer at world [param x] (px) stands inside the door blast (BLAST_MIN_X..BLAST_MAX_X).
 static func is_in_blast(x: float) -> bool:
 	return x >= BLAST_MIN_X and x <= BLAST_MAX_X
 
 
+## True when an engineer at world [param x] (px) has any part of their body over the vent grate.
 static func is_on_vent(x: float) -> bool:
 	return x >= VENT_MIN_X and x <= VENT_MAX_X
 

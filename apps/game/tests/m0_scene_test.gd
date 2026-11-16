@@ -622,6 +622,7 @@ func _tap_to_step(step: int) -> void:
 		await tap(&"interact")
 
 
+## The width (px) of [param label]'s widest row of text in its own font and size, ignoring wrapping.
 func _widest_line(label: Label) -> float:
 	var widest: float = 0.0
 	for line: String in label.text.split("\n"):

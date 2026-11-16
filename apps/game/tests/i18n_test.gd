@@ -470,7 +470,7 @@ func _check_english_glyphs() -> void:
 	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\\n]|\\\\.)*)\"")
 	var characters: String = ""
 	for dir: String in TEXT_DIRS:
-		for path: String in _files_under(dir, ["gd", "tscn"]):
+		for path: String in files_under(dir, ["gd", "tscn"]):
 			for line: String in FileAccess.get_file_as_string(path).split("\n"):
 				var code: String = line.get_slice("#", 0) if path.ends_with(".gd") else line
 				for found: RegExMatch in literal.search_all(code):
@@ -486,17 +486,6 @@ func _check_english_glyphs() -> void:
 	bare.data = FileAccess.get_file_as_bytes(ROBOTO_FILE)
 	for px: int in [12, 14, 16, 17, 20, 23, 28, 40]:
 		_check(roboto.get_height(px) == bare.get_height(px), "Roboto with its symbols fallback keeps its own line height at %d px (%.0f, bare %.0f)" % [px, roboto.get_height(px), bare.get_height(px)])
-
-
-## Every file under [param dir] (at any depth) whose extension is in [param extensions], as res:// paths.
-func _files_under(dir: String, extensions: Array[String]) -> Array[String]:
-	var found: Array[String] = []
-	for file: String in DirAccess.get_files_at(dir):
-		if file.get_extension() in extensions:
-			found.append(dir.path_join(file))
-	for sub: String in DirAccess.get_directories_at(dir):
-		found.append_array(_files_under(dir.path_join(sub), extensions))
-	return found
 
 
 ## The text [param code] must draw: its picker name, its machine-translation tag, and every message of

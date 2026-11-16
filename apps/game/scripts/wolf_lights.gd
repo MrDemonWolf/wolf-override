@@ -41,7 +41,7 @@ const RISE_CENTRES: Array[Vector2] = [Vector2(311.3, -108.6), Vector2(148.6, -33
 const RISE_HALF_SIZES: Array[Vector2] = [Vector2(3.2, 5.5), Vector2(2.6, 9.7)]
 const RISE_ANGLES: Array[float] = [-57.0, 20.0]
 
-## Which piece the body shows: &"stand", &"lie" or &"rise" (Main._wolf_pose sets it with the texture).
+## Which piece the body shows: &"stand", &"lie" or &"rise" (Main.wolf_pose sets it with the texture).
 var pose: StringName = &"stand":
 	set(value):
 		pose = value

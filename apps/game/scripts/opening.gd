@@ -84,7 +84,7 @@ const EXIT_BADGE_S: float = 0.3
 const EXIT_READER_S: float = 0.12
 const EXIT_OPEN_S: float = 0.45
 const EXIT_CLOSE_S: float = 1.2
-## Sounds: the wake's servo, the tear's boom (Main._shutter_boom), each leaf catch's quiet clunk, the
+## Sounds: the wake's servo, the tear's boom (Main.shutter_boom), each leaf catch's quiet clunk, the
 ## klaxon with the lockdown order, the door's quiet latch (dB, pitch).
 const SERVO_DB: float = -14.0
 const CATCH_DB: float = -16.0

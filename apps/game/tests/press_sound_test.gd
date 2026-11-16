@@ -247,6 +247,7 @@ func _screen_text() -> String:
 	return "%s|%s|%s|%s|%s|%s|%s|%s" % [(game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text, hint.visible, (hint.get_node("Text") as Label).text, (game.get_node("CanvasLayer/TopBar/HUD") as Label).text, (game.get_node("CanvasLayer/BottomBar") as Control).visible, (game.get_node("CanvasLayer/TopBar") as Control).visible, (game.get("dialogue_continue") as Control).visible]
 
 
+## True while the bypass's COOLANT FAULT tag can be seen: in the tree, visible and not faded out.
 func _fault_shown() -> bool:
 	return bypass.fault_tag.is_visible_in_tree() and bypass.fault_tag.self_modulate.a > 0.0
 

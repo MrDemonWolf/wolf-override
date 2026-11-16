@@ -11,6 +11,7 @@ extends RefCounted
 ## catches its near end counts (Nathanial's decision Q7, October 13, 2026) while a tank that only
 ## brushes it does not.
 
+## The floor mark's centre (world x, px, in the Service Junction): the tank hangs over it and lands on it.
 const MARK_X: float = 700.0
 ## Half the floor brackets, which are drawn this wide either side of the mark: the tank's own
 ## footprint (JunctionRoom.TANK_SIZE.x is 46 px), so what lands inside them is under the tank.
@@ -122,10 +123,12 @@ static func footprint() -> Vector2:
 	return Vector2(MARK_X - HIT_RANGE, MARK_X + HIT_RANGE)
 
 
+## Seconds since the missed tank landed and the rewind began (0 to REWIND_SECONDS).
 func _rewind_elapsed() -> float:
 	return REWIND_SECONDS - rewind_remaining
 
 
+## True while the cloud a landed tank threw up still hangs in the lane.
 func cloud_active() -> bool:
 	return cloud_remaining > 0.0
 

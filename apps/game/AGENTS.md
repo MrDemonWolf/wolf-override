@@ -12,7 +12,7 @@
 
 | Need | Home |
 |---|---|
-| UI sizes, colours, spacing | `scripts/ui_tokens.gd` (one token file, shared with the mockups) |
+| UI sizes, colours, spacing, timing | `ui/ui.tokens.json`, read through `scripts/ui_tokens.gd` (one token file, shared with `mockups/`) |
 | Player-facing text | Story lines are marked in `scripts/story_text.gd`; languages and translation go through `scripts/i18n.gd` and the catalogs in `i18n/` |
 | Settings and saved preferences | `scripts/game_settings.gd` |
 | Test helpers | `tests/support/` (start with `game_suite.gd`) |
@@ -28,6 +28,6 @@
 
 ## Checks
 
-1. Run the suites your change touches with `godot --headless`, then `scripts/check-game.sh` for the full run (about 6 minutes).
+1. Run the suites your change touches with `godot --headless`, then `scripts/check-game.sh` for the full run.
 2. Make rendered stills with `tools/render/render.sh` only. Never open a Godot or game window.
 3. Say which of these you did: headless logic, rendered stills. Hands-on play, exports and devices are Nathanial's checks; do not claim them.

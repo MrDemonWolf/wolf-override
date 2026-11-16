@@ -1,7 +1,7 @@
 ---
 title: Developer home
 seoTitle: "Developer guide: build and contribute"
-description: "Every developer page for WOLF OVERRIDE in one table: set up the Godot project, follow the rules, run the checks and cut a release."
+description: "Every developer page for WOLF OVERRIDE in one place: set up the Godot project, follow the rules, run the checks and cut a release."
 ---
 
 **What this page is for:** find the developer page you need.
@@ -12,24 +12,42 @@ description: "Every developer page for WOLF OVERRIDE in one table: set up the Go
 
 ## Start here
 
-1. [Set up the project](/docs/development/setup/).
-2. Read the [Project rules](/docs/development/rules/).
+1. [Set up the project](/docs/development/setup/): install the tools, run the game and the site.
+2. Read the [Project rules](/docs/development/rules/) every change follows.
 3. Follow [Contributing](/docs/development/contributing/) to send a change.
 
-## Every developer page
+## Understand and check the code
 
-| I want to… | Page |
-| --- | --- |
-| Install the tools, run the game and the site | [Set up the project](/docs/development/setup/) |
-| Send a change | [Contributing](/docs/development/contributing/) |
-| Know the rules every change follows | [Project rules](/docs/development/rules/) |
-| Find where code lives | [Architecture](/docs/development/architecture/) |
-| Run the checks and know what CI runs | [Testing and CI](/docs/development/testing/) |
-| See what the game is doing, jump anywhere, capture a bug | [Debug tools](/docs/development/debug-tools/) |
-| Know what has actually been checked | [What was checked](/docs/development/evidence/) |
-| Work on languages | [Localization](/docs/development/localization/) |
-| Add or replace art | [Art pipeline](/docs/development/art-pipeline/) |
-| Number a version, cut one, make a build | [Releases and versions](/docs/development/releases/) |
-| See what is built and what comes next | [Current status](/docs/development/status/) |
-| Write or change a guide page | [Docs style guide](/docs/development/style-guide/) |
-| Follow changes | [Changelog](/docs/changelog/) |
+<LinkCards
+  label="Understand and check the code"
+  links={[
+    { href: '/docs/development/architecture/', title: 'Architecture', description: 'Find where code lives' },
+    { href: '/docs/development/testing/', title: 'Testing and CI', description: 'Run the checks and know what CI runs' },
+    { href: '/docs/development/debug-tools/', title: 'Debug tools', description: 'See what the game is doing, jump anywhere, capture a bug' },
+    { href: '/docs/development/evidence/', title: 'What was checked', description: 'Know what has actually been checked' },
+  ]}
+/>
+
+## Add art, languages and pages
+
+<LinkCards
+  label="Add art, languages and pages"
+  columns={3}
+  links={[
+    { href: '/docs/development/art-pipeline/', title: 'Art pipeline', description: 'Add or replace art' },
+    { href: '/docs/development/localization/', title: 'Localization', description: 'Work on languages' },
+    { href: '/docs/development/style-guide/', title: 'Docs style guide', description: 'Write or change a guide page' },
+  ]}
+/>
+
+## Follow versions and status
+
+<LinkCards
+  label="Follow versions and status"
+  columns={3}
+  links={[
+    { href: '/docs/development/releases/', title: 'Releases and versions', description: 'Number a version, cut one, make a build' },
+    { href: '/docs/development/status/', title: 'Current status', description: 'See what is built and what comes next' },
+    { href: '/docs/changelog/', title: 'Changelog', description: 'Follow changes' },
+  ]}
+/>

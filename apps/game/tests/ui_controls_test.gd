@@ -461,6 +461,7 @@ func _check_hud_writes_on_change(game: Node2D) -> void:
 	await process_frame
 
 
+## True when controller button [param index] is bound to [param action] in the InputMap.
 func _has_button(action: StringName, index: JoyButton) -> bool:
 	for event: InputEvent in InputMap.action_get_events(action):
 		if event is InputEventJoypadButton and event.button_index == index:
@@ -468,6 +469,7 @@ func _has_button(action: StringName, index: JoyButton) -> bool:
 	return false
 
 
+## Sends Escape pressed or released ([param pressed]) through the kit's send_key.
 func _send_escape(pressed: bool) -> void:
 	await send_key(KEY_ESCAPE, pressed)
 

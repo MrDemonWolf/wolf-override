@@ -125,6 +125,8 @@ func _check_shapes(game: Main, rooms: Dictionary, camera: Camera2D) -> void:
 	await frames(3)
 
 
+## One room's layered set ([param depth], named [param room_name] in messages): it has far, mid and
+## near plates in the right draw order, and the mid plate spans the room with its walkway on the floor.
 func _check_plates(room_name: String, depth: RoomDepth) -> void:
 	_expect(depth.painting != null and depth.mid_painting != null and depth.near_painting != null, "%s has far, mid and near plates" % room_name)
 	_expect(depth.far_dust.z_index < depth.mid_layer.z_index and depth.far_dust.z_index >= depth.backdrop_layer.z_index and depth.far_dust.get_index() > depth.backdrop_layer.get_index(), "%s: the far dust drifts over the far wall and behind the mid plate" % room_name)
@@ -277,10 +279,12 @@ func _face_level(leaf: SwingLeaf, theta: float) -> float:
 	return c.get_luminance()
 
 
+## [param sprite]'s drawn rectangle in world px (its own rect through its global transform).
 func _global_rect(sprite: Sprite2D) -> Rect2:
 	return sprite.get_global_transform() * sprite.get_rect()
 
 
+## The world y (px) of [param prop]'s lowest edge: where it meets the floor.
 func _bottom(prop: Sprite2D) -> float:
 	return _global_rect(prop).end.y
 

@@ -718,10 +718,10 @@ func _make_shaft() -> Sprite2D:
 ## [param piece_scale] (world px per source px) with its top-left corner at [param top_left] in its
 ## parent's space, filtered with mipmaps like every painted plate. It is named [param piece_name] unless
 ## that is empty, and is not added to any parent: node order is draw order, so the caller adds it where
-## it belongs. The one builder for an atlas cut: make_prop, the blast door's and the exit door's pieces
-## (JunctionRoom._door_piece, _exit_piece) and the corridor seal's sprites (Main._seal_sprite) use it, so
-## each must keep wanting exactly these settings; a caller that needs more (centred, z, flips) sets it
-## on the result.
+## it belongs. The one builder for a painted piece: make_prop, every door's pieces (DoorKit.piece), the
+## blast door's (JunctionRoom._door_piece), the dock bay's plate and doors (DockBay) and the bypass's
+## gearbox (BypassHandle) use it, so each must keep wanting exactly these settings; a caller that needs
+## more (centred, z, flips) sets it on the result.
 static func cut(texture: Texture2D, region: Rect2, piece_scale: float, piece_name: String = "", top_left: Vector2 = Vector2.ZERO) -> Sprite2D:
 	var sprite: Sprite2D = Sprite2D.new()
 	if not piece_name.is_empty():

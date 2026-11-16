@@ -27,7 +27,6 @@ const A_MOUTH: float = 1.46348
 const A_LEAD_SHUT: float = -2.19069
 const TRAVEL_M: float = 3.65417
 const LEAF_TOP_M: float = 3.2
-const H_OPEN: float = 3.05
 const START: float = 0.4
 ## The piece's texel density both ways (345 x 256 px for 4.31 x 3.2 m) and where its front face ends
 ## and its leading edge's face begins (texel x: the front's 3.95 m).
@@ -60,6 +59,8 @@ static func project(a: float, h: float, t: float) -> Vector2:
 	return DoorCamera.project(x_m, h, depth)
 
 
+## Where the leaf's leading edge is along the wall (a, metres) at the seal's [param open_value] (0 shut
+## to 1 open): it stays shut until START, then slides TRAVEL_M back into the pocket by 1.
 static func lead_at(open_value: float) -> float:
 	return A_LEAD_SHUT + clampf((open_value - START) / (1.0 - START), 0.0, 1.0) * TRAVEL_M
 

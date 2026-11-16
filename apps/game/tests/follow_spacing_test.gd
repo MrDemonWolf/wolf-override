@@ -309,6 +309,7 @@ func _world_span(actor: M0Actor) -> Vector2:
 	return Vector2(origin + span.x, origin + span.y)
 
 
+## Fails with [param where] when WOLF's and the engineer's visible bodies overlap in world x.
 func _expect_clear(human: M0Actor, wolf: M0Actor, where: String) -> void:
 	var human_span: Vector2 = _world_span(human)
 	var wolf_span: Vector2 = _world_span(wolf)
