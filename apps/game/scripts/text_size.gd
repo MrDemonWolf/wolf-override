@@ -19,13 +19,16 @@ static func px(base: int) -> int:
 	return roundi(base * factor)
 
 
-## Scales a menu control from its authored font and minimum height, remembered once to avoid compounding.
+## Scales a menu control from its authored font/minimum height, cached to avoid compounding.
+## Buttons wrap so large translated actions cannot force their scrolling column outside its card.
 static func apply_control(control: Control) -> void:
 	if not control.has_meta(&"menu_font_base"):
 		control.set_meta(&"menu_font_base", control.get_theme_font_size(&"font_size"))
 		control.set_meta(&"menu_minimum_base", control.custom_minimum_size.y)
 	control.add_theme_font_size_override(&"font_size", px(int(control.get_meta(&"menu_font_base"))))
 	control.custom_minimum_size.y = px(int(control.get_meta(&"menu_minimum_base")))
+	if control is Button:
+		(control as Button).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
 ## The nearest offered step to [param value] (a saved or hand-edited setting).

@@ -13,7 +13,8 @@ func _run() -> void:
 	check_name = "Crank hold"
 	base = "user://crank-hold-test-%s" % OS.get_process_id()
 	remove_tools_files(base)
-	await _check_bypass_first_frame()
+	for device: StringName in [&"action", &"key", &"pad"]:
+		await _check_bypass_first_frame(device)
 	await _check_bypass_held_time()
 	await _check_bypass_toggle()
 	await _check_valve()
@@ -26,7 +27,8 @@ func _run() -> void:
 
 ## Holding interact at the bypass: on the frame Main first sees the press the wheel has turned and the
 ## ratchet has clicked, long before the first notch at 0.25 s; letting go springs the part turn back.
-func _check_bypass_first_frame() -> void:
+## [param device] chooses the shared action/native E/native A injection, without copying the probe.
+func _check_bypass_first_frame(device: StringName) -> void:
 	# Each check starts from default settings (TOGGLE HOLDS off).
 	remove_tools_files(base)
 	var game: Node2D = await spawn_tools_game(base, true)
@@ -34,15 +36,15 @@ func _check_bypass_first_frame() -> void:
 	var handle: BypassHandle = game.get("bypass_handle") as BypassHandle
 	var hold: HoldUse = game.get("hold_use") as HoldUse
 	var resting: float = handle.wheel.rotation_degrees
-	var clicks: Array[int] = await _press_listening(game)
+	var clicks: Array[int] = await _press_listening(game, device)
 	var answered_at: int = Engine.get_process_frames()
-	_expect(hold.holding and hold.started, "Main takes the hold on the first frame interact is down")
+	_expect(hold.holding and hold.started, "%s: Main takes the hold on the first frame interact is down" % device)
 	_expect(hold.ticks == 0 and handle.ticks == 0 and hold.progress < BypassHandle.TICK_SECONDS, "no notch has landed yet on the press frame")
 	_expect(handle.hold_fraction >= HoldUse.FIRST_FRAME_GIVE and handle.wheel.rotation_degrees - resting >= BypassHandle.TICK_DEGREES * HoldUse.FIRST_FRAME_GIVE - 0.01, "on the press frame the wheel has already turned (%.1f degrees)" % (handle.wheel.rotation_degrees - resting))
 	_expect(not clicks.is_empty() and clicks[0] <= answered_at, "and the ratchet clicks on that frame")
 	var notched: bool = await wait_until(func() -> bool: return handle.ticks >= 1, 30)
 	_expect(notched and handle.wheel.rotation_degrees >= BypassHandle.TICK_DEGREES, "the first notch lands with the wheel past an eighth")
-	Input.action_release(&"interact")
+	use_input(false, device)
 	await wait_until(func() -> bool: return not hold.holding, 5)
 	await frames(20)
 	_expect(handle.hold_fraction == 0.0 and is_equal_approx(handle.wheel.rotation_degrees, BypassHandle.TICK_DEGREES * handle.ticks), "letting go springs the part turn back to the last notch (%.1f degrees, %d notches)" % [handle.wheel.rotation_degrees, handle.ticks])
@@ -228,16 +230,16 @@ func _settings_path() -> String:
 	return base + ".cfg"
 
 
-## Presses interact (and leaves it held) while listening for the ratchet's clank, and returns once
+## Presses interact through [param device] (and leaves it held) while listening for the ratchet's clank, and returns once
 ## Main's first frame with interact down has run: process_frame fires before the nodes process, so
 ## the second one resumes after that frame. Returns the process frame of every clank the bank starts
 ## from the press on; the array keeps filling while the game runs.
-func _press_listening(game: Node2D) -> Array[int]:
+func _press_listening(game: Node2D, device: StringName = &"action") -> Array[int]:
 	var clicks: Array[int] = []
 	(game.get("sfx_bank") as SfxBank).clip_started.connect(func(clip: StringName) -> void:
 		if clip == &"clank":
 			clicks.append(Engine.get_process_frames()))
-	Input.action_press(&"interact")
+	use_input(true, device)
 	await process_frame
 	await process_frame
 	return clicks

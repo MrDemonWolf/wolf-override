@@ -17,10 +17,10 @@ extends SceneTree
 ##
 ## Users (2026-10-18): every tests/*_test.gd. What must stay true for every user:
 ## - What the statics touch besides their arguments: the running SceneTree (tree(), and its paused
-##   flag in free_tools_game); the global Input actions and events (hold, press_for, tap, walk_to,
+##   flag in free_tools_game); the global Input actions and events (use_input, hold, press_for, tap, walk_to,
 ##   walk_to_reading_on, retry, send_key and continue_until (with its two users) press or send them,
-##   and each releases what it pressed before it returns; tap_now releases on the next process frame
-##   instead); user:// files (remove_file and remove_tools_files delete them, write_text writes one,
+##   and the bounded helpers release what they pressed before returning; use_input leaves down/up
+##   with its caller, while tap_now releases on the next process frame); user:// files (remove_file and remove_tools_files delete them, write_text writes one,
 ##   fresh_save_path, start_game and open_game delete stale save and settings files before the game
 ##   starts, end_game deletes the game's own after it is freed); the root's children
 ##   (start_clock adds a GameClock the caller frees, wait_game_seconds adds and frees its own); and
@@ -445,6 +445,26 @@ static func controller_button(button: JoyButton, pressed: bool) -> InputEventJoy
 	event.button_index = button
 	event.pressed = pressed
 	return event
+
+
+## Injects default USE as an action, native E key or native pad A; [param pressed] owns down/up.
+## Used by press/hold probes with fresh default bindings. Changes global Input; the caller must release it.
+static func use_input(pressed: bool, source: StringName = &"action") -> void:
+	match source:
+		&"action":
+			if pressed:
+				Input.action_press(&"interact")
+			else:
+				Input.action_release(&"interact")
+		&"key":
+			Input.parse_input_event(key_event(KEY_E, pressed))
+		&"pad":
+			Input.parse_input_event(controller_button(JOY_BUTTON_A, pressed))
+		_:
+			push_error("GameSuite.use_input: unknown source %s" % source)
+	if source != &"action":
+		# Native events may be buffered until frame end; measure from dispatch, as the engine loop does.
+		Input.flush_buffered_events()
 
 
 ## Writes [param text] to the user:// (or absolute) file at [param path], replacing what it held, for

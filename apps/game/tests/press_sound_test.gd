@@ -24,6 +24,8 @@ var started: Array[StringName] = []
 ## State-changing presses checked, and how many of them were heard within one frame.
 var presses: int = 0
 var heard: int = 0
+## State-changing probes by injected action or native E/A event path.
+var device_counts: Dictionary[StringName, int] = {&"action": 0, &"key": 0, &"pad": 0}
 
 
 func _run() -> void:
@@ -41,7 +43,8 @@ func _run() -> void:
 	await _junction_exit()
 
 	_expect(presses >= 20, "the probe checked the slice's state-changing presses (%d)" % presses)
-	print("Press probe: %d state-changing presses, %d heard within one frame" % [presses, heard])
+	_expect(device_counts[&"key"] >= 1 and device_counts[&"pad"] >= 1, "native E and pad A each exercised a state-changing USE")
+	print("Press probe: %d state-changing presses, %d heard within one frame; devices %s" % [presses, heard, device_counts])
 	# The kit's teardown stops the bank and every player and lets the mixer release them (about 0.5 s
 	# in all, as before) before it frees the game and removes its files.
 	await end_game(game, 0.4)
@@ -57,7 +60,7 @@ func _route_wolf_takes_relay() -> void:
 	await _press(&"choice_1", "telling WOLF the risk at the breaker")
 	_expect(started.has(&"actuator"), "WOLF's answer at the relay is heard as his joints move (heard %s)" % [started])
 	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the disclosed-risk reply before arming")
-	await _press(&"interact", "arming the corridor breaker")
+	await _press(&"interact", "arming the corridor breaker", -1.0, true, &"key")
 	await _place(605.0, 520.0)
 	_expect(_fault_shown(), "the live relay wears its COOLANT FAULT tag")
 	await _press(&"interact", "signalling WOLF to take the relay")
@@ -82,7 +85,7 @@ func _route_bypass() -> void:
 	await _ask_relay()
 	await _press(&"choice_2", "pressing WOLF at the breaker")
 	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the refusal before arming")
-	await _press(&"interact", "arming the corridor breaker after his refusal")
+	await _press(&"interact", "arming the corridor breaker after his refusal", -1.0, true, &"pad")
 	await _press(&"interact", "asking WOLF again at the live relay", 605.0)
 	_expect(started.has(&"actuator"), "WOLF's refusal at the relay is heard (heard %s)" % [started])
 	await _place(700.0, 480.0)
@@ -200,20 +203,29 @@ func _lane_answer(response: int, label: String) -> void:
 
 
 ## One press of [param action] (with the engineer first placed at [param at_x] when it is 0 or more)
-## through the game's own input, as a key, button or tap does it. When the press changes the game's
-## state it must start a sound within one frame and change what the screen says; [param must_change]
-## also requires that it changes the state.
-func _press(action: StringName, label: String, at_x: float = -1.0, must_change: bool = true) -> void:
+## through the game's own input. [param device] selects action injection or native key/pad USE;
+## native USE stays down for three process frames and release must not fire it again. State changes
+## must start a sound and visible feedback within one frame; [param must_change] requires a change.
+func _press(action: StringName, label: String, at_x: float = -1.0, must_change: bool = true, device: StringName = &"action") -> void:
+	if not _expect(device == &"action" or action == &"interact", "native press probes use the default USE binding"):
+		return
+	label = "%s [%s]" % [label, device]
 	if at_x >= 0.0:
 		await _place(at_x, wolf.position.x)
 	await process_frame
 	var before: String = _fingerprint()
 	var said: String = _screen_text()
 	started.clear()
-	Input.action_press(action)
+	if action == &"interact":
+		use_input(true, device)
+	else:
+		Input.action_press(action)
 	# The frame the game sees the press.
 	await process_frame
-	Input.action_release(action)
+	if device != &"action":
+		_expect(_fingerprint() != before, "%s changes puzzle state on the press frame, not just the prompt family" % label)
+	if device == &"action":
+		Input.action_release(action)
 	var heard_at: int = 0 if not started.is_empty() else -1
 	var shown_at: int = 0 if _screen_text() != said else -1
 	await process_frame
@@ -221,12 +233,19 @@ func _press(action: StringName, label: String, at_x: float = -1.0, must_change: 
 		heard_at = 1
 	if shown_at < 0 and _screen_text() != said:
 		shown_at = 1
+	if device != &"action":
+		await process_frame
+		var held_state: String = _fingerprint()
+		use_input(false, device)
+		await process_frame
+		_expect(_fingerprint() == held_state, "%s does not fire USE again on release" % label)
 	var changed: bool = _fingerprint() != before
 	if must_change:
 		_expect(changed, "%s changes the game's state" % label)
 	if not changed:
 		return
 	presses += 1
+	device_counts[device] += 1
 	if _expect(heard_at >= 0, "%s starts a sound within one frame (heard %s)" % [label, started]):
 		heard += 1
 	_expect(shown_at >= 0, "%s changes what the screen says within one frame" % label)

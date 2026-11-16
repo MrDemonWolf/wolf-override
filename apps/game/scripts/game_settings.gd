@@ -631,8 +631,6 @@ func apply_text_size() -> void:
 		if control is Label or control is BaseButton or control is TabBar:
 			if control != $Title:
 				TextSize.apply_control(control)
-		if control is Button:
-			(control as Button).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		if control is OptionButton:
 			var option: OptionButton = control as OptionButton
 			option.fit_to_longest_item = false

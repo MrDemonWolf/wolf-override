@@ -837,8 +837,8 @@ var credits_paused: bool = false
 ## translates it as one message (the template's msgid is this scene text) and puts the AI disclosure
 ## block above it.
 var _credits_english: String = ""
-## Whether Pause's hint last showed the touch line, so a language change writes it again the same way
-## ([method _show_pause_hint]).
+## Last Pause input class, so opening/recovery resume guidance keeps its input names on a language
+## change ([method _show_pause_hint]).
 var _pause_hint_tapped: bool = false
 ## The exported changelog as loaded at title time; empty when the file is missing.
 var changelog_text: String = ""
@@ -2520,21 +2520,26 @@ func _show_pause_menu() -> void:
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton.text = I18n.KEY.tr("SKIP OPENING") if intro_active else I18n.KEY.tr("RETURN TO TITLE")
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ReturnWarning.visible = not intro_active
 	_show_pause_hint(input_mode.touch_layout())
+	($CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll as ScrollContainer).scroll_vertical = 0
 	_reveal_menu()
 	_grab_menu_focus(resume_button)
 
 
-## Writes Pause's hint in the current language: TAP RESUME TO RETURN when [param tapped] (a phone or
-## tablet at start-up; the touch layout with no controller in use when Pause opens), else the Pause key or
-## button and RESUME. The key's name goes into the translated template, so the hint is translated here
-## and its Label's auto-translate is off (main.tscn); [method _notification] writes it again, the same
-## way, when the language changes while Pause is open.
+## Shows the current translated goal above Resume during play, reusing the existing hint label.
+## Disconnect reasons take priority; opening, closing and recovery screens keep their resume guidance.
+## [param tapped] is remembered so a language change preserves that input-specific fallback.
 func _show_pause_hint(tapped: bool) -> void:
 	_pause_hint_tapped = tapped
 	var hint: Label = $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/PauseHint
-	hint.text = tr("Controller disconnected. Resume when ready.") if controller_disconnected else (tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)]))
-	# Keep the reason for pausing above Resume, including when the action list scrolls at 200%.
-	hint.get_parent().move_child(hint, 0 if controller_disconnected else hint.get_parent().get_child_count() - 1)
+	var has_goal: bool = not (title_open or intro_active or chapter_close_active or end_card_active or fail_active)
+	if controller_disconnected:
+		hint.text = tr("Controller disconnected. Resume when ready.")
+	elif has_goal:
+		hint.text = HudText.card(_objective_card_message())
+	else:
+		hint.text = tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)])
+	# The useful context stays above Resume, including when the action list scrolls at 200%.
+	hint.get_parent().move_child(hint, 0 if controller_disconnected or has_goal else hint.get_parent().get_child_count() - 1)
 
 
 ## Leaves play for the title: stops the opening, tweens, a knockdown and every loop, and shows the

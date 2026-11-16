@@ -248,7 +248,7 @@ func _run() -> void:
 	await send_key(KEY_DOWN, true)
 	await send_key(KEY_DOWN, false)
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
-	_expect((pause_scroll.get_node("MenuMargin/MenuList/PauseHint") as Label).text == "Escape  RESUME", "Pause updates its prompt when keyboard input replaces touch")
+	_expect(not bool(game.get("touch_enabled")) and (pause_scroll.get_node("MenuMargin/MenuList/PauseHint") as Label).text == HudText.card(str(game.call("_objective_card_message"))), "Pause keeps the current goal when keyboard input replaces touch")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
 	var fps: OptionButton = game.get("fps_options") as OptionButton

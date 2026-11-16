@@ -2,6 +2,7 @@
 Changes merged after 0.15.0. They become the next version when it is cut.
 
 -- Gameplay --
+- Pause shows the current goal above Resume, so phones can recover it after the HUD card fades. Headless and rendered checks only; not played by hand.
 - Brief walk-and-talk uses a compact panel above its speaker, falling back to the lower reading area when space is tight. Headless and rendered checks only; not played by hand.
 - Purge-display, Records-entry and later evidence reads pause the engineer until read. Headless checks only; not played by hand.
 - Records copy readouts wait for input through either mirror route. Headless chapter and complete-route checks passed; not played by hand.
@@ -75,6 +76,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
 
 -- Accessibility --
+- Large translated menu actions wrap inside their scrolling columns. Headless and rendered checks only; not played by hand.
 - Already-read dialogue stays dismissed when phone controls return, so USE reaches the next interaction. Headless checks only; not played by hand.
 - Timed walk-and-talk keeps phone controls clear of text, including at 200%; stopped conversations use dialogue taps. Headless and rendered checks; physical touch unverified.
 - Question pages wait for input, with a continue cue only while more pages remain. Headless input checks and 200% rendered stills; not played by hand.
@@ -130,6 +132,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Settings are written to a temporary file first and then swapped in, so a crash while saving cannot leave a broken settings file.
 
 -- Website --
+- The first-play guide matches speaker tabs, brief speech and the Accessibility location of Text Size.
 - The accessibility guide describes title text scaling and dialogue speaker tabs.
 - Next.js is updated to 16.4.3 with the October security fixes; the website stays a static export.
 - Zod, used by the docs build, is updated to 4.6.7 with its collection-validation security fix.
@@ -204,6 +207,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Play overview no longer says there is no packaged download; it points to the test build and the source game, as Get the game does.
 
 -- Development --
+- Press and crank probes exercise native E and controller A, including no second USE on release. Headless checks passed; hardware remains unverified.
 - Route, movement and sound checks read stopped conversations before using the next station. Focused headless checks only.
 - Language checks measure actual hint templates in the hint bar; dialogue keeps its separate pagination checks.
 - Debug drawings protect the floating move pad’s ring and thumb bounds. Headless checks only.
