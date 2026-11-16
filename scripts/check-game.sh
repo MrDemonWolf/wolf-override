@@ -16,8 +16,9 @@ limit="${SUITE_TIMEOUT:-240}"
 # takes on the wall clock. These measure the opening's beats against bounds of 0.02 to 0.1 s, finer than
 # one frame when four suites share the CPU (a frame then lasts 0.1 s or more, and the game moves a whole
 # frame at once), so in real time they failed under load (PR #140's stress runs). Each checks it got the
-# flag (GameSuite._expect_fixed_fps); tests/support/game_suite.gd's start_clock says more.
-fixed_fps_suites=(opening_timing_test opening_early_press_test)
+# flag (GameSuite._expect_fixed_fps); dock_bay_test also needs one render update per physics step
+# to measure camera speed. tests/support/game_suite.gd's start_clock says more.
+fixed_fps_suites=(opening_timing_test opening_early_press_test dock_bay_test)
 
 # Internal: `check-game.sh --suite NAME LOG_DIR WORK_DIR` runs one suite and writes NAME.result.
 if [ "${1:-}" = "--suite" ]; then
