@@ -120,11 +120,6 @@ func is_warning() -> bool:
 	return state == &"building" and gauge >= WARN_GAUGE - EPSILON
 
 
-## True while the fuse is lit and the door is about to go.
-func is_dangerous() -> bool:
-	return state == &"fuse" or state == &"charged"
-
-
 static func is_in_blast(x: float) -> bool:
 	return x >= BLAST_MIN_X and x <= BLAST_MAX_X
 

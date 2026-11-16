@@ -27,7 +27,6 @@ const A_MOUTH: float = 1.46348
 const A_LEAD_SHUT: float = -2.19069
 const TRAVEL_M: float = 3.65417
 const LEAF_TOP_M: float = 3.2
-const H_OPEN: float = 3.05
 const START: float = 0.4
 ## The piece's texel density both ways (345 x 256 px for 4.31 x 3.2 m) and where its front face ends
 ## and its leading edge's face begins (texel x: the front's 3.95 m).
