@@ -126,12 +126,7 @@ func _run() -> void:
 	_expect(not Input.is_action_pressed(&"interact"), "hiding a held USE button releases its action")
 	other.pressed = false
 	root.push_input(other, true)
-	touch.position = game.bottom_bar.get_global_rect().get_center()
-	touch.pressed = true
-	root.push_input(touch, true)
-	touch.pressed = false
-	root.push_input(touch, true)
-	await settle(2)
+	await tap_touch(game.bottom_bar.get_global_rect().get_center())
 	_expect(game.dialogue_cleared, "tapping the dialogue still dismisses its final page without USE")
 	game.status_line = ""
 	game.call("_refresh_ui")

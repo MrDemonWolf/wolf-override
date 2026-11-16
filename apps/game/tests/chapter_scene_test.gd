@@ -34,6 +34,8 @@ func _run() -> void:
 		return
 	await tap(&"interact")
 	_require(state.purge_trace_preserved and game.call("_objective") == "COPY MIRROR INDEX", "purge trace advances objective")
+	_require(game.call("_conversation_active") and not human.controlled, "the copied source holds for the player to read")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "reading the copied source releases movement")
 	# Audit 23: a USE over the middle of a machine steps the engineer out beside it, facing it.
 	_require(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= RecordsRoom.PURGE_X - RecordsRoom.PURGE_HALF_WIDTH + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
 	var purge_save: M0State = State.load_from_disk(path)
@@ -61,6 +63,8 @@ func _run() -> void:
 	for _frame in range(90):
 		await physics_frame
 	_require(absf(wolf.position.x - wolf_mirror_x) <= 2.0 and wolf.body_sprite.flip_h, "after his readout WOLF stays at the mirror port's right, facing it, while the engineer is at it (x %.0f)" % wolf.position.x)
+	_require(game.call("_conversation_active") and not human.controlled, "the mirror readout remains stopped while WOLF holds his reading spot")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "reading the mirror result releases movement")
 	if not await walk_to(human, 700.0):
 		_require(false, "engineer can walk on from the mirror port")
 		return
@@ -144,6 +148,7 @@ func _run() -> void:
 		_require(false, "fallback engineer can reach purge queue")
 		return
 	await tap(&"interact")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "fallback reads the copied source before walking on")
 	if not await walk_to(human, 520.0):
 		_require(false, "fallback engineer can reach mirror port")
 		return
@@ -153,6 +158,7 @@ func _run() -> void:
 	_require(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "the manual copy also leaves the mirror port reading as copied")
 	_require(state.memory.get("choice_id") == State.PRESS, "manual route retains accurate earlier choice")
 	_require(not (game.get_node("Wolf") as M0Actor).controlled, "fallback never transfers control to WOLF")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "fallback reads the manual-port result before leaving")
 	if not await walk_to(human, 830.0):
 		_require(false, "fallback engineer can reach exit")
 		return

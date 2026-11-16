@@ -393,6 +393,18 @@ static func tap(action: StringName, settle_frames: int = 0) -> void:
 		await tree().process_frame
 
 
+## Taps with native finger 0 at canvas-pixel [param point], through viewport routing rather than InputMap.
+## Waits two process frames for the down/up pair to reach the game; it sends no OS input.
+static func tap_touch(point: Vector2) -> void:
+	var event: InputEventScreenTouch = InputEventScreenTouch.new()
+	event.position = point
+	event.pressed = true
+	tree().root.push_input(event, true)
+	event.pressed = false
+	tree().root.push_input(event, true)
+	await settle(2)
+
+
 ## Presses the input [param action] now and releases it on the next process frame, without waiting:
 ## the same press [method tap] makes (seen by this frame's _process when called right after
 ## `await process_frame`, held for one process frame), for a suite that reads the game every frame

@@ -1561,7 +1561,11 @@ func _use_pressed() -> bool:
 
 
 ## Explicitly reading a bubble advances a page/queued line, then dismisses its last page; never uses a station.
+## A choice question keeps its final page until answered; reading never selects an answer.
 func _read_pointer_dialogue() -> void:
+	if waiting_for_choice:
+		_next_box()
+		return
 	if _conversation_active():
 		if not _next_box():
 			dialogue_cleared = true
@@ -3196,7 +3200,7 @@ func _interact_records(x: float) -> void:
 			sfx_bank.play(&"chirp", -8.0)
 			# TRANSLATORS: %s is the engineer's first name. The worker is the records worker, the witness; no gendered form for them.
 			# i18n: story speaker=narrator engineer=name
-			_aside(I18n.format(I18n.KEY.tr("The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing."), [_first_name()]))
+			_converse(I18n.format(I18n.KEY.tr("The Director's purge order has a time and file ID. %s keeps a local copy; the worker's originals are still missing."), [_first_name()]))
 		else:
 			# TRANSLATORS: i18n: story speaker=narrator
 			_aside(I18n.KEY.tr("The purge-order trace is already copied. The mirror port may confirm when the source existed."))
@@ -3521,11 +3525,11 @@ func _choose_mirror(route_id: String) -> void:
 	if route_id == "wolf":
 		# TRANSLATORS: The worker is the records worker, the witness; no gendered form for them.
 		# i18n: story speaker=narrator
-		status_line = I18n.KEY.tr("WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order.")
+		_converse(I18n.KEY.tr("WOLF reads the timestamp off his own readout. The worker's files existed before the deletion order."))
 	else:
 		# TRANSLATORS: %s is the engineer's first name.
 		# i18n: story speaker=narrator engineer=name
-		status_line = I18n.format(I18n.KEY.tr("%s copies the timestamp through the maintenance port. WOLF keeps watch."), [_first_name()])
+		_converse(I18n.format(I18n.KEY.tr("%s copies the timestamp through the maintenance port. WOLF keeps watch."), [_first_name()]))
 	_sync_records_room()
 	_save_progress()
 
