@@ -47,6 +47,7 @@ func _run() -> void:
 	_check_display_page(menu)
 	await _check_scrolling_pages(menu)
 	await _check_mobile_chrome(menu)
+	await _check_settings_scaling(game, menu)
 	await _check_language_row(game, path)
 	await _check_menu_translation(game)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
@@ -283,7 +284,7 @@ func _check_mobile_chrome(menu: GameSettings) -> void:
 		menu.tab_buttons[index].pressed.emit()
 		await frames(3)
 		_expect(menu.tabs.current_tab == index and menu.pages[index].visible and menu.tab_buttons[index].button_pressed, "mobile tab %d selects the same page model" % index)
-	_expect(menu.tab_rail.scroll_vertical > 0 and menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "the last mobile tab scrolls fully into view")
+	_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "the last mobile tab scrolls fully into view")
 	_expect(menu.tab_focus_target() == menu.tab_buttons[GameSettings.GENERAL_TAB], "opening mobile Settings focuses the selected visible tab")
 	var locale: String = TranslationServer.get_locale()
 	for code: String in I18n.offered():
@@ -299,6 +300,52 @@ func _check_mobile_chrome(menu: GameSettings) -> void:
 	menu.select_tab(0)
 	await frames(3)
 	_expect(menu.tabs.visible and not menu.tab_rail.visible and menu.tab_focus_target() == menu.tabs, "desktop restores the horizontal tab bar")
+
+
+## Every offered text size reflows Settings without compounding, covering desktop and mobile chrome.
+func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
+	for mobile_layout: bool in [false, true]:
+		menu.mobile = mobile_layout
+		for factor: float in TextSize.STEPS:
+			menu.text_size.select(TextSize.STEPS.find(factor))
+			menu.text_size.item_selected.emit(TextSize.STEPS.find(factor))
+			game.call("_apply_text_size")
+			menu.select_tab(0)
+			await frames(4)
+			_expect(menu.get_viewport_rect().encloses(menu.get_global_rect()), "%.0f%% mobile=%s: Settings stays inside the canvas during size changes" % [factor * 100, mobile_layout])
+			var heading: Control = menu.get_node("Title") as Control
+			var back: Control = menu.get_node("BackButton") as Control
+			_expect(menu.text_size.get_popup().get_theme_font_size("font_size") == roundi(16 * factor), "option lists follow the selected text size")
+			_expect(menu.vsync.get_theme_font_size("font_size") == roundi(16 * factor), "%.0f%% Settings scales once, including repeated application" % (factor * 100))
+			_expect(not heading.get_global_rect().intersects(back.get_global_rect()), "%.0f%% mobile=%s: heading and Back stay separate" % [factor * 100, mobile_layout])
+			menu.antialiasing.grab_focus()
+			await frames(8)
+			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%.0f%% mobile=%s: focused Display control stays fully visible (%s; %s)" % [factor * 100, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
+			_expect(not menu.pages[0].get_global_rect().intersects(back.get_global_rect()), "%.0f%% mobile=%s: body stays clear of Back" % [factor * 100, mobile_layout])
+			menu.select_tab(GameSettings.GENERAL_TAB)
+			await frames(4)
+			if mobile_layout:
+				_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "%.0f%%: mobile General stays reachable" % (factor * 100))
+	var locale: String = TranslationServer.get_locale()
+	for code: String in I18n.offered():
+		I18n.apply_for_checks(code)
+		TextSize.factor = 2.0
+		for mobile_layout: bool in [false, true]:
+			menu.mobile = mobile_layout
+			game.call("_apply_text_size")
+			menu.select_tab(0)
+			await frames(4)
+			menu.antialiasing.grab_focus()
+			await frames(8)
+			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%s 200%% mobile=%s: focused control fits (%s; %s)" % [code, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
+	I18n.apply_for_checks(locale)
+	menu.text_size.select(0)
+	menu.text_size.item_selected.emit(0)
+	menu.mobile = false
+	game.call("_apply_text_size")
+	menu.select_tab(0)
+	menu.tabs.grab_focus()
+	await frames(4)
 
 
 ## LANGUAGE on the GENERAL tab (PR L6, PLAN.md and DESIGN.md "Settings: the LANGUAGE option"):

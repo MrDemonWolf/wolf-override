@@ -2234,12 +2234,23 @@ func _resume_game() -> void:
 
 func _show_settings() -> void:
 	pause_menu.hide()
-	menu_panel.position = Vector2(100, 38)
-	menu_panel.size = Vector2(760, 464)
+	_layout_settings_card()
 	$CanvasLayer/PauseOverlay/Panel/Accent.hide()
 	settings_menu.show()
+	settings_menu.layout_for_device()
 	_reveal_menu()
 	_grab_menu_focus(settings_menu.tab_focus_target())
+
+
+## Mobile and enlarged Settings use the canvas with a 16 px edge; normal desktop keeps its authored card.
+func _layout_settings_card() -> void:
+	# A size change can arrive during the entrance; its old destination must not move the new card.
+	Tweens.kill(menu_tween)
+	menu_panel.modulate.a = 1.0
+	var canvas: Vector2 = get_viewport_rect().size
+	menu_panel.size = canvas - Vector2(32, 32) if settings_menu.mobile or TextSize.factor >= 1.5 else Vector2(760, 464)
+	menu_panel.position = (canvas - menu_panel.size) * 0.5
+	settings_menu.size = menu_panel.size
 
 
 func _show_title_settings() -> void:
@@ -5182,17 +5193,16 @@ func _dismiss_name_card() -> void:
 	top_card_tween.tween_callback(top_card.hide)
 
 
-## TEXT SIZE changed (or the game started): title/pause actions and station names take the new size,
+## TEXT SIZE changed (or the game started): Settings, title/pause actions and station names take the new size,
 ## dialogue is split again, and menu scrolling follows the focused action after layout.
 func _apply_text_size() -> void:
+	if settings_menu.visible:
+		_layout_settings_card()
+	settings_menu.apply_text_size()
 	# Both menus use the same authored-size cache and focus-following path.
 	for scroll: ScrollContainer in [$CanvasLayer/TitleScreen/MenuScroll, $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll]:
 		for item: Control in scroll.get_node("MenuMargin/MenuList").get_children():
-			if not item.has_meta(&"menu_font_base"):
-				item.set_meta(&"menu_font_base", item.get_theme_font_size(&"font_size"))
-				item.set_meta(&"menu_minimum_base", item.custom_minimum_size.y)
-			item.add_theme_font_size_override(&"font_size", TextSize.px(int(item.get_meta(&"menu_font_base"))))
-			item.custom_minimum_size.y = TextSize.px(int(item.get_meta(&"menu_minimum_base")))
+			TextSize.apply_control(item)
 		UIMotion.follow_focus(scroll)
 	_refit_station_labels()
 	dialogue_key = ""

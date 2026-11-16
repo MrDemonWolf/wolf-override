@@ -76,7 +76,7 @@ var settings_path: String
 var tabs: TabBar
 var tab_rail: ScrollContainer
 var tab_buttons: Array[Button] = []
-var rows: Array[HBoxContainer] = []
+var rows: Array[BoxContainer] = []
 var surface: Panel
 var subtitle: Label
 var vsync: CheckButton
@@ -353,10 +353,6 @@ func _build_menu() -> void:
 	$Title.size.x = 690
 	$BackButton.position = Vector2(32, 414)
 	$BackButton.size = Vector2(180, 38)
-	# Two rows of the 15 px note (about 38 px) fit above BACK at y 414, so a translated note that wraps
-	# is not cut (localization PR L8).
-	note.position = Vector2(40, 372)
-	note.size = Vector2(680, 40)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# The note is often filled in (an action's name, the Display note's two sentences), so show_note
 	# translates it and the Label must not translate it again.
@@ -476,11 +472,13 @@ func _page_box() -> VBoxContainer:
 	scroll.follow_focus = true
 	add_child(scroll)
 	var margin: MarginContainer = MarginContainer.new()
+	margin.name = "PageMargin"
 	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for side: String in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 8)
 	scroll.add_child(margin)
 	var box: VBoxContainer = VBoxContainer.new()
+	box.name = "Rows"
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 12)
 	margin.add_child(box)
@@ -489,8 +487,8 @@ func _page_box() -> VBoxContainer:
 
 ## Adds a 48 canvas px row to parent, with an optional shared-width label and an expanding control.
 ## Existing controls are reparented, so their bindings, signals and saved preferences stay intact.
-func _control_row(parent: Control, control: Control, caption: String = "") -> HBoxContainer:
-	var row: HBoxContainer = HBoxContainer.new()
+func _control_row(parent: Control, control: Control, caption: String = "") -> BoxContainer:
+	var row: BoxContainer = BoxContainer.new()
 	row.custom_minimum_size.y = 48
 	parent.add_child(row)
 	rows.append(row)
@@ -531,7 +529,7 @@ func _option_row(page: Control, caption: String, items: Array[String]) -> Option
 ## the value x 100 otherwise). Returns the slider; the caller connects it and sets its value.
 func _slider_row(parent: Control, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
 	var slider: HSlider = HSlider.new()
-	var row: HBoxContainer = _control_row(parent, slider, caption)
+	var row: BoxContainer = _control_row(parent, slider, caption)
 	slider.min_value = minimum
 	slider.max_value = maximum
 	slider.step = step
@@ -576,22 +574,58 @@ func layout_for_device() -> void:
 	tabs.visible = not mobile
 	tab_rail.visible = mobile
 	subtitle.visible = not mobile
-	$Title.size = Vector2(690, 0)
-	$Title.position = Vector2(32, 16 if mobile else 35)
-	$Title.add_theme_font_size_override("font_size", 18 if mobile else 27)
-	$BackButton.position = Vector2(548, 56) if mobile else Vector2(32, 414)
-	$BackButton.size = Vector2(180, 48 if mobile else 38)
-	tab_rail.position = Vector2(32, 116)
-	tab_rail.size = Vector2(200, 246)
-	var body: Rect2 = Rect2(248, 116, 480, 246) if mobile else Rect2(40, 128, 680, 234)
+	$Title.add_theme_font_size_override("font_size", TextSize.px(18 if mobile else 27))
+	$Title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	$Title.size = Vector2(size.x - 64, 0)
+	subtitle.size = Vector2(size.x - 64, 0)
+	$Title.position = Vector2(32, 16 if mobile else subtitle.position.y + subtitle.get_combined_minimum_size().y + 4)
+	var heading_bottom: float = $Title.position.y + $Title.get_combined_minimum_size().y
+	$BackButton.size = Vector2(180, maxf(TextSize.px(38), $BackButton.get_combined_minimum_size().y))
+	$BackButton.position = Vector2(size.x - 212, heading_bottom + 10) if mobile else Vector2(32, size.y - 12 - $BackButton.size.y)
+	cancel_button.size = Vector2(260, maxf(TextSize.px(38), cancel_button.get_combined_minimum_size().y))
+	cancel_button.position = Vector2(size.x - 292, size.y - 12 - cancel_button.size.y)
+	tabs.position.y = heading_bottom + 8
+	tabs.size.x = size.x - 64
+	tabs.size.y = maxf(TextSize.px(38), tabs.get_combined_minimum_size().y)
+	var top: float = $BackButton.position.y + $BackButton.size.y + 12 if mobile else tabs.position.y + tabs.size.y + 8
+	var bottom: float = minf(cancel_button.position.y, size.y - 12) if mobile else minf($BackButton.position.y, cancel_button.position.y)
+	# At 200%, 320 canvas px fits ACCESSIBILITY on one line while leaving room for page controls.
+	var rail_width: float = minf(320, 200 * TextSize.factor)
+	var body_left: float = 48 + rail_width if mobile else 40
+	var body: Rect2 = Rect2(body_left, top, size.x - body_left - 32, bottom - 12 - top)
+	tab_rail.position = Vector2(32, top)
+	tab_rail.size = Vector2(rail_width, body.size.y)
 	for page: Control in pages:
 		page.position = body.position
 		page.size = body.size
+		var margin: MarginContainer = page.get_node("PageMargin") as MarginContainer
+		for side: String in ["left", "right"]:
+			margin.add_theme_constant_override("margin_" + side, ceili(body.size.x * (UIMotion.LIFT_SCALE.x - 1.0) * 0.5) + 2)
 	surface.position = body.position - Vector2(8, 2)
 	surface.size = body.size + Vector2(16, 4)
-	for row: HBoxContainer in rows:
+	for row: BoxContainer in rows:
+		row.vertical = TextSize.factor >= 1.5
 		if row.get_child(0) is Label:
-			(row.get_child(0) as Label).custom_minimum_size.x = 144 if mobile else 220
+			(row.get_child(0) as Label).custom_minimum_size.x = 0 if row.vertical else (144 if mobile else 220)
+	for page: Control in pages:
+		UIMotion.follow_focus(page as ScrollContainer)
+	UIMotion.follow_focus(tab_rail)
+
+
+## Applies TEXT SIZE to Settings once from each control's authored font; reflows rows instead of shrinking text.
+func apply_text_size() -> void:
+	for control: Control in find_children("*", "Control", true, false):
+		if control is Label or control is BaseButton or control is TabBar:
+			if control != $Title:
+				TextSize.apply_control(control)
+		if control is Button:
+			(control as Button).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		if control is OptionButton:
+			var option: OptionButton = control as OptionButton
+			option.fit_to_longest_item = false
+			option.get_popup().add_theme_font_size_override("font_size", TextSize.px(16))
+			option.get_popup().add_theme_font_size_override("font_separator_size", TextSize.px(TAG_FONT_PX))
+	layout_for_device()
 
 
 ## The visible tab control to focus when opening or returning to Settings.
@@ -612,6 +646,9 @@ func select_tab(index: int) -> void:
 	cancel_capture()
 	for page_index: int in pages.size():
 		pages[page_index].visible = page_index == index
+	var column: VBoxContainer = pages[index].get_node("PageMargin/Rows") as VBoxContainer
+	note.reparent(column)
+	column.move_child(note, 0)
 	if index == 0:
 		# The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
 		if mobile:
@@ -641,6 +678,8 @@ func _show_translated_note() -> void:
 	for insert: String in _note_inserts:
 		filled.append(tr(insert))
 	note.text = I18n.fill(_note_message, filled)
+	if tabs != null and tabs.current_tab < pages.size():
+		pages[tabs.current_tab].set_deferred("scroll_vertical", 0)
 
 
 ## Applies the DISPLAY page's vsync (when the toggle is enabled on this platform) and edge smoothing
