@@ -722,7 +722,7 @@ func begin_capture(action: StringName, kind: String) -> void:
 	capture_kind = kind
 	# One message per device, so the note names the device in words, not by its id ("keyboard"), and a
 	# translation can phrase each one whole.
-	var message: String = I18n.KEY.tr("Press a keyboard input for %s. Esc cancels.") if kind == "keyboard" else I18n.KEY.tr("Press a controller input for %s. Esc cancels.")
+	var message: String = I18n.KEY.tr("Press a keyboard input for %s. Esc cancels.") if kind == "keyboard" else I18n.KEY.tr("Press a controller input for %s. Menu cancels.")
 	show_note(message, [ACTION_NAMES[ACTIONS.find(action)]])
 	cancel_button.show()
 
@@ -754,12 +754,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## During a rebind (begin_capture), takes the next press of the captured kind ([param event]: a key, a
 ## controller button, or a stick pushed at least 0.65 of the way) and binds it to the action, unless
-## another action already uses it, which the note names instead. Escape cancels. Bound presses are
+## another action already uses it, which the note names instead. Escape or controller Menu cancels. Bound presses are
 ## marked handled and saved at once. Ignores everything outside a rebind or while the menu is hidden.
 func _input(event: InputEvent) -> void:
 	if capture_action.is_empty() or not is_visible_in_tree():
 		return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+	if (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_START):
 		cancel_capture()
 		show_note(I18n.KEY.tr("Rebind cancelled."))
 		get_viewport().set_input_as_handled()

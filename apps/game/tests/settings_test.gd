@@ -127,10 +127,20 @@ func _run() -> void:
 	_expect(menu.prompt(&"choice_1", false) == "1" and not menu.capture_action.is_empty(), "duplicate gameplay binding is rejected without losing the old key")
 	menu._input(key_event(KEY_ESCAPE))
 	_expect(menu.capture_action.is_empty() and paused, "Escape cancels rebinding without unpausing")
+	for kind: String in ["keyboard", "controller"]:
+		var before_binding: String = menu.binding_label(&"choice_1", kind)
+		var before_config: String = FileAccess.get_file_as_string(path)
+		menu.begin_capture(&"choice_1", kind)
+		for pressed: bool in [true, false]:
+			Input.parse_input_event(controller_button(JOY_BUTTON_START, pressed))
+			await frames(2)
+		_expect(menu.capture_action.is_empty() and not menu.cancel_button.visible and paused and menu.is_visible_in_tree(), "Menu cancels %s capture without closing Settings or unpausing" % kind)
+		_expect(menu.binding_label(&"choice_1", kind) == before_binding and FileAccess.get_file_as_string(path) == before_config, "Menu cancellation preserves %s bindings and the saved file" % kind)
 	menu.begin_capture(&"choice_1", "controller")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
-	await process_frame
-	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation")
+	# Native input is buffered; allow its dispatch before checking the capture result.
+	await frames(2)
+	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation (prompt=%s paused=%s visible=%s capture=%s)" % [menu.prompt(&"choice_1", true), paused, menu.is_visible_in_tree(), menu.capture_action])
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	menu.begin_capture(&"move_left", "controller")
@@ -470,7 +480,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	catalog.add_message("Press a keyboard input for %s. Esc cancels.", "Pressione uma tecla para %s. Esc cancela.")
 	catalog.add_message("%s  RESUME", "%s  CONTINUAR")
 	# A broken translation (other conversions than the English), as a gap in the PO gates would ship it.
-	catalog.add_message("Press a controller input for %s. Esc cancels.", "Pressione um botão para %d. Esc cancela.")
+	catalog.add_message("Press a controller input for %s. Menu cancels.", "Pressione um botão para %d. Esc cancela.")
 	catalog.add_message("Minus", "Menos", GameSettings.KEY_NAME_CONTEXT)
 	TranslationServer.add_translation(catalog)
 	_expect(menu.prompt(&"pause_game", true) == "START" and menu.prompt(&"pause_game", false) == "Escape", "in English the Pause prompts read START and Escape (and are remembered)")
@@ -482,7 +492,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	_expect(keyboard.text == "Escape-pt" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
 	_expect(menu.note.text == "Pressione uma tecla para Pausa (ação). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)
 	menu.begin_capture(&"pause_game", "controller")
-	_expect(menu.note.text == "Press a controller input for Pausa (ação). Esc cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
+	_expect(menu.note.text == "Press a controller input for Pausa (ação). Menu cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
 	menu.cancel_capture()
 	var symbol: InputEventKey = InputEventKey.new()
 	symbol.physical_keycode = KEY_MINUS
@@ -508,7 +518,7 @@ func _check_menu_translation(game: Node2D) -> void:
 	pause_menu.show()
 	I18n.apply("en")
 	await process_frame
-	_expect(hint.text == "Escape  RESUME" and menu.note.text == "Press a controller input for Pause. Esc cancels.", "back in English, Pause's hint and the note are English again (%s; %s)" % [hint.text, menu.note.text])
+	_expect(hint.text == "Escape  RESUME" and menu.note.text == "Press a controller input for Pause. Menu cancels.", "back in English, Pause's hint and the note are English again (%s; %s)" % [hint.text, menu.note.text])
 	pause_menu.visible = was_visible
 	I18n.forget(catalog)
 	I18n.apply("en")

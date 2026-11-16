@@ -3470,3 +3470,10 @@ msgstr "Глава 1 завершена. ИГРАТЬ СНОВА начинае�
 #. i18n: speaker=ui
 msgid "ACCESSIBILITY"
 msgstr "СПЕЦИАЛЬНЫЕ ВОЗМОЖНОСТИ"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Controller rebinding prompt; %s is the action name. Menu cancels capture.
+#. i18n: speaker=ui
+#, c-format
+msgid "Press a controller input for %s. Menu cancels."
+msgstr "Нажми кнопку или двинь стик контроллера для «%s». Меню — отмена."

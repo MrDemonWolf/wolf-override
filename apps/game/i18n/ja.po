@@ -3410,3 +3410,10 @@ msgstr "第1章完了。もう一度プレイで最初から始める。"
 #. i18n: speaker=ui
 msgid "ACCESSIBILITY"
 msgstr "アクセシビリティ"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Controller rebinding prompt; %s is the action name. Menu cancels capture.
+#. i18n: speaker=ui
+#, c-format
+msgid "Press a controller input for %s. Menu cancels."
+msgstr "「%s」に割り当てるコントローラーの入力を押す。メニューでキャンセル。"

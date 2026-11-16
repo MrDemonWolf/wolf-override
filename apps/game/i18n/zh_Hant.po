@@ -3428,3 +3428,10 @@ msgstr "第一章完成。選擇再次遊玩可重新開始。"
 #. i18n: speaker=ui
 msgid "ACCESSIBILITY"
 msgstr "無障礙"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Controller rebinding prompt; %s is the action name. Menu cancels capture.
+#. i18n: speaker=ui
+#, c-format
+msgid "Press a controller input for %s. Menu cancels."
+msgstr "請為「%s」按下控制器按鍵。按選單鍵取消。"

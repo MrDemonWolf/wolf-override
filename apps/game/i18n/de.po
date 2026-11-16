@@ -3479,3 +3479,10 @@ msgstr "Kapitel 1 abgeschlossen. NOCH MAL SPIELEN beginnt einen neuen Durchlauf.
 #. i18n: speaker=ui
 msgid "ACCESSIBILITY"
 msgstr "BARRIEREFREIHEIT"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Controller rebinding prompt; %s is the action name. Menu cancels capture.
+#. i18n: speaker=ui
+#, c-format
+msgid "Press a controller input for %s. Menu cancels."
+msgstr "Drücke eine Controller-Taste oder bewege einen Stick für „%s“. Menü bricht ab."

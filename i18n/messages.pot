@@ -668,7 +668,7 @@ msgid "Press a keyboard input for %s. Esc cancels."
 msgstr ""
 
 #: scripts/game_settings.gd:725
-msgid "Press a controller input for %s. Esc cancels."
+msgid "Press a controller input for %s. Menu cancels."
 msgstr ""
 
 #: scripts/game_settings.gd:764

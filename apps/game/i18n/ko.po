@@ -3410,3 +3410,10 @@ msgstr "1장 완료. 다시 플레이하면 새로 시작합니다."
 #. i18n: speaker=ui
 msgid "ACCESSIBILITY"
 msgstr "접근성"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Controller rebinding prompt; %s is the action name. Menu cancels capture.
+#. i18n: speaker=ui
+#, c-format
+msgid "Press a controller input for %s. Menu cancels."
+msgstr "%s 동작에 쓸 컨트롤러 입력을 누르세요. 메뉴: 취소."
