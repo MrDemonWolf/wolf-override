@@ -44,9 +44,33 @@ func _run() -> void:
 	_expect(game.dialogue_cleared and not game.waiting_for_choice, "reading the risk explanation does not answer or open the next question in the same press")
 	await tap(&"interact")
 	_expect(game.waiting_for_choice, "a fresh USE opens the existing relay question")
-	for repeat: int in 2:
+	I18n.apply_for_checks("de")
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	_expect(game.dialogue_boxes.size() > 1, "the German question spans real pages at 200 percent")
+	var question_page: int = game.dialogue_index
+	game.call("_tick_dialogue", 60.0)
+	_expect(game.dialogue_index == question_page, "a question page waits for input after a minute of reading time")
+	_expect(game.dialogue_continue.visible, "an unread question page shows its continue cue")
+	game.touch_choice_1.grab_focus()
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, true))
+	await settle(2)
+	Input.parse_input_event(controller_button(JOY_BUTTON_A, false))
+	await settle(2)
+	_expect(game.waiting_for_choice and game.state.memory.is_empty() and game.dialogue_index == question_page + 1, "controller Interact reads exactly one page instead of confirming the focused answer")
+	# Rewind this same question to check the polled action path as well as the native controller event.
+	game.dialogue_index = question_page
+	game.dialogue_age = 0.0
+	game.call("_refresh_ui")
+	await tap(&"interact")
+	_expect(game.waiting_for_choice and game.dialogue_index == question_page + 1, "the Interact action advances a question without selecting an answer")
+	for repeat: int in game.dialogue_boxes.size() + 1:
 		await tap_touch(game.bottom_bar.get_global_rect().get_center())
-	_expect(game.waiting_for_choice and not game.dialogue_cleared and not str(game.call("_shown_box")).is_empty(), "reading a choice question cannot dismiss it or select an answer")
+	_expect(game.waiting_for_choice and not game.dialogue_cleared and game.dialogue_index == game.dialogue_boxes.size() - 1, "reading a choice question keeps its last page without selecting an answer")
+	_expect(not game.dialogue_continue.visible, "the last question page hides the continue cue and leaves the answers available")
+	I18n.apply_for_checks(I18n.FALLBACK)
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
 	await tap(&"choice_2")
 	_expect(game.state.memory.get("choice_id") == M0State.PRESS and game.call("_conversation_active") and not game.human.controlled, "the refusal response stays player-paced without changing the chosen engineer-only route")
 	await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES)

@@ -1538,6 +1538,8 @@ func _process(delta: float) -> void:
 			_answer_choice(1)
 		elif Input.is_action_just_pressed(&"choice_2"):
 			_answer_choice(2)
+		elif _use_pressed():
+			_read_pointer_dialogue()
 	elif Input.is_action_just_pressed(&"cycle_name"):
 		state.cycle_name()
 		# TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name.
@@ -2657,6 +2659,11 @@ func _input(event: InputEvent) -> void:
 		if response != 0:
 			_answer_choice(response)
 			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed(&"interact"):
+			_sync_dialogue_boxes()
+			if dialogue_index < dialogue_boxes.size() - 1:
+				# Reserve Interact for reading; the process tick consumes it once, before GUI confirmation.
+				get_viewport().set_input_as_handled()
 
 
 ## Routes answer 1 or 2 to whichever question is open.
@@ -5340,7 +5347,7 @@ func _set_dialogue(hint: String) -> void:
 		# A crank remains actionable while its feedback line is up.
 		if not intro_active and not chapter_close_active and not fail_active and _hold_station().is_empty():
 			touch_use.hide()
-	dialogue_continue.visible = bottom_bar.visible and not waiting_for_choice and not fail_active and not hatch_exit_walking
+	dialogue_continue.visible = bottom_bar.visible and (not waiting_for_choice or dialogue_index < dialogue_boxes.size() - 1) and not fail_active and not hatch_exit_walking
 	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
 	context_hint.visible = not hint.is_empty() and (not bottom_bar.visible and not intro_active and not chapter_close_active or _urgent_context_hint())
 	if bottom_bar.visible or intro_active or chapter_close_active:
@@ -5439,13 +5446,13 @@ func _dialogue_fits(words: String) -> bool:
 
 
 ## Ages the page by delta seconds. Timed feedback advances by reading time and clears when walking on.
-## Conversations, opening/closing scenes and investigation pages wait for explicit input.
+## Conversations, choice questions, opening/closing scenes and investigation pages wait for explicit input.
 func _tick_dialogue(delta: float) -> void:
 	_sync_dialogue_boxes()
 	if opening_lines_held or dialogue_boxes.is_empty():
 		return
 	dialogue_age += delta
-	if intro_active or chapter_close_active or _conversation_active() or state.chapter_id == "investigation":
+	if intro_active or chapter_close_active or waiting_for_choice or _conversation_active() or state.chapter_id == "investigation":
 		return
 	if dialogue_index < dialogue_boxes.size() - 1:
 		if dialogue_age >= _box_seconds():

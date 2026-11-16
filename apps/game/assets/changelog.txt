@@ -73,6 +73,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
 
 -- Accessibility --
+- Question pages wait for input, with a continue cue only while more pages remain. Headless input checks and 200% rendered stills; not played by hand.
 - Reading a choice question keeps its final page visible until an answer is selected. Native-touch headless checks passed.
 - Every opening and closing cinematic page waits for a press. Headless page-hold and opening-sequence checks passed; ordinary conversation modes remain in progress.
 - The title action list fits its normal-size desktop actions; enlarged text still scrolls to the focused action. Headless and container checks only.
