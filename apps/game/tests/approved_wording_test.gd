@@ -101,7 +101,7 @@ func _check_sources() -> void:
 				code += line.get_slice(" ## ", 0) + "\n"
 		for cut: String in CUT_LINES:
 			var at: int = code.find(cut)
-			# "alcove" survives only inside identifiers and comments (alcove_rect, ALCOVE_FLOOR), never in a string.
+			# "alcove" survives only inside identifiers and comments (JunctionRoom.alcove_rect), never in a string.
 			var in_string: bool = false
 			while at >= 0:
 				var before: String = code.substr(0, at)

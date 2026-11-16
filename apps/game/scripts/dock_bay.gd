@@ -188,7 +188,7 @@ const BEACON_PEAK: float = 0.55
 const BEACON_TROUGH: float = 0.12
 const BEACON_LENS_TROUGH: float = 0.6
 ## WOLF's pieces on the pad: lying belly-down while he charges (wolf-lie-pad, 8 px per world px) and
-## getting up off it (wolf-rise, 6 px per world px). Main's _wolf_pose draws each at the standing piece's
+## getting up off it (wolf-rise, 6 px per world px). Main.wolf_pose draws each at the standing piece's
 ## density (8) over its own, times WOLF_ART_SCALE, so he keeps one size whatever his pose.
 const WOLF_LIE: Texture2D = preload("res://assets/characters/wolf-lie-pad.png")
 const WOLF_RISE: Texture2D = preload("res://assets/characters/wolf-rise.png")
