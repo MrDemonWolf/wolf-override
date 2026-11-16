@@ -59,6 +59,8 @@ var speed_scale: float = 1.0
 const MARKER_Z: int = 4
 var _marker: Node2D
 
+## World px per second: the player's walk at full input, and the most an actor does walking on their
+## own (times speed_scale), a little faster so a follower closes a gap. Tuned by play; no source recorded.
 const WALK_SPEED: float = 190.0
 const FOLLOW_SPEED: float = 220.0
 ## The unhurried step out from over a machine (settle_x).

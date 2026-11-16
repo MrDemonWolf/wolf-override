@@ -7,6 +7,7 @@ extends RefCounted
 ## go first. Advanced with real delta so timing tests are frame-independent; a room sets
 ## [member paused] during a choice.
 
+## Seconds the gauge takes to climb from empty to full once the breaker arms the line.
 const BUILD_SECONDS: float = 6.0
 ## Long enough for someone who starts moving on the klaxon to clear the blast zone (Nathanial's
 ## decision Q13, October 13, 2026: about 2.5 s, to be tuned down by play).
