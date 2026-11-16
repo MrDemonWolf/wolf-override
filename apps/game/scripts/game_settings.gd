@@ -1,6 +1,6 @@
 class_name GameSettings
 extends Control
-## The Settings menu, shared by the title and Pause: its DISPLAY, AUDIO, CONTROLS and GENERAL tabs, built
+## The Settings menu, shared by the title and Pause: its DISPLAY, AUDIO, CONTROLS, ACCESSIBILITY and GENERAL tabs, built
 ## in code by [method configure] from the saved settings file, which every change writes back at once
 ## ([method _save_extra]). GENERAL holds LANGUAGE (localization PR L6, decision D10) and stays hidden
 ## while the game offers one language.
@@ -56,9 +56,8 @@ const DEFAULT_WINDOW_SIZE: int = 1
 ## tablets, where the OS sizes the window; the V-sync sentence applies everywhere.
 const MOBILE_WINDOW_NOTE: String = "Window size is OS-managed on mobile."
 const VSYNC_NOTE: String = "V-sync may limit the FPS cap."
-## The GENERAL tab's index, after the three older tabs so their indices (which the parity capture, the UI
-## dump and the tests use) stay as they were while the tab is hidden (PR L6).
-const GENERAL_TAB: int = 3
+## GENERAL follows ACCESSIBILITY; callers use this index so hiding the language tab keeps page order.
+const GENERAL_TAB: int = 4
 ## The "machine translation" tag's size (px), under a name in the open list and under the LANGUAGE row:
 ## smaller than the 16 px names, so the name row keeps its width (DESIGN.md, "Settings").
 const TAG_FONT_PX: int = 12
@@ -284,7 +283,7 @@ func _build_menu() -> void:
 	tabs.theme_type_variation = &"TerminalTabBar"
 	tabs.position = Vector2(32, 81)
 	tabs.size = Vector2(696, 38)
-	for caption: String in [I18n.KEY.tr("DISPLAY"), I18n.KEY.tr("AUDIO"), I18n.KEY.tr("CONTROLS"), I18n.KEY.tr("GENERAL")]:
+	for caption: String in [I18n.KEY.tr("DISPLAY"), I18n.KEY.tr("AUDIO"), I18n.KEY.tr("CONTROLS"), I18n.KEY.tr("ACCESSIBILITY"), I18n.KEY.tr("GENERAL")]:
 		tabs.add_tab(caption)
 	add_child(tabs)
 	tabs.tab_changed.connect(select_tab)
@@ -311,18 +310,22 @@ func _build_menu() -> void:
 	vsync.toggled.connect(func(_value: bool) -> void: _apply_graphics(); _save_extra())
 	antialiasing = _option_row(display, I18n.KEY.tr("EDGE SMOOTHING"), Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), [I18n.KEY.tr("OFF"), I18n.KEY.tr("2× MSAA"), I18n.KEY.tr("4× MSAA"), I18n.KEY.tr("8× MSAA")])
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
+	var accessibility: Control = Control.new()
+	accessibility.position = display.position
+	accessibility.size = display.size
+	add_child(accessibility)
 	reduced_motion = CheckButton.new()
 	reduced_motion.text = "REDUCED MOTION"
 	reduced_motion.tooltip_text = "No camera shake or hit-stop; screen flashes are shorter."
-	reduced_motion.position = Vector2(404, 154)
+	reduced_motion.position = Vector2(8, 70)
 	reduced_motion.size = Vector2(272, 40)
-	display.add_child(reduced_motion)
+	accessibility.add_child(reduced_motion)
 	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
 	# TEXT SIZE scales the play HUD's words and the station names, 100% to 200% (TextSize).
 	var size_captions: Array[String] = []
 	for step: float in TextSize.STEPS:
 		size_captions.append("%d%%" % roundi(step * 100.0))
-	text_size = _option_row(display, I18n.KEY.tr("TEXT SIZE"), Rect2(410, 198, 100, 40), Rect2(520, 196, 160, 40), size_captions)
+	text_size = _option_row(accessibility, I18n.KEY.tr("TEXT SIZE"), Rect2(8, 12, 160, 40), Rect2(183, 12, 160, 40), size_captions)
 	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
 	var audio: VBoxContainer = _page_box()
@@ -380,6 +383,7 @@ func _build_menu() -> void:
 	reset.custom_minimum_size.y = 40
 	controls.add_child(reset)
 	reset.pressed.connect(reset_controls)
+	pages.append(accessibility)
 	_build_general_page()
 	$Title.size.x = 690
 	$BackButton.position = Vector2(32, 414)
@@ -586,7 +590,7 @@ func apply_theme() -> void:
 		button.add_theme_font_size_override("font_size", 16)
 
 
-## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 GENERAL) and its note, hiding the others,
+## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 ACCESSIBILITY, 4 GENERAL) and its note, hiding the others,
 ## and cancels a rebind in progress. It does not move the tab bar, whose tab_changed calls it.
 func select_tab(index: int) -> void:
 	cancel_capture()
@@ -601,7 +605,7 @@ func select_tab(index: int) -> void:
 		else:
 			show_note(I18n.KEY.tr(VSYNC_NOTE))
 	else:
-		show_note([I18n.KEY.tr("Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
+		show_note([I18n.KEY.tr("Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Scales the dialogue, hints, cards and station names."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
 
 
 ## Shows [param message] (English) in the note under the tabs, in the current language: tr(message), with

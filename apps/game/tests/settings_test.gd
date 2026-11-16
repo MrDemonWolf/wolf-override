@@ -36,7 +36,7 @@ func _run() -> void:
 	_expect(game.call("_resolution_size", 0) == Vector2i(960, 540) and game.call("_resolution_size", 2) == Vector2i(1920, 1080) and game.call("_resolution_size", 7) == Vector2i(1280, 720), "every saved window size keeps its own size; an unknown index opens at the default")
 	_expect(ProjectSettings.get_setting("display/window/size/window_width_override") == 1280 and ProjectSettings.get_setting("display/window/size/window_height_override") == 720 and ProjectSettings.get_setting("display/window/size/viewport_width") == 960, "the first window opens at 1280×720 over the unchanged 960×540 canvas")
 	var impact: Impact = game.get("impact") as Impact
-	_expect(impact != null and not impact.reduce_motion and menu.reduced_motion.is_visible_in_tree(), "Reduced Motion is off by default and sits on the Display tab")
+	_expect(impact != null and not impact.reduce_motion and not menu.reduced_motion.is_visible_in_tree(), "Reduced Motion is off by default and hidden while Display is selected")
 	menu.reduced_motion.button_pressed = true
 	_expect(impact.reduce_motion, "the Reduced Motion toggle reaches the impact kit")
 	impact.add_trauma(1.0)
@@ -223,7 +223,7 @@ func _check_hostile_settings() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
-## Q10 (October 14, 2026): the Display tab, where TEXT SIZE is, keeps its THE DEN / LOCAL CONFIGURATION
+## Q10 (October 14, 2026): the Display tab keeps its THE DEN / LOCAL CONFIGURATION
 ## heading, shows no GPU or renderer line, and says the window size is OS-managed only on phones and
 ## tablets; the V-sync sentence shows everywhere.
 func _check_display_page(menu: GameSettings) -> void:
@@ -233,7 +233,11 @@ func _check_display_page(menu: GameSettings) -> void:
 	for label: Node in menu.find_children("*", "Label", true, false):
 		if (label as Label).is_visible_in_tree():
 			texts.append((label as Label).text)
-	_expect("THE DEN  /  LOCAL CONFIGURATION" in texts and menu.text_size.is_visible_in_tree(), "the Display tab keeps the THE DEN / LOCAL CONFIGURATION heading, beside TEXT SIZE")
+	_expect("THE DEN  /  LOCAL CONFIGURATION" in texts and not menu.text_size.is_visible_in_tree(), "Display keeps the terminal heading and leaves text size on Accessibility")
+	_expect(menu.tabs.tab_count == 5 and menu.tabs.get_tab_title(3) == "ACCESSIBILITY", "Settings has the five reviewed tabs in order")
+	menu.select_tab(3)
+	_expect(menu.text_size.is_visible_in_tree() and menu.reduced_motion.is_visible_in_tree() and not menu.vsync.is_visible_in_tree(), "Accessibility shows the existing reading and motion controls separately from Display")
+	menu.select_tab(0)
 	var adapter: String = RenderingServer.get_video_adapter_name()
 	var developer_lines: Array[String] = []
 	for text: String in texts:
