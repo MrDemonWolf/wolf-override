@@ -684,6 +684,8 @@ var save_path: String = M0State.SAVE_PATH
 var settings_path: String = "user://settings.cfg"
 var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
 var controller_active: bool = false
+## True after real mouse input, until keyboard, controller or touch input takes over menu focus.
+var mouse_active: bool = false
 var title_open: bool = true
 ## The title control a menu last meant to focus, so a later key press after touch lands there.
 var title_focus_return: Control = null
@@ -2330,7 +2332,7 @@ func _return_to_title() -> void:
 	_grab_menu_focus(_title_first_button())
 
 
-## Keyboard and controller players need a focused menu control; pure touch play shows no focus ring.
+## Keyboard/controller menus show focus; mouse menus keep hidden focus, and pure touch clears it.
 ## Touch clears focus instead, so a stale focus behind an overlay cannot take the next key press.
 func _grab_menu_focus(control: Control) -> void:
 	if title_screen.is_ancestor_of(control):
@@ -2338,7 +2340,7 @@ func _grab_menu_focus(control: Control) -> void:
 	if touch_enabled and not controller_active:
 		get_viewport().gui_release_focus()
 	else:
-		control.grab_focus()
+		control.grab_focus(mouse_active)
 
 
 ## The menu control a keyboard or controller press should land on when nothing has focus.
@@ -2473,6 +2475,11 @@ func _answer_choice(response: int) -> void:
 
 ## Called from _input during play and from PauseOverlay while the tree is paused.
 func _note_input_device(event: InputEvent) -> void:
+	if event.device != InputEvent.DEVICE_ID_EMULATION and (event is InputEventMouseButton or event is InputEventMouseMotion):
+		mouse_active = true
+		var focused: Control = get_viewport().gui_get_focus_owner()
+		if focused != null:
+			focused.grab_focus(true)
 	var use_controller: bool = controller_active
 	var navigation_press: bool = false
 	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
@@ -2483,9 +2490,14 @@ func _note_input_device(event: InputEvent) -> void:
 	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
 		use_controller = false
 		navigation_press = event is InputEventKey
+	if navigation_press or event is InputEventScreenTouch or event is InputEventScreenDrag:
+		mouse_active = false
 	if use_controller != controller_active:
 		controller_active = use_controller
 		_refresh_ui()
+	var owner: Control = get_viewport().gui_get_focus_owner()
+	if navigation_press and owner != null and not owner.has_focus(true):
+		owner.grab_focus()
 	# Touch menus open unfocused; the first key or controller press gives keyboard and controller players a focus to move.
 	if navigation_press and get_viewport().gui_get_focus_owner() == null:
 		var target: Control = _menu_focus_target()

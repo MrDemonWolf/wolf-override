@@ -12,6 +12,24 @@ func _run() -> void:
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
+	var first: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var mouse: InputEventMouseMotion = InputEventMouseMotion.new()
+	game.call("_note_input_device", mouse)
+	game.call("_grab_menu_focus", first)
+	_expect(first.has_focus() and not first.has_focus(true), "mouse menu focus stays navigable without a visible ring")
+	var key: InputEventKey = InputEventKey.new()
+	key.keycode = KEY_DOWN
+	key.pressed = true
+	game.call("_note_input_device", key)
+	_expect(first.has_focus(true), "keyboard input restores the menu focus ring")
+	game.call("_note_input_device", mouse)
+	var drift: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	drift.axis_value = 0.1
+	game.call("_note_input_device", drift)
+	_expect(game.get("mouse_active") and not first.has_focus(true), "idle controller drift does not restore a mouse-hidden focus ring")
+	game.call("_note_input_device", controller_button(JOY_BUTTON_A, true))
+	_expect(first.has_focus(true), "controller input restores the menu focus ring")
+	game.set("controller_active", false)
 	# The title CHANGELOG button opens the exported changelog in the game; the online button keeps the website link.
 	var changelog: Button = game.get_node("CanvasLayer/TitleScreen/ChangelogButton") as Button
 	var changelog_screen: ColorRect = game.get_node("CanvasLayer/TitleScreen/ChangelogScreen") as ColorRect
