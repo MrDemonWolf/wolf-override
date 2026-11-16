@@ -289,6 +289,8 @@ func _build_menu() -> void:
 	add_child(tabs)
 	tabs.tab_changed.connect(select_tab)
 	var display: Control = Control.new()
+	# Existing display controls are siblings underneath this container; leave their pointer hits clear.
+	display.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	display.position = Vector2(32, 126)
 	display.size = Vector2(696, 240)
 	add_child(display)

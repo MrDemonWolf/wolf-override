@@ -228,6 +228,7 @@ func _check_hostile_settings() -> void:
 ## tablets; the V-sync sentence shows everywhere.
 func _check_display_page(menu: GameSettings) -> void:
 	menu.select_tab(0)
+	_expect(menu.pages[0].mouse_filter == Control.MOUSE_FILTER_IGNORE, "the Display container does not block pointer input to the existing controls underneath")
 	var texts: Array[String] = []
 	for label: Node in menu.find_children("*", "Label", true, false):
 		if (label as Label).is_visible_in_tree():
