@@ -17,7 +17,7 @@ For each bounded gameplay change, identify the player's immediate goal, the acti
 
 ## Prove what the player experiences
 
-Run the relevant headless checks after code changes. For a claim about movement, pacing, readability, controls or WOLF's behavior, also play the affected route in one normal game window with a separate test save. Record what was observed and which paths remain unplayed. A still render or headless test does not prove game feel. Exports and devices need their own checks.
+Run the relevant headless checks after code changes. For a claim about movement, pacing, readability, controls or WOLF's behavior, the affected route must also be played by hand with a separate test save. Nathanial does that play; coding agents never open a Godot or game window on his Mac and use `godot --headless` and `tools/render/render.sh` instead. Record what was observed and which paths remain unplayed. A still render or headless test does not prove game feel. Exports and devices need their own checks.
 
 Keep public copy accurate about what is playable today. Nathanial Henniges originated the game and core story; research informs craft and does not replace that credit. Detailed story drafts stay in Notion and the tracked agent files.
 

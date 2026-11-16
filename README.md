@@ -243,7 +243,7 @@ wolf-override/
 ├── docs/             # Decision records and the notes index
 ├── .github/          # Game checks, test builds and Pages workflows
 ├── AGENT.md          # Shared game quality guide
-├── AGENTS.md         # Rules for coding agents
+├── AGENTS.md         # Rules for coding agents (each area has its own AGENTS.md too)
 ├── PRIVATE_AGENTS.md # Provisional story and design rules
 ├── PROJECT_CONTEXT.md # Provisional story and design context
 ├── CONTRIBUTING.md   # How to send a change
