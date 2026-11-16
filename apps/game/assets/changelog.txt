@@ -184,6 +184,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Every page carries a Content Security Policy, so it loads scripts, styles, fonts and images only from the site itself.
 - Search results still underline the words you typed, and the site builds without its two CSS warnings.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
+- The guide menu has four groups: Play, Get the game, About the project and Develop. Checked on rendered pages at 390, 1280 and 1920 px in headless Chrome; not on a real phone.
+- Start here is shorter and links to Get the game, First steps and Saving instead of repeating them; Developer home and Play overview use link cards.
+- Play overview no longer says there is no packaged download; it points to the test build and the source game, as Get the game does.
 
 -- Development --
 - Settings UI tests wait for input and layout frames instead of physics ticks; checked at normal and coarse frame rates.
@@ -281,6 +284,10 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The approved-wording records keep each changed line's old text under its history, and the tests that pin these lines check the new text.
 - One UI token file, apps/game/ui/ui.tokens.json, holds the game's UI colours, type, sizes, motion and timing. scripts/export_ui_tokens.py writes the theme from it, and the game reads it through UiTokens. Nothing on screen changes.
 - HTML mockups of the game's UI screens live in mockups/, built from the game's own files and art, with a Tune panel whose changes go back into the token file.
+- Each area has its own short AGENTS.md (apps/game, apps/docs, scripts, tools/render) under the root rules; the quality guide no longer tells agents to open a game window.
+- Removed four unused game definitions and moved three copied test helpers into the shared suite kit. Headless suites only; no behaviour change.
+- Every function in the game, test and parity scripts has a doc comment; six stale comment references fixed. Comments only.
+- The landing and press-kit pages share their list, text-link and chip styles from one file; unused exports removed.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.

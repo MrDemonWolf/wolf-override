@@ -12,7 +12,7 @@
 
 | Need | Home |
 |---|---|
-| UI sizes, colours, spacing | `scripts/ui_tokens.gd` (one token file, shared with the mockups) |
+| UI sizes, colours, spacing, timing | `ui/ui.tokens.json`, read through `scripts/ui_tokens.gd` (one token file, shared with `mockups/`) |
 | Player-facing text | Story lines are marked in `scripts/story_text.gd`; languages and translation go through `scripts/i18n.gd` and the catalogs in `i18n/` |
 | Settings and saved preferences | `scripts/game_settings.gd` |
 | Test helpers | `tests/support/` (start with `game_suite.gd`) |
