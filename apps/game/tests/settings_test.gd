@@ -136,6 +136,7 @@ func _run() -> void:
 			await frames(2)
 		_expect(menu.capture_action.is_empty() and not menu.cancel_button.visible and paused and menu.is_visible_in_tree(), "Menu cancels %s capture without closing Settings or unpausing" % kind)
 		_expect(menu.binding_label(&"choice_1", kind) == before_binding and FileAccess.get_file_as_string(path) == before_config, "Menu cancellation preserves %s bindings and the saved file" % kind)
+		_expect(game.get("controller_active"), "a captured controller press still updates the shared input owner")
 	menu.begin_capture(&"choice_1", "controller")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	# Native input is buffered; allow its dispatch before checking the capture result.

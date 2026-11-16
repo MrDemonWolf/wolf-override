@@ -20,7 +20,7 @@
 #       2340x1080 window letterboxes the 16:9 game (stretch aspect "keep"), so its stills are the
 #       1920x1080 picture inside the bars. Routes run side by side, PARITY_JOBS at a time (default 2).
 #   scripts/parity/run.sh ui <out file>
-#       Headless resolved-property dump of every visible HUD and menu control in 13 states.
+#       Headless resolved-property dump of every visible HUD/menu control and every visible Settings page.
 #   scripts/parity/run.sh perf <out dir> <label>
 #       Headless CPU-side performance probe (startup including load(main.tscn), per-state frame and
 #       _process time, _refresh_ui, and the junction room's and its Recesses' _draw in microseconds,

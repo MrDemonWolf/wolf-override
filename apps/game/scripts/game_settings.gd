@@ -65,6 +65,9 @@ const TAG_FONT_PX: int = 12
 ## since PR L6 the "machine translation" tags, which read as notes beside the names.
 const MUTED_TEXT: Color = Color("#89acbf")
 
+## Visible-menu input reaches the same owner even when rebinding consumes it.
+signal input_seen(event: InputEvent)
+
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
 ## TOGGLE HOLDS changed: with it on, one press of interact works a crank until a second press.
@@ -161,7 +164,7 @@ func configure(path: String) -> void:
 			var saved: Variant = config.get_value("bindings", "%s_%s" % [action, kind], {})
 			if saved is Dictionary:
 				var event: InputEvent = _decode_binding(saved)
-				if event != null and _event_kind(event) == kind:
+				if event != null and InputMode.binding_kind(event) == kind:
 					_replace_binding(action, kind, event)
 					overrides["%s_%s" % [action, kind]] = [action, kind, event]
 	# Validate the whole loaded map so legitimate key swaps are preserved.
@@ -171,10 +174,10 @@ func configure(path: String) -> void:
 			var entry: Array = overrides[key]
 			if not _binding_conflict(entry[0], entry[2]).is_empty():
 				for old: InputEvent in InputMap.action_get_events(entry[0]):
-					if _event_kind(old) == entry[1]:
+					if InputMode.binding_kind(old) == entry[1]:
 						InputMap.action_erase_event(entry[0], old)
 				for original: InputEvent in defaults[entry[0]]:
-					if _event_kind(original) == entry[1]:
+					if InputMode.binding_kind(original) == entry[1]:
 						InputMap.action_add_event(entry[0], original)
 				overrides.erase(key)
 				rejected = true
@@ -739,7 +742,7 @@ func cancel_capture() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree() or not capture_action.is_empty():
 		return
-	var step: int = MenuNavigation.tab_step(event)
+	var step: int = InputMode.tab_step(event)
 	if step == 0:
 		return
 	var index: int = tabs.current_tab
@@ -757,15 +760,18 @@ func _unhandled_input(event: InputEvent) -> void:
 ## another action already uses it, which the note names instead. Escape or controller Menu cancels. Bound presses are
 ## marked handled and saved at once. Ignores everything outside a rebind or while the menu is hidden.
 func _input(event: InputEvent) -> void:
-	if capture_action.is_empty() or not is_visible_in_tree():
+	if not is_visible_in_tree():
+		return
+	input_seen.emit(event)
+	if capture_action.is_empty():
 		return
 	if (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_START):
 		cancel_capture()
 		show_note(I18n.KEY.tr("Rebind cancelled."))
 		get_viewport().set_input_as_handled()
 		return
-	var pressed: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventJoypadMotion and absf(event.axis_value) >= 0.65)
-	if not pressed or _event_kind(event) != capture_kind:
+	var pressed: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventJoypadMotion and absf(event.axis_value) >= InputMode.CAPTURE_THRESHOLD)
+	if not pressed or InputMode.binding_kind(event) != capture_kind:
 		return
 	get_viewport().set_input_as_handled()
 	var binding: InputEvent = _decode_binding(_encode_binding(event))
@@ -785,11 +791,6 @@ func _input(event: InputEvent) -> void:
 		show_note(I18n.KEY.tr("Binding saved."))
 
 
-## "keyboard" for a key event, "controller" for a controller button or stick, "" for anything else.
-func _event_kind(event: InputEvent) -> String:
-	return "keyboard" if event is InputEventKey else ("controller" if event is InputEventJoypadButton or event is InputEventJoypadMotion else "")
-
-
 ## The first action other than [param target] (and other than the engine's ui_ actions) that
 ## [param event] already triggers, or an empty StringName when none does.
 func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
@@ -804,7 +805,7 @@ func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
 func _replace_binding(action: StringName, kind: String, event: InputEvent) -> void:
 	_forget_prompts()
 	for old: InputEvent in InputMap.action_get_events(action):
-		if _event_kind(old) == kind:
+		if InputMode.binding_kind(old) == kind:
 			InputMap.action_erase_event(action, old)
 	InputMap.action_add_event(action, event)
 
@@ -858,7 +859,7 @@ func _decode_binding(data: Dictionary) -> InputEvent:
 func binding_label(action: StringName, kind: String) -> String:
 	var labels: PackedStringArray = []
 	for event: InputEvent in InputMap.action_get_events(action):
-		if _event_kind(event) == kind:
+		if InputMode.binding_kind(event) == kind:
 			if event is InputEventKey:
 				labels.append(key_name(event))
 			elif event is InputEventJoypadButton:
@@ -1021,6 +1022,6 @@ func _save_extra() -> bool:
 func _family_bindings(events: Array[InputEvent], kind: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for event: InputEvent in events:
-		if _event_kind(event) == kind:
+		if InputMode.binding_kind(event) == kind:
 			result.append(_encode_binding(event))
 	return result

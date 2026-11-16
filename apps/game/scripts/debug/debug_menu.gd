@@ -417,15 +417,10 @@ func close(settle: bool = true) -> void:
 ## On opening, gives focus to the current page's tab, or to nothing in the touch layout (no focus ring
 ## under a finger).
 func _focus_first() -> void:
-	if _touch_layout():
+	if game.input_mode.touch_layout():
 		get_viewport().gui_release_focus()
 	else:
 		(tab_buttons[page] as Button).grab_focus()
-
-
-## True when the menu is laid out for touch: touch controls are on and no controller is in use.
-func _touch_layout() -> bool:
-	return game.touch_enabled and not game.controller_active
 
 
 ## Shows page [param id] (one of PAGES) and presses its tab, scrolled to the top, disarming CLEAR SAVE,
@@ -477,7 +472,7 @@ func _link_focus() -> void:
 func step_page(by: int) -> void:
 	var index: int = (PAGES.find(page) + by + PAGES.size()) % PAGES.size()
 	show_page(PAGES[index])
-	if not _touch_layout():
+	if not game.input_mode.touch_layout():
 		(tab_buttons[page] as Button).grab_focus()
 
 
@@ -486,21 +481,22 @@ func step_page(by: int) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
+	game._note_input_device(event)
 	if not event.is_echo() and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause_game")):
 		close()
 		get_viewport().set_input_as_handled()
 		return
-	var step: int = MenuNavigation.tab_step(event)
+	var step: int = InputMode.tab_step(event)
 	if step != 0:
 		step_page(step)
 		get_viewport().set_input_as_handled()
 		return
 	# After touch nothing has focus: the first key or controller press gives it to the page's tab, and
 	# does nothing else.
-	var navigation: bool = event is InputEventKey and event.pressed or event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf((event as InputEventJoypadMotion).axis_value) > 0.45
+	var navigation: bool = InputMode.navigation_press(event)
 	if navigation and get_viewport().gui_get_focus_owner() == null:
 		(tab_buttons[page] as Button).grab_focus()
-		for action: StringName in [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]:
+		for action: StringName in InputMode.NAVIGATION_ACTIONS:
 			if event.is_action_pressed(action):
 				get_viewport().set_input_as_handled()
 				return
@@ -619,7 +615,7 @@ func refresh() -> void:
 	_switch("view:shake", "CAMERA SHAKE", actions.shake_on)
 	_switch("view:flash", "SCREEN FLASH", actions.flash_on)
 	var controller: bool = game.controller_active
-	hint_label.text = "TAP OUTSIDE TO CLOSE" if _touch_layout() else ("B  CLOSE   LB / RB  PAGE" if controller else "ESC  CLOSE   `  TOGGLE")
+	hint_label.text = "TAP OUTSIDE TO CLOSE" if game.input_mode.touch_layout() else ("B  CLOSE   LB / RB  PAGE" if controller else "ESC  CLOSE   `  TOGGLE")
 
 
 ## Presses or releases button [param id] without emitting its signals; does nothing for an unknown id.

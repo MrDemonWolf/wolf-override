@@ -158,6 +158,7 @@ var frame_drawn_signal: Signal = Signal()
 ## overlay, note and DEBUG button, and listens for the logo taps.
 func setup(main: Main) -> void:
 	game = main
+	game.input_mode.changed.connect(_queue_view)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process(false)
 	set_physics_process(false)
@@ -281,7 +282,7 @@ func _refresh_view(redraw: bool = false) -> void:
 	# answers: its legend is clear of them); a capture with boxes draws it whatever is up.
 	zones.set_shown(available and (_capturing_boxes or (overlay_mode == Overlay.ZONES and not card_up)))
 	var controller: bool = game.controller_active
-	var touch_layout: bool = game.touch_enabled and not controller
+	var touch_layout: bool = game.input_mode.touch_layout()
 	zones.set_device("controller" if controller else ("touch" if touch_layout else "keyboard"))
 	debug_button.visible = available and touch_layout and not menu_open and not card_up
 	if note.visible:
@@ -375,6 +376,7 @@ func _refresh_overlay() -> void:
 func _input(event: InputEvent) -> void:
 	if game == null:
 		return
+	game._note_input_device(event)
 	if event is InputEventJoypadButton and not event.pressed and (event as InputEventJoypadButton).button_index == _swallow_release:
 		_swallow_release = -1
 		get_viewport().set_input_as_handled()
@@ -383,9 +385,6 @@ func _input(event: InputEvent) -> void:
 		_watch_codes(event)
 	if not available:
 		return
-	# The touch layout follows the last device Main saw; Main notes it after this node has the event.
-	if event is InputEventJoypadButton or event is InputEventScreenTouch or event is InputEventKey:
-		_queue_view()
 	if _rebinding():
 		return
 	if actions.frame_step and not menu_open and _frame_step_input(event):

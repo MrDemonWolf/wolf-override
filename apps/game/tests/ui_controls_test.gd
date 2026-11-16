@@ -178,7 +178,7 @@ func _run() -> void:
 	controller_event.pressed = true
 	game.call("_input", controller_event)
 	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with("X  ") and second_choice.text.begins_with("Y  "), "controller choices use compact stacked cards with action prompts")
-	_expect(not right.visible and not use.visible, "controller input hides mobile touch movement controls")
+	_expect(not right.visible and not use.visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "controller input hides on-screen touch movement and Pause controls")
 	var touch_event: InputEventScreenTouch = InputEventScreenTouch.new()
 	touch_event.pressed = true
 	game.call("_input", touch_event)
@@ -206,6 +206,7 @@ func _run() -> void:
 	await send_key(KEY_DOWN, true)
 	await send_key(KEY_DOWN, false)
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
+	_expect((pause_scroll.get_node("MenuMargin/MenuList/PauseHint") as Label).text == "Escape  RESUME", "Pause updates its prompt when keyboard input replaces touch")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
 	var fps: OptionButton = game.get("fps_options") as OptionButton
@@ -330,7 +331,7 @@ func _run() -> void:
 	# The END OF SLICE card (decision D) answers touch, controller and keyboard through the real input path.
 	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
 	var end_button: Button = end_card.get_node("EndCardContinue") as Button
-	game.set("controller_active", false)
+	game.call("_input", touch_event)
 	game.call("_show_end_card")
 	await process_frame
 	_expect(end_card.visible and end_button.text == "TAP CONTINUE" and not (game.get_node("CanvasLayer/TouchControls") as Control).visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "on touch the END OF SLICE card shows TAP CONTINUE with no play buttons over it")

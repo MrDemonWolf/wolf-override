@@ -1,6 +1,6 @@
 extends SceneTree
 ## UI parity dump (never shipped: run.sh copies it into a scratch copy of the game).
-## Drives main.tscn through 13 menu and HUD states and writes, per visible Control under CanvasLayer,
+## Drives main.tscn through menus and HUD states and writes, per visible Control under CanvasLayer,
 ## its class, global rect, theme-resolved font, size and colour, and stylebox description. Run it
 ## before and after a UI refactor and diff the two files: any line that changes is a visual change.
 ## Usage: scripts/parity/run.sh ui <out file>   (headless, --fixed-fps 60, so the waits are frames)
@@ -50,7 +50,9 @@ func _run() -> void:
 	game.call("_show_title_settings")
 	await _settle(20)
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
-	for i: int in 3:
+	for i: int in menu.pages.size():
+		if menu.tabs.is_tab_hidden(i):
+			continue
 		menu.select_tab(i)
 		await _settle(4)
 		await _snap("settings-tab%d" % i)

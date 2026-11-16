@@ -269,29 +269,30 @@ func _route_1() -> void:
 	await _controller_shot("title-controller")
 	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton")
 	await _raw(40)
-	await _shot("settings-display")
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
-	menu.tabs.current_tab = 1
-	await _raw(20)
-	await _shot("settings-audio")
-	menu.tabs.current_tab = 2
-	await _raw(20)
-	await _shot("settings-controls")
-	(menu.binding_buttons["interact_keyboard"] as Button).pressed.emit()
-	await _raw(10)
-	await _shot("settings-rebind-prompt")
-	await _key(KEY_F)
-	await _raw(10)
-	await _shot("settings-rebind-saved")
-	if not language.is_empty():
-		menu.tabs.current_tab = GameSettings.GENERAL_TAB
+	# Capture IDs stay stable when the menu captions are translated.
+	var tab_names: Array[String] = ["display", "audio", "controls", "accessibility", "general"]
+	for index: int in menu.pages.size():
+		if menu.tabs.is_tab_hidden(index):
+			continue
+		menu.tabs.current_tab = index
 		await _raw(20)
-		await _shot("settings-general")
-		menu.language.show_popup()
-		await _raw(20)
-		await _shot("settings-language-list")
-		menu.language.get_popup().hide()
-		await _raw(10)
+		await _shot("settings-%s" % tab_names[index])
+		if index == 2:
+			(menu.binding_buttons["interact_keyboard"] as Button).pressed.emit()
+			await _raw(10)
+			await _shot("settings-rebind-prompt")
+			await _key(KEY_F)
+			await _raw(10)
+			await _shot("settings-rebind-saved")
+			await _restore_input_variant()
+			await _raw(10)
+		if index == GameSettings.GENERAL_TAB and not language.is_empty():
+			menu.language.show_popup()
+			await _raw(20)
+			await _shot("settings-language-list")
+			menu.language.get_popup().hide()
+			await _raw(10)
 	_press("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton")
 	await _raw(30)
 	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton")
@@ -762,20 +763,24 @@ func _answer(response: int) -> void:
 		await _tap(&"choice_%d" % response)
 
 
-## A still with controller prompts (a trigger pull), then back to keyboard (an unbound key).
+## A still with controller prompts, then a real event restores the requested capture input class.
 func _controller_shot(slug: String) -> void:
 	await _trigger_pull()
 	await _raw(10)
 	await _shot(slug)
-	await _key(KEY_SHIFT)
+	await _restore_input_variant()
 	await _raw(10)
 
 
-## Switches input device mid-play (critique C6): from the variant's own layout to a controller, then
-## a screen touch, then a key, with a still after the first two. The context hint must change to the
-## controller prompts and come back unchanged; in the touch run the USE button must hide for the
-## controller and return for the touch. (The game has touch buttons only where touch_enabled is set,
-## on phones; in the keyboard runs a screen touch brings back the keyboard prompts.)
+## Restores the capture's chosen input class using the same events a player would send.
+func _restore_input_variant() -> void:
+	if variant == "touch-fx":
+		await _screen_touch()
+	else:
+		await _key(KEY_SHIFT)
+
+
+## Checks native controller, touch and keyboard switching on every platform, then restores the variant.
 func _device_switch(slug: String) -> void:
 	var start: String = _hint()
 	var use_button: Control = game.get_node("CanvasLayer/TouchControls/Use") as Control
@@ -792,14 +797,18 @@ func _device_switch(slug: String) -> void:
 	await _screen_touch()
 	await _raw(10)
 	await _shot("%s-device-touch" % slug)
-	if bool(game.get("controller_active")) or _hint() != start:
-		_fail("%s: after a screen touch the hint reads %s, not %s" % [slug, _hint(), start])
-	if use_button.is_visible_in_tree() != use_shown:
-		_fail("%s: the touch USE button did not return after a screen touch" % slug)
+	var mode: InputMode = game.get("input_mode") as InputMode
+	if not mode.touch_layout() or not use_button.is_visible_in_tree():
+		_fail("%s: a screen touch did not enable touch controls" % slug)
 	await _key(KEY_SHIFT)
 	await _raw(10)
-	if _hint() != start:
+	if mode.touch_layout() or bool(game.get("controller_active")) or use_button.is_visible_in_tree():
+		_fail("%s: a key did not restore keyboard controls" % slug)
+	if variant != "touch-fx" and _hint() != start:
 		_fail("%s: after a key the hint reads %s, not %s" % [slug, _hint(), start])
+	if variant == "touch-fx":
+		await _restore_input_variant()
+		await _raw(10)
 
 
 func _hint() -> String:

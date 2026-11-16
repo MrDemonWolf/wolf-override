@@ -442,7 +442,6 @@ const WOLF_MIRROR_X: float = 551.8 + 5.0 + M0Actor.WOLF_SNOUT
 ## How far either side of M0Actor.CLEAR_GAP the engineer has to go before WOLF changes his mind about
 ## walking up to his spot by the valve after the blast (_wolf_rubble_x).
 const WOLF_RUBBLE_HYSTERESIS: float = 24.0
-const MENU_NAVIGATION_ACTIONS: Array[StringName] = [&"ui_accept", &"ui_up", &"ui_down", &"ui_left", &"ui_right", &"ui_focus_next", &"ui_focus_prev"]
 ## Every gameplay action; pause and a knockdown release them all so nothing stays held.
 const GAMEPLAY_ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2"]
 ## A knockdown's timing (Cold Still, decided October 11 and confirmed as Q17 on October 14, 2026): its
@@ -676,12 +675,20 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 var state: M0State = M0State.new()
 var save_path: String = M0State.SAVE_PATH
 var settings_path: String = "user://settings.cfg"
-var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
-var controller_active: bool = false
+var input_mode: InputMode = InputMode.new()
+## Legacy script properties delegate to the shared owner, so tooling keeps its existing API.
+var touch_enabled: bool:
+	get: return input_mode.touch_enabled
+	set(value): input_mode.touch_enabled = value
+var controller_active: bool:
+	get: return input_mode.controller_active
+	set(value): input_mode.controller_active = value
 ## Why play was paused; reconnecting alone never clears it or resumes the game.
 var controller_disconnected: bool = false
 ## True after real mouse input, until keyboard, controller or touch input takes over menu focus.
-var mouse_active: bool = false
+var mouse_active: bool:
+	get: return input_mode.pointer_focus
+	set(value): input_mode.pointer_focus = value
 var title_open: bool = true
 ## The title control a menu last meant to focus, so a later key press after touch lands there.
 var title_focus_return: Control = null
@@ -1044,13 +1051,16 @@ func _ready() -> void:
 	_setup_impact()
 	var pads: Array[int] = Input.get_connected_joypads()
 	if not pads.is_empty():
-		impact.rumble_device = pads[0]
+		input_mode.controller_device = pads[0]
+		impact.rumble_device = input_mode.controller_device
+	input_mode.changed.connect(_on_input_mode_changed)
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	_setup_touch_controls()
 	pause_button.pressed.connect(_on_pause_button)
 	pause_overlay.resume_requested.connect(_resume_game)
 	pause_overlay.back_requested.connect(_on_settings_back)
 	pause_overlay.input_seen.connect(_note_input_device)
+	settings_menu.input_seen.connect(_note_input_device)
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton.pressed.connect(_on_title_button)
@@ -1386,7 +1396,7 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 
 func _update_gameplay_camera() -> void:
 	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
-	var touch_buttons: bool = touch_enabled and not controller_active
+	var touch_buttons: bool = input_mode.touch_layout()
 	var camera_y: float = GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y
 	var low: float = half_view
 	if state.chapter_id == "lockdown":
@@ -2301,7 +2311,7 @@ func _show_pause_menu() -> void:
 	pause_menu.show()
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton.text = I18n.KEY.tr("SKIP OPENING") if intro_active else I18n.KEY.tr("RETURN TO TITLE")
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ReturnWarning.visible = not intro_active
-	_show_pause_hint(touch_enabled and not controller_active)
+	_show_pause_hint(input_mode.touch_layout())
 	_reveal_menu()
 	_grab_menu_focus(resume_button)
 
@@ -2352,7 +2362,7 @@ func _return_to_title() -> void:
 func _grab_menu_focus(control: Control) -> void:
 	if title_screen.is_ancestor_of(control):
 		title_focus_return = control
-	if touch_enabled and not controller_active:
+	if input_mode.touch_layout():
 		get_viewport().gui_release_focus()
 	else:
 		control.grab_focus(mouse_active)
@@ -2491,7 +2501,7 @@ func _answer_choice(response: int) -> void:
 ## Losing the pad actually in use pauses live play; other pads and reconnects never change menu state.
 ## Device IDs come from Input's connection signal and may be nonzero. Existing pause releases held actions.
 func _on_joy_connection_changed(device: int, connected: bool) -> void:
-	if connected or device != impact.rumble_device:
+	if connected or device != input_mode.controller_device:
 		return
 	impact.stop_rumble()
 	if controller_active and not title_open and not end_card_active and not get_tree().paused:
@@ -2499,28 +2509,27 @@ func _on_joy_connection_changed(device: int, connected: bool) -> void:
 		_pause_game()
 
 
-## Called from _input during play and from PauseOverlay while the tree is paused.
+## Applies a shared input-class or pad change to rumble routing and every open menu's prompts.
+func _on_input_mode_changed() -> void:
+	if input_mode.controller_device >= 0:
+		impact.rumble_device = input_mode.controller_device
+	_refresh_ui()
+	if pause_overlay.visible and pause_menu.visible:
+		_show_pause_hint(input_mode.touch_layout())
+	if debug_tools != null and debug_tools.menu_open:
+		debug_tools.menu.refresh()
+
+
+## Observes input even when menus consume it; this method applies the shared owner's state to focus and UI.
 func _note_input_device(event: InputEvent) -> void:
-	if event.device != InputEvent.DEVICE_ID_EMULATION and (event is InputEventMouseButton or event is InputEventMouseMotion):
-		mouse_active = true
+	var navigation_press: bool = input_mode.observe(event)
+	if mouse_active:
 		var focused: Control = get_viewport().gui_get_focus_owner()
 		if focused != null:
 			focused.grab_focus(true)
-	var use_controller: bool = controller_active
-	var navigation_press: bool = false
-	if event is InputEventJoypadButton and event.pressed or event is InputEventJoypadMotion and absf(event.axis_value) > 0.45:
-		use_controller = true
-		navigation_press = true
-		# Rumble goes to the pad that is actually in use, not always the first one connected.
-		impact.rumble_device = event.device
-	elif event is InputEventScreenTouch and event.pressed or event is InputEventScreenDrag or event is InputEventKey and event.pressed or event is InputEventMouseButton and event.pressed:
-		use_controller = false
-		navigation_press = event is InputEventKey
-	if navigation_press or event is InputEventScreenTouch or event is InputEventScreenDrag:
-		mouse_active = false
-	if use_controller != controller_active:
-		controller_active = use_controller
-		_refresh_ui()
+	# Captures and the debug menu own their focus; input identity still follows their consumed events.
+	if not settings_menu.capture_action.is_empty() or (debug_tools != null and debug_tools.menu_open):
+		return
 	var owner: Control = get_viewport().gui_get_focus_owner()
 	if navigation_press and owner != null and not owner.has_focus(true):
 		owner.grab_focus()
@@ -2530,7 +2539,7 @@ func _note_input_device(event: InputEvent) -> void:
 		if target != null and target.is_visible_in_tree():
 			target.grab_focus()
 			# A navigation or confirm press only reveals focus; it must not also move it or activate the control.
-			for action: StringName in MENU_NAVIGATION_ACTIONS:
+			for action: StringName in InputMode.NAVIGATION_ACTIONS:
 				if event.is_action_pressed(action):
 					get_viewport().set_input_as_handled()
 					break
@@ -4903,7 +4912,7 @@ func _wolf_follow_min_x() -> float:
 
 func _refresh_ui() -> void:
 	_hud_drawn = true
-	var touch_layout: bool = touch_enabled and not controller_active
+	var touch_layout: bool = input_mode.touch_layout()
 	impact.rumble_enabled = controller_active
 	impact.haptics_enabled = touch_layout
 	# The END OF SLICE card stands alone: no play HUD, touch controls or Pause over it.
@@ -4912,7 +4921,7 @@ func _refresh_ui() -> void:
 			hud_part.hide()
 		end_card_button.text = _continue_prompt(touch_layout)
 		return
-	pause_button.visible = not title_open and not pause_overlay.visible
+	pause_button.visible = touch_layout and not title_open and not pause_overlay.visible
 	# PAUSE is one whole message, so the button translates itself (auto-translate); the mark is for the
 	# template.
 	pause_button.text = I18n.KEY.tr("PAUSE")
@@ -5077,7 +5086,7 @@ func _shown_speaker_tags() -> Array[String]:
 ## input (built with HudText.key: the safe point's save error, WOLF's manual-port line) names the input in
 ## use, and on touch reads its touch form, since touch answers carry no number (PHONE-3).
 func _shown_line() -> String:
-	var touch_layout: bool = touch_enabled and not controller_active
+	var touch_layout: bool = input_mode.touch_layout()
 	var keys: Dictionary = _key_names(touch_layout)
 	var key_line: Callable = func(words: String) -> String:
 		return HudText.localise(words, keys, touch_layout, false) if HudText.has_keys(words) else ""
@@ -5274,7 +5283,7 @@ func _dialogue_room(between: bool) -> float:
 ## Above 100% a box under the touch buttons would rise into ◀ ▶ and USE (their bottoms at y 435), so
 ## while they show it stands between them instead, in the hint bar's span (PHONE-7).
 func _box_between_touch_buttons() -> bool:
-	return touch_enabled and not controller_active and touch_use.visible and TextSize.factor > 1.0
+	return input_mode.touch_layout() and touch_use.visible and TextSize.factor > 1.0
 
 
 ## The speaker column's width: the widest name it shows as drawn, at the current text size (measured once
@@ -5312,7 +5321,7 @@ func _story_wrap_width(column: float) -> float:
 ## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
 ## tab above the words; narration without a tab), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
 func _layout_hud() -> void:
-	var touch_layout: bool = touch_enabled and not controller_active
+	var touch_layout: bool = input_mode.touch_layout()
 	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
 	_set_font_size(speaker, TextSize.px(SPEAKER_FONT_SIZE))
 	_set_font_size(context_hint_text, TextSize.px(HINT_FONT_SIZE))
@@ -5969,8 +5978,8 @@ func debug_snapshot(include_state: bool = true) -> Dictionary:
 		"flags": {
 			"title_open": title_open, "intro_active": intro_active, "paused": get_tree().paused, "waiting_for_choice": waiting_for_choice,
 			"choice_context": choice_context, "fail_active": fail_active, "chapter_close_active": chapter_close_active,
-			"end_card_active": end_card_active, "touch_layout": touch_enabled and not controller_active, "controller_active": controller_active,
-			"controller_disconnected": controller_disconnected, "controller_device": impact.rumble_device,
+			"end_card_active": end_card_active, "touch_layout": input_mode.touch_layout(), "controller_active": controller_active,
+			"controller_disconnected": controller_disconnected, "controller_device": input_mode.controller_device,
 			"save_pending": save_pending, "seal_opening": seal_opening, "wolf_baiting": wolf_baiting, "bypass_ticks": bypass_ticks,
 		},
 		"save_path": save_path,

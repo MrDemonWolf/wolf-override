@@ -524,10 +524,21 @@ func _check_touch_button_and_menu_inputs() -> void:
 	game.call("_resume_game")
 	await process_frame
 	_expect(button.visible, "it comes back on resume")
-	await _tap_pad(JOY_BUTTON_X)
-	_expect(not button.visible, "controller play hides the DEBUG button")
+	var axis: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	axis.axis = JOY_AXIS_TRIGGER_LEFT
+	axis.axis_value = 1.0
+	Input.parse_input_event(axis)
+	await settle(3)
+	_expect(not button.visible, "controller axis input hides the DEBUG button through the shared owner")
+	axis.axis_value = 0.0
+	Input.parse_input_event(axis)
+
 	await _touch(Vector2(480.0, 200.0))
 	_expect(button.visible, "touch brings it back")
+	await _tap_pad(JOY_BUTTON_X)
+	_expect(not button.visible, "controller button input also hides DEBUG")
+	await _touch(Vector2(480.0, 200.0))
+	_expect(button.visible, "touch restores DEBUG after a controller button")
 	var menu: DebugMenu = tools.menu
 	tools.menu_requested.connect(_on_menu_requested)
 	button.pressed.emit()

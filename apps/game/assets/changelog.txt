@@ -69,6 +69,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
 
 -- Accessibility --
+- One input owner keeps play, Settings and debug UI in sync; desktop taps enable touch controls, and mouse motion preserves prompts. Headless and rendered checks only.
 - Losing the active controller pauses play and releases held actions; reconnecting waits for Resume. The notice stays beside Resume at 200%. Headless and rendered checks only.
 - Mobile Settings widens its tab rail for translated words at 200% and reflows after language changes; headless and rendered checks only.
 - Settings text and option lists scale through 200%; enlarged rows stack, notes scroll, and the card uses more canvas. Headless and rendered checks only.
@@ -179,6 +180,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
 
 -- Development --
+- Capture routes restore their requested input class after device switches, and UI dumps include every visible Settings page.
 - Short lamp-flicker and response checks use fixed frames so a busy machine cannot skip the sampled animation.
 - The dock-bay camera-speed check uses fixed frames so CPU load cannot distort its measurement; its speed limit stays unchanged.
 - Phone Settings mockups keep Back clear of the heading and scroll enlarged tabs inside the safe area; browser checks only.
