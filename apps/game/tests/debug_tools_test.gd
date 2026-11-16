@@ -999,7 +999,9 @@ func _check_zones_controller_toggles() -> void:
 	await _tap_pad(JOY_BUTTON_LEFT_SHOULDER)
 	_expect(not zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.HITBOXES] and zones.layers[DebugZones.RENDER], "LB turns the zones off")
 	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
+	(game.get("top_card") as Control).hide()
 	await _tap_pad(JOY_BUTTON_BACK)
+	_expect(not (game.get("top_card") as Control).visible, "View belongs to the debug zones while they are open, without recalling the objective")
 	_expect(not zones.layers[DebugZones.HITBOXES] and not zones.layers[DebugZones.RENDER] and not (zones.legend_buttons[DebugZones.RENDER] as Button).button_pressed, "RB and View turn the hitboxes and the render boxes off, and the legend follows")
 	for button: JoyButton in [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER, JOY_BUTTON_BACK]:
 		await _tap_pad(button)

@@ -578,7 +578,7 @@ func _check_corridor() -> void:
 	_expect(not bar.visible, "a read line clears once the engineer moves on")
 	var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 	var hint_rect: Rect2 = hint_panel.get_global_rect()
-	_expect(hint_panel.visible and absf(hint_rect.end.y - Main.DIALOGUE_BOTTOM) <= 0.5, "with no box up the hint bar takes the box's place at the bottom (%s)" % hint_rect)
+	_expect(hint_panel.visible and absf(hint_rect.end.y - float(game.call("_dialogue_bottom"))) <= 0.5, "with no box up the hint bar takes the box's place at the bottom (%s)" % hint_rect)
 	game.call("_interact")
 	await _play(0.1, "said again")
 	_expect(bar.visible or game.status_line.is_empty(), "the next line shows again")
@@ -998,7 +998,7 @@ func _check_prompt_clear(fresh: Main, touch: bool, box_up: bool, context: String
 		return
 	var prompt: Rect2 = fresh.tutorial_prompt.get_global_rect()
 	# A long frame under load can carry the engineer past the display, where the prompt only points on.
-	_expect((not english or fresh.tutorial_text.text.contains("right to the breaker.")) and prompt.position.y >= 0.0 and prompt.end.y <= Main.DIALOGUE_BOTTOM and prompt.position.x >= 0.0 and prompt.end.x <= 960.0, "%s: after the first step the tutorial prompt shows on the canvas (%s)" % [context, prompt])
+	_expect((not english or fresh.tutorial_text.text.contains("right to the breaker.")) and prompt.position.y >= 0.0 and prompt.end.y <= float(fresh.call("_dialogue_bottom")) and prompt.position.x >= 0.0 and prompt.end.x <= 960.0, "%s: after the first step the tutorial prompt shows on the canvas (%s)" % [context, prompt])
 	for label: Label in fresh._corridor_station_labels():
 		if label.is_visible_in_tree() and label.modulate.a > 0.05:
 			var name_rect: Rect2 = label.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, label.size)

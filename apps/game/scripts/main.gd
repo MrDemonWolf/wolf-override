@@ -111,10 +111,10 @@ const PURGE_DISPLAY_MAX_X: float = 181.0
 const DIALOGUE_FONT_SIZE: int = 23
 const DIALOGUE_COLUMN_WIDTH: float = 440.0
 const SPEAKER_FONT_SIZE: int = 16
-## The box's inner margins and the box's
-## bottom edge on the 960 x 540 canvas.
+## Inner margins of the dialogue panel, in canvas px.
 const DIALOGUE_PADDING: Vector2 = Vector2(20.0, 12.0)
-const DIALOGUE_BOTTOM: float = 526.0
+## Bottom inset of the authored dialogue on the base canvas, in canvas px.
+const DIALOGUE_BOTTOM_INSET: float = 14.0
 ## No part of the play HUD comes closer than this to the canvas's sides.
 const HUD_SIDE_MARGIN: float = 20.0
 ## The gap the top card keeps from the touch DEBUG button beside it.
@@ -128,14 +128,6 @@ const TUTORIAL_FONT_SIZE: int = 17
 const HINT_GAP: float = 4.0
 ## The most of its own area the tutorial prompt may lay over the corridor's machines in the top card's place.
 const TUTORIAL_ART_OVERLAP: float = 0.1
-## The x span (canvas px, left and right edge) the hint bar fills on touch: 12 px in from the inner
-## edges of ◀ ▶ and USE (offset_right 238 and offset_left 773 under TouchControls in main.tscn).
-## Above 100% the dialogue box stands in it too (_box_between_touch_buttons), and a tutorial prompt
-## that drops to the bottom on touch centres on it. Move the buttons and this moves with them.
-const TOUCH_HINT_SPAN: Vector2 = Vector2(250.0, 761.0)
-## TOUCH_HINT_SPAN's width (511 px) and middle (x 505.5), worked out once for every user above.
-const TOUCH_HINT_WIDTH: float = TOUCH_HINT_SPAN.y - TOUCH_HINT_SPAN.x
-const TOUCH_HINT_CENTRE_X: float = (TOUCH_HINT_SPAN.x + TOUCH_HINT_SPAN.y) * 0.5
 ## On the opening's first box: Pause offers SKIP OPENING (P0-13's stopgap until the opening is reworked).
 const SKIP_OPENING_HINT: String = "PAUSE: skip the opening"
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
@@ -642,6 +634,9 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var touch_left: Button = $CanvasLayer/TouchControls/Left
 @onready var touch_right: Button = $CanvasLayer/TouchControls/Right
 @onready var touch_use: Button = $CanvasLayer/TouchControls/Use
+## One canvas/safe-area owner; layout readers never query the monitor work area themselves.
+var screen_shape: ScreenShape = ScreenShape.new()
+
 @onready var touch_choice_1: Button = $CanvasLayer/TouchControls/Choice1
 @onready var touch_choice_2: Button = $CanvasLayer/TouchControls/Choice2
 @onready var pause_overlay: PauseOverlay = $CanvasLayer/PauseOverlay
@@ -1043,6 +1038,8 @@ static func game_version() -> String:
 
 
 func _ready() -> void:
+	add_child(screen_shape)
+	screen_shape.shape_changed.connect(_on_screen_shape_changed)
 	get_window().title = str(ProjectSettings.get_setting(NAME_SETTING, ""))
 	title_version.text = game_version()
 	speaker.add_theme_stylebox_override(&"normal", speaker.get_theme_stylebox(&"tab_selected", &"TerminalTabBar"))
@@ -2271,9 +2268,9 @@ func _layout_settings_card() -> void:
 	# A size change can arrive during the entrance; its old destination must not move the new card.
 	Tweens.kill(menu_tween)
 	menu_panel.modulate.a = 1.0
-	var canvas: Vector2 = get_viewport_rect().size
-	menu_panel.size = canvas - Vector2(32, 32) if settings_menu.mobile or TextSize.factor >= 1.5 else Vector2(760, 464)
-	menu_panel.position = (canvas - menu_panel.size) * 0.5
+	var safe: Rect2 = screen_shape.safe_rect.grow(-16.0)
+	menu_panel.size = safe.size if settings_menu.mobile or TextSize.factor >= 1.5 else Vector2(760, 464).min(safe.size)
+	menu_panel.position = safe.get_center() - menu_panel.size * 0.5
 	settings_menu.size = menu_panel.size
 
 
@@ -2303,15 +2300,36 @@ func _reveal_menu() -> void:
 	menu_tween.tween_property(menu_panel, "modulate:a", 1.0, MENU_REVEAL_SECONDS)
 
 
+## Centres the existing scrollable pause card inside the safe area without changing its authored size.
+func _layout_pause_card() -> void:
+	var safe: Rect2 = screen_shape.safe_rect.grow(-16.0)
+	menu_panel.size = Vector2(450, 430).min(safe.size)
+	menu_panel.position = safe.get_center() - menu_panel.size * 0.5
+	pause_menu.size = menu_panel.size
+
+
+## Applies safe-area changes to the active HUD and menu; resizing never opens or closes a menu.
+func _on_screen_shape_changed(_visible: Rect2, _safe: Rect2) -> void:
+	if not is_node_ready():
+		return
+	_layout_hud()
+	if pause_overlay.visible:
+		Tweens.kill(menu_tween)
+		menu_panel.modulate.a = 1.0
+		if settings_menu.visible:
+			_layout_settings_card()
+			settings_menu.layout_for_device()
+		else:
+			_layout_pause_card()
+
+
 func _show_pause_menu() -> void:
 	if title_open and pause_overlay.visible:
 		_resume_game()
 		_grab_menu_focus($CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton)
 		return
 	settings_menu.cancel_capture()
-	menu_panel.position = Vector2(255, 55)
-	menu_panel.size = Vector2(450, 430)
-	pause_menu.size = Vector2(450, 430)
+	_layout_pause_card()
 	$CanvasLayer/PauseOverlay/Panel/Accent.show()
 	settings_menu.hide()
 	pause_menu.show()
@@ -2486,7 +2504,7 @@ func _on_settings_back() -> void:
 ## Tracks native input, recalls a live objective, and routes direct answer presses before focused controls.
 func _input(event: InputEvent) -> void:
 	_note_input_device(event)
-	if not event.is_echo() and event.is_action_pressed(&"show_objective") and not title_open and not intro_active and not end_card_active and not fail_active and not get_tree().paused and human.controlled and not waiting_for_choice and not _opening_lines_playing():
+	if not event.is_echo() and event.is_action_pressed(&"show_objective") and not title_open and not intro_active and not end_card_active and not fail_active and not get_tree().paused and human.controlled and not waiting_for_choice and not _opening_lines_playing() and not (debug_tools != null and debug_tools.zones.visible):
 		# Reuse the transient card without advancing a line, changing a goal or opening another menu.
 		name_card_remaining = 0.0
 		last_top_card_key = "%s:%s" % [state.chapter_id, _objective()]
@@ -5280,6 +5298,16 @@ func _refit_station_labels() -> void:
 	junction_room.refit_labels()
 
 
+## Bottom edge of dialogue and lower hints, in canvas px, preserving the authored 14 px safe-area gap.
+func _dialogue_bottom() -> float:
+	return screen_shape.safe_rect.end.y - DIALOGUE_BOTTOM_INSET
+
+
+## Inner edges of the touch movement/use buttons, with the existing 12 px reading gap.
+func _touch_hint_span() -> Vector2:
+	return Vector2(touch_right.position.x + touch_right.size.x + 12.0, touch_use.position.x - 12.0)
+
+
 ## The words' column width at the current text size: 42 characters' worth, or what the canvas leaves.
 func _dialogue_column_width() -> float:
 	var wanted: float = DIALOGUE_COLUMN_WIDTH * TextSize.factor
@@ -5290,7 +5318,8 @@ func _dialogue_column_width() -> float:
 ## stands between the touch buttons ([param between], from _box_between_touch_buttons), otherwise the
 ## canvas less HUD_SIDE_MARGIN each side. The column width and the box layout both read it.
 func _dialogue_room(between: bool) -> float:
-	return TOUCH_HINT_WIDTH if between else 960.0 - HUD_SIDE_MARGIN * 2.0
+	var span: Vector2 = _touch_hint_span()
+	return span.y - span.x if between else screen_shape.safe_rect.size.x - HUD_SIDE_MARGIN * 2.0
 
 
 ## Above 100% a box under the touch buttons would rise into ◀ ▶ and USE (their bottoms at y 435), so
@@ -5334,6 +5363,22 @@ func _story_wrap_width(column: float) -> float:
 ## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
 ## tab above the words; narration without a tab), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
 func _layout_hud() -> void:
+	var safe: Rect2 = screen_shape.safe_rect
+	# Authored offsets stay inside the safe rect; no scene or input-mode copy of the inset arithmetic.
+	_set_rect(pause_button, Vector2(safe.end.x - 116.0, safe.position.y + 16.0), pause_button.size)
+	# Keep the authored controls above the dialogue while that placement fits the safe area.
+	var touch_height: float = maxf(touch_left.size.y, maxf(touch_right.size.y, touch_use.size.y))
+	var touch_top: float = clampf(screen_shape.visible_rect.end.y - 195.0, safe.position.y + 16.0, safe.end.y - touch_height - DIALOGUE_BOTTOM_INSET)
+	_set_rect(touch_left, Vector2(safe.position.x + 32.0, touch_top), touch_left.size)
+	_set_rect(touch_right, Vector2(safe.position.x + 142.0, touch_top), touch_right.size)
+	_set_rect(touch_use, Vector2(safe.end.x - 187.0, touch_top), touch_use.size)
+	if debug_tools != null and debug_tools.debug_button != null:
+		debug_tools.layout_button()
+	var span: Vector2 = _touch_hint_span()
+	var span_width: float = span.y - span.x
+	var span_centre: float = (span.x + span.y) * 0.5
+	var dialogue_bottom: float = _dialogue_bottom()
+	_set_rect(top_card, safe.position + Vector2(18.0, 16.0), top_card.size)
 	var touch_layout: bool = input_mode.touch_layout()
 	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
 	_set_font_size(speaker, TextSize.px(SPEAKER_FONT_SIZE))
@@ -5344,14 +5389,14 @@ func _layout_hud() -> void:
 	var column: float = _dialogue_column_width()
 	var names: float = _speaker_column_width()
 	var between: bool = _box_between_touch_buttons()
-	var centre_x: float = TOUCH_HINT_CENTRE_X if between else 480.0
+	var centre_x: float = span_centre if between else safe.get_center().x
 	# Speaker tabs sit outside the text panel, so narration and speech share one words column.
 	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column
 	_set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
 	var line_height: float = story.get_line_height()
 	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
 	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + text_height
-	_set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), DIALOGUE_BOTTOM - bar_height), Vector2(bar_width, bar_height))
+	_set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), dialogue_bottom - bar_height), Vector2(bar_width, bar_height))
 	_set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), text_height))
 	# The reused tab style includes content margins, which can exceed the text's line height.
 	var tab_height: float = maxf(speaker.get_combined_minimum_size().y, speaker.get_line_height() + DIALOGUE_PADDING.y)
@@ -5359,7 +5404,9 @@ func _layout_hud() -> void:
 	_set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
 	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
 	# and takes a third row if its words need one there.
-	var card_width: float = clampf(448.0 * TextSize.factor, 448.0, 820.0)
+	var card_width: float = minf(clampf(448.0 * TextSize.factor, 448.0, 820.0), safe.size.x - 36.0)
+	if pause_button.visible:
+		card_width = minf(card_width, pause_button.position.x - HUD_CARD_GAP - top_card.position.x)
 	if _debug_button_shown():
 		card_width = minf(card_width, debug_tools.debug_button.position.x - HUD_CARD_GAP - top_card.position.x)
 	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, hud.size.y))
@@ -5370,12 +5417,12 @@ func _layout_hud() -> void:
 	# The hint bar: top right under PAUSE (and under the top card where that reaches across) in the
 	# opening and the closing shots, otherwise just above the dialogue box; on touch between ◀ ▶ and USE.
 	var cinematic: bool = intro_active or chapter_close_active
-	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (TOUCH_HINT_WIDTH if touch_layout else minf(549.0 * TextSize.factor, 960.0 - HUD_SIDE_MARGIN * 2.0))
+	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (span_width if touch_layout else minf(549.0 * TextSize.factor, safe.size.x - HUD_SIDE_MARGIN * 2.0))
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
 	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
-	var hint_x: float = 960.0 - 32.0 - hint_width if cinematic else (TOUCH_HINT_SPAN.x if touch_layout else roundf((960.0 - hint_width) * 0.5))
+	var hint_x: float = safe.end.x - 32.0 - hint_width if cinematic else (span.x if touch_layout else roundf(safe.get_center().x - hint_width * 0.5))
 	# With no box up the hint takes the box's place at the bottom instead of floating over the floor.
-	var hint_bottom: float = DIALOGUE_BOTTOM - bar_height - HINT_GAP if bottom_bar.visible else DIALOGUE_BOTTOM
+	var hint_bottom: float = dialogue_bottom - bar_height - HINT_GAP if bottom_bar.visible else dialogue_bottom
 	var hint_y: float = maxf(94.0, top_card.position.y + card_height + HUD_CARD_GAP) if cinematic else hint_bottom - hint_height
 	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
 	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
@@ -5383,7 +5430,7 @@ func _layout_hud() -> void:
 	# The tutorial prompt, sized to its rows and centred under the card.
 	var tutorial_size: Vector2 = tutorial_text.get_minimum_size() + Vector2(32.0, 18.0)
 	tutorial_size.x = maxf(tutorial_size.x, 316.0 if tutorial_text.text.contains("\n") else 0.0)
-	var tutorial_rect: Rect2 = Rect2(Vector2(roundf(480.0 - tutorial_size.x * 0.5), top_card.position.y + card_height + 18.0), tutorial_size)
+	var tutorial_rect: Rect2 = Rect2(Vector2(roundf(safe.get_center().x - tutorial_size.x * 0.5), top_card.position.y + card_height + 18.0), tutorial_size)
 	tutorial_prompt_slot = &"under_card"
 	if tutorial_prompt.visible and (_covers_station_name(tutorial_rect) or _station_art_overlap(tutorial_rect) > 0.0):
 		tutorial_rect.position = _tutorial_prompt_place(tutorial_rect, touch_layout)
@@ -5421,12 +5468,12 @@ func _tutorial_prompt_place(rect: Rect2, touch_layout: bool) -> Vector2:
 			top_right = minf(top_right, debug_tools.debug_button.position.x)
 		var best: Vector2 = Vector2(-1.0, top_card.position.y)
 		var best_overlap: float = rect.get_area() * TUTORIAL_ART_OVERLAP
-		var x: float = HUD_SIDE_MARGIN
+		var x: float = screen_shape.safe_rect.position.x + HUD_SIDE_MARGIN
 		while x + rect.size.x <= top_right - HUD_CARD_GAP:
 			var place: Rect2 = Rect2(Vector2(x, top_card.position.y), rect.size)
 			if not _covers_station_name(place):
 				var overlap: float = _station_art_overlap(place)
-				var nearer: bool = best.x < 0.0 or absf(x + rect.size.x * 0.5 - 480.0) < absf(best.x + rect.size.x * 0.5 - 480.0)
+				var nearer: bool = best.x < 0.0 or absf(x + rect.size.x * 0.5 - screen_shape.safe_rect.get_center().x) < absf(best.x + rect.size.x * 0.5 - screen_shape.safe_rect.get_center().x)
 				if overlap < best_overlap or (overlap == best_overlap and nearer):
 					best = place.position
 					best_overlap = overlap
@@ -5435,9 +5482,10 @@ func _tutorial_prompt_place(rect: Rect2, touch_layout: bool) -> Vector2:
 			tutorial_prompt_slot = &"card_place"
 			return best
 	if not bottom_bar.visible:
-		var centre: float = TOUCH_HINT_CENTRE_X if touch_layout and rect.size.x <= TOUCH_HINT_WIDTH else 480.0
+		var span: Vector2 = _touch_hint_span()
+		var centre: float = (span.x + span.y) * 0.5 if touch_layout and rect.size.x <= span.y - span.x else screen_shape.safe_rect.get_center().x
 		tutorial_prompt_slot = &"bottom"
-		return Vector2(roundf(centre - rect.size.x * 0.5), DIALOGUE_BOTTOM - rect.size.y)
+		return Vector2(roundf(centre - rect.size.x * 0.5), _dialogue_bottom() - rect.size.y)
 	tutorial_prompt_slot = &"waiting"
 	tutorial_prompt.hide()
 	return rect.position
@@ -5480,6 +5528,9 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 		answers = MIRROR_CHOICE_TEXT
 	elif choice_context == "lane":
 		answers = LANE_CHOICE_TEXT
+	var safe: Rect2 = screen_shape.safe_rect
+	var left: float = safe.position.x + 42.0
+	var right: float = safe.end.x - 42.0
 	var buttons: Array[Button] = [touch_choice_1, touch_choice_2]
 	for index: int in 2:
 		var button: Button = buttons[index]
@@ -5497,16 +5548,16 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 		var touch_height: float = maxf(76.0, maxf(touch_choice_1.get_minimum_size().y, touch_choice_2.get_minimum_size().y))
 		var question_top: float = speaker.global_position.y if speaker.visible else bottom_bar.position.y
 		var touch_top: float = question_top - 10.0 - touch_height
-		_set_rect(touch_choice_1, Vector2(42.0, touch_top), Vector2(428.0, touch_height))
-		_set_rect(touch_choice_2, Vector2(490.0, touch_top), Vector2(428.0, touch_height))
+		_set_rect(touch_choice_1, Vector2(left, touch_top), Vector2((right - left - 20.0) * 0.5, touch_height))
+		_set_rect(touch_choice_2, Vector2(safe.get_center().x + 10.0, touch_top), Vector2((right - left - 20.0) * 0.5, touch_height))
 		return
 	# Right-aligned at x 918, so the widest still leaves the side margin on the left.
-	var width: float = minf(522.0 * TextSize.factor, 918.0 - HUD_SIDE_MARGIN)
+	var width: float = minf(522.0 * TextSize.factor, right - safe.position.x - HUD_SIDE_MARGIN)
 	var height: float = maxf(40.0 * TextSize.factor, 0.0)
-	_set_rect(touch_choice_1, Vector2(918.0 - width, top), Vector2(width, height))
+	_set_rect(touch_choice_1, Vector2(right - width, top), Vector2(width, height))
 	height = maxf(height, touch_choice_1.get_minimum_size().y)
-	_set_rect(touch_choice_1, Vector2(918.0 - width, top), Vector2(width, height))
-	_set_rect(touch_choice_2, Vector2(918.0 - width, top + height + 6.0 * TextSize.factor), Vector2(width, maxf(height, touch_choice_2.get_minimum_size().y)))
+	_set_rect(touch_choice_1, Vector2(right - width, top), Vector2(width, height))
+	_set_rect(touch_choice_2, Vector2(right - width, top + height + 6.0 * TextSize.factor), Vector2(width, maxf(height, touch_choice_2.get_minimum_size().y)))
 
 
 ## The HUD is refreshed every frame, so these write a value only when it differs. A theme override
