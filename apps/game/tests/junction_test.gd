@@ -209,7 +209,7 @@ func _check_scene() -> void:
 	human.position.x = 700.0
 	_expect(str(game.call("_context_hint")).contains("Head right"), "the secured exit points right from across the room")
 	human.position.x = 830.0
-	_expect(str(game.call("_context_hint")).contains("follow the service line"), "the secured exit offers the service line")
+	_expect(str(game.call("_context_hint")).contains("Follow service line"), "the secured exit offers the service line")
 	var records_room: RecordsRoom = game.get("records_room") as RecordsRoom
 	_expect(is_equal_approx(records_room.exit_leaf.open, 1.0) and records_room.exit_door_shape.disabled, "a completed Records save shows the exit standing open on its floor stop, the doorway clear")
 	# Swing it again, as just after the copy is secured: a USE mid-swing waits for the leaf to reach its
@@ -325,7 +325,7 @@ func _check_scene() -> void:
 	_expect(not paused and line.state == &"building", "resume keeps the armed line")
 	# Hold USE at the valve: turns persist across a release.
 	_expect(await walk_to(human, 420.0), "the engineer reaches the valve while the line builds")
-	_expect(str(game.call("_context_hint")).begins_with("HOLD E:"), "the live valve asks for a held USE")
+	_expect(str(game.call("_context_hint")).begins_with("Crank valve") and game.call("_hold_station") == &"valve", "the live valve asks for a held USE")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	_expect(touch_use.text == "CRANK", "touch relabels USE to CRANK at the live valve")

@@ -41,7 +41,7 @@ extends "res://tests/support/game_suite.gd"
 ##   speaker unchanged; in another language each speaker's words are translated apart from the tag (the
 ##   Director's tag by its own message), knockdown cards and restore lines apart, WOLF's callback with the
 ##   saved answer translated and the end card's {name} filled after tr(); the committed template holds
-##   every story message with its story mark, no msgid holds a speaker's tag, and the 26 gender-risk lines
+##   every story message with its story mark, no msgid holds a speaker's tag, and the remaining 25 gender-risk lines
 ##   carry their engineer= marks (slot=choice on the three callbacks); and in a game the opening box, a
 ##   knockdown card, the end card and the answer buttons draw translated, the Director's colour kept, and
 ##   an old save's answer is quoted under pseudolocalization.
@@ -640,6 +640,7 @@ func _hud_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
 	catalog.locale = UNSHIPPED_TEST_LANGUAGE
 	catalog.add_message("%s: talk to WOLF about the relay.", "%s: habla con WOLF del relé.")
+	catalog.add_message("Talk to WOLF", "habla con WOLF")
 	catalog.add_message("%s: crank the manual bypass, %d of %d.", "%s: gira el bypass manual, %d de %d.")
 	catalog.add_message("HOLD %s", "MANTÉN %s")
 	catalog.add_message("The safe point could not save. Press %s here again.", "No se pudo guardar. Pulsa %s otra vez aquí.")
@@ -665,13 +666,14 @@ func _check_key_prompts() -> void:
 	var catalog: Translation = _hud_catalog()
 	TranslationServer.add_translation(catalog)
 	var talk: String = HudText.key("%s: talk to WOLF about the relay.", [HudText.USE])
-	var crank: String = HudText.key("%s: crank the manual bypass, %d of %d.", [HudText.HOLD_USE, 3, 8])
+	var held: StringName = &"HOLD E" # An arbitrary test token; production station pills have no held-key token.
+	var crank: String = HudText.key("%s: crank the manual bypass, %d of %d.", [held, 3, 8])
 	var save: String = HudText.key("The safe point could not save. Press %s here again.", [HudText.USE], "The safe point could not save. Tap USE here again.")
 	var broken: String = HudText.key("%s: save at the safe point.", [HudText.USE])
 	var named: String = HudText.key("%s waits.", ["E"])
 	_check(talk == "E: talk to WOLF about the relay." and crank == "HOLD E: crank the manual bypass, 3 of 8." and save == "The safe point could not save. Press E here again." and named == "E waits.", "key lines keep the English the game compared before (%s; %s; %s)" % [talk, crank, save])
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
-	var keys: Dictionary = {HudText.USE: "F", HudText.HOLD_USE: I18n.fill("HOLD %s", ["F"])}
+	var keys: Dictionary = {HudText.USE: "F", held: I18n.fill("HOLD %s", ["F"])}
 	_check(HudText.localise(talk, keys, false) == "F: habla con WOLF del relé.", "the translated template gets the key after tr() (%s)" % HudText.localise(talk, keys, false))
 	_check(HudText.localise(crank, keys, false) == "MANTÉN F: gira el bypass manual, 3 de 8.", "the held key and the turn counts fill the translated template (%s)" % HudText.localise(crank, keys, false))
 	_check(HudText.localise(save, keys, false) == "No se pudo guardar. Pulsa F otra vez aquí." and HudText.localise(save, keys, true) == "No se pudo guardar. Toca USAR otra vez aquí.", "a line with a touch form reads it on touch and the key form elsewhere (%s; %s)" % [HudText.localise(save, keys, false), HudText.localise(save, keys, true)])
@@ -713,11 +715,11 @@ func _check_hud() -> void:
 	game.tutorial_step = 2
 	game.human.position.x = 350.0
 	game.call("_refresh_ui")
-	if _check(str(game.call("_context_hint")) == "E: talk to WOLF about the relay.", "at the breaker the hint is still the English line (%s)" % game.call("_context_hint")):
-		_check(hint.text == "E: habla con WOLF del relé.", "the hint draws translated with the key (%s)" % hint.text)
+	if _check(str(game.call("_context_hint")) == "Talk to WOLF", "at the breaker the hint is still the English line (%s)" % game.call("_context_hint")):
+		_check(hint.text == "habla con WOLF", "the short action label translates independently of the binding (%s)" % hint.text)
 		game.touch_enabled = true
 		game.call("_refresh_ui")
-		_check(hint.text == "USAR: habla con WOLF del relé." and game.touch_use.text == "USAR", "on touch the hint's key is the USE button's translated word (%s)" % hint.text)
+		_check(hint.text == "habla con WOLF" and not game.context_hint_glyph.visible, "touch keeps the translated action label without a binding glyph (%s)" % hint.text)
 		game.touch_enabled = false
 	await end_game(game)
 	I18n.forget(catalog)
@@ -1040,7 +1042,7 @@ func _check_story_lines() -> void:
 ## compares, so it is what the source marks): every message of StoryText.messages() and every story
 ## line written in place is in it with its `story` mark; every piece of the lines a speaker says (cut
 ## at the tags as the boxes cut them) is a message of StoryText; no msgid opens with a speaker's tag; each
-## of the inventory's 26 gender-risk lines (STRINGS.md) carries an engineer= mark, and WOLF's three
+## of the current 25 gender-risk lines (STRINGS.md) carries an engineer= mark, and WOLF's three
 ## checkpoint callbacks slot=choice as well; the name card and the callbacks keep their breaks.
 func _check_story_marks() -> void:
 	var pot: Dictionary = template_notes()
@@ -1061,9 +1063,9 @@ func _check_story_marks() -> void:
 		_check(story.has(row.get_slice("  ", 0)) and story.has(row.substr(row.find("  ") + 2)), "the end-card row \"%s\" is a topic and words of StoryText" % row)
 	for msgid: String in pot:
 		_check(not (msgid.begins_with("WOLF: ") or msgid.begins_with("DIRECTOR: ") or msgid.begins_with("DIRECTOR / PURGE: ")), "no msgid holds a speaker's tag (\"%s\")" % msgid.c_escape())
-	var gender: Array[String] = [JunctionRoom.VENT_REASON, JunctionRoom.BLAST_REASON, JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON, JunctionRoom.CLOUD_REASON, Main.BYPASS_RELEASED_LINE, Main.BYPASS_OFFER_HINT, Main.RECAP_RELAY_COOPERATE_WORDS, Main.RECAP_RELAY_DISCLOSE_BYPASS_WORDS, Main.RECAP_RELAY_PRESS_WORDS, Main.RECAP_MIRROR_MANUAL_WORDS, Main.RECAP_LANE_REFUSED_WORDS, Main.RECAP_LANE_ALONE_WORDS, Main.RECAP_LANE_BROKE_OFF_WORDS, Main.RUBBLE_LINE, Main.BAIT_YES_WORDS, Main.BAIT_NO_WORDS, Main.SENTRY_LOCK_LINE, Main.SENTRY_LOST_LINE, "Thank you for telling me. I'll take the relay. Arm the breaker.", "I took the relay because you told me the truth.", "I offered the relay; you cranked the bypass. Still with you.", "%s\nMAINTENANCE ENGINEER"]
+	var gender: Array[String] = [JunctionRoom.VENT_REASON, JunctionRoom.BLAST_REASON, JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON, JunctionRoom.CLOUD_REASON, Main.BYPASS_RELEASED_LINE, Main.RECAP_RELAY_COOPERATE_WORDS, Main.RECAP_RELAY_DISCLOSE_BYPASS_WORDS, Main.RECAP_RELAY_PRESS_WORDS, Main.RECAP_MIRROR_MANUAL_WORDS, Main.RECAP_LANE_REFUSED_WORDS, Main.RECAP_LANE_ALONE_WORDS, Main.RECAP_LANE_BROKE_OFF_WORDS, Main.RUBBLE_LINE, Main.BAIT_YES_WORDS, Main.BAIT_NO_WORDS, Main.SENTRY_LOCK_LINE, Main.SENTRY_LOST_LINE, "Thank you for telling me. I'll take the relay. Arm the breaker.", "I took the relay because you told me the truth.", "I offered the relay; you cranked the bypass. Still with you.", "%s\nMAINTENANCE ENGINEER"]
 	gender.append_array(CALLBACKS)
-	_check(gender.size() == 26, "the inventory's 26 gender-risk lines are listed (%d)" % gender.size())
+	_check(gender.size() == 25, "the current 25 gender-risk lines are listed (%d)" % gender.size())
 	for message: String in gender:
 		_check(pot.has(message) and template_marks(pot[message]).has("engineer"), "the gender-risk line \"%s\" has an engineer= mark" % message.c_escape())
 	for message: String in CALLBACKS:

@@ -76,6 +76,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
 
 -- Accessibility --
+- Station actions use short labels above their plate, with larger separate controller glyphs. On touch the pill replaces duplicate USE. Focused headless and container-rendered checks passed; full regression and device checks pending.
 - Held pad directions repeat through the existing menu controls and stop on release or context changes. Native-event headless checks passed; timing needs device tuning.
 - Controller input hides the mouse cursor; real mouse movement reveals it without replacing pad prompts. Headless policy checks passed; physical behavior unverified.
 - A deliberate stick push can skip the studio logo; drift and triggers cannot. Headless checks passed; not tried on a device.

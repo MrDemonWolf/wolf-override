@@ -104,6 +104,9 @@ func handle_unhandled(event: InputEvent) -> bool:
 		if target == null and (not _can_walk() or not _floor(point)):
 			return false
 		active = {"id": id, "target": target, "point": point, "cancelled": false, "fired": false, "hold": &""}
+		# Keep the pressed canvas target stable through the crank's first-frame alignment lock.
+		if target != null and target.kind == Tappable.Kind.USE:
+			active["rect"] = Tappable.canvas_rect(game.context_hint)
 		if target != null and _can_walk() and not String(game.call("_hold_station")).is_empty() and (target.kind == Tappable.Kind.USE or target.kind == Tappable.Kind.WORLD and _reached(target) and game.call("_hold_station") == target.hold_station):
 			active["fired"] = true
 			active["hold"] = game.call("_hold_station")
@@ -172,6 +175,27 @@ func advance(delta: float) -> void:
 		target.feedback(target == hovered and game.input_mode.pointer_focus and _available(target), not active.is_empty() and active["target"] == target and not active["cancelled"], game.impact.reduce_motion)
 
 
+## Resolves the same currently reachable station as physical USE, using the existing registry and gates.
+## It never extends reach or performs an interaction; an owned crank survives its presentation lock.
+func prompt_target() -> Tappable:
+	for target: Tappable in targets:
+		if target.kind == Tappable.Kind.WORLD and _available(target, true) and _reached(target):
+			return target
+	return null
+
+
+## Drawn station labels are shared placement obstacles, including the separately owned COOLANT FAULT cue.
+func prompt_obstacles() -> Array[Rect2]:
+	var obstacles: Array[Rect2] = []
+	for target: Tappable in targets:
+		if target.kind != Tappable.Kind.WORLD:
+			continue
+		for item: CanvasItem in target.regions:
+			if item is Label and item.is_visible_in_tree() and item.modulate.a >= 0.05 and item.self_modulate.a >= 0.05:
+				obstacles.append(Tappable.canvas_rect(item))
+	return obstacles
+
+
 ## Hides ordinary station-name glyphs during story reading. Self alpha preserves the room's edge fade;
 ## the fault tag has its own warning/fade owner. The plate's gauge stays visible only for active cranking.
 func show_station_names(show: bool) -> void:
@@ -232,8 +256,12 @@ func _reached(target: Tappable) -> bool:
 
 
 ## Dialogue/objective targets can be read without walking; world targets require live engineer control.
-func _available(target: Tappable) -> bool:
-	return (target.chapters.is_empty() or game.state.chapter_id in target.chapters) and (not target.enabled.is_valid() or target.enabled.call()) and (target.kind != Tappable.Kind.WORLD or _can_walk())
+func _available(target: Tappable, for_prompt: bool = false) -> bool:
+	# Presentation keeps an owned crank through its short alignment step; hit tests keep the normal lock.
+	var controls: bool = _can_walk()
+	if for_prompt and _can_read() and not game.call("_conversation_active") and not target.hold_station.is_empty():
+		controls = controls or holding(target.hold_station)
+	return (target.chapters.is_empty() or game.state.chapter_id in target.chapters) and (not target.enabled.is_valid() or target.enabled.call()) and (target.kind != Tappable.Kind.WORLD or controls)
 
 
 ## The nearest actual art/label hit wins before any expanded margin; HUD reading wins over world art.

@@ -536,14 +536,14 @@ func _check_scene() -> void:
 		var line: String = str(game.get("status_line"))
 		var hint: String = str(game.call("_context_hint"))
 		if parked:
-			agreed[0] = agreed[0] and line == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and hint == "E: drop the tank. It's parked on the mark."
+			agreed[0] = agreed[0] and line == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and hint == "Drop tank on mark"
 		else:
 			agreed[0] = agreed[0] and line == "Wait. WOLF hasn't got it on the mark yet." and hint == "Wait for WOLF to park it on the mark."
 		return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) <= 0.5 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0, 300), "WOLF crosses to the far end of the lane and the sentry parks on the mark, facing him")
 	_expect(agreed[0], "after an early press the \"Wait\" and its hint hold until the sentry parks, then the line and the hint both say it is on the mark")
 	for _frame: int in 60:
 		await physics_frame
-	_expect(str(game.get("status_line")) == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and str(game.call("_context_hint")).contains("drop the tank. It's parked"), "parked, the go line stays up beside the drop hint; nothing brings back the wait")
+	_expect(str(game.get("status_line")) == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and str(game.call("_context_hint")).contains("Drop tank on mark"), "parked, the go line stays up beside the drop hint; nothing brings back the wait")
 	# While WOLF holds it, it watches only him with its red eye and stops scanning: no beam is drawn, so
 	# nothing runs over the engineer, over WOLF or across the EXIT BOLT box between them (round 3b).
 	await physics_frame
@@ -555,7 +555,7 @@ func _check_scene() -> void:
 	_expect(await walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")
 	_expect(not game.get("fail_active") and brain.state == &"fixated", "crossing while it holds on WOLF is safe")
 	_expect(absf(human.position.x - wolf.position.x) >= M0Actor.WOLF_REACH + M0Actor.HUMAN_REACH, "WOLF drawing it stands clear of the engineer at the release (%.1f px apart)" % absf(human.position.x - wolf.position.x))
-	_expect(str(game.call("_context_hint")).contains("drop the tank. It's parked") and game.call("_drop_ready"), "with it parked the release offers the drop")
+	_expect(str(game.call("_context_hint")).contains("Drop tank on mark") and game.call("_drop_ready"), "with it parked the release offers the drop")
 	await physics_frame
 	_expect(room.mark_lit(), "the floor brackets light up with the sentry's body inside them")
 	game.set("touch_enabled", true)
@@ -583,7 +583,7 @@ func _check_scene() -> void:
 	_expect(await wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0, 240) and wolf.body_sprite.flip_h, "after Continue from autosave C WOLF waits by the hatch, facing back at the engineer")
 	_expect(await walk_to(human, JunctionRoom.BOLT_X), "the engineer reaches the exit bolt")
 	_expect(wolf.position.x - M0Actor.WOLF_REACH > human.position.x + M0Actor.HUMAN_REACH - 2.0 * M0Actor.AVOID_TOLERANCE and wolf.position.x - M0Actor.WOLF_REACH > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "at the bolt the engineer and WOLF both stand clear of each other and of the tank (WOLF %.0f, engineer %.0f)" % [wolf.position.x, human.position.x])
-	_expect(str(game.call("_context_hint")).contains("pop the exit bolt"), "the bolt panel offers USE")
+	_expect(str(game.call("_context_hint")).contains("Release exit bolt"), "the bolt panel offers USE")
 	await tap(&"interact")
 	_expect(game.get("bolt_state") == &"charging", "USE starts the bolt's whine")
 	for _frame: int in 12:
@@ -616,7 +616,7 @@ func _check_scene() -> void:
 	await physics_frame
 	_expect(human.position.x >= JunctionRoom.HATCH_REACH_MIN_X and human.position.x <= JunctionRoom.HATCH_REACH_MAX_X + 1.0, "walking on, the engineer reaches the door and stops behind WOLF (x %.0f)" % human.position.x)
 	_expect(wolf.position.x - M0Actor.WOLF_REACH >= human.position.x + M0Actor.HUMAN_REACH - 1.0, "at the door the engineer and WOLF are not drawn over each other")
-	_expect(str(game.call("_context_hint")) == "E: leave through the door.", "at the door the hint offers the way out")
+	_expect(str(game.call("_context_hint")) == "Leave through door", "at the door the hint offers the way out")
 	await tap(&"interact")
 	var state: M0State = game.get("state") as M0State
 	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled, "USE at the open hatch clears the junction into a closing beat")

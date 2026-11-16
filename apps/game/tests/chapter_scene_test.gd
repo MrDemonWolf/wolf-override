@@ -18,9 +18,9 @@ func _run() -> void:
 	game.set("state", state)
 	game.call("_sync_scene")
 	(game.get_node("Human") as M0Actor).position.x = 160.0
-	_require(not str(game.call("_context_hint")).contains("enter records"), "checkpoint entry hint stays hidden outside safe-point reach")
+	_require(not str(game.call("_context_hint")).contains("Enter records"), "checkpoint entry hint stays hidden outside safe-point reach")
 	(game.get_node("Human") as M0Actor).position.x = 876.0
-	_require(str(game.call("_context_hint")).contains("enter records"), "checkpoint entry hint appears at the safe point")
+	_require(str(game.call("_context_hint")).contains("Enter records"), "checkpoint entry hint appears at the safe point")
 	game.call("_interact_checkpoint")
 	_require(state.chapter_id == "records" and FileAccess.file_exists(path), "checkpoint opens and saves a second room")
 	game.call("_refresh_ui")
@@ -122,7 +122,7 @@ func _run() -> void:
 	over_safe_point.human_position = Vector2(873.5, 410.0)
 	over_safe_point.save_to_disk(path)
 	game.call("_load_game")
-	_require(absf(human.position.x - (876.0 - 35.0 - M0Actor.HUMAN_REACH + 6.0)) <= 0.5 and not human.body_sprite.flip_h and str(game.call("_context_hint")).contains("enter records"), "Continue over the SAFE POINT console puts the engineer beside it, facing it and in reach (x %.1f)" % human.position.x)
+	_require(absf(human.position.x - (876.0 - 35.0 - M0Actor.HUMAN_REACH + 6.0)) <= 0.5 and not human.body_sprite.flip_h and str(game.call("_context_hint")).contains("Enter records"), "Continue over the SAFE POINT console puts the engineer beside it, facing it and in reach (x %.1f)" % human.position.x)
 	var over_queue: M0State = _checkpoint_state(State.PRESS)
 	over_queue.enter_records()
 	over_queue.preserve_purge_trace()

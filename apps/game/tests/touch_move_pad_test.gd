@@ -94,6 +94,9 @@ func _run() -> void:
 	game.call("_drop_box_queue")
 	game.status_line = ""
 	game.tutorial_step = 2
+	game.stakes_spoken = true
+	# Test the fallback USE button between stations; a reachable action now uses its pill instead.
+	game.debug_place(250.0, 200.0)
 	touch.position = Vector2(100, 200)
 	game.call("_note_input_device", touch)
 	await settle(3)
@@ -104,6 +107,7 @@ func _run() -> void:
 	drag.position = touch.position + Vector2(90, 0)
 	game.call("_input", drag)
 	_expect(game.human.touch_axis > 0.0, "native HUD drag reaches the engineer without global action injection")
+	_expect(game.interaction_target_at(game.human.position.x).is_empty() and game.touch_use.visible, "the between-stations fixture exposes the fallback USE button")
 	other.pressed = true
 	other.position = game.touch_use.get_global_rect().get_center()
 	root.push_input(other, true)

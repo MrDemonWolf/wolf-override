@@ -3579,3 +3579,100 @@ msgstr "방향 패드 아래"
 #: scripts/game_settings.gd scripts/main.gd
 msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
 msgstr "컨트롤러 아이콘: Kenney(CC0), 글꼴 변환: univeous(MIT)."
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6194
+#: scripts/main.gd:6209
+#: scripts/main.gd:6243
+msgid "Continue"
+msgstr "계속"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+#: scripts/main.gd:6329
+msgid "Leave through door"
+msgstr "문으로 나가기"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+msgid "Inspect source"
+msgstr "자료 조사"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6209
+msgid "Follow service line"
+msgstr "정비 통로 따라가기"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6212
+msgid "Copy purge trace"
+msgstr "삭제 기록 복사"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6216
+msgid "Examine mirror"
+msgstr "미러 포트 조사"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6219
+msgid "Secure copy"
+msgstr "사본 보관"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+msgid "Enter records"
+msgstr "기록실 입장"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+#: scripts/main.gd:6230
+msgid "Read display"
+msgstr "화면 읽기"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6227
+msgid "Save checkpoint"
+msgstr "체크포인트 저장"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6236
+#, c-format
+msgid "Crank bypass · %d/%d"
+msgstr "바이패스 돌리기 · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+msgid "Talk to WOLF"
+msgstr "WOLF와 대화"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+#: scripts/main.gd:6276
+msgid "Arm breaker"
+msgstr "차단기 작동"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6248
+msgid "Signal WOLF"
+msgstr "WOLF에게 신호"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6278
+msgid "Reset breaker"
+msgstr "차단기 재설정"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6282
+#, c-format
+msgid "Crank valve · %d/%d"
+msgstr "밸브 돌리기 · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6323
+msgid "Release exit bolt"
+msgstr "출구 잠금 해제"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6342
+msgid "Drop tank on mark"
+msgstr "표시 위에 탱크 투하"

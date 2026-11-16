@@ -3579,3 +3579,100 @@ msgstr "十字キー下"
 #: scripts/game_settings.gd scripts/main.gd
 msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
 msgstr "コントローラーアイコン：Kenney（CC0）。フォント変換：univeous（MIT）。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6194
+#: scripts/main.gd:6209
+#: scripts/main.gd:6243
+msgid "Continue"
+msgstr "続ける"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+#: scripts/main.gd:6329
+msgid "Leave through door"
+msgstr "扉から出る"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+msgid "Inspect source"
+msgstr "資料を調べる"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6209
+msgid "Follow service line"
+msgstr "整備通路を進む"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6212
+msgid "Copy purge trace"
+msgstr "消去の記録をコピー"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6216
+msgid "Examine mirror"
+msgstr "ミラーポートを調べる"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6219
+msgid "Secure copy"
+msgstr "コピーを保管"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+msgid "Enter records"
+msgstr "記録室に入る"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+#: scripts/main.gd:6230
+msgid "Read display"
+msgstr "画面を読む"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6227
+msgid "Save checkpoint"
+msgstr "チェックポイントを保存"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6236
+#, c-format
+msgid "Crank bypass · %d/%d"
+msgstr "バイパスを回す · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+msgid "Talk to WOLF"
+msgstr "WOLFと話す"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+#: scripts/main.gd:6276
+msgid "Arm breaker"
+msgstr "ブレーカーを入れる"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6248
+msgid "Signal WOLF"
+msgstr "WOLFに合図する"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6278
+msgid "Reset breaker"
+msgstr "ブレーカーを戻す"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6282
+#, c-format
+msgid "Crank valve · %d/%d"
+msgstr "バルブを回す · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6323
+msgid "Release exit bolt"
+msgstr "出口のボルトを外す"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6342
+msgid "Drop tank on mark"
+msgstr "印の上にタンクを落とす"

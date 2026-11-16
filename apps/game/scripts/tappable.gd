@@ -4,9 +4,9 @@ extends Node
 ## so camera movement, text size and screen shape never need a second hit-box layout.
 
 enum Kind { WORLD, DIALOGUE, OBJECTIVE, USE }
-## Brief B11 target floors: 24 canvas px for a mouse, 58 for phone touch. Larger art keeps its bounds.
-const MOUSE_MIN: float = 24.0
-const TOUCH_MIN: float = 58.0
+## Shared pointer hit floor and phone density in canvas px; larger art keeps its authored bounds.
+static var MOUSE_MIN: float = UiTokens.px("density.pointer-hit-min")
+static var TOUCH_MIN: float = UiTokens.px("density.phone")
 ## Provisional feedback strengths; timing reuses the existing button-motion tokens.
 const HOVER_GAIN: float = 1.12
 const PRESS_GAIN: float = 0.88
@@ -42,6 +42,22 @@ static func canvas_rect(item: CanvasItem) -> Rect2:
 	if item is Sprite2D:
 		return item.get_global_transform_with_canvas() * item.get_rect()
 	return Rect2()
+
+
+## Live prompt anchor in canvas px: a registered plate, otherwise visible art; hidden nodes give no anchor.
+## Plate geometry stays stable while speech fades its ink, so an active touch hold never jumps to the wheel.
+func prompt_rect() -> Rect2:
+	var art: Rect2
+	for item: CanvasItem in regions:
+		if not is_instance_valid(item) or not item.is_visible_in_tree():
+			continue
+		if item is Label:
+			return canvas_rect(item)
+		if item.modulate.a < 0.05 or item.self_modulate.a < 0.05:
+			continue
+		if not art.has_area():
+			art = canvas_rect(item)
+	return art
 
 
 ## Distance score for a visible region under [param point] (canvas px), or INF when none is hit.

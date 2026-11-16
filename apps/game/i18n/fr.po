@@ -3653,3 +3653,100 @@ msgstr "Croix directionnelle bas"
 #: scripts/game_settings.gd scripts/main.gd
 msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
 msgstr "Icônes de manette : Kenney (CC0), conversion en police par univeous (MIT)."
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6194
+#: scripts/main.gd:6209
+#: scripts/main.gd:6243
+msgid "Continue"
+msgstr "Continuer"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+#: scripts/main.gd:6329
+msgid "Leave through door"
+msgstr "Passer la porte"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+msgid "Inspect source"
+msgstr "Examiner la source"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6209
+msgid "Follow service line"
+msgstr "Suivre la voie de service"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6212
+msgid "Copy purge trace"
+msgstr "Copier la trace de purge"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6216
+msgid "Examine mirror"
+msgstr "Examiner le port miroir"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6219
+msgid "Secure copy"
+msgstr "Mettre la copie en sécurité"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+msgid "Enter records"
+msgstr "Entrer aux archives"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+#: scripts/main.gd:6230
+msgid "Read display"
+msgstr "Lire l’écran"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6227
+msgid "Save checkpoint"
+msgstr "Sauvegarder au point de contrôle"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6236
+#, c-format
+msgid "Crank bypass · %d/%d"
+msgstr "Tourner la dérivation · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+msgid "Talk to WOLF"
+msgstr "Parler à WOLF"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+#: scripts/main.gd:6276
+msgid "Arm breaker"
+msgstr "Activer le disjoncteur"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6248
+msgid "Signal WOLF"
+msgstr "Faire signe à WOLF"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6278
+msgid "Reset breaker"
+msgstr "Réarmer le disjoncteur"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6282
+#, c-format
+msgid "Crank valve · %d/%d"
+msgstr "Tourner la vanne · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6323
+msgid "Release exit bolt"
+msgstr "Libérer le verrou de sortie"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6342
+msgid "Drop tank on mark"
+msgstr "Lâcher le réservoir sur le repère"

@@ -104,7 +104,7 @@ func _run() -> void:
 	_expect(fastest <= MAX_PAN_SPEED, "the camera pans into the room continuously (fastest %.0f px/s)" % fastest)
 	_expect(leftmost_view >= DockBay.VIEW_LEFT - 0.5, "the view never shows past the end wall into the plate's dark margin (%.1f)" % leftmost_view)
 	_expect(await wait_until(func() -> bool: return absf(camera.get_screen_center_position().x - Main.L1_ROOM_VIEW_CENTRE) <= 1.0, 120), "the camera settles on the whole room, the bay to the opening")
-	_expect(str(game.call("_context_hint")) != "E: read the Director's purge display.", "the corridor's purge display is not offered from the bay")
+	_expect(str(game.call("_context_hint")) != "Read display", "the corridor's purge display is not offered from the bay")
 	await end_game(game)
 	finish("Dock bay checks passed")
 

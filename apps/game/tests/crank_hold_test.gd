@@ -98,7 +98,7 @@ func _check_bypass_toggle() -> void:
 	await _at_bypass(game)
 	game.call("_refresh_ui")
 	var shown: String = (game.get_node("CanvasLayer/ContextHint/Text") as Label).text
-	_expect(str(game.call("_context_hint")).begins_with("HOLD E:") and shown.begins_with("E: crank"), "with TOGGLE HOLDS on the bypass prompt on screen drops HOLD (%s)" % shown)
+	_expect(str(game.call("_context_hint")).begins_with("Crank bypass") and shown.begins_with("Crank bypass") and not (game.get_node("CanvasLayer/ContextHint/Hold") as Label).visible, "with TOGGLE HOLDS on the bypass prompt on screen drops HOLD (%s)" % shown)
 	var state: M0State = game.get("state") as M0State
 	var hold: HoldUse = game.get("hold_use") as HoldUse
 	# A tap, then a move: the toggled crank stops and the turns made stay.

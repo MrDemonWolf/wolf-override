@@ -39,6 +39,8 @@ func _run() -> void:
 	game.human.position.x = Main.BYPASS_CRANK_X
 	game.call("_update_controls")
 	await frames(3)
+	var station: Tappable = pointer.prompt_target()
+	_expect(station != null and station.id == &"bypass" and station.prompt_rect().has_area(), "the prompt resolves the dispatcher's live bypass with a drawn anchor")
 	var wheel: Sprite2D = game.bypass_handle.wheel
 	var down: InputEventMouseButton = InputEventMouseButton.new()
 	down.button_index = MOUSE_BUTTON_LEFT
@@ -75,6 +77,8 @@ func _check_canvas_geometry() -> void:
 	_expect(not is_inf(target.hit_score(Vector2(60, 50), false)), "the displayed plate centre remains clickable")
 	holder.position.x += 80.0
 	_expect(Tappable.canvas_rect(plate).position.is_equal_approx(Vector2(120, 35)) and is_inf(target.hit_score(Vector2(60, 50), false)), "moving the plate updates geometry without a cached hit rectangle")
+	_expect(target.prompt_rect().is_equal_approx(Tappable.canvas_rect(plate)), "prompt and hit geometry share the same transformed plate")
 	plate.hide()
 	_expect(is_inf(target.hit_score(Vector2(140, 50), true)), "hidden plates retain geometry but cannot take a touch")
+	_expect(not target.prompt_rect().has_area(), "hidden targets supply no drawn prompt anchor")
 	holder.free()

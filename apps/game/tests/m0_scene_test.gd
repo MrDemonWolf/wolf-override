@@ -266,7 +266,7 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	game.call("_update_gameplay_camera")
 	_expect(not wolf.controlled and wolf.position.x > 400.0 and wolf.position.x < human.position.x, "WOLF stays a companion at the relay")
-	_expect(str(game.call("_context_hint")) == "E: signal WOLF to take the contact.", "after WOLF offered, the relay hint signals him instead of asking again")
+	_expect(str(game.call("_context_hint")) == "Signal WOLF", "after WOLF offered, the relay hint signals him instead of asking again")
 	await tap(&"interact")
 	if not _require(not state.door_open and game.get("wolf_heading_to_relay") and str(game.get("status_line")).contains("I've got the contact"), "WOLF sets off for the contact himself and the seal stays closed until he arrives"):
 		return
@@ -443,7 +443,7 @@ func _run() -> void:
 	_expect(human.position.x < 760.0, "locked door physically blocks the engineer")
 	if not _require(await walk_to(human, 700.0), "engineer walks to the manual bypass after refusal"):
 		return
-	_expect(str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, 0 of 8." and game.call("_hold_station") == &"bypass", "the bypass asks for a held USE and counts the turns")
+	_expect(str(game.call("_context_hint")) == "Crank bypass · 0/8" and game.call("_hold_station") == &"bypass", "the bypass asks for a held USE and counts the turns")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	_expect((game.get_node("CanvasLayer/TouchControls/Use") as Button).text == "CRANK", "on touch the USE button reads CRANK at the bypass")
@@ -481,7 +481,7 @@ func _run() -> void:
 	# the line from before the release.
 	var let_go: bool = await wait_until(func() -> bool: return not game.get("bypass_was_holding"), 30)
 	var kept: int = int(game.get("bypass_ticks"))
-	_expect(let_go and not state.door_open and kept >= 4 and str(game.get("status_line")) == "The handle holds where Rowan left it. The alarm keeps going." and str(game.call("_context_hint")) == "HOLD E: crank the manual bypass, %d of 8." % kept, "letting go keeps the turns made; the alarm keeps going")
+	_expect(let_go and not state.door_open and kept >= 4 and str(game.get("status_line")) == "The handle holds where Rowan left it. The alarm keeps going." and str(game.call("_context_hint")) == "Crank bypass · %d/8" % kept, "letting go keeps the turns made; the alarm keeps going")
 	Input.action_press(&"interact")
 	var opened: bool = await wait_until(func() -> bool: return state.door_open, 150)
 	Input.action_release(&"interact")
@@ -566,7 +566,7 @@ func _run() -> void:
 	for probe_x: int in range(553, 670, 4):
 		human.position.x = probe_x
 		var probe_hint: String = str(game.call("_context_hint"))
-		if probe_hint != "E: signal WOLF to take the contact.":
+		if probe_hint != "Signal WOLF":
 			gap_hints.append("%d: %s" % [probe_x, probe_hint])
 	human.position.x = armed_x
 	_expect(gap_hints.is_empty(), "from the relay's left edge up to the bypass's reach the hint is the relay's own (%s)" % ", ".join(gap_hints))
@@ -576,14 +576,14 @@ func _run() -> void:
 	_expect(bypass.bypass_label.modulate.a == 1.0, "in full view the MANUAL BYPASS plate shows whole")
 	var ready_x: float = float((game.get_script() as Script).get_script_constant_map()["WOLF_BYPASS_CLEAR_X"])
 	_expect(wolf.autonomous_target_x == ready_x and ready_x + M0Actor.WOLF_REACH <= 605.0 - 43.0, "at the bypass on the honest route WOLF waits off the relay, ready to take it, instead of following onto the machine")
-	_expect(str(game.call("_context_hint")) == "HOLD E: crank it yourself, or let WOLF take the relay.", "after WOLF offered, the bypass still offers the engineer-only way")
+	_expect(str(game.call("_context_hint")) == "Crank bypass · 0/8" and not game.call("_relay_refused"), "after WOLF offered, the bypass still offers the engineer-only way")
 	# Part cranked, letting WOLF take the relay is still on offer, and the hint keeps saying so.
 	Input.action_press(&"interact")
 	var part_cranked: bool = await wait_until(func() -> bool: return int(game.get("bypass_ticks")) >= 2, 120)
 	Input.action_release(&"interact")
 	await physics_frame
 	var part_ticks: int = int(game.get("bypass_ticks"))
-	_expect(part_cranked and not state.door_open and str(game.call("_context_hint")) == "HOLD E: crank on, %d of 8, or let WOLF take the relay." % part_ticks, "part cranked on the honest route, the hint counts the turns and still offers WOLF the relay")
+	_expect(part_cranked and not state.door_open and str(game.call("_context_hint")) == "Crank bypass · %d/8" % part_ticks and not game.call("_relay_refused"), "part cranked on the honest route, the hint counts the turns and still offers WOLF the relay")
 	Input.action_press(&"interact")
 	var cranked: bool = await wait_until(func() -> bool: return state.door_open, 300)
 	Input.action_release(&"interact")

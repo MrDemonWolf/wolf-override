@@ -85,9 +85,14 @@ func _run() -> void:
 	await tap(&"interact", 2)
 	_expect(game.dialogue_cleared and not game.waiting_for_choice, "reading the risk explanation does not answer or open the next question in the same press")
 	game.call("_sync_dialogue_boxes")
-	_expect(game.dialogue_cleared and not game.bottom_bar.visible and game.dialogue_boxes.size() > 1, "returning phone controls reflows the already-cleared warning into more pages")
+	# The hidden duplicate USE no longer narrows the column; explicitly resize to exercise reflow.
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	_expect(game.dialogue_cleared and not game.bottom_bar.visible and game.dialogue_boxes.size() > 1, "large phone text reflows an already-cleared warning without restoring it")
 	var cleared_page: int = game.dialogue_index
 	_expect(not game.call("_next_box") and game.dialogue_index == cleared_page, "an already-cleared line cannot consume input by advancing hidden pages")
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
 	await tap(&"interact", 2)
 	_expect(game.waiting_for_choice, "a fresh USE opens the existing relay question (x %.1f, controlled %s, conversation %s, line %s)" % [game.human.position.x, game.human.controlled, game.dialogue_is_conversation, game.status_line])
 	I18n.apply_for_checks("de")

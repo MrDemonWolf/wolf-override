@@ -610,7 +610,11 @@ func _check_corridor() -> void:
 	_expect(not bar.visible, "reading the final reply clears its panel")
 	var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
 	var hint_rect: Rect2 = hint_panel.get_global_rect()
-	_expect(hint_panel.visible and absf(hint_rect.end.y - float(game.call("_dialogue_bottom"))) <= 0.5, "with no box up the hint bar takes the box's place at the bottom (%s)" % hint_rect)
+	var target: Tappable = game.get("station_prompt_target") as Tappable
+	_expect(target != null and hint_panel.visible, "reading the reply restores the available station prompt")
+	if target != null:
+		var anchor: Rect2 = target.prompt_rect()
+		_expect(game.screen_shape.safe_rect.encloses(hint_rect) and not hint_rect.intersects(anchor), "the station prompt stays inside the safe area and clear of its plate (%s)" % hint_rect)
 	game.call("_interact")
 	await _play(0.1, "said again")
 	_expect(bar.visible or game.status_line.is_empty(), "the next line shows again")
@@ -627,7 +631,7 @@ func _check_records_exit() -> void:
 	_expect(game.state.chapter_complete and story.text == "FIRST COPY SECURED.", "the closing lines start with their first box (%s)" % story.text.c_escape())
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	await _play(2.0, "records exit")
-	_expect(speaker.text == "WOLF" and hint.text.ends_with("continue."), "WOLF's box follows, and USE at the exit offers to continue (%s)" % hint.text)
+	_expect(speaker.text == "WOLF" and hint.text == "Continue", "WOLF's box follows, and USE at the exit offers to continue (%s)" % hint.text)
 	game.call("_interact")
 	await _play(0.05, "records exit")
 	_expect(game.state.chapter_id == "records" and speaker.text == (game.call("_first_name") as String).to_upper(), "USE at the exit shows the next box rather than leaving")
@@ -717,7 +721,7 @@ func _check_story_kept() -> void:
 	_place_at_records_exit()
 	game.call("_refresh_ui")
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
-	_expect(hint.text.ends_with("continue."), "with the closing lines held back, USE at the exit offers to continue (%s)" % hint.text)
+	_expect(hint.text == "Continue", "with the closing lines held back, USE at the exit offers to continue (%s)" % hint.text)
 	game.call("_interact")
 	await process_frame
 	_expect(game.state.chapter_id == "records" and game.status_line == close and speaker.text == "WOLF", "USE at the exit brings the held-back lines back rather than leaving (%s)" % story.text.c_escape())
@@ -779,7 +783,11 @@ func _check_touch(code: String = I18n.FALLBACK) -> void:
 	var hint: Label = hint_panel.get_node("Text") as Label
 	var use: Button = game.get_node("CanvasLayer/TouchControls/Use") as Button
 	if english:
-		_expect(use.text == "CRANK" and hint.text.begins_with("HOLD CRANK:"), "on touch the crank hint names the CRANK button (%s)" % hint.text)
+		_expect(use.text == "CRANK" and hint.text.begins_with("Crank valve"), "the touch crank uses a short action label (%s)" % hint.text)
+	if hint_panel.visible:
+		_expect(game.context_hint_hold.visible and not use.visible, "the touch action pill keeps HOLD and replaces duplicate CRANK")
+	else:
+		_expect(use.visible, "walk-and-talk retains the fallback CRANK button while its pill is hidden")
 	for button: Button in [use, game.get_node("CanvasLayer/TouchControls/Left") as Button, game.get_node("CanvasLayer/TouchControls/Right") as Button]:
 		_expect(not hint_panel.get_global_rect().intersects(button.get_global_rect()), "%s: the hint bar stays clear of %s (%s vs %s)" % [code, button.text, hint_panel.get_global_rect(), button.get_global_rect()])
 	_expect(not hint_panel.get_global_rect().intersects(bar.get_global_rect()), "%s: the hint bar sits above the dialogue box" % code)
@@ -837,7 +845,7 @@ func _check_text_size(path: String) -> void:
 	settings.text_size.select(4)
 	settings.text_size.item_selected.emit(4)
 	_expect(is_equal_approx(TextSize.factor, 2.0) and GameSettings.load_config(path).get_value("video", "text_size", 0.0) == 2.0, "choosing 200% applies and saves it")
-	_expect(story.get_theme_font_size(&"font_size") == 46 and (game.get_node("CanvasLayer/ContextHint/Text") as Label).get_theme_font_size(&"font_size") == 28 and game.hud.get_theme_font_size(&"font_size") == 30 and (game.get_node("CanvasLayer/TutorialPrompt/Text") as Label).get_theme_font_size(&"font_size") == 34, "dialogue, hint, card and tutorial double")
+	_expect(story.get_theme_font_size(&"font_size") == 46 and (game.get_node("CanvasLayer/ContextHint/Text") as Label).get_theme_font_size(&"font_size") == Main.HINT_FONT_SIZE * 2 and game.hud.get_theme_font_size(&"font_size") == 30 and (game.get_node("CanvasLayer/TutorialPrompt/Text") as Label).get_theme_font_size(&"font_size") == 34, "dialogue, hint, card and tutorial double")
 	_expect(breaker_label.get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and absf(breaker_label.position.y + breaker_label.size.y - base_label_bottom) <= 2.0, "station names grow to their cap (TextSize.WORLD_MAX_FACTOR) at 200%% and grow upward from where they stood (%d px)" % breaker_label.get_theme_font_size(&"font_size"))
 	var junction_label: Label = game.junction_room.station_labels[0]
 	_expect(junction_label.get_theme_font_size(&"font_size") == roundi(JunctionRoom.LABEL_FONT_SIZE * TextSize.WORLD_MAX_FACTOR) and game.records_room.station_labels[0].get_theme_font_size(&"font_size") == roundi(13 * TextSize.WORLD_MAX_FACTOR) and game.bypass_handle.fault_tag.get_theme_font_size(&"font_size") == roundi(BypassHandle.LABEL_FONT_SIZE * TextSize.WORLD_MAX_FACTOR), "the junction's, Records' and the bypass's plates grow too")

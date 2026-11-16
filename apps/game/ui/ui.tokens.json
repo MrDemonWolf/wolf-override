@@ -1784,6 +1784,21 @@
           }
         }
       }
+    },
+    "input-glyph-scale": {
+      "$type": "number",
+      "$value": 2,
+      "$description": "Controller glyph size relative to Body, so enclosed letters can match body capitals. Keep the larger icon separate from text wrapping.",
+      "$extensions": {
+        "com.mrdemonwolf.wolfoverride": {
+          "status": "proposal",
+          "source": "4.4; registered font versus Roboto hb-view comparison; device readability remains unverified",
+          "min": 2,
+          "max": 3,
+          "step": 0.125,
+          "hard_min": 2
+        }
+      }
     }
   },
   "density": {

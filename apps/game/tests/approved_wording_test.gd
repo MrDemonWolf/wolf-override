@@ -466,7 +466,7 @@ func _check_after_blast() -> void:
 	_expect(str(game.call("_context_hint")) == "The sentry patrols past the rubble. The TANK RELEASE hides you from it.", "item 3 S1: the default hint")
 	var stations: Array = game.get_script().get_script_constant_map()["JUNCTION_STATIONS"]
 	human.position.x = float(game.call("debug_station_side_x", stations[2], JunctionRoom.ARM_X + 1.0))
-	_expect(str(game.call("_context_hint")) == "E: drop the tank. Land it with the sentry on the mark.", "item 3 S12: the release's hint")
+	_expect(str(game.call("_context_hint")) == "Drop tank on mark", "item 3 S12: the release's hint")
 	human.position.x = SentryBrain.COVER_MAX_X + 30.0
 	(game.get("sentry_brain") as SentryBrain).state = &"patrol"
 	_expect(str(game.call("_context_hint")) == "You're in its sights. Hide at the TANK RELEASE or the rubble.", "item 3 S2: out in the open")

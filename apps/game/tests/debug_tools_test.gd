@@ -760,7 +760,7 @@ func _check_zones_records() -> void:
 	human.position.x = float(purge["x_range"][1])
 	_expect(str(game.call("_context_hint")).contains("purge"), "at the purge queue range's edge the hint offers the purge queue")
 	human.position.x = float(purge["x_range"][1]) + 1.0
-	_expect(not str(game.call("_context_hint")).contains("E: copy the purge"), "just past it the purge queue is out of reach")
+	_expect(not str(game.call("_context_hint")).contains("Copy purge trace"), "just past it the purge queue is out of reach")
 	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "WOLF: mirror").get("x", -1.0)), float(constants["WOLF_MIRROR_X"])), "WOLF's mirror spot is drawn")
 	_expect(_entry(geometry["zones"], "name", "use: relay").is_empty() and _entry(geometry["hitboxes"], "name", "blast").is_empty(), "nothing from the other rooms is drawn")
 	_expect(_entry(geometry["hitboxes"], "path", "Door/CollisionShape2D").get("active") == false, "the corridor seal, out of play, is not in force here")
