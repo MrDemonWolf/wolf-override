@@ -83,6 +83,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - In Japanese and Chinese a two-row dialogue box breaks between whole words, after a comma where one sits near the middle; in Korean it breaks at a space, never inside a word.
 
 -- Settings --
+- Audio shows Master and Effects, the two controls that affect current playback; inactive Music/Voice sliders are removed and their saved values retained. Headless and rendered checks only.
 - Controller Menu cancels rebinding without changing the binding or leaving Settings; translated prompts name the button. Headless checks only.
 - Controller LB/RB switches Settings tabs and skips hidden tabs, using the debug menu's shared input decoder; rebinding keeps priority. Headless checks only.
 - Mobile Settings uses a compact header, separate Back row and scrolling tab rail; bindings use one column per input section. Headless and rendered checks only.

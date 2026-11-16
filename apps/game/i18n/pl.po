@@ -3484,3 +3484,7 @@ msgstr "Naciśnij przycisk lub porusz gałką kontrolera dla „%s”. Menu anul
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "Kontroler odłączony. Wznów grę, gdy zechcesz."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "Zmiany głośności są stosowane natychmiast."

@@ -3483,3 +3483,7 @@ msgstr "Нажми кнопку или двинь стик контроллер�
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "Контроллер отключён. Продолжи, когда захочешь."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "Изменения громкости применяются сразу."

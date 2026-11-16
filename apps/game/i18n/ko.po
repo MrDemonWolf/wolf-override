@@ -3423,3 +3423,7 @@ msgstr "%s 동작에 쓸 컨트롤러 입력을 누르세요. 메뉴: 취소."
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "컨트롤러 연결이 끊어졌습니다. 준비되면 재개하세요."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "음량 변경은 즉시 적용됩니다."

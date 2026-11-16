@@ -25,10 +25,10 @@ static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr(
 static var OTHER_ACTION_NAMES: Dictionary = {&"cycle_name": I18n.KEY.tr("cycle name")}
 ## The AudioServer buses Settings controls, by id: the ids are the settings file's [audio] keys and the
 ## bus names, never shown.
-const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
+const BUSES: Array[String] = ["Master", "Effects"]
 ## The AUDIO row caption of each of [constant BUSES], in its order (a display name, not the bus id; a
 ## static var for the marks, like ACTION_NAMES).
-static var BUS_CAPTIONS: Array[String] = [I18n.KEY.tr("Master volume"), I18n.KEY.tr("Music volume"), I18n.KEY.tr("Effects volume"), I18n.KEY.tr("Voice volume")]
+static var BUS_CAPTIONS: Array[String] = [I18n.KEY.tr("Master volume"), I18n.KEY.tr("Effects volume")]
 ## Display servers whose DisplayServer.keyboard_get_label_from_physical reads the active keyboard layout
 ## (Godot 4.7.2: DisplayServerX11, DisplayServerWayland, DisplayServerWindows, DisplayServerMacOSBase).
 ## Every other one (headless, Android, iOS, the web) has only the base version, which logs "Not supported
@@ -669,7 +669,7 @@ func select_tab(index: int) -> void:
 		else:
 			show_note(I18n.KEY.tr(VSYNC_NOTE))
 	else:
-		show_note([I18n.KEY.tr("Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Scales the dialogue, hints, cards and station names."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
+		show_note([I18n.KEY.tr("Volume changes apply immediately."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Scales the dialogue, hints, cards and station names."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
 
 
 ## Shows [param message] (English) in the note under the tabs, in the current language: tr(message), with

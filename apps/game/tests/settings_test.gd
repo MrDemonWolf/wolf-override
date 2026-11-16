@@ -11,25 +11,27 @@ func _run() -> void:
 	var corrupt: ConfigFile = ConfigFile.new()
 	for key: String in ["fps_limit", "resolution", "msaa_2d"]:
 		corrupt.set_value("video", key, {"bad": true})
-	corrupt.set_value("audio", "Music", {"bad": true})
+	corrupt.set_value("audio", "Effects", {"bad": true})
 	corrupt.set_value("controls", "deadzone", "bad")
 	corrupt.set_value("video", "fullscreen", {})
 	corrupt.set_value("video", "vsync", {})
 	corrupt.set_value("video", "reduced_motion", "bad")
 	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_I})
+	corrupt.set_value("audio", "Music", 21.0)
+	corrupt.set_value("audio", "Voice", 64.0)
 	_expect(corrupt.save(path) == OK, "the corrupt settings fixture is written")
 	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("settings_path", path)
 	game.set("save_path", "user://settings-save-test-%s.json" % OS.get_process_id())
 	root.add_child(game)
 	var malformed: ConfigFile = ConfigFile.new()
-	malformed.set_value("audio", "Music", {"bad": true})
+	malformed.set_value("audio", "Effects", {"bad": true})
 	malformed.set_value("controls", "deadzone", "bad")
-	_expect(GameSettings.number(malformed, "audio", "Music", 100.0) == 100.0 and GameSettings.number(malformed, "controls", "deadzone", 0.25) == 0.25, "malformed numeric preferences fall back safely")
+	_expect(GameSettings.number(malformed, "audio", "Effects", 100.0) == 100.0 and GameSettings.number(malformed, "controls", "deadzone", 0.25) == 0.25, "malformed numeric preferences fall back safely")
 	(game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
-	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
+	_expect(Engine.max_fps == 60 and (menu.volumes["Effects"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
 	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed and not menu.reduced_motion.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
 	var resolution_options: OptionButton = game.get("resolution_options") as OptionButton
 	_expect(resolution_options.selected == 1 and resolution_options.get_item_text(1) == "1280 × 720" and game.call("_resolution_size", resolution_options.selected) == Vector2i(1280, 720), "an unreadable window size falls back to the 1280×720 default")
@@ -98,12 +100,12 @@ func _run() -> void:
 	game.set("touch_enabled", false)
 	title_settings.pressed.emit()
 	menu.tabs.current_tab = 1
-	var music: HSlider = menu.volumes["Music"]
-	music.value = 37.0
+	var effects: HSlider = menu.volumes["Effects"]
+	effects.value = 37.0
 	var master: HSlider = menu.volumes["Master"]
 	master.value = 0.0
 	_expect(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "zero master volume mutes the mixer")
-	_expect(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music"))), 0.37), "music slider changes its live mixer bus")
+	_expect(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Effects"))), 0.37), "effects slider changes its live mixer bus")
 	menu.antialiasing.select(2)
 	menu.antialiasing.item_selected.emit(2)
 	(game.get("fps_options") as OptionButton).select(0)
@@ -112,7 +114,9 @@ func _run() -> void:
 	game.call("_on_resolution_selected", 0)
 	var config: ConfigFile = ConfigFile.new()
 	config.load(path)
-	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "resolution") == 0 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
+	_expect(config.get_value("audio", "Effects") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "resolution") == 0 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
+	_expect(menu.volumes.size() == 2 and not menu.volumes.has("Music") and not menu.volumes.has("Voice"), "Audio shows only the two controls backed by actual playback")
+	_expect(config.get_value("audio", "Music") == 21.0 and config.get_value("audio", "Voice") == 64.0, "saving active audio controls preserves legacy Music and Voice preferences")
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
 	menu.begin_capture(&"interact", "keyboard")
@@ -153,7 +157,7 @@ func _run() -> void:
 	menu.deadzone.value = 0.4
 	_expect(is_equal_approx(InputMap.action_get_deadzone(&"move_left"), 0.4), "stick deadzone applies to gameplay")
 	config.load(path)
-	_expect(config.get_value("bindings", "interact_keyboard").code == KEY_Q and config.get_value("audio", "Music") == 37.0, "remapping preserves audio and display settings")
+	_expect(config.get_value("bindings", "interact_keyboard").code == KEY_Q and config.get_value("audio", "Effects") == 37.0, "remapping preserves audio and display settings")
 	var saved: ConfigFile = config
 	menu.reset_controls()
 	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", true) == "X", "reset restores keyboard and controller defaults")
@@ -170,7 +174,7 @@ func _run() -> void:
 	root.add_child(reloaded)
 	var restored: GameSettings = reloaded.get("settings_menu") as GameSettings
 	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == "B" and restored.prompt(&"move_left", true) == "AXIS 2 −", "reopening restores key, button and stick bindings")
-	_expect((restored.volumes["Music"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
+	_expect((restored.volumes["Effects"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
 	_expect((reloaded.get("resolution_options") as OptionButton).selected == 0, "a saved 960×540 window size still wins over the 1280×720 default")
 	_expect(restored.reduced_motion.button_pressed and (reloaded.get("impact") as Impact).reduce_motion, "reopening restores Reduced Motion and applies it to the impact kit")
 	restored.reduced_motion.button_pressed = false
@@ -229,7 +233,7 @@ func _check_hostile_settings() -> void:
 		root.add_child(game)
 		var menu: GameSettings = game.get("settings_menu") as GameSettings
 		_expect(not Engine.has_meta("wolf_settings_poc"), "%s does not run code from the settings file" % label)
-		_expect(Engine.max_fps == 60 and menu.vsync.button_pressed and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.prompt(&"interact", false) == "E", "%s loads default settings" % label)
+		_expect(Engine.max_fps == 60 and menu.vsync.button_pressed and (menu.volumes["Effects"] as HSlider).value == 100.0 and menu.prompt(&"interact", false) == "E", "%s loads default settings" % label)
 		game.queue_free()
 		await process_frame
 		if Engine.has_meta("wolf_settings_poc"):

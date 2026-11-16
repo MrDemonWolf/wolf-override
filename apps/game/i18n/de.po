@@ -3492,3 +3492,7 @@ msgstr "Drücke eine Controller-Taste oder bewege einen Stick für „%s“. Men
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "Controller getrennt. Setze das Spiel fort, wenn du möchtest."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "Lautstärkeänderungen werden sofort angewendet."

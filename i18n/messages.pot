@@ -321,15 +321,7 @@ msgid "Master volume"
 msgstr ""
 
 #: scripts/game_settings.gd:31
-msgid "Music volume"
-msgstr ""
-
-#: scripts/game_settings.gd:31
 msgid "Effects volume"
-msgstr ""
-
-#: scripts/game_settings.gd:31
-msgid "Voice volume"
 msgstr ""
 
 #: scripts/game_settings.gd:48
@@ -652,7 +644,7 @@ msgid "V-sync may limit the FPS cap."
 msgstr ""
 
 #: scripts/game_settings.gd:672
-msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
+msgid "Volume changes apply immediately."
 msgstr ""
 
 #: scripts/game_settings.gd:672

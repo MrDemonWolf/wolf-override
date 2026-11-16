@@ -3493,3 +3493,7 @@ msgstr "Pressione um botão ou stick do controle para “%s”. Menu cancela."
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "Controle desconectado. Retome quando quiser."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "As alterações de volume são aplicadas imediatamente."

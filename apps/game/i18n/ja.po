@@ -3423,3 +3423,7 @@ msgstr "「%s」に割り当てるコントローラーの入力を押す。メ�
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "コントローラーが切断されました。準備ができたら再開してください。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "音量の変更はすぐに反映されます。"

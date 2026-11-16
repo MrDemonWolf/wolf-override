@@ -3497,3 +3497,7 @@ msgstr "Appuie sur un bouton ou bouge un stick de la manette pour « %s ». Menu
 #. i18n: speaker=ui
 msgid "Controller disconnected. Resume when ready."
 msgstr "Manette déconnectée. Reprends quand tu veux."
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "Les changements de volume sont appliqués immédiatement."
