@@ -25,6 +25,7 @@ func _run() -> void:
 	drag.position = touch.position + Vector2(90, 0)
 	pad.observe(drag)
 	_expect(pad.axis == 1.0 and pad.offset.x == pad.radius, "long drags clamp to full right movement")
+	_expect(pad.visual_rect().size.x > pad.radius * 2.0, "visual bounds include the thumb protruding past the ring")
 	other.pressed = false
 	pad.observe(other)
 	_expect(pad.axis == 1.0, "another finger's release cannot stop the owner's movement")
@@ -135,6 +136,8 @@ func _run() -> void:
 	game.status_line = ""
 	game.call("_refresh_ui")
 	_expect(game.touch_use.visible, "USE returns when exploration resumes")
+	var protected: Array = game.debug_tools.zones.keep_clear_info()["controls_and_text"]
+	_expect(protected.any(func(entry: Dictionary) -> bool: return entry["name"] == "touch_move_pad" and entry["screen_rect"][2] > 0.0), "debug drawings reserve the visible pad footprint during exploration")
 	game.call("_pause_game")
 	_expect(game.human.touch_axis == 0.0 and game.touch_move_pad.finger == PAD.NO_FINGER, "pausing cancels the live thumb immediately")
 	game.call("_resume_game")

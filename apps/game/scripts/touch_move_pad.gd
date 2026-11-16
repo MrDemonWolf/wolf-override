@@ -90,11 +90,25 @@ func _set_axis(value: float) -> void:
 		axis_changed.emit(value)
 
 
+## The drawn centre in local canvas px, shared by rendering and overlay protection.
+func _centre() -> Vector2:
+	return origin if finger != NO_FINGER else Vector2(zone.get_center().x, zone.end.y - radius * 2.0)
+
+
+## Bounds the ring and protruding thumb in local px, including half the 2 px ring stroke.
+func visual_rect() -> Rect2:
+	if radius <= 0.0:
+		return Rect2()
+	var centre: Vector2 = _centre()
+	var thumb_radius: float = radius * THUMB_RATIO
+	return Rect2(centre - Vector2.ONE * radius, Vector2.ONE * radius * 2.0).merge(Rect2(centre + offset - Vector2.ONE * thumb_radius, Vector2.ONE * thumb_radius * 2.0)).grow(1.0)
+
+
 ## Draws a quiet idle ring, then follows the owning thumb; positions and radii use canvas px.
 func _draw() -> void:
 	if radius <= 0.0:
 		return
-	var centre: Vector2 = origin if finger != NO_FINGER else Vector2(zone.get_center().x, zone.end.y - radius * 2.0)
+	var centre: Vector2 = _centre()
 	draw_circle(centre, radius, UiTokens.color("color.role.touch.bg"))
 	draw_arc(centre, radius, 0.0, TAU, 48, UiTokens.color("color.role.touch.border"), 2.0, true)
 	draw_circle(centre + offset, radius * THUMB_RATIO, UiTokens.color("color.role.touch.border"))

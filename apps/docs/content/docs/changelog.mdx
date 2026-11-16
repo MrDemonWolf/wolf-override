@@ -93,7 +93,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Accessibility
 
-- The title action list uses tighter spacing to fit its normal-size desktop actions. Verification is pending.
+- The title action list fits its normal-size desktop actions; enlarged text still scrolls to the focused action. Headless and container checks only.
+- The touch movement prompt uses direction symbols from the bundled font. Language-suite verification is pending.
+- Touch USE stays available at a crank during its feedback line. Holding touch USE checked headlessly.
 
 - Speaker tabs fit the current name; idle crank gauges hide during dialogue while active cranking stays visible. Headless and container checks only; not played by hand.
 - Ordinary station names hide during dialogue; fault indicators retain their own visibility, and hidden names no longer catch clicks. Headless checks only.
@@ -235,6 +237,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
 
 ### Development
+
+- Debug drawings protect the floating move pad’s ring and thumb bounds. Headless checks only.
 
 - A floating phone move pad shares the engineer’s movement path and cancels on Pause; simultaneous MOVE + USE passed headless checks. The pad and extra USE button hide during ordinary dialogue; hidden touch presses release their actions. Phone stills checked at 100% and 200%. Device checks remain unfinished.
 

@@ -165,12 +165,24 @@ func _run() -> void:
 	var touch: Control = game.get_node("CanvasLayer/TouchControls") as Control
 	var right: Button = touch.get_node("Right") as Button
 	var use: Button = touch.get_node("Use") as Button
-	_expect(touch.visible and right.visible and use.visible, "touch movement and use appear during play")
-	right.button_down.emit()
-	_expect(Input.is_action_pressed(&"move_right"), "held touch direction drives the movement action")
+	var move_pad: TouchMovePad = game.get("touch_move_pad") as TouchMovePad
+	_expect(touch.visible and move_pad.visible and not right.visible and use.visible, "the move pad and USE appear during exploration")
+	var thumb: InputEventScreenTouch = InputEventScreenTouch.new()
+	thumb.position = Vector2(100, 200)
+	thumb.pressed = true
+	_expect(move_pad.begin(thumb), "the movement probe claims a free thumb")
+	var drag: InputEventScreenDrag = InputEventScreenDrag.new()
+	drag.position = thumb.position + Vector2(move_pad.radius, 0)
+	move_pad.observe(drag)
+	_expect((game.get("human") as M0Actor).touch_axis > 0.0 and not Input.is_action_pressed(&"move_right"), "thumb movement stays local instead of injecting a global action")
 	game.call("_process", 0.016)
-	right.button_up.emit()
-	_expect(not Input.is_action_pressed(&"move_right") and game.get("tutorial_step") == 1, "releasing touch stops movement and advances the tutorial")
+	thumb.pressed = false
+	move_pad.observe(thumb)
+	_expect((game.get("human") as M0Actor).touch_axis == 0.0 and game.get("tutorial_step") == 1, "releasing the thumb stops movement and advances the tutorial")
+	# Resume the control-binding probe after dialogue; native dialogue taps are covered by touch_move_pad_test.
+	game.call("_drop_box_queue")
+	game.set("status_line", "")
+	game.call("_refresh_ui")
 	await process_frame
 	use.button_down.emit()
 	await process_frame

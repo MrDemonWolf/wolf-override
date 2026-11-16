@@ -694,8 +694,8 @@ func _check_key_prompts() -> void:
 
 
 ## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant UNSHIPPED_TEST_LANGUAGE]: in the
-## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
-## prompt fills its key into the translated template; in play the top card, the tutorial and the hint
+## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another,
+## with one continue cue; in play the top card, the tutorial and the hint
 ## (keyboard, then touch, where the key is the USE button's word) are translated, and switching back to
 ## English draws the top card in English again at once (NOTIFICATION_TRANSLATION_CHANGED).
 func _check_hud() -> void:
@@ -709,7 +709,7 @@ func _check_hud() -> void:
 	await process_frame
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	_check(game.touch_use.text == "SEGUIR" and String(TranslationServer.translate("CONTINUE")) == "CONTINUAR", "the touch button's CONTINUE has its own context, apart from the title's (%s)" % game.touch_use.text)
-	_check(hint.text.begins_with("E  SEGUIR\n"), "the opening's first prompt fills its key into the translated template (%s)" % hint.text.c_escape())
+	_check(not game.context_hint.visible and game.dialogue_continue.visible, "the opening keeps its continue cue without a duplicate translated instruction panel")
 	game.call("_finish_intro")
 	await process_frame
 	game.call("_refresh_ui")

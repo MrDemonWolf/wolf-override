@@ -612,7 +612,7 @@ func shape_item(shape_node: CollisionShape2D) -> Item:
 ## Main's controls that nothing drawn may cover, by name: the touch arrows, USE, the answers and PAUSE.
 func keep_clear_controls() -> Dictionary:
 	return {
-		"touch_left": game.touch_left, "touch_right": game.touch_right, "touch_use": game.touch_use,
+		"touch_left": game.touch_left, "touch_right": game.touch_right, "touch_use": game.touch_use, "touch_move_pad": game.touch_move_pad,
 		"touch_choice_1": game.touch_choice_1, "touch_choice_2": game.touch_choice_2, "pause_button": game.pause_button,
 	}
 
@@ -635,7 +635,8 @@ func _begin_pass() -> void:
 		for property: String in controls:
 			var control: Control = controls[property] as Control
 			if control != null and control.is_visible_in_tree() and effective_alpha(control) >= MIN_ALPHA:
-				_add_clear(control, control.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, control.size), property)
+				var bounds: Rect2 = control.visual_rect() if control is TouchMovePad else Rect2(Vector2.ZERO, control.size)
+				_add_clear(control, control.get_global_transform_with_canvas() * bounds, property)
 		var labels: Dictionary = keep_clear_text()
 		for property: String in labels:
 			var label: Label = labels[property] as Label

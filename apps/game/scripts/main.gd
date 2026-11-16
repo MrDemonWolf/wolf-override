@@ -5175,7 +5175,7 @@ func _refresh_ui() -> void:
 		# Touch prompts name the on-screen buttons, in the same "button  action" form as the keys.
 		# Translated here, each row its own message with its key filled after tr() (localization PR L7b):
 		# the Label's auto-translate is off in main.tscn.
-		var move_label: String = I18n.fill(I18n.KEY.tr("%s  MOVE"), ["↔" if touch_layout else move_keys]) if touch_layout or not controller_active else tr("STICK / D-PAD MOVE")
+		var move_label: String = I18n.fill(I18n.KEY.tr("%s  MOVE"), ["◀▶" if touch_layout else move_keys]) if touch_layout or not controller_active else tr("STICK / D-PAD MOVE")
 		var read_label: String = I18n.fill(I18n.KEY.tr("%s  READ DISPLAY (optional)"), [tr("USE") if touch_layout else interact_key])
 		# The display is optional, so once the engineer heads right the tutorial only points forward; in
 		# the dock bay it points back to the breaker.
@@ -5295,7 +5295,8 @@ func _set_dialogue(hint: String) -> void:
 	# Reading has one focus; danger keeps the engineer’s escape control available.
 	if bottom_bar.visible and not _live_hazard():
 		touch_move_pad.hide()
-		if not intro_active and not chapter_close_active and not fail_active:
+		# A crank remains actionable while its feedback line is up.
+		if not intro_active and not chapter_close_active and not fail_active and _hold_station().is_empty():
 			touch_use.hide()
 	dialogue_continue.visible = bottom_bar.visible and not waiting_for_choice and not fail_active and not hatch_exit_walking
 	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
