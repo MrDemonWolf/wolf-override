@@ -20,6 +20,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Gameplay
 
+- Click or tap machines to walk up and use them; floor taps walk, and dragging cancels. Headless checks only; device play unverified.
+
 - Tab or controller View recalls the current objective in its existing card; the action can be rebound. Headless and rendered checks only.
 
 - Chapter 1 continues after the Service Junction into a maintenance annex with three record checks and saved progress; draft dialogue, not played by hand.
@@ -229,6 +231,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Development
 
+- Settings UI tests wait for input and layout frames instead of physics ticks; checked at normal and coarse frame rates.
 - Headless layout fixtures start at the configured window size; camera coverage checks exercise actual phone, tablet and ultrawide canvases.
 
 - The debug zones keep controller View for their render-box toggle while open; normal play keeps objective recall. Headless checks only.

@@ -636,6 +636,7 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var touch_use: Button = $CanvasLayer/TouchControls/Use
 ## One canvas/safe-area owner; layout readers never query the monitor work area themselves.
 var screen_shape: ScreenShape = ScreenShape.new()
+var world_input: WorldInput = WorldInput.new()
 
 @onready var touch_choice_1: Button = $CanvasLayer/TouchControls/Choice1
 @onready var touch_choice_2: Button = $CanvasLayer/TouchControls/Choice2
@@ -1155,6 +1156,7 @@ func _ready() -> void:
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
 	_setup_debug_tools()
+	_setup_world_input()
 	# Saved window settings can resize during setup, before the procedural rooms exist.
 	screen_shape.shape_changed.connect(_on_screen_shape_changed)
 	_on_screen_shape_changed.call_deferred(screen_shape.visible_rect, screen_shape.safe_rect)
@@ -1443,6 +1445,9 @@ func _start_gameplay_camera() -> void:
 
 
 func _process(delta: float) -> void:
+	world_input.advance(delta)
+	if world_input.objective_pressed:
+		_show_top_card(_objective_card_message(), OBJECTIVE_CARD_SECONDS)
 	# The intro's full-screen alarm wash and fade cost a full-screen blend even when clear: they draw
 	# only while they show something.
 	intro_alarm.visible = intro_alarm.color.a > 0.0
@@ -1458,19 +1463,19 @@ func _process(delta: float) -> void:
 		opening.tick()
 		_tick_dialogue(delta)
 		# A press shows the beat's next box, or after its last one goes on to the next beat.
-		if Input.is_action_just_pressed(&"interact") and not _next_box():
+		if (_use_pressed() or world_input.read_pressed) and not _next_box():
 			_advance_intro()
 		_refresh_ui()
 		return
 	if end_card_active:
-		if Input.is_action_just_pressed(&"interact"):
+		if _use_pressed():
 			_close_end_card()
 		return
 	_tick_engineer_step()
 	_tick_records_walk_out(delta)
 	if chapter_close_active:
 		_tick_dialogue(delta)
-		if Input.is_action_just_pressed(&"interact") and not _next_box():
+		if (_use_pressed() or world_input.read_pressed) and not _next_box():
 			_finish_chapter_close()
 		_refresh_ui()
 		return
@@ -1493,7 +1498,7 @@ func _process(delta: float) -> void:
 		# Knocked down: the card holds until RETRY, which it takes from RETRY_READY_SECONDS after the hit
 		# (only a fresh press counts: the knockdown released every held action); nothing else reads input.
 		fail_age += delta
-		if _retry_ready() and Input.is_action_just_pressed(&"interact"):
+		if _retry_ready() and _use_pressed():
 			_retry()
 		_tick_dialogue(delta)
 		_refresh_ui()
@@ -1512,14 +1517,16 @@ func _process(delta: float) -> void:
 	elif state.chapter_id == "lockdown":
 		_tick_corridor(delta, held_ticks)
 	_show_hold()
-	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right")):
+	if tutorial_step == 0 and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right") or not is_inf(human.pointer_target_x)):
 		tutorial_step = 1
 		# The first step takes the name card away; the opening lines follow once it has faded.
 		_dismiss_name_card()
 	# The purge display is optional; reaching the breaker finishes the tutorial too.
 	if tutorial_step < 2 and absf(human.position.x - 350.0) <= 52.0:
 		tutorial_step = 2
-	if waiting_for_choice:
+	if world_input.read_pressed:
+		_read_pointer_dialogue()
+	elif waiting_for_choice:
 		if Input.is_action_just_pressed(&"choice_1"):
 			_answer_choice(1)
 		elif Input.is_action_just_pressed(&"choice_2"):
@@ -1529,7 +1536,7 @@ func _process(delta: float) -> void:
 		# TRANSLATORS: WOLF, when the hidden name key gives the engineer another of their three names; %s is the full name.
 		# i18n: speaker=WOLF engineer=name
 		status_line = "WOLF: " + I18n.format(I18n.KEY.tr("%s. That name sounds like you."), [state.human_name()])
-	elif Input.is_action_just_pressed(&"interact"):
+	elif _use_pressed():
 		_interact()
 	# The opening lines start after the first step, once no top card is up (one thing to read at a time).
 	if opening_lines_held and tutorial_step >= 1 and name_card_remaining <= 0.0 and not top_card.visible:
@@ -1538,16 +1545,30 @@ func _process(delta: float) -> void:
 	_refresh_ui()
 
 
+## Physical USE and a pointer activation share the same one-frame action throughout the game tick.
+func _use_pressed() -> bool:
+	return Input.is_action_just_pressed(&"interact") or world_input.use_pressed
+
+
+## Explicitly reading a bubble advances a page/queued line, then dismisses its last page; never uses a station.
+func _read_pointer_dialogue() -> void:
+	if not _next_box():
+		if not box_queue.is_empty():
+			_next_box_now()
+		else:
+			dialogue_cleared = true
+
+
 ## Whether a crank is being worked this frame at [param station]: interact held down, or with TOGGLE
 ## HOLDS on, latched by one press and kept turning until a second press, a move, leaving the crank's
 ## reach or the crank being done (the station going away).
 func _crank_held(station: StringName) -> bool:
 	if not hold_toggle:
 		crank_latched = false
-		return human.controlled and Input.is_action_pressed(&"interact")
-	if station.is_empty() or waiting_for_choice or Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right"):
+		return human.controlled and (Input.is_action_pressed(&"interact") or world_input.holding(station))
+	if station.is_empty() or waiting_for_choice or not is_inf(human.pointer_target_x) or Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right"):
 		crank_latched = false
-	elif Input.is_action_just_pressed(&"interact"):
+	elif _use_pressed():
 		crank_latched = not crank_latched
 	return crank_latched and human.controlled
 
@@ -1944,6 +1965,7 @@ func _ask_relay() -> void:
 
 
 func _new_game() -> void:
+	world_input.cancel()
 	get_tree().paused = false
 	pause_overlay.hide()
 	Tweens.kill(intro_tween)
@@ -2238,6 +2260,7 @@ func _on_pause_button() -> void:
 
 
 func _pause_game() -> void:
+	world_input.cancel()
 	impact.stop_rumble()
 	for action: StringName in GAMEPLAY_ACTIONS:
 		Input.action_release(action)
@@ -2406,6 +2429,7 @@ func _show_pause_hint(tapped: bool) -> void:
 
 
 func _return_to_title() -> void:
+	world_input.cancel()
 	_resume_game()
 	if intro_active:
 		_finish_intro()
@@ -2460,6 +2484,9 @@ func _menu_focus_target() -> Control:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if world_input.handle_unhandled(event):
+		get_viewport().set_input_as_handled()
+		return
 	# Back or Pause on the END OF SLICE card goes on to the title, like its CONTINUE.
 	if end_card_active and not event.is_echo() and (event.is_action_pressed(&"ui_cancel") or event.is_action_pressed(&"pause_game")):
 		_close_end_card()
@@ -2553,10 +2580,16 @@ func _on_settings_back() -> void:
 		_grab_menu_focus(settings_button)
 
 
+## The shared objective-recall gate for View/Tab and tapping its card; never replaces an opening slate.
+func can_recall_objective() -> bool:
+	return not title_open and not intro_active and not end_card_active and not fail_active and not get_tree().paused and human.controlled and not waiting_for_choice and not _opening_lines_playing() and not (debug_tools != null and debug_tools.zones.visible)
+
+
 ## Tracks native input, recalls a live objective, and routes direct answer presses before focused controls.
 func _input(event: InputEvent) -> void:
 	_note_input_device(event)
-	if not event.is_echo() and event.is_action_pressed(&"show_objective") and not title_open and not intro_active and not end_card_active and not fail_active and not get_tree().paused and human.controlled and not waiting_for_choice and not _opening_lines_playing() and not (debug_tools != null and debug_tools.zones.visible):
+	world_input.observe(event)
+	if not event.is_echo() and event.is_action_pressed(&"show_objective") and can_recall_objective():
 		# Reuse the transient card without advancing a line, changing a goal or opening another menu.
 		name_card_remaining = 0.0
 		last_top_card_key = "%s:%s" % [state.chapter_id, _objective()]
@@ -2630,6 +2663,7 @@ func _note_input_device(event: InputEvent) -> void:
 
 
 func _load_game() -> void:
+	world_input.cancel()
 	get_tree().paused = false
 	pause_overlay.hide()
 	last_top_card_key = ""
@@ -2724,8 +2758,103 @@ func _load_game() -> void:
 		status_line = I18n.join(" ", [I18n.KEY.tr("Safe point restored."), state.checkpoint_callback()])
 
 
+## Registers each station's existing art and label once; hit testing and gestures live in shared components.
+func _setup_world_input() -> void:
+	world_input.game = self
+	add_child(world_input)
+	world_input.add_target(&"purge_display", ["lockdown"], [purge_terminal_art])
+	world_input.add_target(&"breaker", ["lockdown"], [breaker_art, $BreakerLabel])
+	world_input.add_target(&"relay", ["lockdown"], [relay_art, $RelayLabel, bypass_handle.fault_tag])
+	world_input.add_target(&"bypass", ["lockdown"], [bypass_handle.wheel, bypass_handle.gearbox, bypass_handle.bypass_label], &"bypass")
+	var seal: Tappable = world_input.add_target(&"exit", ["lockdown"], [checkpoint_art, $CheckpointLabel, door_visual])
+	seal.enabled = func() -> bool: return state.door_open
+	world_input.add_target(&"purge", ["records", "investigation"], [records_room.purge_art, records_room.purge_label])
+	world_input.add_target(&"mirror", ["records", "investigation"], [records_room.mirror_art, records_room.mirror_label])
+	world_input.add_target(&"exit", ["records"], [records_room.container_art, records_room.container_label, records_room.exit_front])
+	world_input.add_target(&"container", ["investigation"], [records_room.container_art, records_room.container_label])
+	var annex_exit: Tappable = world_input.add_target(&"exit", ["investigation"], [records_room.exit_front])
+	annex_exit.enabled = func() -> bool: return state.investigation_step == 3
+	world_input.add_target(&"breaker", ["junction"], [junction_room.breaker_art, junction_room.breaker_label])
+	world_input.add_target(&"valve", ["junction"], [junction_room.valve_art, junction_room.valve_label], &"valve")
+	world_input.add_target(&"vent", ["junction"], [junction_room.vent_art, junction_room.vent_label])
+	var door: Tappable = world_input.add_target(&"door", ["junction"], [junction_room.door_leaf, junction_room.door_label])
+	door.enabled = func() -> bool: return not state.door_blown
+	var arm: Tappable = world_input.add_target(&"tank_release", ["junction"], [junction_room.arm_panel_art, junction_room.arm_label])
+	arm.enabled = func() -> bool: return state.door_blown
+	world_input.add_target(&"exit", ["junction"], [junction_room.bolt_panel_art, junction_room.hatch_label])
+	var hatch: Tappable = world_input.add_target(&"exit", ["junction"], [junction_room.exit_front])
+	hatch.enabled = _exit_door_open
+	hatch.reached = func() -> bool: return _at_open_exit(human.position.x)
+	hatch.approach = func() -> float: return JunctionRoom.HATCH_REACH_MIN_X + 1.0
+	var read: Tappable = world_input.add_target(&"dialogue", [], [bottom_bar, speaker])
+	read.kind = Tappable.Kind.DIALOGUE
+	var objective: Tappable = world_input.add_target(&"objective", [], [top_card])
+	objective.kind = Tappable.Kind.OBJECTIVE
+	objective.enabled = can_recall_objective
+	var prompt: Tappable = world_input.add_target(&"use", [], [context_hint])
+	prompt.kind = Tappable.Kind.USE
+	debug_tools.menu.panel.visibility_changed.connect(world_input.cancel)
+
+
+## A station's authored working spot in world px, inside the same reach used by physical USE.
+## Floor navigation is clamped by M0Actor; this never teleports or opens a door.
+func pointer_use_x(id: StringName) -> float:
+	match state.chapter_id:
+		"lockdown":
+			match id:
+				&"purge_display": return PURGE_DISPLAY_X
+				&"breaker": return _station_side_x(CORRIDOR_STATIONS[0], human.position.x)
+				&"relay": return _station_side_x(CORRIDOR_STATIONS[1], human.position.x)
+				&"bypass": return BYPASS_CRANK_X
+				&"exit": return _station_side_x(CORRIDOR_STATIONS[2], human.position.x)
+		"records", "investigation":
+			match id:
+				&"purge": return _station_side_x(RECORDS_STATIONS[0], human.position.x)
+				&"mirror": return _station_side_x(RECORDS_STATIONS[1], human.position.x)
+				&"container": return _station_side_x(RECORDS_STATIONS[2], human.position.x)
+				&"exit": return RecordsRoom.EXIT_DOOR_X - M0Actor.HUMAN_REACH + 1.0 if state.chapter_id == "investigation" else RECORDS_CONTAINER_SIDE_X
+		"junction":
+			match id:
+				&"breaker": return _station_side_x(JUNCTION_STATIONS[0], human.position.x)
+				&"valve": return VALVE_CRANK_X
+				&"vent": return junction_room.vent_art.position.x
+				&"door": return M0State.JUNCTION_DOOR_LEFT_X - M0State.HUMAN_HALF_WIDTH
+				&"tank_release": return _station_side_x(JUNCTION_STATIONS[2], human.position.x)
+				&"exit": return _station_side_x(JUNCTION_STATIONS[3], human.position.x)
+	return human.position.x
+
+
+## The existing USE dispatcher as a target id at [param x] world px. Pointer targeting reads this same
+## priority order; it never invents a second reach, bypasses a refusal or directly changes puzzle state.
+func interaction_target_at(x: float) -> StringName:
+	if state.chapter_id == "lockdown":
+		if _at_purge_display(x): return &"purge_display"
+		if _at_bypass(x): return &"bypass"
+		if _at_breaker(x): return &"breaker"
+		if _at_relay(x): return &"relay"
+		if absf(x - CORRIDOR_STATIONS[2].x) <= CORRIDOR_STATIONS[2].z: return &"exit"
+	elif state.chapter_id in ["records", "investigation"]:
+		if state.chapter_id == "investigation" and state.investigation_step == 3 and x >= RecordsRoom.EXIT_DOOR_X - M0Actor.HUMAN_REACH:
+			return &"exit"
+		if absf(x - RECORDS_STATIONS[0].x) <= RECORDS_STATIONS[0].z: return &"purge"
+		if absf(x - RECORDS_STATIONS[1].x) <= RECORDS_STATIONS[1].z: return &"mirror"
+		if state.chapter_id == "records" and _at_records_exit(x): return &"exit"
+		if state.chapter_id == "investigation" and absf(x - RECORDS_STATIONS[2].x) <= RECORDS_STATIONS[2].z: return &"container"
+	elif state.chapter_id == "junction":
+		if _door_use(x): return &"door"
+		if absf(x - JUNCTION_STATIONS[0].x) <= JUNCTION_STATIONS[0].z: return &"breaker"
+		if absf(x - JUNCTION_STATIONS[1].x) <= JUNCTION_STATIONS[1].z: return &"valve"
+		if PressureLine.is_on_vent(x) and not state.door_blown: return &"vent"
+		if absf(x - JunctionRoom.DOOR_X) <= 40.0 and not state.door_blown: return &"door"
+		if state.door_blown and _at_arm_panel(x): return &"tank_release"
+		if x >= JunctionRoom.BOLT_REACH_MIN_X: return &"exit"
+	return &""
+
+
+## Performs one USE at the engineer's position, preserving the room's authored responses and progress.
 func _interact() -> void:
 	var x: float = human.position.x
+	var target: StringName = interaction_target_at(x)
 	tutorial_step = 2
 	# The name card never waits on the player: the first USE skips it.
 	name_card_remaining = 0.0
@@ -2753,19 +2882,19 @@ func _interact() -> void:
 		_interact_junction(x)
 		return
 	_step_beside_station(x)
-	if _at_purge_display(x):
+	if target == &"purge_display":
 		# TRANSLATORS: The Director's purge display, read as a speaker; WOLF answers in the next message. The records worker is the witness; no gendered form for them.
 		# i18n: story speaker=DIRECTOR
 		var display: String = I18n.KEY.tr("Records worker's archive marked for deletion.")
 		# TRANSLATORS: i18n: story speaker=WOLF
 		_aside("DIRECTOR / PURGE: %s\nWOLF: %s" % [display, I18n.KEY.tr("They want the source record gone. We need to preserve it.")])
-	elif _at_bypass(x):
+	elif target == &"bypass":
 		_interact_bypass()
-	elif _at_breaker(x):
+	elif target == &"breaker":
 		_interact_breaker()
-	elif _at_relay(x):
+	elif target == &"relay":
 		_interact_relay()
-	elif absf(x - 876.0) <= 52.0:
+	elif target == &"exit":
 		_interact_checkpoint()
 	else:
 		# TRANSLATORS: i18n: story speaker=narrator
@@ -3010,7 +3139,8 @@ func _interact_checkpoint() -> void:
 
 
 func _interact_records(x: float) -> void:
-	if absf(x - 190.0) <= 58.0:
+	var target: StringName = interaction_target_at(x)
+	if target == &"purge":
 		if state.preserve_purge_trace():
 			sfx_bank.play(&"chirp", -8.0)
 			# TRANSLATORS: %s is the engineer's first name. The worker is the records worker, the witness; no gendered form for them.
@@ -3021,7 +3151,7 @@ func _interact_records(x: float) -> void:
 			_aside(I18n.KEY.tr("The purge-order trace is already copied. The mirror port may confirm when the source existed."))
 		_sync_records_room()
 		_save_progress()
-	elif absf(x - 520.0) <= 58.0:
+	elif target == &"mirror":
 		if not state.purge_trace_preserved:
 			# TRANSLATORS: i18n: story speaker=narrator
 			_aside(I18n.KEY.tr("The mirror index has no context yet. Copy the purge-order trace first."))
@@ -3037,7 +3167,7 @@ func _interact_records(x: float) -> void:
 			# answer buttons show them, translated (_layout_choices).
 			# TRANSLATORS: i18n: story speaker=WOLF
 			status_line = "WOLF: %s\n1  %s     2  %s" % [I18n.KEY.tr("I found the mirror index. We can use my readout or your maintenance port."), MIRROR_CHOICE_TEXT[0], MIRROR_CHOICE_TEXT[1]]
-	elif _at_records_exit(x):
+	elif target == &"exit":
 		if state.complete_chapter():
 			# The copy goes into the security container, at its lock; the exit's bolt lets go and the door
 			# swings open (RecordsRoom.open_exit).
@@ -3453,14 +3583,15 @@ func _interact_investigation(x: float) -> void:
 			else:
 				_next_box_now()
 		return
+	var target: StringName = interaction_target_at(x)
 	var requested: int = 0
-	if absf(x - RecordsRoom.PURGE_X) <= 58.0:
+	if target == &"purge":
 		requested = 1
-	elif absf(x - RecordsRoom.MIRROR_X) <= 58.0:
+	elif target == &"mirror":
 		requested = 2
-	elif absf(x - RecordsRoom.CONTAINER_X) <= 58.0:
+	elif target == &"container":
 		requested = 3
-	if state.investigation_step == 3 and x >= RecordsRoom.EXIT_DOOR_X - M0Actor.HUMAN_REACH:
+	if target == &"exit":
 		state.investigate(4)
 		_save_progress()
 		_show_end_card()
@@ -3490,7 +3621,8 @@ func _investigation_objective() -> String:
 
 
 func _interact_junction(x: float) -> void:
-	if absf(x - JunctionRoom.BREAKER_X) <= 52.0:
+	var target: StringName = interaction_target_at(x)
+	if target == &"breaker":
 		if state.door_blown:
 			_refuse(REFUSE_SPENT, &"breaker")
 		elif pressure_line.arm():
@@ -3508,7 +3640,7 @@ func _interact_junction(x: float) -> void:
 			_refuse(REFUSE_FUSE_LIT, &"breaker")
 	elif absf(x - JunctionRoom.VALVE_X) <= 52.0 and state.door_blown:
 		_refuse(REFUSE_SPENT, &"valve")
-	elif absf(x - JunctionRoom.VALVE_X) <= 52.0:
+	elif target == &"valve":
 		match pressure_line.state:
 			&"idle":
 				_refuse(REFUSE_VALVE_DEAD, &"valve")
@@ -3523,14 +3655,14 @@ func _interact_junction(x: float) -> void:
 				_refuse(REFUSE_FUSE_LIT, &"valve")
 			_:
 				_refuse(REFUSE_SPENT, &"valve")
-	elif PressureLine.is_on_vent(x) and not state.door_blown:
+	elif target == &"vent":
 		# TRANSLATORS: i18n: story speaker=narrator
 		status_line = I18n.KEY.tr("Relief vent. It lets go when the gauge peaks; don't be standing on it.")
-	elif absf(x - JunctionRoom.DOOR_X) <= 40.0 and not state.door_blown:
+	elif target == &"door":
 		_refuse(REFUSE_DOOR, &"door")
-	elif state.door_blown and _at_arm_panel(x):
+	elif target == &"tank_release":
 		_use_arm_panel()
-	elif x >= JunctionRoom.BOLT_REACH_MIN_X:
+	elif target == &"exit":
 		_use_exit(x)
 	elif state.sentry_down:
 		# TRANSLATORS: i18n: story speaker=narrator
@@ -5273,7 +5405,7 @@ func _dialogue_read() -> bool:
 
 ## The engineer is walking on their own, with control, and nothing waits on an answer.
 func _moving_on() -> bool:
-	return human.controlled and not waiting_for_choice and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right"))
+	return human.controlled and not waiting_for_choice and (Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right") or not is_inf(human.pointer_target_x))
 
 
 ## The box on screen, or "" while there is none (held, cleared or nothing said).

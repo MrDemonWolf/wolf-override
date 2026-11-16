@@ -1,7 +1,7 @@
 class_name M0Actor
 extends CharacterBody2D
 ## One of the slice's two walking bodies, the engineer ([member actor_id] "human") or WOLF ("wolf"). Each
-## physics step it moves one of three ways: by the player's move input while [member controlled], towards
+## physics step it moves one of three ways: by player movement or a pointer destination while [member controlled], towards
 ## [member autonomous_target_x] when Main sends it somewhere on its own, or beside [member follow_target]
 ## (WOLF following the engineer). Positions and limits are world px, speeds world px per second. It also
 ## draws the control marker at its feet and dims WOLF while he walks past the engineer.
@@ -9,9 +9,14 @@ extends CharacterBody2D
 @export var actor_id: StringName = &"human"
 @onready var body_sprite: Sprite2D = get_node_or_null("BodySprite") as Sprite2D
 
+## Finite world x means a player pointer walk; INF means none. Authored autonomous targets stay separate.
+var pointer_target_x: float = INF
+
 var controlled: bool = false:
 	set(value):
 		controlled = value
+		if not value:
+			pointer_target_x = INF
 		if _marker != null:
 			_marker.queue_redraw()
 var follow_target: Node2D
@@ -115,10 +120,18 @@ func _physics_process(delta: float) -> void:
 	var edging: bool = false
 	if controlled:
 		var axis: float = Input.get_axis(&"move_left", &"move_right")
+		if axis != 0.0:
+			pointer_target_x = INF
+		elif not is_inf(pointer_target_x):
+			var distance: float = pointer_target_x - position.x
+			if absf(distance) <= ARRIVE_TOLERANCE:
+				pointer_target_x = INF
+			else:
+				axis = clampf(distance / (delta * WALK_SPEED), -1.0, 1.0)
 		velocity.x = axis * WALK_SPEED
 		if velocity.x > 0.0:
 			velocity.x = minf(velocity.x, maxf(walk_max_x - position.x, 0.0) / delta)
-		if axis == 0.0 and settle_x >= 0.0:
+		if axis == 0.0 and is_inf(pointer_target_x) and settle_x >= 0.0:
 			velocity.x = clampf(_approach(settle_x, delta), -SETTLE_SPEED, SETTLE_SPEED)
 			settling = true
 	elif autonomous_target_x != NO_TARGET:

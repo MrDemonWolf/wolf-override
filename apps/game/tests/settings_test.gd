@@ -2,6 +2,7 @@ extends "res://tests/support/game_suite.gd"
 ## Settings: values saved and loaded, hostile settings files, rebinding keys and controller buttons, the
 ## display page, the LANGUAGE row (localization PR L6) and the menus' text in another language (PR L7a).
 ## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
+## UI layout and buffered input need process frames: several physics ticks can precede one input flush.
 
 
 func _run() -> void:
@@ -137,14 +138,14 @@ func _run() -> void:
 		menu.begin_capture(&"choice_1", kind)
 		for pressed: bool in [true, false]:
 			Input.parse_input_event(controller_button(JOY_BUTTON_START, pressed))
-			await frames(2)
+			await settle(2)
 		_expect(menu.capture_action.is_empty() and not menu.cancel_button.visible and paused and menu.is_visible_in_tree(), "Menu cancels %s capture without closing Settings or unpausing" % kind)
 		_expect(menu.binding_label(&"choice_1", kind) == before_binding and FileAccess.get_file_as_string(path) == before_config, "Menu cancellation preserves %s bindings and the saved file" % kind)
 		_expect(game.get("controller_active"), "a captured controller press still updates the shared input owner")
 	menu.begin_capture(&"choice_1", "controller")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	# Native input is buffered; allow its dispatch before checking the capture result.
-	await frames(2)
+	await settle(2)
 	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation (prompt=%s paused=%s visible=%s capture=%s)" % [menu.prompt(&"choice_1", true), paused, menu.is_visible_in_tree(), menu.capture_action])
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
@@ -281,7 +282,7 @@ func _check_scrolling_pages(menu: GameSettings) -> void:
 		_expect(page is ScrollContainer and (page as ScrollContainer).follow_focus, "every Settings page scrolls to focused controls")
 	menu.select_tab(0)
 	menu.antialiasing.grab_focus()
-	await frames(6)
+	await settle(6)
 	var scroll: ScrollContainer = menu.pages[0] as ScrollContainer
 	_expect(scroll.scroll_vertical > 0 and scroll.get_global_rect().encloses(menu.antialiasing.get_global_rect()), "focus brings the last Display row fully into view (%s; page %s; control %s)" % [scroll.scroll_vertical, scroll.get_global_rect(), menu.antialiasing.get_global_rect()])
 	_expect(not scroll.get_global_rect().intersects((menu.get_node("BackButton") as Control).get_global_rect()), "scrolling rows leave Back outside the page")
@@ -292,29 +293,29 @@ func _check_scrolling_pages(menu: GameSettings) -> void:
 func _check_mobile_chrome(menu: GameSettings) -> void:
 	menu.mobile = true
 	menu.layout_for_device()
-	await frames(3)
+	await settle(3)
 	var heading: Control = menu.get_node("Title") as Control
 	var back: Control = menu.get_node("BackButton") as Control
 	_expect(not menu.tabs.visible and menu.tab_rail.visible and not heading.get_global_rect().intersects(back.get_global_rect()), "mobile uses a compact header with Back in its own row")
 	for index: int in menu.tab_buttons.size():
 		menu.tab_buttons[index].pressed.emit()
-		await frames(3)
+		await settle(3)
 		_expect(menu.tabs.current_tab == index and menu.pages[index].visible and menu.tab_buttons[index].button_pressed, "mobile tab %d selects the same page model" % index)
 	_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "the last mobile tab scrolls fully into view")
 	_expect(menu.tab_focus_target() == menu.tab_buttons[GameSettings.GENERAL_TAB], "opening mobile Settings focuses the selected visible tab")
 	var locale: String = TranslationServer.get_locale()
 	for code: String in I18n.offered():
 		I18n.apply_for_checks(code)
-		await frames(3)
+		await settle(3)
 		menu.select_tab(GameSettings.GENERAL_TAB)
-		await frames(3)
+		await settle(3)
 		_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "%s: translated mobile tabs keep General reachable" % code)
 	I18n.apply_for_checks(locale)
 
 	menu.mobile = false
 	menu.layout_for_device()
 	menu.select_tab(0)
-	await frames(3)
+	await settle(3)
 	_expect(menu.tabs.visible and not menu.tab_rail.visible and menu.tab_focus_target() == menu.tabs, "desktop restores the horizontal tab bar")
 
 
@@ -327,7 +328,7 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 			menu.text_size.item_selected.emit(TextSize.STEPS.find(factor))
 			game.call("_apply_text_size")
 			menu.select_tab(0)
-			await frames(4)
+			await settle(4)
 			_expect(menu.get_viewport_rect().encloses(menu.get_global_rect()), "%.0f%% mobile=%s: Settings stays inside the canvas during size changes" % [factor * 100, mobile_layout])
 			var heading: Control = menu.get_node("Title") as Control
 			var back: Control = menu.get_node("BackButton") as Control
@@ -335,11 +336,11 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 			_expect(menu.vsync.get_theme_font_size("font_size") == roundi(16 * factor), "%.0f%% Settings scales once, including repeated application" % (factor * 100))
 			_expect(not heading.get_global_rect().intersects(back.get_global_rect()), "%.0f%% mobile=%s: heading and Back stay separate" % [factor * 100, mobile_layout])
 			menu.antialiasing.grab_focus()
-			await frames(8)
+			await settle(8)
 			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%.0f%% mobile=%s: focused Display control stays fully visible (%s; %s)" % [factor * 100, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
 			_expect(not menu.pages[0].get_global_rect().intersects(back.get_global_rect()), "%.0f%% mobile=%s: body stays clear of Back" % [factor * 100, mobile_layout])
 			menu.select_tab(GameSettings.GENERAL_TAB)
-			await frames(4)
+			await settle(4)
 			if mobile_layout:
 				_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "%.0f%%: mobile General stays reachable" % (factor * 100))
 	var locale: String = TranslationServer.get_locale()
@@ -350,9 +351,9 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 			menu.mobile = mobile_layout
 			game.call("_apply_text_size")
 			menu.select_tab(0)
-			await frames(4)
+			await settle(4)
 			menu.antialiasing.grab_focus()
-			await frames(8)
+			await settle(8)
 			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%s 200%% mobile=%s: focused control fits (%s; %s)" % [code, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
 			if mobile_layout:
 				for button: Button in menu.tab_buttons:
@@ -363,10 +364,10 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 						_expect(word_width + padding <= button.size.x, "%s: mobile tab keeps %s whole at 200%% (word %.1f, padding %.1f, button %.1f, rail %.1f)" % [code, word, word_width, padding, button.size.x, menu.tab_rail.size.x])
 
 	I18n.apply_for_checks("en")
-	await frames(4)
+	await settle(4)
 	var english_width: float = menu.tab_rail.size.x
 	I18n.apply_for_checks("de")
-	await frames(4)
+	await settle(4)
 	_expect(menu.tab_rail.size.x > english_width, "a language change reflows the rail without changing text size again")
 	I18n.apply_for_checks(locale)
 	menu.text_size.select(0)
@@ -375,7 +376,7 @@ func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
 	game.call("_apply_text_size")
 	menu.select_tab(0)
 	menu.tabs.grab_focus()
-	await frames(4)
+	await settle(4)
 
 
 ## Shoulder presses change pages, wrap and skip hidden tabs through native input dispatch on both layouts.
@@ -389,14 +390,14 @@ func _check_controller_tabs(game: Node2D, menu: GameSettings) -> void:
 			menu.select_tab(scenario[0])
 			for pressed: bool in [true, false]:
 				Input.parse_input_event(controller_button(scenario[1], pressed))
-				await frames(2)
+				await settle(2)
 			_expect(menu.tabs.current_tab == scenario[2] and root.gui_get_focus_owner() == menu.tab_focus_target(), "mobile=%s: shoulder %s changes tab %s to %s and focuses the visible tab" % [mobile_layout, scenario[1], scenario[0], scenario[2]])
 			_expect(game.get("controller_active"), "Settings tab navigation records controller input")
 	var before_capture: int = menu.tabs.current_tab
 	menu.begin_capture(&"interact", "controller")
 	for pressed: bool in [true, false]:
 		Input.parse_input_event(controller_button(JOY_BUTTON_RIGHT_SHOULDER, pressed))
-		await frames(2)
+		await settle(2)
 	_expect(menu.tabs.current_tab == before_capture and InputMap.action_has_event(&"interact", controller_button(JOY_BUTTON_RIGHT_SHOULDER, true)), "rebinding captures a shoulder button instead of changing tabs")
 	menu.reset_controls()
 	menu.tabs.set_tab_hidden(GameSettings.GENERAL_TAB, false)
@@ -404,7 +405,7 @@ func _check_controller_tabs(game: Node2D, menu: GameSettings) -> void:
 	game.set("touch_enabled", false)
 	for pressed: bool in [true, false]:
 		Input.parse_input_event(key_event(KEY_SHIFT, pressed))
-		await frames(2)
+		await settle(2)
 	menu.select_tab(0)
 	game.call("_show_settings")
 
