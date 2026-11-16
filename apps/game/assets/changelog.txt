@@ -73,7 +73,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 -- Accessibility --
 - Every opening and closing cinematic page waits for a press. Headless page-hold and opening-sequence checks passed; ordinary conversation modes remain in progress.
 - The title action list fits its normal-size desktop actions; enlarged text still scrolls to the focused action. Headless and container checks only.
-- The touch movement prompt uses direction symbols from the bundled font. Language-suite verification is pending.
+- The touch movement prompt uses direction symbols from the bundled font. Font coverage and language suites checked headlessly.
 - Touch USE stays available at a crank during its feedback line. Holding touch USE checked headlessly.
 - Speaker tabs fit the current name; idle crank gauges hide during dialogue while active cranking stays visible. Headless and container checks only; not played by hand.
 - Ordinary station names hide during dialogue; fault indicators retain their own visibility, and hidden names no longer catch clicks. Headless checks only.

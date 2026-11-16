@@ -241,10 +241,10 @@ func _fingerprint() -> String:
 	return JSON.stringify(data)
 
 
-## What the screen says: dialogue, hint and objective text plus each panel’s visibility; dismissing text is visible feedback too.
+## Visible text feedback includes dialogue, hints, objectives and the continue cue; dismissing one is feedback too.
 func _screen_text() -> String:
 	var hint: Panel = game.get_node("CanvasLayer/ContextHint") as Panel
-	return "%s|%s|%s|%s|%s|%s|%s" % [(game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text, hint.visible, (hint.get_node("Text") as Label).text, (game.get_node("CanvasLayer/TopBar/HUD") as Label).text, (game.get_node("CanvasLayer/BottomBar") as Control).visible, (game.get_node("CanvasLayer/TopBar") as Control).visible]
+	return "%s|%s|%s|%s|%s|%s|%s|%s" % [(game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text, hint.visible, (hint.get_node("Text") as Label).text, (game.get_node("CanvasLayer/TopBar/HUD") as Label).text, (game.get_node("CanvasLayer/BottomBar") as Control).visible, (game.get_node("CanvasLayer/TopBar") as Control).visible, (game.get("dialogue_continue") as Control).visible]
 
 
 func _fault_shown() -> bool:
