@@ -3404,3 +3404,9 @@ msgstr "%s：次の情報源を調べる。"
 # Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
 msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
 msgstr "第1章完了。もう一度プレイで最初から始める。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Settings tab for text size and reduced motion.
+#. i18n: speaker=ui
+msgid "ACCESSIBILITY"
+msgstr "アクセシビリティ"

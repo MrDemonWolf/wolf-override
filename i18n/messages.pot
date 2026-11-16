@@ -536,189 +536,185 @@ msgctxt "key name"
 msgid "Section"
 msgstr ""
 
-#: scripts/game_settings.gd:271
+#: scripts/game_settings.gd:276
 msgid "THE DEN  /  LOCAL CONFIGURATION"
 msgstr ""
 
-#: scripts/game_settings.gd:283
+#: scripts/game_settings.gd:288
 msgid "DISPLAY"
 msgstr ""
 
-#: scripts/game_settings.gd:283
+#: scripts/game_settings.gd:288
 msgid "AUDIO"
 msgstr ""
 
-#: scripts/game_settings.gd:283
+#: scripts/game_settings.gd:288
 msgid "CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:283
+#: scripts/game_settings.gd:288
 msgid "ACCESSIBILITY"
 msgstr ""
 
-#: scripts/game_settings.gd:283
+#: scripts/game_settings.gd:288
 msgid "GENERAL"
 msgstr ""
 
-#: scripts/game_settings.gd:289
+#: scripts/game_settings.gd:294
 msgid "FPS LIMIT"
 msgstr ""
 
-#: scripts/game_settings.gd:289
+#: scripts/game_settings.gd:294
 msgid "WINDOW SIZE"
 msgstr ""
 
-#: scripts/game_settings.gd:293
+#: scripts/game_settings.gd:298
 msgid "V-SYNC"
 msgstr ""
 
-#: scripts/game_settings.gd:297
+#: scripts/game_settings.gd:302
 msgid "EDGE SMOOTHING"
 msgstr ""
 
-#: scripts/game_settings.gd:297
+#: scripts/game_settings.gd:302
 msgid "OFF"
 msgstr ""
 
-#: scripts/game_settings.gd:297
+#: scripts/game_settings.gd:302
 msgid "2× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:297
+#: scripts/game_settings.gd:302
 msgid "4× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:297
+#: scripts/game_settings.gd:302
 msgid "8× MSAA"
 msgstr ""
 
-#: scripts/game_settings.gd:301
+#: scripts/game_settings.gd:306
 msgid "REDUCED MOTION"
 msgstr ""
 
-#: scripts/game_settings.gd:302
+#: scripts/game_settings.gd:307
 msgid "No camera shake or hit-stop; screen flashes are shorter."
 msgstr ""
 
-#: scripts/game_settings.gd:309
+#: scripts/game_settings.gd:314
 msgid "TEXT SIZE"
 msgstr ""
 
-#: scripts/game_settings.gd:310
-#: scripts/game_settings.gd:577
+#: scripts/game_settings.gd:315
+#: scripts/game_settings.gd:622
 msgid "Scales the dialogue, hints, cards and station names."
 msgstr ""
 
-#: scripts/game_settings.gd:324
-msgid "ACTION"
-msgstr ""
-
-#: scripts/game_settings.gd:324
+#: scripts/game_settings.gd:327
 msgid "KEYBOARD"
 msgstr ""
 
-#: scripts/game_settings.gd:324
+#: scripts/game_settings.gd:327
 msgid "CONTROLLER"
 msgstr ""
 
-#: scripts/game_settings.gd:344
+#: scripts/game_settings.gd:337
 msgid "Stick deadzone"
 msgstr ""
 
-#: scripts/game_settings.gd:348
+#: scripts/game_settings.gd:341
 msgid "TOGGLE HOLDS"
 msgstr ""
 
-#: scripts/game_settings.gd:349
+#: scripts/game_settings.gd:342
 msgid "Press interact once to start a crank and again to stop it, instead of holding it down. Keyboard, controller and touch."
 msgstr ""
 
-#: scripts/game_settings.gd:354
+#: scripts/game_settings.gd:347
 msgid "RESTORE DEFAULT CONTROLS"
 msgstr ""
 
-#: scripts/game_settings.gd:376
+#: scripts/game_settings.gd:369
 msgid "CANCEL REBIND"
 msgstr ""
 
-#: scripts/game_settings.gd:389
+#: scripts/game_settings.gd:395
 msgid "LANGUAGE"
 msgstr ""
 
-#: scripts/game_settings.gd:573
+#: scripts/game_settings.gd:618
 msgid "Window size is OS-managed on mobile."
 msgstr ""
 
-#: scripts/game_settings.gd:573
-#: scripts/game_settings.gd:575
+#: scripts/game_settings.gd:618
+#: scripts/game_settings.gd:620
 msgid "V-sync may limit the FPS cap."
 msgstr ""
 
-#: scripts/game_settings.gd:577
+#: scripts/game_settings.gd:622
 msgid "Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."
 msgstr ""
 
-#: scripts/game_settings.gd:577
+#: scripts/game_settings.gd:622
 msgid "Select a binding, then press a key, controller button or move a stick."
 msgstr ""
 
-#: scripts/game_settings.gd:577
+#: scripts/game_settings.gd:622
 msgid "Until you choose a language, the game uses your system's."
 msgstr ""
 
-#: scripts/game_settings.gd:631
+#: scripts/game_settings.gd:676
 msgid "Press a keyboard input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:631
+#: scripts/game_settings.gd:676
 msgid "Press a controller input for %s. Esc cancels."
 msgstr ""
 
-#: scripts/game_settings.gd:653
+#: scripts/game_settings.gd:698
 msgid "Rebind cancelled."
 msgstr ""
 
-#: scripts/game_settings.gd:668
+#: scripts/game_settings.gd:713
 msgid "Already used by %s. Choose another input or cancel."
 msgstr ""
 
-#: scripts/game_settings.gd:674
+#: scripts/game_settings.gd:719
 msgid "Binding saved."
 msgstr ""
 
-#: scripts/game_settings.gd:756
+#: scripts/game_settings.gd:801
 msgid "Left stick"
 msgstr ""
 
-#: scripts/game_settings.gd:756
+#: scripts/game_settings.gd:801
 msgid "Axis %d"
 msgstr ""
 
-#: scripts/game_settings.gd:785
+#: scripts/game_settings.gd:830
 msgid "AXIS %d %s"
 msgstr ""
 
-#: scripts/game_settings.gd:836
+#: scripts/game_settings.gd:881
 msgid "START"
 msgstr ""
 
-#: scripts/game_settings.gd:837
+#: scripts/game_settings.gd:882
 msgid "D-pad left"
 msgstr ""
 
-#: scripts/game_settings.gd:838
+#: scripts/game_settings.gd:883
 msgid "D-pad right"
 msgstr ""
 
-#: scripts/game_settings.gd:839
+#: scripts/game_settings.gd:884
 msgid "BUTTON %d"
 msgstr ""
 
-#: scripts/game_settings.gd:875
+#: scripts/game_settings.gd:920
 msgid "Default controls restored."
 msgstr ""
 
-#: scripts/game_settings.gd:903
+#: scripts/game_settings.gd:948
 #: scripts/main.gd:2204
 msgid "Settings could not be saved."
 msgstr ""

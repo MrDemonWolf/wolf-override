@@ -3422,3 +3422,9 @@ msgstr "%s：檢查下一份資料。"
 # Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
 msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
 msgstr "第一章完成。選擇再次遊玩可重新開始。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Settings tab for text size and reduced motion.
+#. i18n: speaker=ui
+msgid "ACCESSIBILITY"
+msgstr "無障礙"

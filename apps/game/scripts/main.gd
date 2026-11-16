@@ -2239,7 +2239,7 @@ func _show_settings() -> void:
 	$CanvasLayer/PauseOverlay/Panel/Accent.hide()
 	settings_menu.show()
 	_reveal_menu()
-	_grab_menu_focus(settings_menu.tabs)
+	_grab_menu_focus(settings_menu.tab_focus_target())
 
 
 func _show_title_settings() -> void:
@@ -2342,7 +2342,7 @@ func _menu_focus_target() -> Control:
 	if end_card_active:
 		return end_card_button
 	if pause_overlay.visible:
-		return settings_menu.tabs if settings_menu.visible else resume_button
+		return settings_menu.tab_focus_target() if settings_menu.visible else resume_button
 	if title_open:
 		if credits_screen.visible:
 			return credits_back_button

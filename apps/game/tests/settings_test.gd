@@ -46,6 +46,7 @@ func _run() -> void:
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
 	_check_display_page(menu)
 	await _check_scrolling_pages(menu)
+	await _check_mobile_chrome(menu)
 	await _check_language_row(game, path)
 	await _check_menu_translation(game)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
@@ -268,6 +269,36 @@ func _check_scrolling_pages(menu: GameSettings) -> void:
 	_expect(scroll.scroll_vertical > 0 and scroll.get_global_rect().encloses(menu.antialiasing.get_global_rect()), "focus brings the last Display row fully into view (%s; page %s; control %s)" % [scroll.scroll_vertical, scroll.get_global_rect(), menu.antialiasing.get_global_rect()])
 	_expect(not scroll.get_global_rect().intersects((menu.get_node("BackButton") as Control).get_global_rect()), "scrolling rows leave Back outside the page")
 	menu.tabs.grab_focus()
+
+
+## Mobile Settings reserves separate header and Back rows; each tab remains reachable in its own rail.
+func _check_mobile_chrome(menu: GameSettings) -> void:
+	menu.mobile = true
+	menu.layout_for_device()
+	await frames(3)
+	var heading: Control = menu.get_node("Title") as Control
+	var back: Control = menu.get_node("BackButton") as Control
+	_expect(not menu.tabs.visible and menu.tab_rail.visible and not heading.get_global_rect().intersects(back.get_global_rect()), "mobile uses a compact header with Back in its own row")
+	for index: int in menu.tab_buttons.size():
+		menu.tab_buttons[index].pressed.emit()
+		await frames(3)
+		_expect(menu.tabs.current_tab == index and menu.pages[index].visible and menu.tab_buttons[index].button_pressed, "mobile tab %d selects the same page model" % index)
+	_expect(menu.tab_rail.scroll_vertical > 0 and menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "the last mobile tab scrolls fully into view")
+	_expect(menu.tab_focus_target() == menu.tab_buttons[GameSettings.GENERAL_TAB], "opening mobile Settings focuses the selected visible tab")
+	var locale: String = TranslationServer.get_locale()
+	for code: String in I18n.offered():
+		I18n.apply_for_checks(code)
+		await frames(3)
+		menu.select_tab(GameSettings.GENERAL_TAB)
+		await frames(3)
+		_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "%s: translated mobile tabs keep General reachable" % code)
+	I18n.apply_for_checks(locale)
+
+	menu.mobile = false
+	menu.layout_for_device()
+	menu.select_tab(0)
+	await frames(3)
+	_expect(menu.tabs.visible and not menu.tab_rail.visible and menu.tab_focus_target() == menu.tabs, "desktop restores the horizontal tab bar")
 
 
 ## LANGUAGE on the GENERAL tab (PR L6, PLAN.md and DESIGN.md "Settings: the LANGUAGE option"):

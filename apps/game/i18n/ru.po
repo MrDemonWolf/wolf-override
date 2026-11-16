@@ -3464,3 +3464,9 @@ msgstr "%s: изучить следующий источник."
 #: scripts/main.gd
 msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
 msgstr "Глава 1 завершена. ИГРАТЬ СНОВА начинает новое прохождение."
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Settings tab for text size and reduced motion.
+#. i18n: speaker=ui
+msgid "ACCESSIBILITY"
+msgstr "СПЕЦИАЛЬНЫЕ ВОЗМОЖНОСТИ"

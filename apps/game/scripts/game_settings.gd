@@ -74,6 +74,11 @@ signal text_size_changed(factor: float)
 
 var settings_path: String
 var tabs: TabBar
+var tab_rail: ScrollContainer
+var tab_buttons: Array[Button] = []
+var rows: Array[HBoxContainer] = []
+var surface: Panel
+var subtitle: Label
 var vsync: CheckButton
 var antialiasing: OptionButton
 var reduced_motion: CheckButton
@@ -261,14 +266,14 @@ static func apply_saved_window(window: Window, config: ConfigFile) -> void:
 ## Builds the backdrop, tabs, five scrolling pages, note and CANCEL REBIND once from configure. Each
 ## control is connected to apply its change and save the file at once (_save_extra).
 func _build_menu() -> void:
-	var surface: Panel = Panel.new()
+	surface = Panel.new()
 	surface.position = Vector2(24, 126)
 	surface.size = Vector2(712, 240)
 	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	surface.theme_type_variation = &"TerminalPanel"
 	add_child(surface)
 	move_child(surface, 0)
-	var subtitle: Label = _label(I18n.KEY.tr("THE DEN  /  LOCAL CONFIGURATION"), 13)
+	subtitle = _label(I18n.KEY.tr("THE DEN  /  LOCAL CONFIGURATION"), 13)
 	subtitle.position = Vector2(34, 15)
 	subtitle.modulate = MUTED_TEXT
 	subtitle.add_theme_font_override("font", CONTROL_FONT)
@@ -318,26 +323,14 @@ func _build_menu() -> void:
 		slider.value_changed.connect(func(value: float) -> void: _apply_volume(bus, value); _save_extra())
 	var controls: VBoxContainer = _page_box()
 	pages.append(controls.get_parent().get_parent())
-	var header: HBoxContainer = HBoxContainer.new()
-	controls.add_child(header)
-	for index: int in 3:
-		var column: Label = _label([I18n.KEY.tr("ACTION"), I18n.KEY.tr("KEYBOARD"), I18n.KEY.tr("CONTROLLER")][index], 14)
-		column.custom_minimum_size.x = 220 if index == 0 else 206
-		header.add_child(column)
-	for index: int in ACTIONS.size():
-		var row: HBoxContainer = HBoxContainer.new()
-		controls.add_child(row)
-		var caption: Label = _label(ACTION_NAMES[index], 16)
-		caption.custom_minimum_size.x = 220
-		row.add_child(caption)
-		for kind: String in ["keyboard", "controller"]:
+	for kind: String in ["keyboard", "controller"]:
+		controls.add_child(_label(I18n.KEY.tr("KEYBOARD") if kind == "keyboard" else I18n.KEY.tr("CONTROLLER"), 14))
+		for index: int in ACTIONS.size():
 			var button: Button = Button.new()
-			# Key and button names are translated as they are worked out (_refresh_bindings), so the
-			# button must not translate them again.
+			# Binding names are already translated by _refresh_bindings.
 			button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-			button.custom_minimum_size = Vector2(206, 48)
-			button.add_theme_font_size_override("font_size", 15)
-			row.add_child(button)
+			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_control_row(controls, button, ACTION_NAMES[index])
 			var action: StringName = ACTIONS[index]
 			binding_buttons["%s_%s" % [action, kind]] = button
 			button.pressed.connect(begin_capture.bind(action, kind))
@@ -377,6 +370,19 @@ func _build_menu() -> void:
 	cancel_button.hide()
 	add_child(cancel_button)
 	cancel_button.pressed.connect(cancel_capture)
+	var rail: VBoxContainer = _page_box()
+	tab_rail = rail.get_parent().get_parent() as ScrollContainer
+	rail.add_theme_constant_override("separation", 8)
+	for index: int in tabs.tab_count:
+		var button: Button = Button.new()
+		button.text = tabs.get_tab_title(index)
+		button.custom_minimum_size.y = 48
+		button.toggle_mode = true
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.pressed.connect(select_tab.bind(index))
+		rail.add_child(button)
+		tab_buttons.append(button)
+	layout_for_device()
 
 
 ## The GENERAL page (pages[GENERAL_TAB]), using the shared scrolling rows: the LANGUAGE caption, its
@@ -421,6 +427,7 @@ func refresh_languages() -> void:
 		if not tag.is_empty():
 			language.add_separator(tag)
 	tabs.set_tab_hidden(GENERAL_TAB, offered.size() < 2)
+	tab_buttons[GENERAL_TAB].visible = offered.size() >= 2
 	_show_language()
 
 
@@ -486,9 +493,11 @@ func _control_row(parent: Control, control: Control, caption: String = "") -> HB
 	var row: HBoxContainer = HBoxContainer.new()
 	row.custom_minimum_size.y = 48
 	parent.add_child(row)
+	rows.append(row)
 	if not caption.is_empty():
 		var label: Label = _label(caption, 16)
 		label.custom_minimum_size.x = 220
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(label)
 	if control.get_parent() != null:
 		control.reparent(row)
@@ -561,9 +570,45 @@ func apply_theme() -> void:
 	theme = menu_theme
 
 
+## Reflows the existing menu for mobile builds; desktop retains its horizontal tabs and footer.
+## Header and Back occupy separate rows, and the mobile rail scrolls without moving the page.
+func layout_for_device() -> void:
+	tabs.visible = not mobile
+	tab_rail.visible = mobile
+	subtitle.visible = not mobile
+	$Title.size = Vector2(690, 0)
+	$Title.position = Vector2(32, 16 if mobile else 35)
+	$Title.add_theme_font_size_override("font_size", 18 if mobile else 27)
+	$BackButton.position = Vector2(548, 56) if mobile else Vector2(32, 414)
+	$BackButton.size = Vector2(180, 48 if mobile else 38)
+	tab_rail.position = Vector2(32, 116)
+	tab_rail.size = Vector2(200, 246)
+	var body: Rect2 = Rect2(248, 116, 480, 246) if mobile else Rect2(40, 128, 680, 234)
+	for page: Control in pages:
+		page.position = body.position
+		page.size = body.size
+	surface.position = body.position - Vector2(8, 2)
+	surface.size = body.size + Vector2(16, 4)
+	for row: HBoxContainer in rows:
+		if row.get_child(0) is Label:
+			(row.get_child(0) as Label).custom_minimum_size.x = 144 if mobile else 220
+
+
+## The visible tab control to focus when opening or returning to Settings.
+func tab_focus_target() -> Control:
+	return tab_buttons[tabs.current_tab] if mobile else tabs
+
+
 ## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 ACCESSIBILITY, 4 GENERAL) and its note, hiding the others,
 ## and cancels a rebind in progress. It does not move the tab bar, whose tab_changed calls it.
 func select_tab(index: int) -> void:
+	if tabs.current_tab != index:
+		tabs.current_tab = index
+		return
+	for tab: int in tab_buttons.size():
+		tab_buttons[tab].set_pressed_no_signal(tab == index)
+	if tab_rail.visible:
+		tab_rail.ensure_control_visible(tab_buttons[index])
 	cancel_capture()
 	for page_index: int in pages.size():
 		pages[page_index].visible = page_index == index
