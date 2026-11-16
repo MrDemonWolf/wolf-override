@@ -19,6 +19,8 @@ func _run() -> void:
 	_expect(quit_button.visible == (not (game.get("settings_menu") as GameSettings).mobile and not OS.has_feature("web")), "Quit is available on desktop and handheld PC, leaving mobile and web exit to the system")
 	_expect(quit_button.pressed.is_connected(Callable(self, "quit")), "Quit closes the running tree through the native engine action")
 	var last: Button = quit_button if quit_button.visible else first.get_parent().get_node("CreditsButton") as Button
+	await settle(4)
+	_expect(title_scroll.get_v_scroll_bar().max_value <= title_scroll.get_v_scroll_bar().page + 1.0, "the normal-size title fits every action without scrolling")
 	last.grab_focus()
 	TextSize.factor = 2.0
 	game.call("_apply_text_size")

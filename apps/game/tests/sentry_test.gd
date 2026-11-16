@@ -612,7 +612,8 @@ func _check_scene() -> void:
 	_expect(str(game.call("_context_hint")) == "E: leave through the door.", "at the door the hint offers the way out")
 	await tap(&"interact")
 	var state: M0State = game.get("state") as M0State
-	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE LINE CLEARED"), "USE at the open hatch clears the junction into a closing beat")
+	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled, "USE at the open hatch clears the junction into a closing beat")
+	_expect(not (game.get_node("CanvasLayer/TopBar") as Control).visible and str(game.call("_shown_line")).begins_with("SERVICE LINE CLEARED."), "the closing dialogue confirms completion without a second objective card")
 	var autosave_d: M0State = State.load_from_disk(path)
 	_expect(autosave_d != null and autosave_d.junction_cleared, "autosave D records the cleared junction")
 	await create_timer(0.6).timeout

@@ -97,10 +97,10 @@ func _run() -> void:
 	_expect(game.get_node_or_null("IntroGate") == null and game.get_node_or_null("IntroCage") == null, "the old code-drawn cage is gone")
 	_expect(wolf.body_sprite.texture == DockBay.WOLF_LIE and dock_bay.lead_travel == 0.0 and not dock_bay.lock_torn and dock_bay.battery.percent == DockBay.CHARGING_PERCENT, "WOLF lies charging on the pad, the cage shut and locked")
 	_expect(game.get("intro_active") and intro_director.visible and not human.visible and not purge_terminal_art.visible and not human.controlled, "opening shows only WOLF and Director, without the later terminal or engineer")
-	_expect(top_card.visible and hud.text.contains("CONTAINMENT"), "opening starts with a location slate")
+	_expect(not top_card.visible, "opening keeps the location slate out of the cinematic dialogue")
 	await create_timer(3.2).timeout
 	game.call("_refresh_ui")
-	_expect(not top_card.visible, "opening slate fades away and does not reappear each frame")
+	_expect(not top_card.visible, "opening keeps the extra location card hidden as dialogue continues")
 	# Audit 12: the Director's lines carry his tag; the narration has its own untagged boxes.
 	_expect(speaker.visible and speaker.text == "DIRECTOR" and story.text == "The records worker saw too much. When WOLF wakes, he kills the worker.", "the Director's first line sits alone under his tag")
 	await tap(&"interact")
@@ -166,7 +166,7 @@ func _run() -> void:
 	Input.action_press(&"move_right")
 	game.call("_process", 0.016)
 	Input.action_release(&"move_right")
-	_expect(tutorial_prompt.visible and tutorial_text.text == "E  READ DISPLAY (optional)\nOr head right to the breaker.", "movement leaves the display optional and points on to the breaker")
+	_expect(not tutorial_prompt.visible and not str(game.call("_shown_box")).is_empty(), "movement starts the opening dialogue without an overlapping tutorial")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	_expect(tutorial_text.text.begins_with("USE  READ DISPLAY (optional)") and _widest_line(tutorial_text) <= tutorial_text.size.x, "the touch tutorial names the USE button and fits inside the tutorial box")
@@ -404,7 +404,7 @@ func _run() -> void:
 	if not _require(await walk_to(human, 270.0), "engineer heads for the breaker without reading the display"):
 		return
 	await process_frame
-	_expect(tutorial_prompt.visible and tutorial_text.text == "A / D  MOVE\nHead right to the breaker." and game.call("_objective") == "CHECK THE BREAKER", "skipping the display keeps the tutorial and objective pointed at the breaker")
+	_expect(not tutorial_prompt.visible and not str(game.call("_shown_box")).is_empty() and game.call("_objective") == "CHECK THE BREAKER", "skipping the display preserves the breaker objective while dialogue owns attention")
 	if not _require(await walk_to(human, 350.0), "engineer reaches breaker on fresh fallback play"):
 		return
 	await process_frame
@@ -500,7 +500,7 @@ func _run() -> void:
 		return
 	await tap(&"cycle_name")
 	_expect(state.name_index == 1, "draft identity changes before fallback save")
-	_expect(str(game.get("status_line")).contains("Alex Bennett") and hud.text == HudText.card(str(game.call("_objective"))), "provisional name changes without crowding the objective display")
+	_expect(str(game.get("status_line")).contains("Alex Bennett") and not top_card.visible and speaker.text == "WOLF", "provisional name changes in dialogue without an extra objective card")
 	_expect(not str(game.get("status_line")).contains("breaker"), "identity line does not rewind the scene after the seal opens")
 	await tap(&"interact")
 	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):
