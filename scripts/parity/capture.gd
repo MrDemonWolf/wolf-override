@@ -172,6 +172,8 @@ func _run() -> void:
 	_finish()
 
 
+## Ends the run: writes shots.json (the run's facts and notes), text.log and audio.log into the output
+## folder, deletes the run's save and settings files, and quits (status 1 when a step failed).
 func _finish() -> void:
 	var f: FileAccess = FileAccess.open(out_dir.path_join("shots.json"), FileAccess.WRITE)
 	f.store_string(JSON.stringify({"route": route, "variant": variant, "language": language if not language.is_empty() else "en", "size": [size.x, size.y], "frames": frame, "joypads": Input.get_connected_joypads().size(), "notes": notes, "failed": failed, "shots": shots}, " "))
@@ -191,6 +193,8 @@ func _finish() -> void:
 
 # ---------------------------------------------------------------- determinism
 
+## For every node entering the tree: particles get one fixed seed, so every run draws the same
+## particles, and Main's SfxBank becomes the logging ParityBank before its _ready runs.
 func _on_node_added(node: Node) -> void:
 	if node is CPUParticles2D:
 		(node as CPUParticles2D).use_fixed_seed = true
@@ -669,6 +673,8 @@ func _retry_and_shoot(slug: String) -> void:
 	await _shot(slug)
 
 
+## True while the sentry patrols leftward between x 780 and 700 (world px): the moment the route
+## waits for before it goes on.
 func _sentry_walking_back() -> bool:
 	var b: SentryBrain = game.get("sentry_brain") as SentryBrain
 	return b.state == &"patrol" and b.facing < 0.0 and b.x <= 780.0 and b.x >= 700.0
@@ -721,6 +727,8 @@ func _breaker_choice(response: int) -> void:
 	await _read_on_to_armed_breaker()
 
 
+## Walks to the bypass wheel and cranks it by holding USE, with shots named after [param tag] on the
+## way.
 func _crank_bypass(tag: String) -> void:
 	await _walk_to(Main.BYPASS_WHEEL.x)
 	await _raw(10)
@@ -811,6 +819,7 @@ func _device_switch(slug: String) -> void:
 		await _raw(10)
 
 
+## The context hint's text as shown right now.
 func _hint() -> String:
 	return (game.get_node("CanvasLayer/ContextHint/Text") as Label).text
 
@@ -838,6 +847,7 @@ func _screen_touch() -> void:
 
 # ---------------------------------------------------------------- saves for R1, R3 and R4 (fixture states: parity_kit.gd)
 
+## Writes [param st] as the run's save file; a failed write fails the run.
 func _write_save(st: M0State) -> void:
 	if not st.save_to_disk(save_path):
 		_fail("could not write the fixture save")
@@ -845,6 +855,8 @@ func _write_save(st: M0State) -> void:
 
 # ---------------------------------------------------------------- input and capture helpers
 
+## Presses the Button at [param path] (from the game's root) by emitting its pressed signal; fails the
+## run when the button is disabled or hidden, as a player could not press it.
 func _press(path: String) -> void:
 	var b: Button = game.get_node(path) as Button
 	if b.disabled or not b.is_visible_in_tree():
@@ -853,6 +865,7 @@ func _press(path: String) -> void:
 	b.pressed.emit()
 
 
+## Sends [param action] pressed then released as input events, one process frame each.
 func _action_event(action: StringName) -> void:
 	for pressed: bool in [true, false]:
 		var ev: InputEventAction = InputEventAction.new()
@@ -862,6 +875,7 @@ func _action_event(action: StringName) -> void:
 		await _raw(1)
 
 
+## Sends key [param code] pressed then released as input events, one process frame each.
 func _key(code: Key) -> void:
 	for pressed: bool in [true, false]:
 		var ev: InputEventKey = InputEventKey.new()
@@ -872,6 +886,8 @@ func _key(code: Key) -> void:
 		await _raw(1)
 
 
+## Presses and releases [param action] through Input, with one process frame before, between and
+## after, so the game's polled input sees one press.
 func _tap(action: StringName) -> void:
 	await _raw(1)
 	Input.action_press(action)
@@ -880,6 +896,8 @@ func _tap(action: StringName) -> void:
 	await _raw(1)
 
 
+## Holds a move action until the engineer is within 6 px of world x [param target_x], for at most 900
+## process frames. Returns whether they arrived; with [param must_arrive] a miss fails the run.
 func _walk_to(target_x: float, must_arrive: bool = true) -> bool:
 	var dir: float = signf(target_x - human.position.x)
 	if absf(target_x - human.position.x) <= 6.0:
@@ -903,6 +921,8 @@ func _walk_to(target_x: float, must_arrive: bool = true) -> bool:
 	return reached
 
 
+## Waits until [param cond] returns true, checking before each of at most [param max_frames] process
+## frames and once more after them. Returns whether it held.
 func _wait_until(cond: Callable, max_frames: int) -> bool:
 	for _i: int in range(max_frames):
 		if cond.call():
@@ -911,6 +931,7 @@ func _wait_until(cond: Callable, max_frames: int) -> bool:
 	return bool(cond.call())
 
 
+## Waits [param frames] process frames.
 func _raw(frames: int) -> void:
 	for _i: int in range(frames):
 		await process_frame
@@ -921,18 +942,23 @@ func _set_size(want: Vector2i) -> void:
 	root.size = want
 
 
+## Takes [param count] shots named [param slug]-00, -01 and so on, one every [param every] frames.
 func _burst(slug: String, count: int, every: int) -> void:
 	for i: int in range(count):
 		await _shot("%s-%02d" % [slug, i])
 		await _raw(maxi(every - 1, 0))
 
 
+## Marks the run failed, with [param why] in shots.json's notes and Godot's error log.
 func _fail(why: String) -> void:
 	failed = true
 	notes.append("FAIL: " + why)
 	push_error("parity: " + why)
 
 
+## Saves the frame on screen as NNN-[param slug].png (NNN counts the shots) in the output folder, after
+## it has been drawn, and lists it in shots.json; fails
+## the run when no new frame was drawn or the renderer drew nothing.
 func _shot(slug: String) -> void:
 	await RenderingServer.frame_post_draw
 	var drawn: int = Engine.get_frames_drawn()
@@ -1026,6 +1052,7 @@ func _audit() -> Dictionary:
 	return found
 
 
+## Deletes the user:// (or absolute) file at [param path] if there is one.
 func _remove(path: String) -> void:
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
