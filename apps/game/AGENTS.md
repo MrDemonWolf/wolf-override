@@ -1,5 +1,33 @@
-# Godot gameplay instructions
+# Game agent instructions (`apps/game`)
 
-Read the repository's [shared game quality guide](../../AGENT.md) before editing this project. The root `AGENTS.md` points to ignored private context when present; keep its story details out of public commits.
+**What this file is for:** the rules that apply only to the Godot project. The repository rules in the root [AGENTS.md](../../AGENTS.md) and the quality guide in [AGENT.md](../../AGENT.md) apply first; this file does not repeat them.
 
-Ship one bounded playable change at a time. Preserve the engineer-only viewpoint, WOLF's independent agency and an engineer-only fallback for essential progress. Use the pinned Godot version, typed GDScript and existing InputMap. Verify state logic headlessly, then play affected routes in one normal game window before claiming their feel or readability is validated. Record asset source and rights in `assets/manifest.json`.
+## Before you edit
+
+1. Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` for story or gameplay changes. They are tracked and public; keep spoilers out of game text that plays before its scene.
+2. Check `docs/playtest-bugs-2026-11.md` for the bug number (B1 to B36) your change belongs to.
+3. Look for an existing script, test helper or style before writing one.
+
+## Where things live
+
+| Need | Home |
+|---|---|
+| UI sizes, colours, spacing | `scripts/ui_tokens.gd` (one token file, shared with the mockups) |
+| Player-facing text | `scripts/story_text.gd` and the catalogs in `i18n/`; never a literal in a scene |
+| Settings and saved preferences | `scripts/game_settings.gd` |
+| Test helpers | `tests/support/` (suites extend `game_suite.gd`) |
+| Asset source and rights | `assets/manifest.json` |
+
+## Rules
+
+- Use the pinned Godot version, typed GDScript, built-in nodes and the existing InputMap.
+- Ship one bounded playable change at a time.
+- The engineer is the only playable character. WOLF acts on his own. Essential progress needs an engineer-only path.
+- `scripts/main.gd` is large and edited by several branches at once. Keep edits there small; put new behaviour in its own script.
+- A new or changed player-facing string needs the translation template refreshed (`scripts/i18n/extract_pot.sh`).
+
+## Checks
+
+1. Run the suites your change touches with `godot --headless`, then `scripts/check-game.sh` for the full run (about 6 minutes).
+2. Make rendered stills with `tools/render/render.sh` only. Never open a Godot or game window.
+3. Say which of these you did: headless logic, rendered stills. Hands-on play, exports and devices are Nathanial's checks; do not claim them.
