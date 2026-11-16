@@ -4,6 +4,7 @@ extends "res://tests/support/game_suite.gd"
 
 func _run() -> void:
 	check_name = "World input"
+	_check_canvas_geometry()
 	var game: Main = await start_game("world-input", keep_running) as Main
 	game.call("_new_game")
 	game.call("_finish_intro")
@@ -55,3 +56,25 @@ func _run() -> void:
 	_expect(not game.hold_use.holding and game.hold_use.ticks == kept, "release stops the crank and preserves completed ticks")
 	await end_game(game)
 	finish("World input checks passed")
+
+
+## A translated/scaled plate keeps the same live canvas bounds for its hit target and HUD avoidance.
+func _check_canvas_geometry() -> void:
+	var holder: Node2D = Node2D.new()
+	root.add_child(holder)
+	holder.position = Vector2(30, 20)
+	var plate: Control = Control.new()
+	holder.add_child(plate)
+	plate.position = Vector2(10, 15)
+	plate.size = Vector2(20, 10)
+	plate.scale = Vector2(2, 3)
+	var target: Tappable = Tappable.new()
+	holder.add_child(target)
+	target.setup(&"plate", [], [plate])
+	_expect(Tappable.canvas_rect(plate).is_equal_approx(Rect2(40, 35, 40, 30)), "plate bounds include ancestor translation and local scale")
+	_expect(not is_inf(target.hit_score(Vector2(60, 50), false)), "the displayed plate centre remains clickable")
+	holder.position.x += 80.0
+	_expect(Tappable.canvas_rect(plate).position.is_equal_approx(Vector2(120, 35)) and is_inf(target.hit_score(Vector2(60, 50), false)), "moving the plate updates geometry without a cached hit rectangle")
+	plate.hide()
+	_expect(is_inf(target.hit_score(Vector2(140, 50), true)), "hidden plates retain geometry but cannot take a touch")
+	holder.free()
