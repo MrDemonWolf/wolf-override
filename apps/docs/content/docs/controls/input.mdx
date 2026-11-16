@@ -35,8 +35,8 @@ description: Every action on keyboard, controller and touch in the current sourc
 
 | Action | Keyboard | Controller | Touch |
 | --- | --- | --- | --- |
-| Move | A / D or ← / → | Left stick or D-pad | Hold ◀ / ▶ |
-| Interact; next line in the opening or closing scene | E | A | USE (reads CONTINUE in those scenes) |
+| Move | A / D or ← / → | Left stick or D-pad | Drag the move pad |
+| Interact; advance a stopped conversation | E | A | USE; tap dialogue to advance |
 | Retry after a knockdown | E | A | USE (reads RETRY) |
 | Crank a wheel ([how](#hold-to-crank)) | Hold E | Hold A | Hold USE (reads CRANK) |
 | Answer 1 / Answer 2 | 1 / 2, or click | X / Y | Tap the answer |
@@ -81,6 +81,7 @@ description: Every action on keyboard, controller and touch in the current sourc
 
 ## Read the story
 
+- **When a conversation stops movement,** press Interact or tap dialogue to advance. Its final page returns movement.
 - **Dialogue and cutscenes take priority.** Routine hints, objectives and tutorial panels hide while they play.
 - **Station names hide during dialogue** and return when exploring. Machine art and warning indicators remain.
 - **Urgent warnings stay visible:** save failures, recovery prompts and live hazards.
@@ -90,7 +91,7 @@ description: Every action on keyboard, controller and touch in the current sourc
 ## Click or tap the room
 
 - **Click or tap a machine** to walk up and use it through the same interaction as keyboard **E**.
-- **Tap the floor** to walk there. Movement starts when you release.
+- **Floor input:** desktop clicks walk on release. Touch starts the pad in the empty left zone; other floor taps walk on release.
 - **Drag away before release** to cancel. Manual movement takes over from a queued walk.
 - **A distant wheel** needs a second press when reached; walking up never starts a crank automatically.
 - **Tap dialogue** to read the next page or line without activating a machine behind it.
@@ -110,19 +111,19 @@ description: Every action on keyboard, controller and touch in the current sourc
 
 ## Touch (iOS and Android builds)
 
-- **The arrow buttons hide** during the opening, the closing scene and while a question waits.
+- **Move:** press an empty area on the left, then slide left or right. Objects take priority over the pad.
 - **PAUSE** opens Resume, Settings and Return to Title (Skip Opening during the opening).
 - **Leaving the app** during play pauses the game.
 - **Android Back** steps back one menu, and pauses play. It closes the game only from the title screen.
 - **Touch menus show no outline.** The first arrow key or controller press selects an item without using it.
 - **The USE button changes its name:** **CRANK** at a crank, **DROP** at the tank release, **USE** elsewhere.
-- **Answers** replace the arrows and **USE** at the bottom, side by side, within thumb reach.
+- **Answers** replace movement and **USE** controls at the bottom, side by side, within thumb reach.
 
 <Details>
 <Summary>Where things sit on a touch screen</Summary>
 
-- The hint line sits between the arrows and **USE**, so neither covers it.
-- With **TEXT SIZE** above 100%, the dialogue box moves into that space too, with the hint line just above it.
+- Dialogue and control visibility follow [Read the story](#read-the-story).
+- Larger text splits into more dialogue pages inside the safe area.
 - Touch answers show their words only, without the 1 and 2 of the keyboard.
 - The camera sits a little lower on touch, so feet and machine bases stay above the buttons. It stays there while answers show.
 

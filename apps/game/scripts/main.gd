@@ -715,6 +715,9 @@ var relay_refused: bool = false
 var wolf_heading_to_relay: bool = false
 var status_line: String = "WOLF: " + OPENING_WOLF_WORDS:
 	set(value):
+		var ended_conversation: bool = dialogue_is_conversation and value != status_line
+		if value != status_line:
+			dialogue_is_conversation = false
 		# A new line, or the same one said again after its box cleared, starts at its first box.
 		if value != status_line or dialogue_cleared:
 			dialogue_key = ""
@@ -723,6 +726,8 @@ var status_line: String = "WOLF: " + OPENING_WOLF_WORDS:
 		if not value in opening_lines:
 			opening_lines_held = false
 		status_line = value
+		if ended_conversation and is_node_ready():
+			_update_controls()
 var door_tween: Tween
 var wolf_reaction_tween: Tween
 var relay_spark_tween: Tween
@@ -928,6 +933,8 @@ var dialogue_boxes: Array[String] = []
 var dialogue_index: int = 0
 var dialogue_age: float = 0.0
 var dialogue_cleared: bool = false
+## Authored conversation mode for the current line; a different status line returns to timed feedback.
+var dialogue_is_conversation: bool = false
 var dialogue_key: String = ""
 var dialogue_restart: bool = true
 ## The width the words on screen wrap at (canvas px), and the box, size and column it was measured
@@ -1537,7 +1544,10 @@ func _process(delta: float) -> void:
 		# i18n: speaker=WOLF engineer=name
 		status_line = "WOLF: " + I18n.format(I18n.KEY.tr("%s. That name sounds like you."), [state.human_name()])
 	elif _use_pressed():
-		_interact()
+		if _conversation_active():
+			_read_pointer_dialogue()
+		else:
+			_interact()
 	# The opening lines start after the first step, once no top card is up (one thing to read at a time).
 	if opening_lines_held and tutorial_step >= 1 and name_card_remaining <= 0.0 and not top_card.visible:
 		opening_lines_held = false
@@ -1552,6 +1562,11 @@ func _use_pressed() -> bool:
 
 ## Explicitly reading a bubble advances a page/queued line, then dismisses its last page; never uses a station.
 func _read_pointer_dialogue() -> void:
+	if _conversation_active():
+		if not _next_box():
+			dialogue_cleared = true
+			_update_controls()
+		return
 	if not _next_box():
 		if not box_queue.is_empty():
 			_next_box_now()
@@ -1828,7 +1843,7 @@ func _advance_box_queue(delta: float) -> void:
 	if state.chapter_id == "investigation":
 		return
 	# The opening lines wait for the first step (TEACH-7), and so do the boxes after them.
-	if opening_lines_held:
+	if opening_lines_held or _conversation_active():
 		return
 	if box_queue.is_empty():
 		# The last box's reading time still runs down (_hold_for_lane_question waits on it).
@@ -1863,8 +1878,12 @@ func _advance_box_queue(delta: float) -> void:
 ## the fuse, the hatch). Boxes still to come of an earlier line are dropped, not held behind it, since
 ## the story has moved past them.
 func _tell(line: String) -> void:
+	var was_conversation: bool = dialogue_is_conversation
+	dialogue_is_conversation = false
 	_drop_box_queue()
 	status_line = line
+	if was_conversation:
+		_update_controls()
 
 
 ## Puts an aside in the box (a station's answer, such as the purge display, or a refusal). A story box
@@ -1880,6 +1899,25 @@ func _aside(line: String) -> void:
 		box_queue_choice_seen = false
 	box_queue_shown = ""
 	status_line = line
+
+
+## Starts a stopped, player-paced line without losing queued story. Existing asides preserve interrupted pages.
+## Live hazards retain movement and timed feedback rather than holding the engineer in danger.
+func _converse(line: String) -> void:
+	_aside(line)
+	opening_lines_held = false
+	if _live_hazard():
+		dialogue_is_conversation = false
+		_update_controls()
+		return
+	dialogue_is_conversation = true
+	_sync_dialogue_boxes()
+	_update_controls()
+
+
+## Whether the current conversation still waits for a fresh advance press.
+func _conversation_active() -> bool:
+	return dialogue_is_conversation and not dialogue_cleared
 
 
 ## Says [param line] in its own box after the boxes still to come of an earlier line, or now if there
@@ -1926,7 +1964,7 @@ static func box_seconds(box: String) -> float:
 ## like a box the queue put up an aside (the purge display) never drops it.
 func _speak_stakes() -> void:
 	stakes_spoken = true
-	status_line = STAKES_LINE
+	_converse(STAKES_LINE)
 	box_queue_shown = STAKES_LINE
 
 
@@ -2965,11 +3003,11 @@ func _choose(choice_id: String) -> void:
 	if choice_id == M0State.DISCLOSE:
 		# TRANSLATORS: WOLF thanks the engineer for telling him the relay's risk. Avoid a past tense that shows the engineer's gender ("you told me").
 		# i18n: story speaker=WOLF engineer=you
-		status_line = "WOLF: " + I18n.KEY.tr("Thank you for telling me. I'll take the relay. Arm the breaker.")
+		_converse("WOLF: " + I18n.KEY.tr("Thank you for telling me. I'll take the relay. Arm the breaker."))
 		_react_as_wolf(true)
 	else:
 		# TRANSLATORS: i18n: story speaker=WOLF
-		status_line = "WOLF: " + I18n.KEY.tr("No. I won't take that risk blind. Use the manual bypass.")
+		_converse("WOLF: " + I18n.KEY.tr("No. I won't take that risk blind. Use the manual bypass."))
 		_react_as_wolf(false)
 
 
@@ -4948,7 +4986,7 @@ func _set_seal_lamp(color: Color) -> void:
 
 
 func _update_controls() -> void:
-	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and not retry_fading_in and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held and not records_exit_walking
+	human.controlled = not title_open and not intro_active and not chapter_close_active and not end_card_active and not waiting_for_choice and not fail_active and not retry_fading_in and engineer_step_x < 0.0 and not engineer_waits_for_wolf and not lane_question_held and not records_exit_walking and not _conversation_active()
 	# Stepping back from the relay, the engineer walks on their own for a moment; leaving the junction
 	# they wait for WOLF to go through the hatch first.
 	if hatch_exit_walking:
@@ -5396,15 +5434,14 @@ func _dialogue_fits(words: String) -> bool:
 	return DialogueBoxes.fits(words, story.get_theme_font(&"font"), story.get_theme_font_size(&"font_size"), _dialogue_column_width())
 
 
-## Runs the box on screen: each stays up for its reading time and gives way to the next; the last one
-## clears once it has been read and the engineer moves on (STORY-8). The opening and the closing
-## shots wait for a press on every page (_next_box); a question stays up until it is answered.
+## Ages the page by delta seconds. Timed feedback advances by reading time and clears when walking on.
+## Conversations, opening/closing scenes and investigation pages wait for explicit input.
 func _tick_dialogue(delta: float) -> void:
 	_sync_dialogue_boxes()
 	if opening_lines_held or dialogue_boxes.is_empty():
 		return
 	dialogue_age += delta
-	if intro_active or chapter_close_active or state.chapter_id == "investigation":
+	if intro_active or chapter_close_active or _conversation_active() or state.chapter_id == "investigation":
 		return
 	if dialogue_index < dialogue_boxes.size() - 1:
 		if dialogue_age >= _box_seconds():
@@ -5438,6 +5475,8 @@ func _box_seconds_of(index: int) -> float:
 ## Every box of the line has been up for its reading time (or has cleared).
 func _dialogue_read() -> bool:
 	_sync_dialogue_boxes()
+	if dialogue_is_conversation:
+		return dialogue_cleared
 	return not opening_lines_held and (dialogue_cleared or dialogue_boxes.is_empty() or (dialogue_index == dialogue_boxes.size() - 1 and dialogue_age >= _box_seconds()))
 
 
