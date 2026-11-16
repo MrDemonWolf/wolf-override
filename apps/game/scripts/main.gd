@@ -942,7 +942,7 @@ var story_words: String = ""
 var opening_lines_held: bool = false
 ## The opening lines' boxes after control (the trust line's two, then WOLF and the engineer).
 var opening_lines: Array[String] = []
-## The speaker column's width and the text size, name and language it was measured for (_speaker_column_width).
+## The current speaker width and its text/size/language cache key (_speaker_column_width).
 var speaker_column: float = 0.0
 var speaker_column_key: String = ""
 
@@ -5529,18 +5529,14 @@ func _box_between_touch_buttons() -> bool:
 	return input_mode.touch_layout() and touch_use.visible and TextSize.factor > 1.0
 
 
-## The speaker column's width: the widest name it shows as drawn, at the current text size (measured once
-## per size, engineer name and language, since the Director's tag is translated; the HUD is laid out every
-## frame).
+## Measures only the speaker currently shown; reserving the longest possible tag made short names
+## look like a second dialogue panel. The cache follows text, size and translated font changes.
 func _speaker_column_width() -> float:
-	var key: String = "%s|%s|%s|%s" % [TextSize.factor, _first_name(), TranslationServer.get_locale(), TranslationServer.pseudolocalization_enabled]
+	var key: String = "%s|%s|%s|%s" % [speaker.text, TextSize.factor, TranslationServer.get_locale(), TranslationServer.pseudolocalization_enabled]
 	if key != speaker_column_key:
 		speaker_column_key = key
 		var font: Font = speaker.get_theme_font(&"font")
-		var widest: float = 0.0
-		for tag: String in _shown_speaker_tags():
-			widest = maxf(widest, font.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(SPEAKER_FONT_SIZE)).x)
-		speaker_column = ceilf(widest)
+		speaker_column = ceilf(font.get_string_size(speaker.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(SPEAKER_FONT_SIZE)).x)
 	return speaker_column
 
 
@@ -5601,7 +5597,8 @@ func _layout_hud() -> void:
 	ScreenShape.set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), text_height))
 	# The reused tab style includes content margins, which can exceed the text's line height.
 	var tab_height: float = maxf(speaker.get_combined_minimum_size().y, speaker.get_line_height() + DIALOGUE_PADDING.y)
-	ScreenShape.set_rect(speaker, Vector2(DIALOGUE_PADDING.x, -tab_height), Vector2(minf(names + DIALOGUE_PADDING.x, column), tab_height))
+	var tab_width: float = maxf(names + DIALOGUE_PADDING.x, speaker.get_combined_minimum_size().x)
+	ScreenShape.set_rect(speaker, Vector2(DIALOGUE_PADDING.x, -tab_height), Vector2(minf(tab_width, column), tab_height))
 	# A non-text cue fits the existing right padding; it never takes space from translated story words.
 	_set_font_size(dialogue_continue, SPEAKER_FONT_SIZE)
 	var cue_size: Vector2 = dialogue_continue.get_minimum_size()

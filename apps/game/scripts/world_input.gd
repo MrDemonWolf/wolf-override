@@ -170,8 +170,11 @@ func advance(delta: float) -> void:
 
 
 ## Hides ordinary station-name glyphs during story reading. Self alpha preserves the room's edge fade;
-## the fault tag has its own warning/fade owner and must never be treated as an ordinary name.
+## the fault tag has its own warning/fade owner. The plate's gauge stays visible only for active cranking.
 func show_station_names(show: bool) -> void:
+	if game == null:
+		return
+	game.bypass_handle.readout.visible = show or game.hold_use.holding
 	var alpha: float = 1.0 if show else 0.0
 	for target: Tappable in targets:
 		if target.kind != Tappable.Kind.WORLD:

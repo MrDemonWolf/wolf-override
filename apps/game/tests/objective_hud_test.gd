@@ -46,6 +46,21 @@ func _run() -> void:
 	for target: Tappable in game.world_input.targets:
 		if target.id == &"breaker" and "lockdown" in target.chapters:
 			_expect(is_inf(target.hit_score(label_point, false)), "a hidden station name does not remain an invisible click target")
+	for factor: float in [1.0, 2.0]:
+		TextSize.factor = factor
+		game.call("_apply_text_size")
+		game.call("_refresh_ui")
+		await settle(2)
+		var name_width: float = ceilf(game.speaker.get_theme_font(&"font").get_string_size(game.speaker.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, TextSize.px(Main.SPEAKER_FONT_SIZE)).x)
+		_expect(game.speaker.size.x <= maxf(name_width + Main.DIALOGUE_PADDING.x, game.speaker.get_combined_minimum_size().x) + 1.0, "a short speaker tab fits its own name at %d%%" % int(factor * 100))
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
+	_expect(not game.bypass_handle.readout.visible, "an idle crank gauge does not float over story dialogue")
+	game.hold_use.advance(0.01, true, &"bypass")
+	game.world_input.show_station_names(false)
+	_expect(game.bypass_handle.readout.visible, "active crank feedback remains visible during dialogue")
+	game.hold_use.reset()
+	game.world_input.show_station_names(false)
 	game.save_error = "Test save failure"
 	game.call("_set_dialogue", game.save_error)
 	_expect(game.context_hint.visible and game.context_hint_text.text == game.save_error, "save failures remain visible during story dialogue")
@@ -55,7 +70,7 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	await settle(3)
 	_expect(game.top_card.visible and not game.bottom_bar.visible, "the deferred goal returns after the story box clears")
-	_expect(breaker_label.self_modulate.a == 1.0, "station names return when exploration resumes")
+	_expect(breaker_label.self_modulate.a == 1.0 and game.bypass_handle.readout.visible, "station names and their gauge return when exploration resumes")
 	game.dialogue_cleared = false
 	game.state.chapter_id = "junction"
 	game.pressure_line.state = &"building"
