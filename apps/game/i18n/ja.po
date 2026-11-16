@@ -3431,3 +3431,11 @@ msgstr "音量の変更はすぐに反映されます。"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "終了"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "目標を表示"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "ビュー"

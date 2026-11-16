@@ -14,12 +14,12 @@ extends Control
 const BODY_FONT: FontVariation = preload("res://assets/fonts/Roboto-Regular.tres")
 const CONTROL_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Semibold.tres")
 const HEADING_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game", &"show_objective"]
 ## The display name of each of [constant ACTIONS], in its order: English, translated where it is drawn
 ## (the CONTROLS rows auto-translate; the notes call tr()). A static var rather than a const only so the
 ## names can carry the I18n.KEY.tr() marks the translation template is extracted from (a const
 ## initialiser cannot call a method).
-static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr("Move right"), I18n.KEY.tr("Interact / continue"), I18n.KEY.tr("Response 1"), I18n.KEY.tr("Response 2"), I18n.KEY.tr("Pause")]
+static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr("Move right"), I18n.KEY.tr("Interact / continue"), I18n.KEY.tr("Response 1"), I18n.KEY.tr("Response 2"), I18n.KEY.tr("Pause"), I18n.KEY.tr("Show objective")]
 ## Display names of the other actions a rebind can clash with (Main's _install_inputs), so the "Already
 ## used by" note never shows an id. The English is the id with "_" as a space, as the note showed before.
 static var OTHER_ACTION_NAMES: Dictionary = {&"cycle_name": I18n.KEY.tr("cycle name")}
@@ -946,6 +946,7 @@ func _button_label(index: int) -> String:
 		JOY_BUTTON_X: return "X"
 		JOY_BUTTON_Y: return "Y"
 		JOY_BUTTON_START: return tr("START")
+		JOY_BUTTON_BACK: return tr("VIEW")
 		JOY_BUTTON_DPAD_LEFT: return tr("D-pad left")
 		JOY_BUTTON_DPAD_RIGHT: return tr("D-pad right")
 	return I18n.fill(I18n.KEY.tr("BUTTON %d"), [index])

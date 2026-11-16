@@ -3501,3 +3501,11 @@ msgstr "As alterações de volume são aplicadas imediatamente."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "SAIR"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "Mostrar objetivo"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "EXIBIR"

@@ -3491,3 +3491,11 @@ msgstr "Изменения громкости применяются сразу.
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "ВЫХОД"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "Показать цель"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "ПРОСМОТР"

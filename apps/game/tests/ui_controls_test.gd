@@ -134,6 +134,30 @@ func _run() -> void:
 	_expect(list_font is FontVariation and (list_font as FontVariation).base_font == GameSettings.CONTROL_FONT.base_font and not list_font.fallbacks.is_empty() and language.get_popup().get_theme_font("font") == list_font and language.get_popup().get_theme_font("font_separator") == list_font, "LANGUAGE and its list draw with the list's own font chain")
 	game.call("_new_game")
 	game.call("_finish_intro")
+	var objective_card: Control = game.get_node("CanvasLayer/TopBar") as Control
+	var before_recall: String = str(game.get("status_line"))
+	objective_card.hide()
+	var recall: InputEventKey = InputEventKey.new()
+	recall.physical_keycode = KEY_TAB
+	recall.pressed = true
+	Input.parse_input_event(recall)
+	await frames(2)
+	_expect(objective_card.visible and (game.get("hud") as Label).text.contains(str(game.call("_objective"))), "Tab recalls the current objective in the existing card")
+	_expect(str(game.get("status_line")) == before_recall and not paused, "recalling the objective leaves dialogue and play state alone")
+	recall.pressed = false
+	Input.parse_input_event(recall)
+	objective_card.hide()
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, true))
+	await frames(2)
+	_expect(objective_card.visible and game.get("controller_active"), "controller View recalls the same objective")
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, false))
+	game.call("_pause_game")
+	objective_card.hide()
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, true))
+	await frames(2)
+	_expect(paused and not objective_card.visible, "View leaves Pause unchanged")
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, false))
+	game.call("_resume_game")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	var touch: Control = game.get_node("CanvasLayer/TouchControls") as Control

@@ -3431,3 +3431,11 @@ msgstr "음량 변경은 즉시 적용됩니다."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "종료"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "목표 표시"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "보기"

@@ -195,6 +195,8 @@ const CORRIDOR_SEAL_LAMP: Vector2 = Vector2(807.908, 344.759)
 const CORRIDOR_DOOR_OPEN_SECONDS: float = 1.0
 ## The engineer's name card when control starts (decision B): its hold before it fades like the top card.
 const NAME_CARD_SECONDS: float = 2.6
+## Existing objective-card reading hold, in seconds; recalled cards use the same authored timing.
+const OBJECTIVE_CARD_SECONDS: float = 3.4
 const TOP_CARD_FADE_SECONDS: float = 0.45
 const TOP_CARD_ACCENT: Color = Color(0.22, 0.78, 0.92, 1)
 const ENGINEER_TINT: Color = Color("#f4d5ae")
@@ -2481,8 +2483,16 @@ func _on_settings_back() -> void:
 		_grab_menu_focus(settings_button)
 
 
+## Tracks native input, recalls a live objective, and routes direct answer presses before focused controls.
 func _input(event: InputEvent) -> void:
 	_note_input_device(event)
+	if not event.is_echo() and event.is_action_pressed(&"show_objective") and not title_open and not intro_active and not end_card_active and not fail_active and not get_tree().paused and human.controlled and not waiting_for_choice and not _opening_lines_playing():
+		# Reuse the transient card without advancing a line, changing a goal or opening another menu.
+		name_card_remaining = 0.0
+		last_top_card_key = "%s:%s" % [state.chapter_id, _objective()]
+		_show_top_card(_objective_card_message(), OBJECTIVE_CARD_SECONDS)
+		get_viewport().set_input_as_handled()
+		return
 	# Direct response bindings win over native focused-button acceptance.
 	if waiting_for_choice and not title_open and not get_tree().paused and not event.is_echo():
 		var response: int = 1 if event.is_action_pressed(&"choice_1") else (2 if event.is_action_pressed(&"choice_2") else 0)
@@ -5008,8 +5018,7 @@ func _refresh_ui() -> void:
 	elif last_top_card_key != card_key and not _opening_lines_playing():
 		# One thing to read at a time (TEACH-7): the location card waits while the opening lines play.
 		last_top_card_key = card_key
-		var location: String = I18n.KEY.tr("MAINTENANCE ANNEX") if state.chapter_id == "investigation" else (I18n.KEY.tr("SERVICE JUNCTION") if state.chapter_id == "junction" else (I18n.KEY.tr("RECORDS ACCESS / FIRST COPY") if state.chapter_id == "records" else I18n.KEY.tr("MAINTENANCE / LOCKDOWN")))
-		_show_top_card("%s\n%s" % [location, _objective()], 3.4)
+		_show_top_card(_objective_card_message(), OBJECTIVE_CARD_SECONDS)
 	var context: String = _context_hint()
 	if context != save_error_context:
 		save_error = ""
@@ -5539,6 +5548,12 @@ func _write_top_card(message: String) -> void:
 	hud.text = HudText.card(message)
 
 
+## The current room and objective as English rows, shared by automatic cards and player recall.
+func _objective_card_message() -> String:
+	var location: String = I18n.KEY.tr("MAINTENANCE ANNEX") if state.chapter_id == "investigation" else (I18n.KEY.tr("SERVICE JUNCTION") if state.chapter_id == "junction" else (I18n.KEY.tr("RECORDS ACCESS / FIRST COPY") if state.chapter_id == "records" else I18n.KEY.tr("MAINTENANCE / LOCKDOWN")))
+	return "%s\n%s" % [location, _objective()]
+
+
 ## Shows the top card with [param message] (English rows, see [method _write_top_card]) for
 ## [param hold_seconds], then fades it out; [param accent] tints its edge.
 func _show_top_card(message: String, hold_seconds: float, accent: Color = TOP_CARD_ACCENT) -> void:
@@ -5777,6 +5792,7 @@ func _install_inputs() -> void:
 	_add_action(&"choice_1", KEY_1)
 	_add_action(&"choice_2", KEY_2)
 	_add_action(&"pause_game", KEY_ESCAPE)
+	_add_action(&"show_objective", KEY_TAB)
 	_add_action(&"cycle_name", KEY_I)
 	_add_joy_button(&"move_left", JOY_BUTTON_DPAD_LEFT)
 	_add_joy_button(&"move_right", JOY_BUTTON_DPAD_RIGHT)
@@ -5786,6 +5802,7 @@ func _install_inputs() -> void:
 	_add_joy_button(&"choice_1", JOY_BUTTON_X)
 	_add_joy_button(&"choice_2", JOY_BUTTON_Y)
 	_add_joy_button(&"pause_game", JOY_BUTTON_START)
+	_add_joy_button(&"show_objective", JOY_BUTTON_BACK)
 	_add_joy_button(&"ui_cancel", JOY_BUTTON_B)
 	_add_joy_button(&"ui_accept", JOY_BUTTON_A)
 

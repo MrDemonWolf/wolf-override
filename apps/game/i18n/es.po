@@ -3515,3 +3515,11 @@ msgstr "Los cambios de volumen se aplican al instante."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "SALIR"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "Mostrar objetivo"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "VISTA"

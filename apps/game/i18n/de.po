@@ -3500,3 +3500,11 @@ msgstr "Lautstärkeänderungen werden sofort angewendet."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "BEENDEN"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "Ziel anzeigen"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "ANSICHT"

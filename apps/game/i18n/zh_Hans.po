@@ -3434,3 +3434,11 @@ msgstr "音量更改立即生效。"
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "退出"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "显示目标"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "视图"

@@ -3492,3 +3492,11 @@ msgstr "Zmiany głośności są stosowane natychmiast."
 # machine-translated by Codex (OpenAI), unreviewed
 msgid "QUIT"
 msgstr "WYJDŹ"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "Pokaż cel"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "WIDOK"
