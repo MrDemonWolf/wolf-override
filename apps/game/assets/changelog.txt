@@ -98,6 +98,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Settings are written to a temporary file first and then swapped in, so a crash while saving cannot leave a broken settings file.
 
 -- Website --
+- The accessibility guide describes title text scaling and dialogue speaker tabs.
 - Next.js is updated to 16.4.3 with the October security fixes; the website stays a static export.
 - Zod, used by the docs build, is updated to 4.6.7 with its collection-validation security fix.
 - Every page limits the referrer sent to other sites to the site's origin.
