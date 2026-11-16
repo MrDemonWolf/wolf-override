@@ -3478,3 +3478,9 @@ msgstr "UŁATWIENIA DOSTĘPU"
 #, c-format
 msgid "Press a controller input for %s. Menu cancels."
 msgstr "Naciśnij przycisk lub porusz gałką kontrolera dla „%s”. Menu anuluje."
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Pause notice after the controller in use disconnects; reconnection alone never resumes play.
+#. i18n: speaker=ui
+msgid "Controller disconnected. Resume when ready."
+msgstr "Kontroler odłączony. Wznów grę, gdy zechcesz."

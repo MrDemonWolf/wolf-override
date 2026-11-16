@@ -678,6 +678,8 @@ var save_path: String = M0State.SAVE_PATH
 var settings_path: String = "user://settings.cfg"
 var touch_enabled: bool = OS.has_feature("ios") or OS.has_feature("android")
 var controller_active: bool = false
+## Why play was paused; reconnecting alone never clears it or resumes the game.
+var controller_disconnected: bool = false
 ## True after real mouse input, until keyboard, controller or touch input takes over menu focus.
 var mouse_active: bool = false
 var title_open: bool = true
@@ -1040,6 +1042,10 @@ func _ready() -> void:
 	_install_inputs()
 	_setup_settings()
 	_setup_impact()
+	var pads: Array[int] = Input.get_connected_joypads()
+	if not pads.is_empty():
+		impact.rumble_device = pads[0]
+	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	_setup_touch_controls()
 	pause_button.pressed.connect(_on_pause_button)
 	pause_overlay.resume_requested.connect(_resume_game)
@@ -2209,6 +2215,7 @@ func _on_pause_button() -> void:
 
 
 func _pause_game() -> void:
+	impact.stop_rumble()
 	for action: StringName in GAMEPLAY_ACTIONS:
 		Input.action_release(action)
 	# Like letting go of a held crank: a toggled crank stops while the game is paused.
@@ -2224,6 +2231,7 @@ func _pause_game() -> void:
 
 
 func _resume_game() -> void:
+	controller_disconnected = false
 	settings_menu.cancel_capture()
 	get_tree().paused = false
 	pause_overlay.hide()
@@ -2306,7 +2314,9 @@ func _show_pause_menu() -> void:
 func _show_pause_hint(tapped: bool) -> void:
 	_pause_hint_tapped = tapped
 	var hint: Label = $CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/PauseHint
-	hint.text = tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)])
+	hint.text = tr("Controller disconnected. Resume when ready.") if controller_disconnected else (tr("TAP RESUME TO RETURN") if tapped else I18n.fill(I18n.KEY.tr("%s  RESUME"), [settings_menu.prompt(&"pause_game", controller_active)]))
+	# Keep the reason for pausing above Resume, including when the action list scrolls at 200%.
+	hint.get_parent().move_child(hint, 0 if controller_disconnected else hint.get_parent().get_child_count() - 1)
 
 
 func _return_to_title() -> void:
@@ -2476,6 +2486,17 @@ func _answer_choice(response: int) -> void:
 			_choose_lane(response)
 		_:
 			_choose(M0State.DISCLOSE if response == 1 else M0State.PRESS)
+
+
+## Losing the pad actually in use pauses live play; other pads and reconnects never change menu state.
+## Device IDs come from Input's connection signal and may be nonzero. Existing pause releases held actions.
+func _on_joy_connection_changed(device: int, connected: bool) -> void:
+	if connected or device != impact.rumble_device:
+		return
+	impact.stop_rumble()
+	if controller_active and not title_open and not end_card_active and not get_tree().paused:
+		controller_disconnected = true
+		_pause_game()
 
 
 ## Called from _input during play and from PauseOverlay while the tree is paused.
@@ -4186,6 +4207,7 @@ func _fail_beat(reason: String, by_sentry: bool = false) -> void:
 		return
 	var in_lane: bool = by_sentry and _seen_in_lane()
 	fail_active = true
+	impact.stop_rumble()
 	_drop_box_queue()
 	for action: StringName in GAMEPLAY_ACTIONS:
 		Input.action_release(action)
@@ -5948,6 +5970,7 @@ func debug_snapshot(include_state: bool = true) -> Dictionary:
 			"title_open": title_open, "intro_active": intro_active, "paused": get_tree().paused, "waiting_for_choice": waiting_for_choice,
 			"choice_context": choice_context, "fail_active": fail_active, "chapter_close_active": chapter_close_active,
 			"end_card_active": end_card_active, "touch_layout": touch_enabled and not controller_active, "controller_active": controller_active,
+			"controller_disconnected": controller_disconnected, "controller_device": impact.rumble_device,
 			"save_pending": save_pending, "seal_opening": seal_opening, "wolf_baiting": wolf_baiting, "bypass_ticks": bypass_ticks,
 		},
 		"save_path": save_path,

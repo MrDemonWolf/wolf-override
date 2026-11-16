@@ -3417,3 +3417,9 @@ msgstr "접근성"
 #, c-format
 msgid "Press a controller input for %s. Menu cancels."
 msgstr "%s 동작에 쓸 컨트롤러 입력을 누르세요. 메뉴: 취소."
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Pause notice after the controller in use disconnects; reconnection alone never resumes play.
+#. i18n: speaker=ui
+msgid "Controller disconnected. Resume when ready."
+msgstr "컨트롤러 연결이 끊어졌습니다. 준비되면 재개하세요."

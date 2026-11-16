@@ -3501,3 +3501,9 @@ msgstr "ACCESIBILIDAD"
 #, c-format
 msgid "Press a controller input for %s. Menu cancels."
 msgstr "Presiona un botón o un stick del control para «%s». Menú cancela."
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Pause notice after the controller in use disconnects; reconnection alone never resumes play.
+#. i18n: speaker=ui
+msgid "Controller disconnected. Resume when ready."
+msgstr "Control desconectado. Reanuda cuando quieras."

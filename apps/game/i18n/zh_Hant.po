@@ -3435,3 +3435,9 @@ msgstr "無障礙"
 #, c-format
 msgid "Press a controller input for %s. Menu cancels."
 msgstr "請為「%s」按下控制器按鍵。按選單鍵取消。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Pause notice after the controller in use disconnects; reconnection alone never resumes play.
+#. i18n: speaker=ui
+msgid "Controller disconnected. Resume when ready."
+msgstr "控制器已中斷連線。準備好後可繼續遊戲。"
