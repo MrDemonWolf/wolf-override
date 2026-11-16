@@ -62,12 +62,12 @@ func _init() -> void:
 	margin.add_child(body)
 
 
-## Where a page can be drawn in the 960x540 canvas: its width, from ORIGIN down to the bottom edge
+## Where a page can be drawn in the live canvas: its width, from ORIGIN down to the bottom edge
 ## (every page is shorter), so a control in that column would be under it. [param state_width] is the
 ## state pages' text width (STATE_WIDTH, or narrowed by width_left_of).
-static func footprint(performance_page: bool, state_width: float = STATE_WIDTH) -> Rect2:
+static func footprint(performance_page: bool, canvas_height: float, state_width: float = STATE_WIDTH) -> Rect2:
 	var width: float = (PERFORMANCE_WIDTH if performance_page else state_width) + MARGIN_X * 2.0 + FRAME_SLACK
-	return Rect2(ORIGIN, Vector2(width, 540.0 - ORIGIN.y))
+	return Rect2(ORIGIN, Vector2(width, canvas_height - ORIGIN.y))
 
 
 ## The widest a state page's text can be and still end CLEAR_GAP left of canvas x [param left].

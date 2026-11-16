@@ -88,6 +88,7 @@ var bar_time: float = 0.0
 var quit_requested: bool = false
 var handed_over: bool = false
 var _mascot_top: float = 0.0
+var screen_shape: ScreenShape = ScreenShape.new()
 
 @onready var mascot: TextureRect = $Mascot
 @onready var grin_mouth: TextureRect = $Mascot/GrinMouth
@@ -107,7 +108,9 @@ static func wants_skip(args: PackedStringArray, display_name: String) -> bool:
 ## applies the saved window (desktop only), starts the background loads of the assets to warm, holds
 ## quitting until they finish, and shows the first frame.
 func _ready() -> void:
-	_mascot_top = mascot.position.y
+	add_child(screen_shape)
+	screen_shape.shape_changed.connect(_layout_logo)
+	_layout_logo(screen_shape.visible_rect, screen_shape.safe_rect)
 	var config: ConfigFile = GameSettings.load_config(settings_path)
 	reduce_motion = GameSettings.boolean(config, "video", "reduced_motion", false)
 	var args: PackedStringArray = OS.get_cmdline_user_args()
@@ -128,6 +131,18 @@ func _ready() -> void:
 	get_tree().auto_accept_quit = false
 	get_tree().quit_on_go_back = false
 	seek(0.0)
+
+
+## Centres the original logo composition without stretching the mascot, then reapplies its current pose.
+func _layout_logo(_visible: Rect2, safe: Rect2) -> void:
+	ScreenShape.fit_authored([$Glow, mascot, company_name, load_bar] as Array[Control], safe)
+	# Resizing a TextureRect scales its image, not its fixed-offset child crop.
+	var mouth: Rect2 = ScreenShape.authored_rect(grin_mouth)
+	var factor: float = mascot.size.x / ScreenShape.authored_rect(mascot).size.x
+	grin_mouth.position = mouth.position * factor
+	grin_mouth.size = mouth.size * factor
+	_mascot_top = mascot.position.y
+	seek(elapsed)
 
 
 ## True when the logo applies the player's saved window size and fullscreen itself: on desktop, once

@@ -18,8 +18,8 @@ func _run() -> void:
 		var depth: RoomDepth = rooms[room_name]
 		_check_plates(room_name, depth)
 	# The play camera's clamp at zoom 1.35 (Main.GAMEPLAY_ZOOM).
-	var half_play: float = 960.0 / 1.35 * 0.5
-	var touch_y: float = (game.get_script() as Script).get_script_constant_map()["GAMEPLAY_CAMERA_Y_TOUCH"]
+	var half_play: float = float(game.call("gameplay_view_width")) * 0.5
+	var touch_y: float = float(game.call("gameplay_camera_y", true))
 	var framings: Array[Array] = [
 		["play, left end", Vector2(half_play, 360.0), 1.35, SHAKE],
 		["play, right end", Vector2(960.0 - half_play, 360.0), 1.35, SHAKE],
@@ -37,6 +37,7 @@ func _run() -> void:
 			for room_name: String in rooms:
 				_check_coverage("%s, %s, shake %d" % [room_name, framing[0], int(shake)], rooms[room_name], view)
 	camera.offset = Vector2.ZERO
+	camera.limit_right = roundi(JunctionRoom.EXIT_VIEW_RIGHT)
 	await _check_exit_view_edge(junction, camera, half_play, touch_y)
 	# Every station stands on the floor, as tall as the art it replaced.
 	var floor_props: Dictionary = {
@@ -85,6 +86,7 @@ func _run() -> void:
 	var arm: Rect2 = _global_rect(junction.arm_art)
 	var shackle: Vector2 = junction.global_position + RoomDepth.prop_point(junction.arm_art, JunctionRoom.ARM_SHACKLE)
 	_expect(absf(shackle.x - DropArm.MARK_X) < 0.01 and absf(arm.end.y - shackle.y) < 0.01 and tank.position.y > shackle.y and absf(tank.get_center().x - DropArm.MARK_X) < 0.01, "the hung tank hangs centred over the mark below the arm's shackle, on its cable (shackle %s, tank top %.1f)" % [shackle, tank.position.y])
+	await _check_shapes(game as Main, rooms, camera)
 	_check_records_doors(records)
 	_check_characters(game)
 	game.queue_free()
@@ -92,6 +94,35 @@ func _run() -> void:
 	for leftover: String in [path, "%s-settings.cfg" % path]:
 		remove_file(leftover)
 	finish("Room depth checks passed")
+
+
+## Native window resizing covers bounded ultrawide/tablet shapes, all room layers, both controls,
+## both ends and maximum shake. It reuses the same coverage assertions as the authored 16:9 shots.
+func _check_shapes(game: Main, rooms: Dictionary, camera: Camera2D) -> void:
+	var original: Vector2i = root.size
+	for size: Vector2i in [Vector2i(1280, 720), Vector2i(2340, 1080), Vector2i(2400, 1080), Vector2i(2560, 1080), Vector2i(3840, 1080), Vector2i(1280, 800), Vector2i(2732, 2048)]:
+		root.size = size
+		await frames(3)
+		var canvas: Vector2 = game.screen_shape.visible_rect.size
+		var config: Dictionary = ScreenShape.window_config(size)
+		var expected: Vector2 = config["size"]
+		if config["aspect"] == Window.CONTENT_SCALE_ASPECT_EXPAND:
+			expected = Vector2(size) / minf(float(size.x) / ScreenShape.design_size.x, float(size.y) / ScreenShape.design_size.y)
+		_expect(canvas.distance_to(expected) < 1.5, "%s actually renders its expected canvas (%s vs %s)" % [size, canvas, expected])
+		_expect(canvas.x / canvas.y >= ScreenShape.MIN_ASPECT - 0.002 and canvas.x / canvas.y <= ScreenShape.MAX_ASPECT + 0.002, "%s stays inside the art aspect bounds (%s)" % [size, canvas])
+		for touch: bool in [false, true]:
+			game.touch_enabled = touch
+			game.call("_layout_hud")
+			var y: float = game.gameplay_camera_y(touch)
+			var half: float = game.gameplay_view_width() * 0.5
+			for x: float in [half, RoomDepth.ROOM_WIDTH - half]:
+				for shake: float in [-SHAKE, SHAKE]:
+					var view: Rect2 = await _view_at(camera, Vector2(x, y), shake)
+					for room_name: String in rooms:
+						_check_coverage("%s / %s / touch %s / x %.1f" % [size, room_name, touch, x], rooms[room_name], view)
+	root.size = original
+	camera.offset = Vector2.ZERO
+	await frames(3)
 
 
 func _check_plates(room_name: String, depth: RoomDepth) -> void:
@@ -262,7 +293,7 @@ func _view_at(camera: Camera2D, at: Vector2, shake: float) -> Rect2:
 	camera.offset = Vector2(shake, absf(shake))
 	await process_frame
 	await process_frame
-	var half: Vector2 = Vector2(960.0, 540.0) * 0.5 / camera.zoom
+	var half: Vector2 = camera.get_viewport().get_visible_rect().size * 0.5 / camera.zoom
 	return Rect2(camera.get_screen_center_position() - half, half * 2.0)
 
 

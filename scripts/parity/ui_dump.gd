@@ -26,6 +26,7 @@ func _settle(frames: int) -> void:
 
 
 func _run() -> void:
+	root.size = Vector2i(ProjectSettings.get_setting("display/window/size/window_width_override"), ProjectSettings.get_setting("display/window/size/window_height_override"))
 	for path: String in [SAVE, SETTINGS]:
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

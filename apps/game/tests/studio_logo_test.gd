@@ -16,6 +16,7 @@ func _run() -> void:
 	# The background-load cases run first, so the title's scripts compile on worker threads as at launch.
 	await _check_timeline()
 	await _check_reduced_motion()
+	await _check_safe_layout()
 	await _check_handover()
 	await _check_skip_waits_for_load()
 	await _check_skip_inputs()
@@ -61,7 +62,7 @@ func _check_timeline() -> void:
 	logo.manual_clock = true
 	var top: float = logo.mascot.position.y
 	_expect(not logo.grin_mouth.visible and logo.company_name.modulate.a == 0.0 and logo.fade.color.a == 0.0 and not logo.load_bar.visible, "the first frame is the smirk alone, as on the boot splash")
-	_expect(logo.mascot.position == Vector2(408, 86) and logo.mascot.size == Vector2(144, 300), "the mascot sits where the boot splash draws it")
+	_expect(logo.mascot.position == Vector2(408, 86) and logo.mascot.size == Vector2(144, 300), "the mascot sits where the boot splash draws it (%s, %s; canvas %s)" % [logo.mascot.position, logo.mascot.size, logo.screen_shape.visible_rect])
 	_check_shader_warmup(logo)
 	logo.seek(StudioLogo.SWAP_AT - 0.01)
 	_expect(not logo.grin_mouth.visible, "the smirk holds until the swap")
@@ -218,6 +219,19 @@ func _check_skip_inputs() -> void:
 		_expect(logo.skipping == cases[label][1], "%s %s the logo" % [label, "skips" if cases[label][1] else "does not skip"])
 	while logo.main_scene == null:
 		await process_frame
+	await _free_logo(logo)
+
+
+## Safe-area shrinking keeps the grin crop aligned with the mascot rather than leaving it full-size.
+func _check_safe_layout() -> void:
+	var logo: StudioLogo = _add_logo(false)
+	logo.manual_clock = true
+	var mouth: Rect2 = Rect2(logo.grin_mouth.position, logo.grin_mouth.size)
+	var safe: Rect2 = Rect2(74, 0, 812, 514)
+	logo.call("_layout_logo", logo.screen_shape.visible_rect, safe)
+	var factor: float = logo.mascot.size.x / 144.0
+	_expect(safe.encloses(logo.mascot.get_global_rect()) and is_equal_approx(logo.mascot.size.y / 300.0, factor), "safe-area shrinking preserves the mascot's proportions")
+	_expect(logo.grin_mouth.position.is_equal_approx(mouth.position * factor) and logo.grin_mouth.size.is_equal_approx(mouth.size * factor), "the grin crop follows the same scale as the face")
 	await _free_logo(logo)
 
 

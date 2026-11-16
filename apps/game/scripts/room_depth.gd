@@ -23,6 +23,7 @@ extends Node2D
 ## ([method set_lockdown_cleared]).
 
 const ROOM_WIDTH: float = 960.0
+const ROOM_HEIGHT: float = 540.0
 const FLOOR_Y: float = 440.0
 const BACKDROP_SCROLL: Vector2 = Vector2(0.9, 1.0)
 const NEAR_SCROLL: Vector2 = Vector2(1.15, 1.0)
@@ -33,17 +34,21 @@ const Z_MID: int = -3
 const Z_ATMOSPHERE: int = -4
 const Z_NEAR: int = 3
 ## The near edge strips are anchored at least this far past the room edges so their outer edges
-## stay off screen through every framing: Parallax2D shifts a layer by (camera x - 480) *
+## stay off screen through every framing: the centred parallax anchor shifts a layer by (camera x - 480) *
 ## (1 - scroll), which at 1.15 is up to 19 px at play (zoom 1.35), 32 px in the opening (zoom 1.8)
 ## and 26 px at the chapter-close shot (zoom 1.55), plus up to 10 px of camera shake.
 const NEAR_OVERHANG: float = 56.0
 ## Mirrored slivers of the mid plate past each room edge, so camera shake at the end of the camera's
 ## travel shows a continuation of the plate instead of its cut edge.
 const MID_BLEED: float = 16.0
+## Canvas width used by the shared parallax anchor; Main updates it on each ScreenShape change.
+var canvas_width: float = ScreenShape.design_size.x
 ## The plates end at world y 540 and every mid plate paints its deck down to there, but the touch
-## framing (Main.GAMEPLAY_CAMERA_Y_TOUCH 392 at zoom 1.35) shows down to y 592 and a camera shake 10 px
+## framing (about y 392 at zoom 1.35 on the base canvas) shows down to y 592 and a camera shake 10 px
 ## more: the far and mid plates' bottom rows are mirrored on down this far (world px).
 const BOTTOM_BLEED: float = 64.0
+## Fractional atlas-to-world scaling can leave the mid plate just short of 540; reserve one world px.
+const ART_BOTTOM: float = ROOM_HEIGHT + BOTTOM_BLEED - 1.0
 ## World px per atlas px of the painted beacons (beacon_atlas, corridor-beacons.png): it was painted at
 ## 2 px per world px, the density of the plates it was cut to fit, and keeps it now that the plates
 ## are painted at their own densities.
@@ -304,7 +309,8 @@ func rebuild() -> void:
 	backdrop = _plate("Painting", painting)
 	backdrop_layer.add_child(backdrop)
 	if painting != null:
-		backdrop_layer.add_child(_bottom_bleed("BottomBleed", painting, BOTTOM_BLEED / _far_scale()))
+		_add_side_bleeds(backdrop_layer, painting, _far_scale())
+		backdrop_layer.add_child(_bottom_bleed("BottomBleed", painting, BOTTOM_BLEED / _far_scale(), MID_BLEED / _far_scale()))
 	haze = Sprite2D.new()
 	haze.name = "Haze"
 	haze.centered = false
@@ -373,11 +379,8 @@ func rebuild() -> void:
 	_built.append(mid_layer)
 	mid_layer.add_child(_plate("Painting", mid_painting))
 	if mid_painting != null:
-		var bleed_source: float = MID_BLEED / _plate_scale()
-		var width: float = float(mid_painting.get_width())
-		mid_layer.add_child(_plate("LeftBleed", mid_painting, Rect2(0.0, 0.0, bleed_source, mid_painting.get_height()), true))
-		mid_layer.add_child(_plate("RightBleed", mid_painting, Rect2(width - bleed_source, 0.0, bleed_source, mid_painting.get_height()), true))
-		mid_layer.add_child(_bottom_bleed("BottomBleed", mid_painting, BOTTOM_BLEED / _plate_scale(), bleed_source))
+		_add_side_bleeds(mid_layer, mid_painting, _plate_scale())
+		mid_layer.add_child(_bottom_bleed("BottomBleed", mid_painting, BOTTOM_BLEED / _plate_scale(), MID_BLEED / _plate_scale()))
 	far_dust = _make_dust("FarDust", FAR_DUST_COUNT, 0.18, 0.4, Z_ATMOSPHERE)
 	near_layer = _add_parallax("Near", NEAR_SCROLL, Z_NEAR)
 	if near_painting != null:
@@ -405,7 +408,8 @@ func _apply() -> void:
 	var far_bleed: Sprite2D = backdrop_layer.get_node_or_null("BottomBleed") as Sprite2D
 	if far_bleed != null:
 		far_bleed.scale = backdrop.scale
-		far_bleed.position = Vector2(far.position.x, far.end.y)
+		far_bleed.position = Vector2(far.position.x - MID_BLEED, far.end.y)
+		_layout_side_bleeds(backdrop_layer, _far_scale(), far.position.y)
 	haze.visible = on
 	haze.position = Vector2(far.position.x, far.position.y + far.size.y * 0.29)
 	haze.scale = Vector2(far.size.x * (haze_end + haze_fade), far.size.y * 0.56) / haze.texture.get_size()
@@ -429,16 +433,12 @@ func _apply() -> void:
 	var mid: Sprite2D = mid_layer.get_node("Painting") as Sprite2D
 	mid.position = Vector2(0.0, mid_top)
 	mid.scale = Vector2.ONE * scale_factor
-	var left_bleed: Sprite2D = mid_layer.get_node_or_null("LeftBleed") as Sprite2D
-	if left_bleed != null:
-		var right_bleed: Sprite2D = mid_layer.get_node("RightBleed") as Sprite2D
-		left_bleed.scale = Vector2.ONE * scale_factor
-		left_bleed.position = Vector2(-MID_BLEED, mid_top)
-		right_bleed.scale = Vector2.ONE * scale_factor
-		right_bleed.position = Vector2(ROOM_WIDTH, mid_top)
+	if mid_painting != null:
+		_layout_side_bleeds(mid_layer, scale_factor, mid_top)
 		var bottom_bleed: Sprite2D = mid_layer.get_node("BottomBleed") as Sprite2D
 		bottom_bleed.scale = Vector2.ONE * scale_factor
 		bottom_bleed.position = Vector2(-MID_BLEED, mid_top + mid.texture.get_height() * scale_factor)
+	set_canvas_width(canvas_width)
 	near_layer.visible = on
 	var left_edge: Sprite2D = near_layer.get_node_or_null("LeftEdge") as Sprite2D
 	var near_scale: float = _far_scale()
@@ -588,6 +588,29 @@ func _far_scale() -> float:
 	return ROOM_WIDTH / float(reference.get_width()) if reference != null else 1.0
 
 
+## Mirrors the same 16-world-px side strips for far and mid art; _layout_side_bleeds places them.
+func _add_side_bleeds(layer: Node2D, texture: Texture2D, scale: float) -> void:
+	var source: float = ceilf(MID_BLEED / scale)
+	layer.add_child(_plate("LeftBleed", texture, Rect2(0, 0, source, texture.get_height()), true))
+	layer.add_child(_plate("RightBleed", texture, Rect2(texture.get_width() - source, 0, source, texture.get_height()), true))
+
+
+## Places a layer's mirrored strips at its art edges, in world px; shared by both plate depths.
+func _layout_side_bleeds(layer: Node2D, scale: float, top: float) -> void:
+	for side: String in ["LeftBleed", "RightBleed"]:
+		var bleed: Sprite2D = layer.get_node(side) as Sprite2D
+		bleed.scale = Vector2.ONE * scale
+		bleed.position = Vector2(-MID_BLEED if side == "LeftBleed" else ROOM_WIDTH, top)
+
+
+## Re-centres both parallax layers for [param width] canvas px; world coordinates keep their 960-px home.
+func set_canvas_width(width: float) -> void:
+	canvas_width = width
+	for layer: Parallax2D in [backdrop_layer, near_layer]:
+		if layer != null:
+			layer.scroll_offset.x = (1.0 - layer.scroll_scale.x) * (width - ScreenShape.design_size.x) * 0.5
+
+
 ## The mid plate's rows from world y [param top_y] down, mirrored on past the room's right edge to
 ## world x [param reach] and on below the plate's bottom as far as BOTTOM_BLEED (mirror repeat), added to
 ## [member behind] as [param bleed_name]: a doorway at the right end whose pieces run on past the edge
@@ -613,6 +636,8 @@ func deck_bleed(bleed_name: String, top_y: float, reach: float) -> Sprite2D:
 ## below the plates' bottom edge (BOTTOM_BLEED). The caller places and scales it.
 func _bottom_bleed(bleed_name: String, texture: Texture2D, rows: float, side: float = 0.0) -> Sprite2D:
 	var width: float = float(texture.get_width())
+	rows = ceilf(rows)
+	side = ceilf(side)
 	var bleed: Sprite2D = _plate(bleed_name, texture, Rect2(-side, texture.get_height() - rows, width + side * 2.0, rows))
 	bleed.flip_v = true
 	bleed.texture_repeat = CanvasItem.TEXTURE_REPEAT_MIRROR

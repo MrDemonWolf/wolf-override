@@ -242,7 +242,7 @@ func _build() -> void:
 ## Keeps the touch debug control beside the live Pause rect, including mobile safe-area changes.
 func layout_button() -> void:
 	var size: Vector2 = BUTTON_RECT.size.max(debug_button.get_combined_minimum_size())
-	Main._set_rect(debug_button, Vector2(game.pause_button.position.x - BUTTON_GAP - size.x, game.screen_shape.safe_rect.position.y + BUTTON_RECT.position.y), size)
+	ScreenShape.set_rect(debug_button, Vector2(game.pause_button.position.x - BUTTON_GAP - size.x, game.screen_shape.safe_rect.position.y + BUTTON_RECT.position.y), size)
 
 
 ## Recomputes availability from the build, the stored unlock and a session lock.
@@ -340,7 +340,7 @@ func state_width() -> float:
 	var prompt: Control = game.tutorial_prompt
 	if prompt.is_visible_in_tree():
 		var rect: Rect2 = prompt.get_global_rect()
-		if DebugOverlay.footprint(false).intersects(rect):
+		if DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y).intersects(rect):
 			return minf(DebugOverlay.STATE_WIDTH, DebugOverlay.width_left_of(rect.position.x))
 	return DebugOverlay.STATE_WIDTH
 

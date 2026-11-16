@@ -409,8 +409,7 @@ func _world_view() -> Rect2:
 ## Where Main holds the play camera's centre (Main._update_gameplay_camera): half its view in from
 ## each end of the 960 px room.
 func _camera_centre_limits() -> Vector2:
-	var half_view: float = Main.GAMEPLAY_VIEW_WIDTH * 0.5
-	return Vector2(half_view, 960.0 - half_view)
+	return game.gameplay_camera_limits()
 
 
 ## True while the title is up (or no game is wired): the rules' zones and hitboxes are left out then, and only
@@ -492,7 +491,7 @@ func zone_items() -> Array[Item]:
 			list.append(heading)
 	# The camera's centre is held between these; the marker is where it is now.
 	var limits: Vector2 = _camera_centre_limits()
-	list.append(_range(ZONES, "camera centre limits", limits.x, limits.y, Row.CAMERA, "GAMEPLAY_VIEW_WIDTH / 2 .. 960 - GAMEPLAY_VIEW_WIDTH / 2", false))
+	list.append(_range(ZONES, "camera centre limits", limits.x, limits.y, Row.CAMERA, "live viewport half-width inside the room", false))
 	var camera: Camera2D = game.intro_camera
 	if camera != null:
 		var centre: Item = _spot(ZONES, "camera x%.2f" % camera.zoom.x, camera.get_screen_center_position().x, Row.CAMERA, "IntroCamera screen centre")
@@ -1055,7 +1054,7 @@ func _world_to_screen(point: Vector2) -> Vector2:
 
 ## The canvas on show (960x540, wider on a wide window).
 func _view() -> Rect2:
-	return get_viewport().get_visible_rect() if is_inside_tree() else Rect2(0.0, 0.0, 960.0, 540.0)
+	return game.screen_shape.visible_rect if game != null else Rect2(Vector2.ZERO, ScreenShape.design_size)
 
 
 ## The floor line (RoomDepth.FLOOR_Y) as a screen y (canvas px), where the rule lanes start.

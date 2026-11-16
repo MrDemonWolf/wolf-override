@@ -91,7 +91,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Accessibility
 
-- Gameplay text, touch controls, Pause and Settings respect a shared mobile safe area. Synthetic insets and container renders checked; physical cutouts unverified, widescreen expansion pending.
+- The view expands from 4:3 to 2.4:1, with bars beyond those limits; cameras, room edges and full-screen UI follow the real canvas. Headless and container checks only; physical devices unverified.
+
+- Gameplay text, touch controls, Pause and Settings respect a shared mobile safe area. Synthetic insets and container renders checked; physical cutouts remain unverified.
 
 - One input owner keeps play, Settings and debug UI in sync; desktop taps enable touch controls, and mouse motion preserves prompts. Headless and rendered checks only.
 
@@ -226,6 +228,8 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
 
 ### Development
+
+- Headless layout fixtures start at the configured window size; camera coverage checks exercise actual phone, tablet and ultrawide canvases.
 
 - The debug zones keep controller View for their render-box toggle while open; normal play keeps objective recall. Headless checks only.
 

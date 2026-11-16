@@ -5,12 +5,19 @@ extends "res://tests/support/game_suite.gd"
 
 func _run() -> void:
 	check_name = "Screen shape"
+	for case: Array in [[Vector2i(1280, 720), Vector2i(960, 540), Window.CONTENT_SCALE_ASPECT_EXPAND], [Vector2i(1280, 800), Vector2i(960, 540), Window.CONTENT_SCALE_ASPECT_EXPAND], [Vector2i(2796, 1290), Vector2i(960, 540), Window.CONTENT_SCALE_ASPECT_EXPAND], [Vector2i(2400, 1080), Vector2i(960, 540), Window.CONTENT_SCALE_ASPECT_EXPAND], [Vector2i(2732, 2048), Vector2i(960, 540), Window.CONTENT_SCALE_ASPECT_EXPAND], [Vector2i(5120, 1440), Vector2i(1296, 540), Window.CONTENT_SCALE_ASPECT_KEEP], [Vector2i(1000, 1000), Vector2i(960, 720), Window.CONTENT_SCALE_ASPECT_KEEP]]:
+		var config: Dictionary = ScreenShape.window_config(case[0])
+		_expect(config["size"] == case[1] and config["aspect"] == case[2], "%s chooses the bounded expansion mode" % case[0])
+	_expect(ScreenShape.centre_limits(0, 960, 1200) == Vector2(480, 480), "a view wider than its room stays centred")
 	var visible: Rect2 = Rect2(0, 0, 960, 540)
 	var safe: Rect2 = Rect2(74, 0, 812, 514)
 	var screen: Transform2D = Transform2D(Vector2(2, 0), Vector2(0, 2), Vector2(120, 80))
 	_expect(ScreenShape.canvas_safe_rect(visible, screen * safe, screen).is_equal_approx(safe), "safe screen pixels become canvas coordinates after scale and bars")
 	_expect(ScreenShape.canvas_safe_rect(visible, Rect2(), screen) == visible, "unavailable safe areas keep the visible canvas")
 	_expect(ScreenShape.canvas_safe_rect(visible, Rect2(-100, -100, 2000, 2000), Transform2D.IDENTITY) == visible, "safe areas are clipped to the viewport")
+	# A saved/previous window can differ from the default reapplied during Main setup.
+	root.size = Vector2i(2732, 2048)
+	await frames(2)
 	var game: Main = await start_game("screen-shape", keep_running) as Main
 	game.call("_new_game")
 	game.call("_finish_intro")

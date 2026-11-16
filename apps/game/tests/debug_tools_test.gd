@@ -349,7 +349,7 @@ func _check_overlay_steps_aside() -> void:
 	await _touch(Vector2(480.0, 230.0))
 	await settle(2)
 	_expect(game.get("waiting_for_choice"), "the tap answered nothing")
-	_expect(choices[0].get_global_rect().position.x < DebugOverlay.footprint(false).end.x, "the touch layout's first answer sits in the overlay's column")
+	_expect(choices[0].get_global_rect().position.x < DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y).end.x, "the touch layout's first answer sits in the overlay's column")
 	_expect(not tools.overlay.visible and not tools.is_processing(), "in the touch layout the overlay steps aside for the answers instead of covering answer 1")
 	_expect(tools.debug_button.visible, "the DEBUG button stays during a touch question")
 	for choice: Control in choices:
@@ -654,8 +654,8 @@ func _check_zones_corridor() -> void:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	_expect(not gap.is_empty() and is_equal_approx(float(gap["x_range"][1]) - float(gap["x_range"][0]), M0Actor.FOLLOW_GAP * 2.0) and is_equal_approx(float(gap["x_range"][0]), human.position.x - M0Actor.FOLLOW_GAP), "WOLF's follow gap is drawn around the engineer")
 	var camera_limits: Dictionary = _entry(geometry["zones"], "name", "camera centre limits")
-	var view_width: float = float(game.get_script().get_script_constant_map()["GAMEPLAY_VIEW_WIDTH"])
-	_expect(not camera_limits.is_empty() and is_equal_approx(float(camera_limits["x_range"][0]), view_width * 0.5) and is_equal_approx(float(camera_limits["x_range"][1]), 960.0 - view_width * 0.5), "the camera's centre limits come from the play view's width")
+	var view_width: float = float(game.call("gameplay_view_width"))
+	_expect(not camera_limits.is_empty() and is_equal_approx(float(camera_limits["x_range"][0]), Main.L1_CORRIDOR_MIN_VIEW_X + view_width * 0.5) and is_equal_approx(float(camera_limits["x_range"][1]), 960.0 - view_width * 0.5), "the camera's centre limits come from the play view's width")
 	# They follow the camera: on screen each range starts where the canvas puts its world x.
 	human.position.x = 700.0
 	await create_timer(1.5).timeout
@@ -1138,7 +1138,7 @@ func _check_menu_keyboard_and_controller() -> void:
 	_expect(tools.overlay.visible and tools.is_processing(), "the overlay stays up and refreshing beside the open menu")
 	await process_frame
 	var card: Rect2 = menu.panel.get_global_rect()
-	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(card) and not card.intersects(tools.overlay.get_global_rect()) and not card.intersects(DebugOverlay.footprint(false)), "the menu card is on screen and clear of the overlay's column (%s)" % card)
+	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(card) and not card.intersects(tools.overlay.get_global_rect()) and not card.intersects(DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y)), "the menu card is on screen and clear of the overlay's column (%s)" % card)
 	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TopBar"]:
 		_expect(not card.intersects((game.get_node(path) as Control).get_global_rect()), "the menu card leaves %s clear" % path.get_file())
 	var focus: Control = root.gui_get_focus_owner()
@@ -1281,7 +1281,7 @@ func _check_note_placement() -> void:
 		_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the %s note is on screen (%s)" % [layout, rect])
 		for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint", "CanvasLayer/BottomBar", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TouchControls/Use"]:
 			_expect(not rect.intersects((game.get_node(path) as Control).get_global_rect()), "the %s note leaves %s clear" % [layout, path.get_file()])
-		for other: Rect2 in [DebugOverlay.footprint(false), DebugMenu.STEP_BAR_RECT, DebugZones.LEGEND_RECT, tools.debug_button.get_global_rect()]:
+		for other: Rect2 in [DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y), DebugMenu.STEP_BAR_RECT, DebugZones.LEGEND_RECT, tools.debug_button.get_global_rect()]:
 			_expect(not rect.intersects(other), "the %s note leaves %s clear (%s)" % [layout, other, rect])
 		for answers: Array in [[Vector2(42.0, 88.0), Vector2(428.0, 76.0)], [Vector2(396.0, 88.0), Vector2(522.0, 40.0)]]:
 			_expect(not rect.intersects(Rect2(answers[0], answers[1])), "the %s note leaves the answer row clear" % layout)
@@ -1295,7 +1295,7 @@ func _check_note_placement() -> void:
 		_expect(band.is_equal_approx(DebugTools.NOTE_RECT) and band.end.y <= 78.0, "with no zones legend the %s note sits in the top band (%s)" % [layout, band])
 		for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint", "CanvasLayer/BottomBar", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TouchControls/Use"]:
 			_expect(not band.intersects((game.get_node(path) as Control).get_global_rect()), "the %s band note leaves %s clear" % [layout, path.get_file()])
-		for other: Rect2 in [tools.overlay.get_global_rect(), DebugOverlay.footprint(false), DebugMenu.STEP_BAR_RECT, tools.debug_button.get_global_rect()]:
+		for other: Rect2 in [tools.overlay.get_global_rect(), DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y), DebugMenu.STEP_BAR_RECT, tools.debug_button.get_global_rect()]:
 			_expect(not band.intersects(other), "the %s band note leaves %s clear (%s)" % [layout, other, band])
 		_expect(tools.note_label.get_line_count() <= 2 and tools.note_label.get_visible_line_count() == tools.note_label.get_line_count(), "a capture's path fits the band note's two lines (%d)" % tools.note_label.get_line_count())
 	# A jump's note never covers the actors or the junction's tank, with or without the zones page.

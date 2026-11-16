@@ -986,16 +986,10 @@ const L1_CORRIDOR_MIN_VIEW_X: float = -40.0
 const L1_WALKBACK_FROM_X: float = 160.0
 const L1_WALKBACK_TO_X: float = -250.0
 const L1_ROOM_VIEW_CENTRE: float = -284.0
-const GAMEPLAY_VIEW_WIDTH: float = 960.0 / GAMEPLAY_ZOOM
 ## The play camera's resting height. At 1.35 it puts the floor (y 440) 27 px above the context hint
 ## (screen y 405) while the junction's arm rail (y 196) stays in view. The approved whole-piece plates
 ## (art swap PR 3) hang the rooms' ceiling lamps just over the view's top, as the art set's frames do.
 const GAMEPLAY_CAMERA_Y: float = 360.0
-## With the touch arrows and USE on screen (their tops at screen y 345) the play camera sits lower,
-## so feet and station bases on the floor land at screen y 335, above the buttons, instead of
-## behind them. The ceiling lamps leave the top of the view; the far plate still covers it. The touch
-## answers take the buttons' place at the bottom during a choice, so the camera stays put.
-const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
 ## The junction's close (the only chapter-close shot: Records keeps control while its closing lines
 ## run) frames its exit door whole and off the edge of the view (review r1): its right
 ## edge runs on to JUNCTION_CLOSE_RIGHT, past the near jamb (JunctionRoom.EXIT_NEAR_JAMB_X) and the
@@ -1004,7 +998,7 @@ const GAMEPLAY_CAMERA_Y_TOUCH: float = 392.0
 ## placard, with the floor about 70 % down the view, above the dialogue card.
 const JUNCTION_CLOSE_RIGHT: float = JunctionRoom.EXIT_VIEW_RIGHT
 const JUNCTION_CLOSE_ZOOM: float = 1.62
-const JUNCTION_CLOSE_CAMERA: Vector2 = Vector2(JUNCTION_CLOSE_RIGHT - 480.0 / JUNCTION_CLOSE_ZOOM, 373.0)
+const JUNCTION_CLOSE_CAMERA_Y: float = 373.0
 ## Menu cards fade and slide in over this long; short enough never to hold up input or players who want little motion.
 const MENU_REVEAL_SECONDS: float = 0.12
 const MENU_REVEAL_OFFSET: Vector2 = Vector2(0.0, 10.0)
@@ -1039,7 +1033,6 @@ static func game_version() -> String:
 
 func _ready() -> void:
 	add_child(screen_shape)
-	screen_shape.shape_changed.connect(_on_screen_shape_changed)
 	get_window().title = str(ProjectSettings.get_setting(NAME_SETTING, ""))
 	title_version.text = game_version()
 	speaker.add_theme_stylebox_override(&"normal", speaker.get_theme_stylebox(&"tab_selected", &"TerminalTabBar"))
@@ -1162,6 +1155,9 @@ func _ready() -> void:
 	reveal.tween_property(title_line, "modulate", Color.WHITE, 0.25)
 	reveal.tween_property(title_logo, "modulate", Color.WHITE, 0.35)
 	_setup_debug_tools()
+	# Saved window settings can resize during setup, before the procedural rooms exist.
+	screen_shape.shape_changed.connect(_on_screen_shape_changed)
+	_on_screen_shape_changed.call_deferred(screen_shape.visible_rect, screen_shape.safe_rect)
 
 
 func _refresh_continue() -> void:
@@ -1397,23 +1393,36 @@ func _attach_status_glow(light: ColorRect) -> Sprite2D:
 	return glow
 
 
+## The live gameplay view width in world px, shared with labels, debug geometry and camera bounds.
+func gameplay_view_width() -> float:
+	return screen_shape.visible_rect.size.x / GAMEPLAY_ZOOM
+
+
+## The play camera's horizontal centre limits, world px; the dock-bay walkback eases from the left limit.
+func gameplay_camera_limits() -> Vector2:
+	return ScreenShape.centre_limits(L1_CORRIDOR_MIN_VIEW_X if state.chapter_id == "lockdown" else 0.0, _view_right(), gameplay_view_width())
+
+
+## Resting camera y in world px. Touch puts the feet 10 canvas px above the live controls;
+## tall views stay above the bottom bleed while the keyboard retains its authored 360-world-px rest.
+func gameplay_camera_y(touch: bool) -> float:
+	var half_height: float = screen_shape.visible_rect.size.y / GAMEPLAY_ZOOM * 0.5
+	var y: float = RoomDepth.FLOOR_Y - (touch_left.position.y - 10.0 - screen_shape.visible_rect.size.y * 0.5) / GAMEPLAY_ZOOM if touch else GAMEPLAY_CAMERA_Y
+	return minf(y, RoomDepth.ART_BOTTOM - Impact.MAX_SHAKE_PX - half_height)
+
+
+## Keeps the fixed-zoom gameplay camera inside the painted floor; tall screens raise it, never zoom it.
 func _update_gameplay_camera() -> void:
-	var half_view: float = GAMEPLAY_VIEW_WIDTH * 0.5
-	var touch_buttons: bool = input_mode.touch_layout()
-	var camera_y: float = GAMEPLAY_CAMERA_Y_TOUCH if touch_buttons else GAMEPLAY_CAMERA_Y
-	var low: float = half_view
-	if state.chapter_id == "lockdown":
-		low = L1_CORRIDOR_MIN_VIEW_X + half_view
-		if human.position.x < L1_WALKBACK_FROM_X:
-			# Walking back toward the dock bay: one continuous ease to the whole room's view.
-			# A wider screen (a phone's) shows more round the centre, so the room's view keeps its left
-			# edge at DockBay.VIEW_LEFT whatever the screen's shape.
-			var shown_half: float = get_viewport().get_visible_rect().size.x / GAMEPLAY_ZOOM * 0.5
-			var room_centre: float = maxf(L1_ROOM_VIEW_CENTRE, DockBay.VIEW_LEFT + shown_half)
-			var u: float = clampf((human.position.x - L1_WALKBACK_TO_X) / (L1_WALKBACK_FROM_X - L1_WALKBACK_TO_X), 0.0, 1.0)
-			intro_camera.position = Vector2(lerpf(room_centre, low, u), camera_y)
-			return
-	intro_camera.position = Vector2(clampf(human.position.x, low, _view_right() - half_view), camera_y)
+	var half_view: float = gameplay_view_width() * 0.5
+	var camera_y: float = gameplay_camera_y(input_mode.touch_layout())
+	_set_camera_bounds()
+	var limits: Vector2 = gameplay_camera_limits()
+	if state.chapter_id == "lockdown" and human.position.x < L1_WALKBACK_FROM_X:
+		var room_centre: float = maxf(L1_ROOM_VIEW_CENTRE, DockBay.VIEW_LEFT + half_view)
+		var u: float = clampf((human.position.x - L1_WALKBACK_TO_X) / (L1_WALKBACK_FROM_X - L1_WALKBACK_TO_X), 0.0, 1.0)
+		intro_camera.position = Vector2(lerpf(room_centre, limits.x, u), camera_y)
+		return
+	intro_camera.position = Vector2(clampf(human.position.x, limits.x, limits.y), camera_y)
 
 
 ## The play view's right edge: the room's, except in the junction, where it runs on to show the exit
@@ -1976,6 +1985,7 @@ func _new_game() -> void:
 		station.hide()
 	opening.start()
 	intro_camera.position = L1_OPENING_CAMERA
+	_set_camera_bounds()
 	intro_camera.position_smoothing_enabled = false
 	intro_camera.zoom = Vector2.ONE * L1_OPENING_ZOOM
 	intro_alarm.color.a = 0.0
@@ -2308,11 +2318,53 @@ func _layout_pause_card() -> void:
 	pause_menu.size = menu_panel.size
 
 
+## Fits the title column and existing credits/changelog/end-card compositions to the current safe area.
+## Full-screen backdrops stay on the visible canvas; only their readable contents use the safe rect.
+func _layout_fullscreen_ui() -> void:
+	var safe: Rect2 = screen_shape.safe_rect
+	var design: Vector2 = ScreenShape.design_size
+	for item: Control in [$CanvasLayer/TitleScreen/Brand, $CanvasLayer/TitleScreen/LogoMark, $CanvasLayer/TitleScreen/TitleLine, $CanvasLayer/TitleScreen/GameTitle, $CanvasLayer/TitleScreen/Subtitle, $CanvasLayer/TitleScreen/MenuScroll, $CanvasLayer/TitleScreen/Credit]:
+		var home: Rect2 = ScreenShape.authored_rect(item)
+		var at: Vector2 = home.position + Vector2(safe.end.x - design.x, safe.position.y)
+		var size: Vector2 = home.size
+		if item.name == &"MenuScroll":
+			size.y += safe.size.y - design.y
+		elif item.name == &"Credit":
+			at.y = home.position.y + safe.end.y - design.y
+		ScreenShape.set_rect(item, at, size)
+	for item: Control in [changelog_button, title_version]:
+		var home: Rect2 = ScreenShape.authored_rect(item)
+		ScreenShape.set_rect(item, home.position + Vector2(safe.position.x, safe.end.y - design.y), home.size)
+	var veil: Control = $CanvasLayer/TitleScreen/TitleVeil
+	var veil_home: Rect2 = ScreenShape.authored_rect(veil)
+	ScreenShape.set_rect(veil, Vector2(safe.end.x - veil_home.size.x, screen_shape.visible_rect.position.y), Vector2(veil_home.size.x, screen_shape.visible_rect.size.y))
+	for overlay: Control in [credits_screen, changelog_screen, end_card]:
+		if overlay != null:
+			var items: Array[Control] = []
+			items.assign(overlay.get_children())
+			ScreenShape.fit_authored(items, safe)
+	_set_camera_bounds()
+
+
+## Built-in camera limits also constrain an in-flight cinematic tween after a window resize.
+## The 10-world-px floor reserve keeps maximum shake inside the plates' 64-px bottom bleed.
+func _set_camera_bounds() -> void:
+	intro_camera.limit_left = roundi(DockBay.VIEW_LEFT) if state.chapter_id == "lockdown" else 0
+	intro_camera.limit_right = roundi(_view_right())
+	intro_camera.limit_top = roundi(Impact.MAX_SHAKE_PX)
+	intro_camera.limit_bottom = roundi(RoomDepth.ART_BOTTOM - Impact.MAX_SHAKE_PX)
+
+
 ## Applies safe-area changes to the active HUD and menu; resizing never opens or closes a menu.
 func _on_screen_shape_changed(_visible: Rect2, _safe: Rect2) -> void:
 	if not is_node_ready():
 		return
 	_layout_hud()
+	for depth: RoomDepth in [$CorridorDepth, records_room.depth, junction_room.depth]:
+		depth.set_canvas_width(screen_shape.visible_rect.size.x)
+	if not intro_active and not chapter_close_active and not title_open:
+		_update_gameplay_camera()
+	_layout_fullscreen_ui()
 	if pause_overlay.visible:
 		Tweens.kill(menu_tween)
 		menu_panel.modulate.a = 1.0
@@ -3764,10 +3816,11 @@ func _leave_junction() -> void:
 	_frame_chapter_close()
 
 
-## Starts the junction's chapter-close camera move on chapter_tween (JUNCTION_CLOSE_CAMERA at
-## JUNCTION_CLOSE_ZOOM, over 0.5 s), so the exit door and both actors share the shot.
+## Moves the chapter-close camera to JUNCTION_CLOSE_RIGHT at JUNCTION_CLOSE_ZOOM over 0.5 s,
+## on chapter_tween, so the exit door and both actors share the live-shaped shot.
 func _frame_chapter_close() -> void:
-	chapter_tween.tween_property(intro_camera, "position", JUNCTION_CLOSE_CAMERA, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	var target: Vector2 = Vector2(JUNCTION_CLOSE_RIGHT - screen_shape.visible_rect.size.x * 0.5 / JUNCTION_CLOSE_ZOOM, minf(JUNCTION_CLOSE_CAMERA_Y, RoomDepth.ART_BOTTOM - screen_shape.visible_rect.size.y * 0.5 / JUNCTION_CLOSE_ZOOM))
+	chapter_tween.tween_property(intro_camera, "position", target, 0.5).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	chapter_tween.parallel().tween_property(intro_camera, "zoom", Vector2.ONE * JUNCTION_CLOSE_ZOOM, 0.5)
 
 
@@ -5282,7 +5335,7 @@ func _refit_station_labels() -> void:
 	bypass_handle.refit_labels()
 	# The first view's right edge (x 671) less the fade there: a name standing in that view stays whole
 	# and unfaded at the corridor's start, as text_boxes_test checks, even when a translation is longer.
-	var first_view_right: float = L1_CORRIDOR_MIN_VIEW_X + GAMEPLAY_VIEW_WIDTH - JunctionRoom.LABEL_EDGE_FADE
+	var first_view_right: float = L1_CORRIDOR_MIN_VIEW_X + gameplay_view_width() - JunctionRoom.LABEL_EDGE_FADE
 	# The COOLANT FAULT tag is held inside that view first, since the relay's name rises by its growth.
 	TextSize.part_world_labels([bypass_handle.fault_tag] as Array[Label], first_view_right)
 	for label: Label in [$BreakerLabel, $RelayLabel, $CheckpointLabel] as Array[Label]:
@@ -5365,20 +5418,20 @@ func _story_wrap_width(column: float) -> float:
 func _layout_hud() -> void:
 	var safe: Rect2 = screen_shape.safe_rect
 	# Authored offsets stay inside the safe rect; no scene or input-mode copy of the inset arithmetic.
-	_set_rect(pause_button, Vector2(safe.end.x - 116.0, safe.position.y + 16.0), pause_button.size)
+	ScreenShape.set_rect(pause_button, Vector2(safe.end.x - 116.0, safe.position.y + 16.0), pause_button.size)
 	# Keep the authored controls above the dialogue while that placement fits the safe area.
 	var touch_height: float = maxf(touch_left.size.y, maxf(touch_right.size.y, touch_use.size.y))
 	var touch_top: float = clampf(screen_shape.visible_rect.end.y - 195.0, safe.position.y + 16.0, safe.end.y - touch_height - DIALOGUE_BOTTOM_INSET)
-	_set_rect(touch_left, Vector2(safe.position.x + 32.0, touch_top), touch_left.size)
-	_set_rect(touch_right, Vector2(safe.position.x + 142.0, touch_top), touch_right.size)
-	_set_rect(touch_use, Vector2(safe.end.x - 187.0, touch_top), touch_use.size)
+	ScreenShape.set_rect(touch_left, Vector2(safe.position.x + 32.0, touch_top), touch_left.size)
+	ScreenShape.set_rect(touch_right, Vector2(safe.position.x + 142.0, touch_top), touch_right.size)
+	ScreenShape.set_rect(touch_use, Vector2(safe.end.x - 187.0, touch_top), touch_use.size)
 	if debug_tools != null and debug_tools.debug_button != null:
 		debug_tools.layout_button()
 	var span: Vector2 = _touch_hint_span()
 	var span_width: float = span.y - span.x
 	var span_centre: float = (span.x + span.y) * 0.5
 	var dialogue_bottom: float = _dialogue_bottom()
-	_set_rect(top_card, safe.position + Vector2(18.0, 16.0), top_card.size)
+	ScreenShape.set_rect(top_card, safe.position + Vector2(18.0, 16.0), top_card.size)
 	var touch_layout: bool = input_mode.touch_layout()
 	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
 	_set_font_size(speaker, TextSize.px(SPEAKER_FONT_SIZE))
@@ -5392,16 +5445,16 @@ func _layout_hud() -> void:
 	var centre_x: float = span_centre if between else safe.get_center().x
 	# Speaker tabs sit outside the text panel, so narration and speech share one words column.
 	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column
-	_set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
+	ScreenShape.set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
 	var line_height: float = story.get_line_height()
 	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
 	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + text_height
-	_set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), dialogue_bottom - bar_height), Vector2(bar_width, bar_height))
-	_set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), text_height))
+	ScreenShape.set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), dialogue_bottom - bar_height), Vector2(bar_width, bar_height))
+	ScreenShape.set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), text_height))
 	# The reused tab style includes content margins, which can exceed the text's line height.
 	var tab_height: float = maxf(speaker.get_combined_minimum_size().y, speaker.get_line_height() + DIALOGUE_PADDING.y)
-	_set_rect(speaker, Vector2(DIALOGUE_PADDING.x, -tab_height), Vector2(minf(names + DIALOGUE_PADDING.x, column), tab_height))
-	_set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
+	ScreenShape.set_rect(speaker, Vector2(DIALOGUE_PADDING.x, -tab_height), Vector2(minf(names + DIALOGUE_PADDING.x, column), tab_height))
+	ScreenShape.set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
 	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
 	# and takes a third row if its words need one there.
 	var card_width: float = minf(clampf(448.0 * TextSize.factor, 448.0, 820.0), safe.size.x - 36.0)
@@ -5409,24 +5462,24 @@ func _layout_hud() -> void:
 		card_width = minf(card_width, pause_button.position.x - HUD_CARD_GAP - top_card.position.x)
 	if _debug_button_shown():
 		card_width = minf(card_width, debug_tools.debug_button.position.x - HUD_CARD_GAP - top_card.position.x)
-	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, hud.size.y))
+	ScreenShape.set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, hud.size.y))
 	var card_height: float = maxf(62.0, hud.get_line_height() * maxi(2, hud.get_line_count()) + 14.0)
-	_set_rect(top_card, top_card.position, Vector2(card_width, card_height))
-	_set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, card_height - 11.0))
-	_set_rect(top_card.get_node("Accent") as Control, Vector2.ZERO, Vector2(4.0, card_height))
+	ScreenShape.set_rect(top_card, top_card.position, Vector2(card_width, card_height))
+	ScreenShape.set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, card_height - 11.0))
+	ScreenShape.set_rect(top_card.get_node("Accent") as Control, Vector2.ZERO, Vector2(4.0, card_height))
 	# The hint bar: top right under PAUSE (and under the top card where that reaches across) in the
 	# opening and the closing shots, otherwise just above the dialogue box; on touch between ◀ ▶ and USE.
 	var cinematic: bool = intro_active or chapter_close_active
 	var hint_width: float = minf(278.0 * TextSize.factor, 440.0) if cinematic else (span_width if touch_layout else minf(549.0 * TextSize.factor, safe.size.x - HUD_SIDE_MARGIN * 2.0))
-	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
+	ScreenShape.set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, context_hint_text.size.y))
 	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
 	var hint_x: float = safe.end.x - 32.0 - hint_width if cinematic else (span.x if touch_layout else roundf(safe.get_center().x - hint_width * 0.5))
 	# With no box up the hint takes the box's place at the bottom instead of floating over the floor.
 	var hint_bottom: float = dialogue_bottom - bar_height - HINT_GAP if bottom_bar.visible else dialogue_bottom
 	var hint_y: float = maxf(94.0, top_card.position.y + card_height + HUD_CARD_GAP) if cinematic else hint_bottom - hint_height
-	_set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
-	_set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
-	_set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
+	ScreenShape.set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
+	ScreenShape.set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
+	ScreenShape.set_rect(context_hint.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(3.0, hint_height - 2.0))
 	# The tutorial prompt, sized to its rows and centred under the card.
 	var tutorial_size: Vector2 = tutorial_text.get_minimum_size() + Vector2(32.0, 18.0)
 	tutorial_size.x = maxf(tutorial_size.x, 316.0 if tutorial_text.text.contains("\n") else 0.0)
@@ -5438,9 +5491,9 @@ func _layout_hud() -> void:
 			# It takes the place of a card that is already leaving: the card goes at once instead of
 			# fading out under it.
 			top_card.hide()
-	_set_rect(tutorial_prompt, tutorial_rect.position, tutorial_size)
-	_set_rect(tutorial_text, Vector2(16.0, 9.0), tutorial_size - Vector2(27.0, 18.0))
-	_set_rect(tutorial_prompt.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(4.0, tutorial_size.y - 2.0))
+	ScreenShape.set_rect(tutorial_prompt, tutorial_rect.position, tutorial_size)
+	ScreenShape.set_rect(tutorial_text, Vector2(16.0, 9.0), tutorial_size - Vector2(27.0, 18.0))
+	ScreenShape.set_rect(tutorial_prompt.get_node("Accent") as Control, Vector2(1.0, 1.0), Vector2(4.0, tutorial_size.y - 2.0))
 	if waiting_for_choice:
 		_layout_choices(touch_layout, top_card.position.y + card_height + 10.0)
 
@@ -5548,16 +5601,16 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 		var touch_height: float = maxf(76.0, maxf(touch_choice_1.get_minimum_size().y, touch_choice_2.get_minimum_size().y))
 		var question_top: float = speaker.global_position.y if speaker.visible else bottom_bar.position.y
 		var touch_top: float = question_top - 10.0 - touch_height
-		_set_rect(touch_choice_1, Vector2(left, touch_top), Vector2((right - left - 20.0) * 0.5, touch_height))
-		_set_rect(touch_choice_2, Vector2(safe.get_center().x + 10.0, touch_top), Vector2((right - left - 20.0) * 0.5, touch_height))
+		ScreenShape.set_rect(touch_choice_1, Vector2(left, touch_top), Vector2((right - left - 20.0) * 0.5, touch_height))
+		ScreenShape.set_rect(touch_choice_2, Vector2(safe.get_center().x + 10.0, touch_top), Vector2((right - left - 20.0) * 0.5, touch_height))
 		return
 	# Right-aligned at x 918, so the widest still leaves the side margin on the left.
 	var width: float = minf(522.0 * TextSize.factor, right - safe.position.x - HUD_SIDE_MARGIN)
 	var height: float = maxf(40.0 * TextSize.factor, 0.0)
-	_set_rect(touch_choice_1, Vector2(right - width, top), Vector2(width, height))
+	ScreenShape.set_rect(touch_choice_1, Vector2(right - width, top), Vector2(width, height))
 	height = maxf(height, touch_choice_1.get_minimum_size().y)
-	_set_rect(touch_choice_1, Vector2(right - width, top), Vector2(width, height))
-	_set_rect(touch_choice_2, Vector2(right - width, top + height + 6.0 * TextSize.factor), Vector2(width, maxf(height, touch_choice_2.get_minimum_size().y)))
+	ScreenShape.set_rect(touch_choice_1, Vector2(right - width, top), Vector2(width, height))
+	ScreenShape.set_rect(touch_choice_2, Vector2(right - width, top + height + 6.0 * TextSize.factor), Vector2(width, maxf(height, touch_choice_2.get_minimum_size().y)))
 
 
 ## The HUD is refreshed every frame, so these write a value only when it differs. A theme override
@@ -5580,15 +5633,6 @@ static func _set_modulate(item: CanvasItem, tint: Color) -> void:
 static func _set_color(rect: ColorRect, color: Color) -> void:
 	if rect.color != color:
 		rect.color = color
-
-
-## Moves [param control] to [param at] and sizes it to [param size] (canvas px), each only when it
-## differs, like the setters above: a needless write would queue a layout pass every frame.
-static func _set_rect(control: Control, at: Vector2, size: Vector2) -> void:
-	if control.position != at:
-		control.position = at
-	if control.size != size:
-		control.size = size
 
 
 ## Puts [param message] on the top card: English rows (a location and an objective, or the name card

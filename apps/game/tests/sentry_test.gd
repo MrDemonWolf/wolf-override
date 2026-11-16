@@ -464,7 +464,7 @@ func _check_scene() -> void:
 	_expect(is_equal_approx(camera.zoom.y, 1.35) and tank_top_screen >= answers_bottom + 8.0, "the hanging tank sits below the keyboard answers (tank top %.0f, answers end %.0f)" % [tank_top_screen, answers_bottom])
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
-	var tank_bottom_touch: float = (room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5 - Main.GAMEPLAY_CAMERA_Y_TOUCH) * camera.zoom.y + 270.0
+	var tank_bottom_touch: float = (room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5 - float(game.call("gameplay_camera_y", true))) * camera.zoom.y + 270.0
 	var answers_top: float = minf(touch_choice_1.get_global_rect().position.y, touch_choice_2.get_global_rect().position.y)
 	_expect(answers_top >= tank_bottom_touch + 8.0, "the hanging tank sits above the touch answers at the bottom (tank bottom %.0f, answers start %.0f)" % [tank_bottom_touch, answers_top])
 	game.set("touch_enabled", false)

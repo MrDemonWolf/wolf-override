@@ -85,6 +85,13 @@ func finish(pass_note: String = "") -> void:
 ## extends the kit defines) deferred, so it runs after the first idle frame, as a SceneTree script's
 ## _initialize cannot await. A suite that does all its work in _initialize overrides this.
 func _initialize() -> void:
+	call_deferred("_begin_suite")
+
+
+## The dummy display applies its initial square window after _initialize. Set the real project size
+## on the first idle frame so headless layout checks start with the same canvas as a normal launch.
+func _begin_suite() -> void:
+	root.size = Vector2i(ProjectSettings.get_setting("display/window/size/window_width_override"), ProjectSettings.get_setting("display/window/size/window_height_override"))
 	call_deferred("_run")
 
 
