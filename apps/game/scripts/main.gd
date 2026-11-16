@@ -5561,10 +5561,10 @@ func _tick_dialogue(delta: float) -> void:
 		dialogue_cleared = true
 
 
-## Shows the next box of the line on screen, if it has one.
+## Advances an unread page and resets its age; a cleared line stays read after layout reflow.
 func _next_box() -> bool:
 	_sync_dialogue_boxes()
-	if opening_lines_held or dialogue_index >= dialogue_boxes.size() - 1:
+	if opening_lines_held or dialogue_cleared or dialogue_index >= dialogue_boxes.size() - 1:
 		return false
 	dialogue_index += 1
 	dialogue_age = 0.0
