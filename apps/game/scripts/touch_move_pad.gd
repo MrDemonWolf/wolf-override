@@ -5,6 +5,9 @@ extends Control
 
 signal axis_changed(value: float)
 
+## The reviewed mockup thumb occupies 40 percent of its ring diameter.
+const THUMB_RATIO: float = 0.4
+
 ## Touch indices are nonnegative; -1 means the pad has no owner.
 const NO_FINGER: int = -1
 var finger: int = NO_FINGER
@@ -43,6 +46,7 @@ func configure(safe: Rect2, diameter: float, deadzone: float) -> void:
 	zone = next_zone
 	radius = next_radius
 	_deadzone = next_deadzone
+	queue_redraw()
 
 
 ## Called only after UI and object hit tests declined the press. A second finger never takes over.
@@ -53,6 +57,7 @@ func begin(event: InputEventScreenTouch) -> bool:
 	origin = event.position
 	offset = Vector2.ZERO
 	_set_axis(0.0)
+	queue_redraw()
 	return true
 
 
@@ -65,6 +70,7 @@ func observe(event: InputEvent) -> void:
 		cancel()
 	elif event is InputEventScreenDrag and event.index == finger and finger != NO_FINGER:
 		offset = Vector2(clampf(event.position.x - origin.x, -radius, radius), 0.0)
+		queue_redraw()
 		var raw: float = offset.x / radius
 		_set_axis(0.0 if absf(raw) <= _deadzone else signf(raw) * (absf(raw) - _deadzone) / (1.0 - _deadzone))
 
@@ -72,6 +78,7 @@ func observe(event: InputEvent) -> void:
 ## Drops only this thumb's axis; physical keyboard/controller actions stay owned by InputMap.
 func cancel() -> void:
 	finger = NO_FINGER
+	queue_redraw()
 	offset = Vector2.ZERO
 	_set_axis(0.0)
 
@@ -81,3 +88,13 @@ func _set_axis(value: float) -> void:
 	if not is_equal_approx(axis, value):
 		axis = value
 		axis_changed.emit(value)
+
+
+## Draws a quiet idle ring, then follows the owning thumb; positions and radii use canvas px.
+func _draw() -> void:
+	if radius <= 0.0:
+		return
+	var centre: Vector2 = origin if finger != NO_FINGER else Vector2(zone.get_center().x, zone.end.y - radius * 2.0)
+	draw_circle(centre, radius, Color(0.03, 0.07, 0.12, 0.7))
+	draw_arc(centre, radius, 0.0, TAU, 48, get_theme_color(&"font_color", &"Button"), 2.0, true)
+	draw_circle(centre + offset, radius * THUMB_RATIO, get_theme_color(&"font_color", &"Button"))

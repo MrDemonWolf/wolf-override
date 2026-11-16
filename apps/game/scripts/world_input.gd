@@ -98,6 +98,9 @@ func handle_unhandled(event: InputEvent) -> bool:
 		if not active.is_empty():
 			return false
 		var target: Tappable = _hit(point, id != MOUSE_ID)
+		if target == null and event is InputEventScreenTouch and _can_walk() and game.touch_move_pad.begin(event):
+			game.human.pointer_target_x = INF
+			return true
 		if target == null and (not _can_walk() or not _floor(point)):
 			return false
 		active = {"id": id, "target": target, "point": point, "cancelled": false, "fired": false, "hold": &""}

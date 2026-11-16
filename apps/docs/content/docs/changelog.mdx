@@ -234,7 +234,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Development
 
-- Phone movement groundwork shares the engineer’s existing movement path; the visible pad is not integrated yet. Headless checks only.
+- A floating phone move pad shares the engineer’s movement path and cancels on Pause; simultaneous MOVE + USE passed headless checks. Rendered and device checks remain unfinished.
 
 - The capture timeout test counts process frames, matching the renderer wait instead of counting physics ticks.
 - Settings UI tests wait for input and layout frames instead of physics ticks; checked at normal and coarse frame rates.

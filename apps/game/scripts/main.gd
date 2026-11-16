@@ -636,6 +636,7 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 ## One canvas/safe-area owner; layout readers never query the monitor work area themselves.
 var screen_shape: ScreenShape = ScreenShape.new()
 var world_input: WorldInput = WorldInput.new()
+var touch_move_pad: TouchMovePad = TouchMovePad.new()
 
 @onready var touch_choice_1: Button = $CanvasLayer/TouchControls/Choice1
 @onready var touch_choice_2: Button = $CanvasLayer/TouchControls/Choice2
@@ -2175,6 +2176,8 @@ func _on_changelog_body_input(event: InputEvent) -> void:
 
 
 func _setup_touch_controls() -> void:
+	touch_controls.add_child(touch_move_pad)
+	touch_move_pad.axis_changed.connect(func(value: float) -> void: human.touch_axis = value)
 	_bind_touch_button(touch_left, &"move_left")
 	_bind_touch_button(touch_right, &"move_right")
 	_bind_touch_button(touch_use, &"interact")
@@ -2587,6 +2590,7 @@ func can_recall_objective() -> bool:
 ## Tracks native input, recalls a live objective, and routes direct answer presses before focused controls.
 func _input(event: InputEvent) -> void:
 	_note_input_device(event)
+	touch_move_pad.observe(event)
 	world_input.observe(event)
 	if not event.is_echo() and event.is_action_pressed(&"show_objective") and can_recall_objective():
 		# Reuse the transient card without advancing a line, changing a goal or opening another menu.
@@ -5143,8 +5147,10 @@ func _refresh_ui() -> void:
 	pause_button.text = I18n.KEY.tr("PAUSE")
 	touch_controls.visible = (touch_layout or waiting_for_choice) and not title_open and not pause_overlay.visible
 	var touch_move: bool = not intro_active and not chapter_close_active and not waiting_for_choice and not fail_active
-	touch_left.visible = touch_layout and touch_move
-	touch_right.visible = touch_layout and touch_move
+	touch_left.hide()
+	touch_right.hide()
+	touch_move_pad.visible = touch_layout and touch_move
+	touch_move_pad.enabled = touch_move_pad.is_visible_in_tree() and human.controlled
 	touch_use.visible = touch_layout and not waiting_for_choice and not hatch_exit_walking
 	# Translated here (its auto-translate is off in main.tscn) so CONTINUE can carry its own context: on
 	# this button it goes on through lines, unlike the title's CONTINUE, which resumes a save. The hint
@@ -5159,7 +5165,7 @@ func _refresh_ui() -> void:
 		# Touch prompts name the on-screen buttons, in the same "button  action" form as the keys.
 		# Translated here, each row its own message with its key filled after tr() (localization PR L7b):
 		# the Label's auto-translate is off in main.tscn.
-		var move_label: String = I18n.fill(I18n.KEY.tr("%s  MOVE"), ["◀ / ▶" if touch_layout else move_keys]) if touch_layout or not controller_active else tr("STICK / D-PAD MOVE")
+		var move_label: String = I18n.fill(I18n.KEY.tr("%s  MOVE"), ["↔" if touch_layout else move_keys]) if touch_layout or not controller_active else tr("STICK / D-PAD MOVE")
 		var read_label: String = I18n.fill(I18n.KEY.tr("%s  READ DISPLAY (optional)"), [tr("USE") if touch_layout else interact_key])
 		# The display is optional, so once the engineer heads right the tutorial only points forward; in
 		# the dock bay it points back to the breaker.
@@ -5564,6 +5570,7 @@ func _layout_hud() -> void:
 	# Authored offsets stay inside the safe rect; no scene or input-mode copy of the inset arithmetic.
 	ScreenShape.set_rect(pause_button, Vector2(safe.end.x - 116.0, safe.position.y + 16.0), pause_button.size)
 	# Keep the authored controls above the dialogue while that placement fits the safe area.
+	touch_move_pad.configure(safe, touch_use.size.y, InputMap.action_get_deadzone(&"move_right"))
 	var touch_height: float = maxf(touch_left.size.y, maxf(touch_right.size.y, touch_use.size.y))
 	var touch_top: float = clampf(screen_shape.visible_rect.end.y - 195.0, safe.position.y + 16.0, safe.end.y - touch_height - DIALOGUE_BOTTOM_INSET)
 	ScreenShape.set_rect(touch_left, Vector2(safe.position.x + 32.0, touch_top), touch_left.size)
