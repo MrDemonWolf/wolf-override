@@ -27,7 +27,7 @@ func _run() -> void:
 	malformed.set_value("audio", "Music", {"bad": true})
 	malformed.set_value("controls", "deadzone", "bad")
 	_expect(GameSettings.number(malformed, "audio", "Music", 100.0) == 100.0 and GameSettings.number(malformed, "controls", "deadzone", 0.25) == 0.25, "malformed numeric preferences fall back safely")
-	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
 	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
 	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed and not menu.reduced_motion.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
@@ -57,7 +57,7 @@ func _run() -> void:
 	await process_frame
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
-	var title_settings: Button = game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button
+	var title_settings: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button
 	_expect(not paused and not game.get("pause_overlay").visible and game.get("title_open"), "controller B closes title settings through native event dispatch")
 	_expect(title_settings.has_focus(), "controller B from title settings leaves the title Settings button focused")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))

@@ -434,7 +434,7 @@ func _check_scene() -> void:
 	var arm: DropArm = game.get("drop_arm") as DropArm
 	var touch_use: Button = game.get_node("CanvasLayer/TouchControls/Use") as Button
 	var touch_choice_1: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
-	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
+	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button
 	if not _require(room != null and brain != null and arm != null and room.sentry != null and room.sentry.get_node_or_null("Visual") != null, "Main builds the sentry with its drawing in one Visual child"):
 		return
 	_expect(room.sentry.collision_layer == 0 and room.sentry.collision_mask == 0, "the sentry body never pushes or blocks the actors")
@@ -692,13 +692,13 @@ func _check_scene() -> void:
 	game.call("_refresh_ui")
 	await tap(&"pause_game")
 	_expect(not paused and game.get("title_open"), "Pause (or Back) on the card goes on to the title instead of pausing")
-	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == MainScript.FINISHED_NOTE, "on a finished save the title offers PLAY AGAIN and says why")
-	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label).text == MainScript.FINISHED_NOTE, "on a finished save the title offers PLAY AGAIN and says why")
+	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	_expect(not new_game_button.visible and is_equal_approx(continue_button.offset_left, new_game_button.offset_left) and game.call("_title_first_button") == continue_button, "NEW GAME would do the same, so PLAY AGAIN stands alone across the row and takes the first focus")
 	var finished_path: String = str(game.get("save_path"))
 	game.set("save_path", finished_path + ".missing")
 	game.call("_refresh_continue")
-	_expect(new_game_button.visible and continue_button.text == "CONTINUE" and continue_button.offset_left > new_game_button.offset_right and game.call("_title_first_button") == new_game_button, "without a finished save NEW GAME and CONTINUE sit side by side again")
+	_expect(new_game_button.visible and continue_button.text == "CONTINUE" and continue_button.get_index() > new_game_button.get_index() and game.call("_title_first_button") == new_game_button, "without a finished save NEW GAME and CONTINUE return in menu order")
 	game.set("save_path", finished_path)
 	game.call("_refresh_continue")
 	var finished_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
@@ -804,7 +804,7 @@ func _check_scene() -> void:
 	_expect(State.load_from_disk(path) == null, "a v4 save with the sentry down but the door sealed is rejected")
 	game.call("_pause_game")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
-	_expect(continue_button.disabled and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Saved checkpoint could not be read.", "the title refuses to continue from it")
+	_expect(continue_button.disabled and (game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label).text == "Saved checkpoint could not be read.", "the title refuses to continue from it")
 	remove_file(path)
 	remove_file("%s-settings.cfg" % path)
 	game.queue_free()

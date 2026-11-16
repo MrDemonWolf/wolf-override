@@ -490,87 +490,97 @@ theme_type_variation = &"TitleVeil"
 
 [node name="Brand" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 106.0
+offset_top = 32.0
 offset_right = 832.0
-offset_bottom = 137.0
+offset_bottom = 63.0
 theme_override_colors/font_color = Color(0.61, 0.77, 0.85, 1)
 theme_override_font_sizes/font_size = 18
 text = "MRDEMONWOLF, INC. PRESENTS"
 
 [node name="LogoMark" type="TextureRect" parent="CanvasLayer/TitleScreen"]
-offset_left = 852.0
-offset_top = 48.0
+offset_left = 884.0
+offset_top = 24.0
 offset_right = 940.0
-offset_bottom = 136.0
+offset_bottom = 80.0
 texture = ExtResource("3_logo")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TitleLine" type="ColorRect" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 153.0
+offset_top = 72.0
 offset_right = 940.0
-offset_bottom = 157.0
+offset_bottom = 76.0
 color = Color(0.10, 0.76, 0.92, 1)
 
 [node name="GameTitle" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 470.0
-offset_top = 175.0
+offset_top = 88.0
 offset_right = 940.0
-offset_bottom = 271.0
+offset_bottom = 152.0
 theme_override_fonts/font = ExtResource("13_display")
 text = "WOLF OVERRIDE"
 
 [node name="Subtitle" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 282.0
+offset_top = 164.0
 offset_right = 940.0
-offset_bottom = 313.0
+offset_bottom = 195.0
 theme_override_colors/font_color = Color(0.68, 0.78, 0.85, 1)
 theme_override_font_sizes/font_size = 20
 text = "CHAPTER 1  /  LOCKDOWN"
 
-[node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
+[node name="MenuScroll" type="ScrollContainer" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 341.0
-offset_right = 700.0
-offset_bottom = 391.0
+offset_top = 212.0
+offset_right = 940.0
+offset_bottom = 480.0
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="MenuMargin" type="MarginContainer" parent="CanvasLayer/TitleScreen/MenuScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MenuList" type="VBoxContainer" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "NEW GAME"
 
-[node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 716.0
-offset_top = 341.0
-offset_right = 940.0
-offset_bottom = 391.0
+[node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "CONTINUE"
 
-[node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 476.0
-offset_top = 393.0
-offset_right = 940.0
-offset_bottom = 433.0
+[node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 2
 autowrap_mode = 3
 
-[node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 476.0
-offset_top = 437.0
-offset_right = 700.0
-offset_bottom = 481.0
-theme_override_font_sizes/font_size = 18
-text = "CREDITS"
-
-[node name="SettingsButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 716.0
-offset_top = 437.0
-offset_right = 940.0
-offset_bottom = 481.0
+[node name="SettingsButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "SETTINGS"
+
+[node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "CREDITS"
 
 [node name="ChangelogButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 48.0

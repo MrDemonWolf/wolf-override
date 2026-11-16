@@ -12,7 +12,23 @@ func _run() -> void:
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
-	var first: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var first: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
+	var title_scroll: ScrollContainer = game.get_node("CanvasLayer/TitleScreen/MenuScroll") as ScrollContainer
+	var base_font: int = first.get_theme_font_size(&"font_size")
+	var last: Button = first.get_parent().get_node("CreditsButton") as Button
+	last.grab_focus()
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	game.call("_apply_text_size")
+	await frames(2)
+	_expect(first.get_theme_font_size(&"font_size") == base_font * 2, "repeated 200% title scaling does not compound")
+	for layout_frame: int in 4:
+		await process_frame
+	_expect(title_scroll.scroll_vertical > 0, "large title menus scroll to the focused final action")
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
+	await frames(2)
+	_expect(first.get_theme_font_size(&"font_size") == base_font, "title text returns to its authored size")
 	var mouse: InputEventMouseMotion = InputEventMouseMotion.new()
 	game.call("_note_input_device", mouse)
 	game.call("_grab_menu_focus", first)
@@ -89,7 +105,7 @@ func _run() -> void:
 	var project_theme: Theme = ThemeDB.get_project_theme()
 	var ring: StyleBoxFlat = project_theme.get_stylebox("focus", "Button") as StyleBoxFlat if project_theme != null and project_theme.has_stylebox("focus", "Button") else null
 	_expect(ring != null and ring.border_color.is_equal_approx(Color("#8de5f5")) and ring.border_width_left == 2 and ring.expand_margin_left == 0.0 and ring.bg_color.a == 0.0, "the shared theme gives buttons an inset cyan focus ring")
-	var title_new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var title_new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	var shared_settings: GameSettings = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as GameSettings
 	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (shared_settings.volumes["Music"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
 	var tab_ring: StyleBoxFlat = shared_settings.tabs.get_theme_stylebox("tab_focus") as StyleBoxFlat
@@ -234,9 +250,9 @@ func _run() -> void:
 	menu.reset_controls()
 	game.call("_pause_game")
 	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
-	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	_expect(not paused and game.get("title_open") and not overlay.visible and not (game.get_node("Human") as M0Actor).controlled and new_game.has_focus(), "Return to Title hides the pause menu and focuses New Game with actor control stopped")
-	_expect((game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
+	_expect((game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
 	new_game.pressed.emit()
 	_expect(game.get("intro_active") and (game.get("state") as M0State).memory.is_empty(), "New Game from the returned title clears the previous remembered choice")
 	# Android Back walks out of menus one step at a time and pauses play instead of quitting.

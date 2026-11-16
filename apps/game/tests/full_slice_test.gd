@@ -42,7 +42,7 @@ func _run() -> void:
 ## NEW GAME on the title, then the opening read through to first control, which must come in the
 ## corridor, past the dock bay's cross-wall (DockBay.ROOM_RIGHT), with the engineer free to walk.
 func _play_opening() -> bool:
-	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	if not _require(game.title_open and new_game.is_visible_in_tree() and not new_game.disabled, "the title offers NEW GAME"):
 		return false
 	new_game.pressed.emit()

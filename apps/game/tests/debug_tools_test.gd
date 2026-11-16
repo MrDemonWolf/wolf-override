@@ -102,7 +102,7 @@ func _check_keyboard_code_and_storage() -> void:
 	_expect(tools.note.visible and tools.note_label.text == DebugTools.UNLOCKED_NOTE and tools.layer.visible, "the title shows 'Debug tools unlocked'")
 	_expect(game.get("title_open") and not game.get("intro_active"), "typing the code does not start a game")
 	var note_rect: Rect2 = tools.note.get_global_rect()
-	for path: String in ["Brand", "LogoMark", "TitleLine", "GameTitle", "Subtitle", "NewGameButton", "ContinueButton", "ContinueNote", "CreditsButton", "SettingsButton", "ChangelogButton", "Credit", "VersionLabel"]:
+	for path: String in ["Brand", "LogoMark", "TitleLine", "GameTitle", "Subtitle", "MenuScroll/MenuMargin/MenuList/NewGameButton", "MenuScroll/MenuMargin/MenuList/ContinueButton", "MenuScroll/MenuMargin/MenuList/ContinueNote", "MenuScroll/MenuMargin/MenuList/CreditsButton", "MenuScroll/MenuMargin/MenuList/SettingsButton", "ChangelogButton", "Credit", "VersionLabel"]:
 		_expect(not note_rect.intersects((game.get_node("CanvasLayer/TitleScreen/" + path) as Control).get_global_rect()), "the title's note leaves %s clear" % path)
 	var config: ConfigFile = GameSettings.load_config(_settings_path())
 	_expect(GameSettings.boolean(config, DebugTools.SETTINGS_SECTION, DebugTools.SETTINGS_KEY, false), "the unlock is stored in the settings file")
@@ -174,7 +174,7 @@ func _check_controller_code() -> void:
 		await _tap_pad(button)
 	await _tap_pad(JOY_BUTTON_B)
 	_expect(not tools.available, "the code needs its last A")
-	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	new_game.grab_focus()
 	await _tap_pad(JOY_BUTTON_A)
 	_expect(tools.available and tools.unlocked and tools.note_label.text == DebugTools.UNLOCKED_NOTE, "Up Up Down Down Left Right Left Right B A unlocks the tools")
@@ -495,7 +495,7 @@ func _check_touch_button_and_menu_inputs() -> void:
 	_expect(button.visible and tools.layer.visible and button.focus_mode == Control.FOCUS_NONE, "touch play shows the DEBUG button, which keyboard and controller focus skip")
 	var rect: Rect2 = button.get_global_rect()
 	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the DEBUG button is on screen")
-	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TouchControls/Use", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/NewGameButton", "CanvasLayer/TopBar"]:
+	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TouchControls/Use", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton", "CanvasLayer/TopBar"]:
 		_expect(not rect.intersects((game.get_node(path) as Control).get_global_rect()), "the DEBUG button never covers %s" % path.get_file())
 	var pause_rect: Rect2 = (game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()
 	_expect(not rect.grow(8.0).intersects(pause_rect), "the DEBUG button leaves a real gap before PAUSE, at its theme's full size (%s, PAUSE %s)" % [rect, pause_rect])
@@ -575,7 +575,9 @@ func _check_zones_corridor() -> void:
 	var legend_rect: Rect2 = zones.legend.get_global_rect()
 	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(legend_rect), "the legend is on screen (%s)" % legend_rect)
 	for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/Brand"]:
-		_expect(not legend_rect.intersects((game.get_node(path) as Control).get_global_rect()), "the legend leaves %s clear" % path.get_file())
+		var control: Control = game.get_node(path) as Control
+		if control.is_visible_in_tree():
+			_expect(not legend_rect.intersects(control.get_global_rect()), "the legend leaves %s clear" % path.get_file())
 	_expect(not legend_rect.intersects(tools.overlay.get_global_rect()), "the legend leaves the state card clear")
 	for choice: String in ["touch_choice_1", "touch_choice_2"]:
 		var button: Control = game.get(choice) as Control
@@ -691,7 +693,7 @@ func _check_zones_corridor() -> void:
 	await settle(2)
 	geometry = tools.dump()["geometry"]
 	var covered_world: bool = _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("covered") == true and _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("active") == false
-	_expect((geometry["zones"] as Array).is_empty() and (geometry["hitboxes"] as Array).is_empty() and covered_world and _entry(geometry["render_boxes"], "path", "CanvasLayer/TitleScreen/NewGameButton").get("active") == true, "on the title only the title's own boxes are drawn; the world under it is reported as covered")
+	_expect((geometry["zones"] as Array).is_empty() and (geometry["hitboxes"] as Array).is_empty() and covered_world and _entry(geometry["render_boxes"], "path", "CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton").get("active") == true, "on the title only the title's own boxes are drawn; the world under it is reported as covered")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	_expect(_idle(tools), "turned off, the zone drawing costs nothing")
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)

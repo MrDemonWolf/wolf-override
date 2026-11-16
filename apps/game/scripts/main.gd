@@ -332,11 +332,7 @@ const RECAP_LANE_BROKE_OFF: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_BROKE_
 const RECAP_LANE_UNKNOWN: String = RECAP_LANE_TOPIC + "  " + RECAP_LANE_UNKNOWN_WORDS
 ## On a finished save the title's Continue starts a fresh run instead.
 const PLAY_AGAIN_TEXT: String = "PLAY AGAIN"
-## The title's Continue button's left edge beside NEW GAME (main.tscn); alone it spans the row. The
-## title's column runs x 476 to 940 with two 224 px buttons 16 px apart (localization PR L8, decision
-## D10): the longest measured word, Spanish NEW GAME, needs 213 px, and English padded 30% by
-## pseudolocalization fits too.
-const TITLE_CONTINUE_LEFT: float = 716.0
+## The title action that resumes a checkpoint; PLAY AGAIN replaces it after the finished slice.
 const CONTINUE_TEXT: String = "CONTINUE"
 ## The translation context of the touch USE button's words (msgctxt): its CONTINUE goes on through lines,
 ## which a language may say differently from the title's CONTINUE, which resumes a save (PR L7b).
@@ -663,12 +659,12 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var title_mark: TextureRect = $CanvasLayer/TitleScreen/LogoMark
 @onready var title_line: ColorRect = $CanvasLayer/TitleScreen/TitleLine
 @onready var title_logo: Label = $CanvasLayer/TitleScreen/GameTitle
-@onready var new_game_button: Button = $CanvasLayer/TitleScreen/NewGameButton
-@onready var continue_button: Button = $CanvasLayer/TitleScreen/ContinueButton
-@onready var continue_note: Label = $CanvasLayer/TitleScreen/ContinueNote
+@onready var new_game_button: Button = $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton
+@onready var continue_button: Button = $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton
+@onready var continue_note: Label = $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote
 ## The version number under CHANGELOG (the number only, no wording; auto-translate off in the scene).
 @onready var title_version: Label = $CanvasLayer/TitleScreen/VersionLabel
-@onready var credits_button: Button = $CanvasLayer/TitleScreen/CreditsButton
+@onready var credits_button: Button = $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/CreditsButton
 @onready var credits_screen: ColorRect = $CanvasLayer/TitleScreen/CreditsScreen
 @onready var credits_body: RichTextLabel = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBody
 @onready var credits_back_button: Button = $CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton
@@ -1053,7 +1049,7 @@ func _ready() -> void:
 	resume_button.pressed.connect(_resume_game)
 	settings_button.pressed.connect(_show_settings)
 	$CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton.pressed.connect(_on_title_button)
-	$CanvasLayer/TitleScreen/SettingsButton.pressed.connect(_show_title_settings)
+	$CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton.pressed.connect(_show_title_settings)
 	settings_back_button.pressed.connect(_show_pause_menu)
 	_build_end_card()
 	# Every menu button, including the ones Settings builds, shares the same hover, focus and press motion.
@@ -1161,7 +1157,6 @@ func _refresh_continue() -> void:
 	# template (localization PR L7a), so the button and the note keep the English.
 	continue_button.text = I18n.KEY.tr(PLAY_AGAIN_TEXT) if finished else I18n.KEY.tr(CONTINUE_TEXT)
 	new_game_button.visible = not finished
-	continue_button.offset_left = new_game_button.offset_left if finished else TITLE_CONTINUE_LEFT
 	if finished and new_game_button.has_focus():
 		_grab_menu_focus(continue_button)
 	var reason: String = I18n.KEY.tr(FINISHED_NOTE) if finished else ""
@@ -2277,7 +2272,7 @@ func _reveal_menu() -> void:
 func _show_pause_menu() -> void:
 	if title_open and pause_overlay.visible:
 		_resume_game()
-		_grab_menu_focus($CanvasLayer/TitleScreen/SettingsButton)
+		_grab_menu_focus($CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton)
 		return
 	settings_menu.cancel_capture()
 	menu_panel.position = Vector2(255, 55)
@@ -5188,14 +5183,41 @@ func _dismiss_name_card() -> void:
 	top_card_tween.tween_callback(top_card.hide)
 
 
-## TEXT SIZE changed (or the game started): the station names take the new size and every box is
-## laid out and split again.
+## TEXT SIZE changed (or the game started): title actions and station names take the new size,
+## dialogue is split again, and the title scroll follows its focused action after layout.
 func _apply_text_size() -> void:
+	# Cache the authored size once so changing the setting never compounds the previous scale.
+	for item: Control in $CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList.get_children():
+		if not item.has_meta(&"title_font_base"):
+			item.set_meta(&"title_font_base", item.get_theme_font_size(&"font_size"))
+			item.set_meta(&"title_minimum_base", item.custom_minimum_size.y)
+		item.add_theme_font_size_override(&"font_size", TextSize.px(int(item.get_meta(&"title_font_base"))))
+		item.custom_minimum_size.y = TextSize.px(int(item.get_meta(&"title_minimum_base")))
+	_follow_title_focus()
 	_refit_station_labels()
 	dialogue_key = ""
 	_layout_hud()
 	if is_inside_tree():
 		_refresh_ui()
+
+
+## Waits for container layout after a text-size change, then reveals the current title focus.
+## Reads the focus after the wait so closing a menu cannot scroll to a stale action.
+func _follow_title_focus() -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var scroll: ScrollContainer = $CanvasLayer/TitleScreen/MenuScroll
+	var focused: Control = get_viewport().gui_get_focus_owner()
+	if focused != null and scroll.is_ancestor_of(focused):
+		scroll.ensure_control_visible(focused)
+		# Godot reveals the layout rectangle; leave room for the shared focus lift as well.
+		var margin: float = ceilf(focused.size.y * (UIMotion.LIFT_SCALE.y - 1.0) * 0.5)
+		var rect: Rect2 = focused.get_global_rect().grow(margin)
+		var viewport_rect: Rect2 = scroll.get_global_rect()
+		if rect.end.y > viewport_rect.end.y:
+			scroll.scroll_vertical += ceili(rect.end.y - viewport_rect.end.y)
+		elif rect.position.y < viewport_rect.position.y:
+			scroll.scroll_vertical -= ceili(viewport_rect.position.y - rect.position.y)
 
 
 ## Every room's station names fitted to their size and to their words in the language shown, and

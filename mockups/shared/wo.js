@@ -627,7 +627,7 @@
     ['accent-hint', 'color', 'prop', 'main.tscn', 'CanvasLayer/ContextHint/Accent', 'color'],
     ['text-hint', 'color', 'prop', 'main.tscn', 'CanvasLayer/ContextHint/Text', 'theme_override_colors/font_color'],
     ['text-sub', 'color', 'prop', 'main.tscn', 'CanvasLayer/TitleScreen/Subtitle', 'theme_override_colors/font_color'],
-    ['text-note', 'color', 'prop', 'main.tscn', 'CanvasLayer/TitleScreen/ContinueNote', 'theme_override_colors/font_color'],
+    ['text-note', 'color', 'prop', 'main.tscn', 'CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote', 'theme_override_colors/font_color'],
     ['text-brand', 'color', 'prop', 'main.tscn', 'CanvasLayer/TitleScreen/Brand', 'theme_override_colors/font_color'],
     ['text-muted', 'color', 'konst', 'game_settings.gd', 'MUTED_TEXT'],
     ['title-bg', 'color', 'prop', 'main.tscn', 'CanvasLayer/TitleScreen', 'color'],

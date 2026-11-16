@@ -3,7 +3,7 @@ extends RefCounted
 ## The TEXT SIZE setting (Settings, DISPLAY tab; STORY-3): one factor, 100% to 200%, that the dialogue
 ## box, the hint bar, the tutorial prompt, the top cards, the answer buttons and the station name
 ## labels multiply their font sizes by (the station names up to WORLD_MAX_FACTOR). Menus keep their
-## own sizes.
+## own sizes, except the title action list, which scales and scrolls.
 
 ## The sizes Settings offers, as factors.
 const STEPS: Array[float] = [1.0, 1.25, 1.5, 1.75, 2.0]

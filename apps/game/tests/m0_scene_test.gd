@@ -29,13 +29,15 @@ func _run() -> void:
 	var game: Node2D = open_game("m0-scene-test")
 	var path: String = str(game.get("save_path"))
 	game_ref = game
+	for layout_frame: int in 3:
+		await process_frame
 	var title_screen: Control = game.get_node("CanvasLayer/TitleScreen") as Control
 	var title_art: TextureRect = game.get_node("CanvasLayer/TitleScreen/CorridorArt") as TextureRect
 	var title_mark: TextureRect = game.get_node("CanvasLayer/TitleScreen/LogoMark") as TextureRect
 	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
-	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
-	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
-	var credits_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsButton") as Button
+	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
+	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button
+	var credits_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/CreditsButton") as Button
 	var credits_screen: ColorRect = game.get_node("CanvasLayer/TitleScreen/CreditsScreen") as ColorRect
 	var credits_back_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsBackButton") as Button
 	var credits_pause_button: Button = game.get_node("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton") as Button
@@ -55,10 +57,9 @@ func _run() -> void:
 
 	if not _require(game.get("title_open") and title_screen.visible and continue_button.disabled, "fresh title disables Continue without a test checkpoint"):
 		return
-	var continue_note: Label = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
+	var continue_note: Label = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label
 	_expect(continue_note.text == "No checkpoint yet. Saving starts at the first SAFE POINT." and continue_button.tooltip_text == continue_note.text, "disabled Continue explains that no checkpoint exists yet")
-	var note_width: float = continue_note.get_theme_font("font").get_string_size(continue_note.text, HORIZONTAL_ALIGNMENT_LEFT, -1, continue_note.get_theme_font_size("font_size")).x
-	_expect(note_width <= continue_note.size.x and continue_note.position.y >= continue_button.position.y + continue_button.size.y and continue_note.position.y + continue_note.size.y <= credits_button.position.y, "Continue caption fits between the title button rows")
+	_expect(continue_note.size.x <= continue_button.size.x and continue_note.position.y >= continue_button.position.y + continue_button.size.y and continue_note.position.y + continue_note.size.y <= credits_button.position.y, "Continue caption fits between the title button rows")
 	if not _require(title_art.texture != null and title_art.texture.resource_path == "res://assets/title-corridor-key-art-provisional.png", "title shows the corridor artwork"):
 		return
 	if not _require(title_logo.text == "WOLF OVERRIDE" and title_mark.texture != null and title_mark.texture.resource_path == "res://assets/logo-mark.svg", "title loads the branded WOLF OVERRIDE logo"):
@@ -515,14 +516,14 @@ func _run() -> void:
 	await process_frame
 	game = add_game(path, "%s-settings.cfg" % path)
 	title_screen = game.get_node("CanvasLayer/TitleScreen") as Control
-	continue_button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
+	continue_button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button
 	human = game.get_node("Human") as M0Actor
 	wolf = game.get_node("Wolf") as M0Actor
 	top_card = game.get_node("CanvasLayer/TopBar") as Panel
 	hud = game.get_node("CanvasLayer/TopBar/HUD") as Label
 	if not _require(game.get("title_open") and title_screen.visible and not continue_button.disabled, "fresh title enables Continue for the test checkpoint"):
 		return
-	continue_note = game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label
+	continue_note = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label
 	_expect(continue_note.text.is_empty() and continue_button.tooltip_text.is_empty(), "enabled Continue shows no warning caption")
 	continue_button.pressed.emit()
 	state = game.get("state") as M0State

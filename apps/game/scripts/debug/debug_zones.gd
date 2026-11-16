@@ -64,7 +64,7 @@ const LEADER_STEPS: int = 6
 ## The candidate sprites and controls are gathered again this often while shown; their rects every frame.
 const REFRESH_SECONDS: float = 0.25
 ## The legend: between the top card (ends x 466) and the DEBUG button (from about x 768), above the
-## title's brand line (y 106) and the answer row (y 88), so it covers no game control.
+## answer row (y 88), so it covers no game control. On the title it moves over the art's left corner.
 const LEGEND_RECT: Rect2 = Rect2(474.0, 10.0, 262.0, 58.0)
 ## The legend buttons keep the theme's button look with tighter padding, so all three fit.
 const LEGEND_BUTTON_PADDING: Vector2 = Vector2(6.0, 2.0)
@@ -320,6 +320,9 @@ func refresh_now() -> void:
 ## While shown: redraws every frame, and gathers the render candidates again every REFRESH_SECONDS
 ## ([param delta] in seconds).
 func _process(delta: float) -> void:
+	# The title's studio heading now uses the right-hand top band; the art's left corner is clear.
+	if legend != null:
+		legend.position = Vector2(48.0, LEGEND_RECT.position.y) if _title_open() else LEGEND_RECT.position
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
 		_candidates = _gather_candidates()

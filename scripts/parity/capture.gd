@@ -70,8 +70,8 @@ const TEXT_PATHS: Array[String] = [
 	"CanvasLayer/TouchControls/Choice2",
 	"CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton",
 	"CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint",
-	"CanvasLayer/TitleScreen/ContinueButton",
-	"CanvasLayer/TitleScreen/ContinueNote",
+	"CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton",
+	"CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote",
 ]
 
 var route: String = "R1"
@@ -246,7 +246,7 @@ func _sample() -> void:
 ## the title's Continue note with a save present, Continue, and the END OF SLICE card.
 func _route_1() -> void:
 	await _shot("title")
-	_press("CanvasLayer/TitleScreen/CreditsButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/CreditsButton")
 	await _raw(2)
 	_press("CanvasLayer/TitleScreen/CreditsScreen/CreditsPauseButton")
 	await _raw(40)
@@ -267,7 +267,7 @@ func _route_1() -> void:
 	_press("CanvasLayer/TitleScreen/ChangelogScreen/ChangelogBackButton")
 	await _raw(30)
 	await _controller_shot("title-controller")
-	_press("CanvasLayer/TitleScreen/SettingsButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton")
 	await _raw(40)
 	await _shot("settings-display")
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
@@ -294,7 +294,7 @@ func _route_1() -> void:
 		await _raw(10)
 	_press("CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton")
 	await _raw(30)
-	_press("CanvasLayer/TitleScreen/NewGameButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton")
 	await _raw(50)
 	await _action_event(&"pause_game")
 	await _raw(40)
@@ -321,7 +321,7 @@ func _route_1() -> void:
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(60)
 	await _shot("title-with-save")
-	_press("CanvasLayer/TitleScreen/ContinueButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
 	await _raw(60)
 	await _shot("continued-safe-point")
 	game.call("debug_show_end_card")
@@ -339,7 +339,7 @@ func _route_1() -> void:
 ## then the three outcomes: disclose and signal WOLF (the seal at 0, mid and open, the safe point and
 ## the cut to Records), press and the manual bypass (released part way), and disclose with the bypass.
 func _route_2() -> void:
-	_press("CanvasLayer/TitleScreen/NewGameButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton")
 	await _raw(50)
 	await _shot("opening-0")
 	for beat: int in range(1, 7):
@@ -442,7 +442,7 @@ func _route_2() -> void:
 ## exit lift, the chapter close (paused while it frames) and the cut to the junction.
 func _route_3() -> void:
 	await _shot("title-records-save")
-	_press("CanvasLayer/TitleScreen/ContinueButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
 	await _raw(60)
 	await _shot("records-continued")
 	await _walk_to(190.0)
@@ -471,7 +471,7 @@ func _route_3() -> void:
 	_write_save(Kit.after_purge_state())
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(40)
-	_press("CanvasLayer/TitleScreen/ContinueButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
 	await _raw(60)
 	await _shot("continued-after-purge")
 	await _walk_to(520.0)
@@ -517,7 +517,7 @@ func _route_3() -> void:
 ## reads and Chapter 1 end card; then Continue from the post-blast save, the engineer alone, the
 ## sentry's chase and its knockdown.
 func _route_4() -> void:
-	_press("CanvasLayer/TitleScreen/ContinueButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
 	await _raw(80)
 	await _shot("junction-continued")
 	await _walk_to(JunctionRoom.BREAKER_X)
@@ -627,13 +627,13 @@ func _route_4() -> void:
 	await _shot("end-card")
 	await _tap(&"interact")
 	# The card's confirm goes on to the title; CONTINUE there must be up before it is pressed.
-	if not await _wait_until(func() -> bool: return (game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button).is_visible_in_tree(), 300):
+	if not await _wait_until(func() -> bool: return (game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button).is_visible_in_tree(), 300):
 		_fail("the title's CONTINUE never showed after the END OF SLICE card")
 	await _raw(40)
 	await _shot("title-after-end")
 	# The engineer alone, from the post-blast save: the sentry sees them and gives chase.
 	_write_save(Kit.after_blast_state())
-	_press("CanvasLayer/TitleScreen/ContinueButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton")
 	await _raw(80)
 	await _shot("continued-after-blast")
 	await _walk_to(600.0)
@@ -681,7 +681,7 @@ func _new_run_skipping_opening() -> void:
 	await _raw(30)
 	_press("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton")
 	await _raw(40)
-	_press("CanvasLayer/TitleScreen/NewGameButton")
+	_press("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton")
 	await _raw(30)
 	await _action_event(&"pause_game")
 	await _raw(30)
