@@ -128,8 +128,6 @@ const TUTORIAL_FONT_SIZE: int = 17
 const HINT_GAP: float = 4.0
 ## The most of its own area the tutorial prompt may lay over the corridor's machines in the top card's place.
 const TUTORIAL_ART_OVERLAP: float = 0.1
-## On the opening's first box: Pause offers SKIP OPENING (P0-13's stopgap until the opening is reworked).
-const SKIP_OPENING_HINT: String = "PAUSE: skip the opening"
 ## The corridor seal's face (Door at x 780, 56 px wide); while it is shut WOLF follows no closer than his reach.
 const CORRIDOR_DOOR_LEFT_X: float = 752.0
 ## The corridor seal is a rolling steel door in a cast cross-wall that stands across the corridor
@@ -625,6 +623,7 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var dialogue_accent: ColorRect = $CanvasLayer/BottomBar/Accent
 @onready var speaker: Label = $CanvasLayer/BottomBar/Speaker
 @onready var story: Label = $CanvasLayer/BottomBar/Story
+@onready var dialogue_continue: Label = $CanvasLayer/BottomBar/ContinueCue
 @onready var context_hint: Panel = $CanvasLayer/ContextHint
 @onready var context_hint_text: Label = $CanvasLayer/ContextHint/Text
 @onready var tutorial_prompt: Panel = $CanvasLayer/TutorialPrompt
@@ -5175,22 +5174,10 @@ func _refresh_ui() -> void:
 		top_card.hide()
 		_layout_hud()
 		return
-	if intro_active:
-		if last_top_card_key != "intro":
-			last_top_card_key = "intro"
-			_show_top_card("%s\nWOLF OVERRIDE" % I18n.KEY.tr("03:17 / CONTAINMENT"), 2.6)
-		var intro_hint: String = tr("TAP CONTINUE  /  PAUSE") if touch_layout else I18n.fill(I18n.KEY.tr("%s  CONTINUE    %s  PAUSE"), [settings_menu.prompt(&"interact", controller_active), settings_menu.prompt(&"pause_game", controller_active)])
-		if intro_step == 0 and dialogue_index == 0:
-			# The opening's first box says how to skip it (Pause offers SKIP OPENING).
-			intro_hint = "%s\n%s" % [_continue_prompt(touch_layout), tr(SKIP_OPENING_HINT)]
-		_set_dialogue(intro_hint)
-		return
-	if chapter_close_active:
-		if last_top_card_key != "chapter_close":
-			last_top_card_key = "chapter_close"
-			_show_top_card("%s\n%s" % [I18n.KEY.tr("SERVICE JUNCTION"), I18n.KEY.tr("SERVICE LINE CLEARED")], 3.4)
-		# Walking out through the hatch nothing waits on a press, so no CONTINUE prompt shows.
-		_set_dialogue("" if hatch_exit_walking else _continue_prompt(touch_layout))
+	if intro_active or chapter_close_active:
+		# Cinematics use the dialogue cue and native Pause controls, not extra instructional panels.
+		top_card.hide()
+		_set_dialogue(HudText.localise(save_error, _key_names(touch_layout), touch_layout))
 		return
 	# The corridor stations' tints and lamps are written only when they change: this runs every frame.
 	_set_modulate(breaker_art, Color.WHITE if state.breaker_armed else UNPOWERED_TINT)
@@ -5205,9 +5192,15 @@ func _refresh_ui() -> void:
 	_set_modulate(breaker_status_glow, Color(breaker_status_light.color, 0.75 if state.breaker_armed else 0.45))
 	_set_modulate(relay_status_glow, Color(relay_status_light.color, 0.75 if state.breaker_armed else 0.3))
 	_set_modulate(checkpoint_art, Color("#d5ffe3") if state.checkpoint_reached else Color.WHITE)
+	_sync_dialogue_boxes()
 	var card_key: String = "%s:%s" % [state.chapter_id, _objective()]
-	if name_card_remaining > 0.0 and state.chapter_id == "lockdown":
-		# The name card comes first; the location card follows once it has faded or been skipped.
+	if intro_active or chapter_close_active or not _shown_box().is_empty():
+		# Queue the current goal until the story is clear; never spend its display time behind dialogue.
+		top_card.hide()
+		if last_top_card_key != "name_card":
+			last_top_card_key = ""
+	elif name_card_remaining > 0.0 and state.chapter_id == "lockdown":
+		# The name card comes first; the current goal follows once it has faded or been skipped.
 		# Built with I18n.format, so the card translates its template and keeps the name as it is.
 		# TRANSLATORS: The engineer's name card: %s is their full name in capitals, then their job on its own row. The engineer is non-binary: use a job word with no gender (a department or field noun), never a masculine or feminine one.
 		# i18n: engineer=name,third keep-breaks
@@ -5219,7 +5212,7 @@ func _refresh_ui() -> void:
 			# Cycling the provisional name while it is up updates it in place.
 			_write_top_card(name_card)
 	elif last_top_card_key != card_key and not _opening_lines_playing():
-		# One thing to read at a time (TEACH-7): the location card waits while the opening lines play.
+		# One thing to read at a time (TEACH-7): the goal waits while the opening lines play.
 		last_top_card_key = card_key
 		_show_top_card(_objective_card_message(), OBJECTIVE_CARD_SECONDS)
 	var context: String = _context_hint()
@@ -5232,7 +5225,21 @@ func _refresh_ui() -> void:
 		# The knockdown card's one prompt once it takes RETRY (Q17); before that only a save error shows.
 		hint = tr(RETRY_TOUCH_PROMPT) if touch_layout else I18n.fill(I18n.KEY.tr(RETRY_PROMPT), [settings_menu.prompt(&"interact", controller_active)])
 	# The tutorial prompt is the one prompt while it shows; the hint bar would only repeat it.
-	_set_dialogue("" if waiting_for_choice or tutorial_prompt.visible else hint)
+	var routine_hidden: bool = waiting_for_choice or tutorial_prompt.visible
+	_set_dialogue("" if routine_hidden and not _urgent_context_hint() else hint)
+
+
+## True only for a save failure, recovery state or an actual live hazard. These hints must remain
+## readable during dialogue; routine directions and repeated CONTINUE instructions can wait.
+func _urgent_context_hint() -> bool:
+	if not save_error.is_empty() or fail_active:
+		return true
+	if state.chapter_id != "junction":
+		return false
+	var x: float = human.position.x
+	if not state.door_blown:
+		return pressure_line.state in [&"charged", &"fuse"] or pressure_line.state == &"building" and PressureLine.is_on_vent(x)
+	return drop_arm.cloud_active() and DropArm.in_cloud(x) or _sentry_hunting() or not state.sentry_down and SentryBrain.is_exposed(x)
 
 
 ## Shows the box on screen with its speaker's name and colour, and [param hint] in the hint bar.
@@ -5265,7 +5272,11 @@ func _set_dialogue(hint: String) -> void:
 	_set_color(dialogue_accent, tint)
 	_set_font_color(speaker, tint)
 	bottom_bar.visible = not box.is_empty()
-	context_hint.visible = not hint.is_empty()
+	dialogue_continue.visible = bottom_bar.visible and not waiting_for_choice and not fail_active and not hatch_exit_walking
+	# Spoken/narrated text owns attention; actual hazards and save failures retain their action.
+	context_hint.visible = not hint.is_empty() and (not bottom_bar.visible and not intro_active and not chapter_close_active or _urgent_context_hint())
+	if bottom_bar.visible or intro_active or chapter_close_active:
+		tutorial_prompt.hide()
 	context_hint_text.text = hint
 	_layout_hud()
 
@@ -5586,6 +5597,10 @@ func _layout_hud() -> void:
 	# The reused tab style includes content margins, which can exceed the text's line height.
 	var tab_height: float = maxf(speaker.get_combined_minimum_size().y, speaker.get_line_height() + DIALOGUE_PADDING.y)
 	ScreenShape.set_rect(speaker, Vector2(DIALOGUE_PADDING.x, -tab_height), Vector2(minf(names + DIALOGUE_PADDING.x, column), tab_height))
+	# A non-text cue fits the existing right padding; it never takes space from translated story words.
+	_set_font_size(dialogue_continue, SPEAKER_FONT_SIZE)
+	var cue_size: Vector2 = dialogue_continue.get_minimum_size()
+	ScreenShape.set_rect(dialogue_continue, Vector2(bar_width - (DIALOGUE_PADDING.x + cue_size.x) * 0.5, bar_height - DIALOGUE_PADDING.y - cue_size.y), cue_size)
 	ScreenShape.set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
 	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
 	# and takes a third row if its words need one there.
@@ -5594,8 +5609,15 @@ func _layout_hud() -> void:
 		card_width = minf(card_width, pause_button.position.x - HUD_CARD_GAP - top_card.position.x)
 	if _debug_button_shown():
 		card_width = minf(card_width, debug_tools.debug_button.position.x - HUD_CARD_GAP - top_card.position.x)
+	var objective_card: bool = last_top_card_key != "name_card"
+	if objective_card:
+		var font: Font = hud.get_theme_font(&"font")
+		var text_width: float = font.get_string_size(hud.text, HORIZONTAL_ALIGNMENT_LEFT, -1.0, hud.get_theme_font_size(&"font_size")).x
+		card_width = minf(card_width, text_width + 28.0)
 	ScreenShape.set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, hud.size.y))
 	var card_height: float = maxf(62.0, hud.get_line_height() * maxi(2, hud.get_line_count()) + 14.0)
+	if objective_card:
+		card_height = hud.get_line_height() * maxi(1, hud.get_line_count()) + 14.0
 	ScreenShape.set_rect(top_card, top_card.position, Vector2(card_width, card_height))
 	ScreenShape.set_rect(hud, Vector2(16.0, 7.0), Vector2(card_width - 28.0, card_height - 11.0))
 	ScreenShape.set_rect(top_card.get_node("Accent") as Control, Vector2.ZERO, Vector2(4.0, card_height))
@@ -5607,7 +5629,8 @@ func _layout_hud() -> void:
 	var hint_height: float = maxf(35.0, context_hint_text.get_line_height() * context_hint_text.get_line_count() + 8.0)
 	var hint_x: float = safe.end.x - 32.0 - hint_width if cinematic else (span.x if touch_layout else roundf(safe.get_center().x - hint_width * 0.5))
 	# With no box up the hint takes the box's place at the bottom instead of floating over the floor.
-	var hint_bottom: float = dialogue_bottom - bar_height - HINT_GAP if bottom_bar.visible else dialogue_bottom
+	var speaker_space: float = tab_height if speaker.visible else 0.0
+	var hint_bottom: float = dialogue_bottom - bar_height - speaker_space - HINT_GAP if bottom_bar.visible else dialogue_bottom
 	var hint_y: float = maxf(94.0, top_card.position.y + card_height + HUD_CARD_GAP) if cinematic else hint_bottom - hint_height
 	ScreenShape.set_rect(context_hint, Vector2(hint_x, hint_y), Vector2(hint_width, hint_height))
 	ScreenShape.set_rect(context_hint_text, Vector2(13.0, 3.0), Vector2(hint_width - 23.0, hint_height - 6.0))
@@ -5767,18 +5790,18 @@ static func _set_color(rect: ColorRect, color: Color) -> void:
 		rect.color = color
 
 
-## Puts [param message] on the top card: English rows (a location and an objective, or the name card
-## built with I18n.format), remembered in [member top_card_message] and drawn in the current language by
+## Puts [param message] on the top card: the English goal or I18n.format name card,
+## remembered in [member top_card_message] and drawn in the current language by
 ## HudText.card. The card's Label has auto-translate off (main.tscn), so nothing is translated twice.
 func _write_top_card(message: String) -> void:
 	top_card_message = message
 	hud.text = HudText.card(message)
 
 
-## The current room and objective as English rows, shared by automatic cards and player recall.
+## The current goal only, shared by automatic notifications and player recall. Room headings
+## competed with the immediate task; keep story and puzzle wording in the existing state selector.
 func _objective_card_message() -> String:
-	var location: String = I18n.KEY.tr("MAINTENANCE ANNEX") if state.chapter_id == "investigation" else (I18n.KEY.tr("SERVICE JUNCTION") if state.chapter_id == "junction" else (I18n.KEY.tr("RECORDS ACCESS / FIRST COPY") if state.chapter_id == "records" else I18n.KEY.tr("MAINTENANCE / LOCKDOWN")))
-	return "%s\n%s" % [location, _objective()]
+	return _objective()
 
 
 ## Shows the top card with [param message] (English rows, see [method _write_top_card]) for

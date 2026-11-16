@@ -336,6 +336,12 @@ theme_override_font_sizes/font_size = 17
 autowrap_mode = 3
 vertical_alignment = 1
 
+[node name="ContinueCue" type="Label" parent="CanvasLayer/BottomBar"]
+visible = false
+auto_translate_mode = 2
+mouse_filter = 2
+text = "▶"
+
 [node name="ContextHint" type="Panel" parent="CanvasLayer"]
 offset_left = 253.0
 offset_top = 405.0

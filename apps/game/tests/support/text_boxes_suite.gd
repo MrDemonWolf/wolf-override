@@ -492,8 +492,8 @@ func _play(seconds: float, context: String, measure: bool = true) -> void:
 func _check_opening() -> void:
 	game.new_game_button.pressed.emit()
 	await process_frame
-	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
-	_expect(hint.text.contains(Main.SKIP_OPENING_HINT) and (game.get_node("CanvasLayer/ContextHint") as Control).visible, "the opening's first box says PAUSE skips the opening (%s)" % hint.text.c_escape())
+	var hint_panel: Control = game.get_node("CanvasLayer/ContextHint") as Control
+	_expect(not hint_panel.visible and game.dialogue_continue.visible, "the opening uses a small continue cue instead of an instructional panel")
 	_measure_shown("opening")
 	var pressed: int = 0
 	while game.intro_active and game.intro_step < Main.INTRO_LINES.size() and pressed < 40:
@@ -508,7 +508,7 @@ func _check_opening() -> void:
 		pressed += 1
 		if game.intro_active and game.intro_step < Main.INTRO_LINES.size():
 			_expect(game.intro_step == step and game.dialogue_index == index + 1 or game.intro_step == step + 1 and game.dialogue_index == 0, "a press in the opening shows the next box (beat %d box %d -> beat %d box %d)" % [step, index, game.intro_step, game.dialogue_index])
-			_expect(not hint.text.contains(Main.SKIP_OPENING_HINT), "only the first box carries the skip hint")
+			_expect(not hint_panel.visible, "the opening keeps routine instructional panels hidden")
 			_measure_shown("opening")
 	_expect(pressed > Main.INTRO_LINES.size(), "the opening's multi-speaker beats take a box per speaker (%d presses for %d beats)" % [pressed, Main.INTRO_LINES.size()])
 	await create_timer(1.0).timeout
@@ -958,7 +958,7 @@ func _check_prompts_clear(path: String, code: String = I18n.FALLBACK) -> void:
 			for frame: int in 40:
 				await process_frame
 			var hint_panel: Control = fresh.get_node("CanvasLayer/ContextHint") as Control
-			_expect(fresh.intro_active and fresh.top_card.visible and hint_panel.visible and not hint_panel.get_global_rect().intersects(fresh.top_card.get_global_rect()), "%s: the opening's hint bar stands below the top card (%s vs %s)" % [context, hint_panel.get_global_rect(), fresh.top_card.get_global_rect()])
+			_expect(fresh.intro_active and not fresh.top_card.visible and not hint_panel.visible and not fresh.tutorial_prompt.visible, "%s: the opening leaves routine objectives, hints and tutorials off screen" % context)
 			fresh.debug_new_game(true)
 			fresh.touch_enabled = touch
 			for frame: int in 5:

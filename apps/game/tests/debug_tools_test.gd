@@ -1035,9 +1035,9 @@ func _check_capture_bounded_wait() -> void:
 	var silent: Node = Node.new()
 	silent.add_user_signal("never")
 	tools.frame_drawn_signal = Signal(silent, "never")
-	var start: int = get_frame()
+	var start: int = Engine.get_process_frames()
 	var paths: Dictionary = await tools.capture_with_boxes()
-	var waited: int = get_frame() - start
+	var waited: int = Engine.get_process_frames() - start
 	_expect(waited <= DebugTools.FRAME_WAIT_LIMIT + 2, "the capture gives up waiting for a drawn frame after %d frames (%d)" % [DebugTools.FRAME_WAIT_LIMIT, waited])
 	_expect(paths.get("with_boxes") == false and str(paths.get("png", "x")).is_empty() and FileAccess.file_exists(str(paths.get("json", ""))), "it still writes the dump, with no stale screenshot and with_boxes false (%s)" % [paths])
 	_expect(not tools.zones.visible and not tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.ZONES] and not tools.get("_capturing_boxes"), "and puts the page and the categories back")

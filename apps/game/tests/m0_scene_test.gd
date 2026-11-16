@@ -500,7 +500,7 @@ func _run() -> void:
 		return
 	await tap(&"cycle_name")
 	_expect(state.name_index == 1, "draft identity changes before fallback save")
-	_expect(str(game.get("status_line")).contains("Alex Bennett") and hud.text.contains("MAINTENANCE"), "provisional name changes without crowding the objective display")
+	_expect(str(game.get("status_line")).contains("Alex Bennett") and hud.text == HudText.card(str(game.call("_objective"))), "provisional name changes without crowding the objective display")
 	_expect(not str(game.get("status_line")).contains("breaker"), "identity line does not rewind the scene after the seal opens")
 	await tap(&"interact")
 	if not _require(state.checkpoint_reached, "fallback reaches checkpoint"):
@@ -551,7 +551,7 @@ func _run() -> void:
 	_expect(top_card.visible and hud.text.contains("MAINTENANCE ENGINEER"), "every new run opens on the name card")
 	await tap(&"interact")
 	await process_frame
-	_expect(float(game.get("name_card_remaining")) == 0.0 and hud.text.contains("MAINTENANCE / LOCKDOWN"), "the first USE skips the name card and the location card follows")
+	_expect(float(game.get("name_card_remaining")) == 0.0 and (not top_card.visible if game.get("bottom_bar").visible else top_card.visible and hud.text == HudText.card(str(game.call("_objective")))), "the first USE skips the name card; dialogue owns attention before the goal follows")
 	if not _require(await walk_to(human, 350.0), "engineer reaches breaker on the disclose-then-bypass route"):
 		return
 	await tap(&"interact")
