@@ -28,7 +28,9 @@ func _run() -> void:
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var main_constants: Dictionary = (game.get_script() as Script).get_script_constant_map()
 	var wolf_mirror_x: float = main_constants["WOLF_MIRROR_X"]
-	_require(human.controlled and not wolf.controlled and wolf.autonomous_target_x == wolf_mirror_x, "only engineer is playable while WOLF starts his own mirror check")
+	_require(not human.controlled and not wolf.controlled and wolf.autonomous_target_x == wolf_mirror_x, "entry dialogue holds the engineer while WOLF starts his own mirror check")
+	_require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "the entry exchange can be read before exploring")
+	_require(human.controlled, "reading the entry exchange returns engineer control")
 	if not await walk_to(human, 190.0):
 		_require(false, "engineer can walk to the purge queue")
 		return
@@ -143,6 +145,7 @@ func _run() -> void:
 	game.call("_sync_scene")
 	game.call("_interact_checkpoint")
 	_require(str(game.get("status_line")).contains("I refused the live relay"), "second room remembers refusal without blocking progress")
+	_require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "fallback reads the entry exchange before exploring")
 	human = game.get_node("Human") as M0Actor
 	if not await walk_to(human, 190.0):
 		_require(false, "fallback engineer can reach purge queue")

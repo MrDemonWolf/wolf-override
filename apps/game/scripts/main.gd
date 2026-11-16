@@ -933,7 +933,7 @@ var dialogue_boxes: Array[String] = []
 var dialogue_index: int = 0
 var dialogue_age: float = 0.0
 var dialogue_cleared: bool = false
-## Authored conversation mode for the current line; a different status line returns to timed feedback.
+## Authored conversation mode; direct status changes return to timed feedback, queued lines retain it.
 var dialogue_is_conversation: bool = false
 var dialogue_key: String = ""
 var dialogue_restart: bool = true
@@ -1570,8 +1570,11 @@ func _read_pointer_dialogue() -> void:
 		return
 	if _conversation_active():
 		if not _next_box():
-			dialogue_cleared = true
-			_update_controls()
+			if not box_queue.is_empty():
+				_next_box_now()
+			else:
+				dialogue_cleared = true
+				_update_controls()
 		return
 	if not _next_box():
 		if not box_queue.is_empty():
@@ -1825,16 +1828,19 @@ func _tick_corridor(delta: float, held_ticks: int) -> void:
 			sfx_bank.play(&"klaxon", -10.0, 1.2)
 
 
-## Shows [param boxes] one after another in the dialogue box, each for its reading time
-## (box_seconds), the last one staying up like any other line.
-func _say(boxes: Array[String]) -> void:
+## Queues authored lines. Timed lines keep movement; [param conversation] holds the engineer until
+## every page is explicitly read. Live hazards always retain movement. Text and progress are unchanged.
+func _say(boxes: Array[String], conversation: bool = false) -> void:
 	status_line = boxes[0]
+	dialogue_is_conversation = conversation and not _live_hazard()
 	box_queue = boxes.slice(1)
 	box_queue_line = status_line
 	box_queue_shown = status_line
 	box_queue_seconds = box_seconds(status_line)
 	box_queue_chapter = state.chapter_id
 	box_queue_choice_seen = false
+	_sync_dialogue_boxes()
+	_update_controls()
 
 
 ## Moves a line said in several boxes on to its next box once this one has been up its reading time.
@@ -1940,10 +1946,14 @@ func _say_next(line: String) -> void:
 func _next_box_now() -> void:
 	if box_queue.is_empty():
 		return
+	var conversation: bool = dialogue_is_conversation
 	status_line = box_queue.pop_front()
+	dialogue_is_conversation = conversation
 	box_queue_line = status_line
 	box_queue_shown = status_line
 	box_queue_seconds = box_seconds(status_line)
+	_sync_dialogue_boxes()
+	_update_controls()
 
 
 ## Forgets the boxes still to come of a line said in several boxes.
@@ -2798,7 +2808,7 @@ func _load_game() -> void:
 		if state.investigation_step == 4:
 			_show_end_card()
 		elif state.investigation_step in [1, 2, 3]:
-			_say(_investigation_lines(state.investigation_step))
+			_say(_investigation_lines(state.investigation_step), true)
 		else:
 			_say([_investigation_objective()])
 	elif state.chapter_id == "records":
@@ -2949,7 +2959,7 @@ func _interact() -> void:
 		# i18n: story speaker=DIRECTOR
 		var display: String = I18n.KEY.tr("Records worker's archive marked for deletion.")
 		# TRANSLATORS: i18n: story speaker=WOLF
-		_aside("DIRECTOR / PURGE: %s\nWOLF: %s" % [display, I18n.KEY.tr("They want the source record gone. We need to preserve it.")])
+		_converse("DIRECTOR / PURGE: %s\nWOLF: %s" % [display, I18n.KEY.tr("They want the source record gone. We need to preserve it.")])
 	elif target == &"bypass":
 		_interact_bypass()
 	elif target == &"breaker":
@@ -3174,7 +3184,7 @@ func _interact_checkpoint() -> void:
 			var cranked: String = I18n.KEY.tr("I offered the relay; you cranked the bypass. Still with you.")
 			var remembered_line: String = refused if state.memory.get("choice_id") == M0State.PRESS else (told if state.route == "cooperate" else cranked)
 			# TRANSLATORS: i18n: story speaker=WOLF
-			status_line = "WOLF: " + I18n.join("\n", [remembered_line, I18n.KEY.tr("Take the purge queue. I'll inspect the mirror.")])
+			_converse("WOLF: " + I18n.join("\n", [remembered_line, I18n.KEY.tr("Take the purge queue. I'll inspect the mirror.")]))
 			_save_progress()
 		return
 	var first_visit: bool = state.reach_checkpoint()
@@ -3638,12 +3648,7 @@ func _investigation_lines(step: int) -> Array[String]:
 ## Annex station USE reads in order, saves the real copied state, and leaves the final reveal player-paced.
 func _interact_investigation(x: float) -> void:
 	if not box_queue.is_empty() or not _dialogue_read():
-		if not _next_box():
-			if box_queue.is_empty():
-				# A fresh USE acknowledges the last box; it never also activates a source or exit.
-				dialogue_cleared = true
-			else:
-				_next_box_now()
+		_read_pointer_dialogue()
 		return
 	var target: StringName = interaction_target_at(x)
 	var requested: int = 0
@@ -3659,9 +3664,9 @@ func _interact_investigation(x: float) -> void:
 		_show_end_card()
 		return
 	if requested > 0 and requested <= state.investigation_step:
-		_say(_investigation_lines(requested))
+		_say(_investigation_lines(requested), true)
 	elif state.investigate(requested):
-		_say(_investigation_lines(requested))
+		_say(_investigation_lines(requested), true)
 		sfx_bank.play(&"chirp", -8.0)
 		_sync_records_room(true)
 		_update_controls()

@@ -11,6 +11,10 @@ func _run() -> void:
 	game.call("_drop_box_queue")
 	game.stakes_spoken = true
 	game.tutorial_step = 2
+	game.debug_place(game.pointer_use_x(&"purge_display"), game.wolf.position.x)
+	await tap(&"interact")
+	_expect(game.call("_conversation_active") and not game.human.controlled, "reading the optional purge display holds its important exchange")
+	await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES)
 	var line: String = Main.OPENING_EXCHANGE % str(game.call("_first_name")).to_upper()
 	game.call("_converse", line)
 	game.call("_refresh_ui")
@@ -77,12 +81,21 @@ func _run() -> void:
 	_expect(await wait_until(func() -> bool: return game.human.controlled, 120), "reading WOLF's response gives the engineer movement back")
 	await tap(&"interact")
 	_expect(game.state.breaker_armed and game.call("_relay_refused"), "a fresh USE arms the breaker with the engineer-only bypass route intact")
+	game.debug_tools.actions.jump(&"safe_point")
+	game.debug_place(game.pointer_use_x(&"exit"), game.wolf.position.x)
+	await tap(&"interact")
+	_expect(game.state.chapter_id == "records" and game.call("_conversation_active") and not game.human.controlled and not game.wolf.controlled, "entering Records holds WOLF's remembered choice without controlling him")
+	await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES)
+	_expect(game.human.controlled and not game.state.purge_trace_preserved, "reading the entry exchange releases movement without copying a source")
 	await _check_records(game)
 	game.call("_converse", line)
 	game.state.chapter_id = "junction"
 	game.pressure_line.state = &"charged"
 	game.call("_converse", line)
 	_expect(not game.call("_conversation_active") and game.human.controlled, "even identical dialogue yields movement when a live hazard is present")
+	var hazard_lines: Array[String] = [line, line]
+	game.call("_say", hazard_lines, true)
+	_expect(not game.call("_conversation_active") and game.human.controlled, "a queued conversation also preserves movement during a live hazard")
 	await end_game(game)
 	finish("Conversation flow checks passed")
 
