@@ -27,6 +27,8 @@ var game_ref: Node2D
 func _run() -> void:
 	check_name = "M0 scene"
 	var game: Node2D = open_game("m0-scene-test")
+	# Fixed wording/scene timing uses Instant; Normal reveal has its own input and complete-route checks.
+	(game.get("settings_menu") as GameSettings).text_speed.select(3)
 	var path: String = str(game.get("save_path"))
 	game_ref = game
 	for layout_frame: int in 3:

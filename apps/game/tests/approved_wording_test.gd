@@ -63,6 +63,8 @@ func _run() -> void:
 	_check_sources()
 	_check_constants()
 	game = open_game("approved-wording-test")
+	# Fixed wording/scene timing uses Instant; Normal reveal has its own input and complete-route checks.
+	(game.get("settings_menu") as GameSettings).text_speed.select(3)
 	path = str(game.get("save_path"))
 	human = game.get_node("Human") as M0Actor
 	wolf = game.get_node("Wolf") as M0Actor
