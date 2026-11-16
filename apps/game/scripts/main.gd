@@ -111,10 +111,9 @@ const PURGE_DISPLAY_MAX_X: float = 181.0
 const DIALOGUE_FONT_SIZE: int = 23
 const DIALOGUE_COLUMN_WIDTH: float = 440.0
 const SPEAKER_FONT_SIZE: int = 16
-## The box's inner margins, the gap the rule splits between the name and the words, and the box's
+## The box's inner margins and the box's
 ## bottom edge on the 960 x 540 canvas.
 const DIALOGUE_PADDING: Vector2 = Vector2(20.0, 12.0)
-const SPEAKER_GAP: float = 17.0
 const DIALOGUE_BOTTOM: float = 526.0
 ## No part of the play HUD comes closer than this to the canvas's sides.
 const HUD_SIDE_MARGIN: float = 20.0
@@ -632,7 +631,6 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var bottom_bar: Panel = $CanvasLayer/BottomBar
 @onready var dialogue_accent: ColorRect = $CanvasLayer/BottomBar/Accent
 @onready var speaker: Label = $CanvasLayer/BottomBar/Speaker
-@onready var speaker_rule: ColorRect = $CanvasLayer/BottomBar/SpeakerRule
 @onready var story: Label = $CanvasLayer/BottomBar/Story
 @onready var context_hint: Panel = $CanvasLayer/ContextHint
 @onready var context_hint_text: Label = $CanvasLayer/ContextHint/Text
@@ -1035,6 +1033,7 @@ static func game_version() -> String:
 func _ready() -> void:
 	get_window().title = str(ProjectSettings.get_setting(NAME_SETTING, ""))
 	title_version.text = game_version()
+	speaker.add_theme_stylebox_override(&"normal", speaker.get_theme_stylebox(&"tab_selected", &"TerminalTabBar"))
 	# The title's size is the Display role of the type scale (type.display.size), the token file being
 	# its one home; it takes no TEXT SIZE factor, like the other menus.
 	title_logo.add_theme_font_size_override(&"font_size", UiTokens.px("type.display.size"))
@@ -5297,8 +5296,7 @@ func _story_wrap_width(column: float) -> float:
 
 
 ## Lays out the HUD's text for the current text size, input and box: the dialogue box (its name
-## column beside the words while both fit the canvas, above them when they do not; narration without
-## one), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
+## tab above the words; narration without a tab), the hint bar above it (or in its place while no box is up), the top card, the tutorial prompt under the card (or off a station, see _tutorial_prompt_place) and the answer buttons.
 func _layout_hud() -> void:
 	var touch_layout: bool = touch_enabled and not controller_active
 	_set_font_size(story, TextSize.px(DIALOGUE_FONT_SIZE))
@@ -5310,23 +5308,18 @@ func _layout_hud() -> void:
 	var column: float = _dialogue_column_width()
 	var names: float = _speaker_column_width()
 	var between: bool = _box_between_touch_buttons()
-	var room: float = _dialogue_room(between)
 	var centre_x: float = TOUCH_HINT_CENTRE_X if between else 480.0
-	var stacked: bool = DIALOGUE_PADDING.x * 2.0 + names + SPEAKER_GAP + column > room
-	# Narration has no name column, so its box is only as wide as the words' column.
-	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column + (names + SPEAKER_GAP if speaker.visible and not stacked else 0.0)
-	_set_rect(story, Vector2(story.position.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
+	# Speaker tabs sit outside the text panel, so narration and speech share one words column.
+	var bar_width: float = DIALOGUE_PADDING.x * 2.0 + column
+	_set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), story.size.y))
 	var line_height: float = story.get_line_height()
 	var text_height: float = line_height * maxi(story.get_line_count(), DialogueBoxes.MAX_ROWS)
-	var name_height: float = speaker.get_line_height() + 4.0 if stacked and speaker.visible else 0.0
-	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + name_height + text_height
+	var bar_height: float = DIALOGUE_PADDING.y * 2.0 + text_height
 	_set_rect(bottom_bar, Vector2(roundf(centre_x - bar_width * 0.5), DIALOGUE_BOTTOM - bar_height), Vector2(bar_width, bar_height))
-	# Narration starts at the box's left margin, where a speaker's name would.
-	var words_x: float = DIALOGUE_PADDING.x + names + SPEAKER_GAP if speaker.visible and not stacked else DIALOGUE_PADDING.x
-	_set_rect(story, Vector2(words_x, DIALOGUE_PADDING.y + name_height), Vector2(_story_wrap_width(column), text_height))
-	_set_rect(speaker, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(column if stacked else names, name_height if stacked else text_height))
-	speaker_rule.visible = speaker.visible and not stacked
-	_set_rect(speaker_rule, Vector2(DIALOGUE_PADDING.x + names + SPEAKER_GAP * 0.5, DIALOGUE_PADDING.y + 2.0), Vector2(1.0, text_height - 4.0))
+	_set_rect(story, Vector2(DIALOGUE_PADDING.x, DIALOGUE_PADDING.y), Vector2(_story_wrap_width(column), text_height))
+	# The reused tab style includes content margins, which can exceed the text's line height.
+	var tab_height: float = maxf(speaker.get_combined_minimum_size().y, speaker.get_line_height() + DIALOGUE_PADDING.y)
+	_set_rect(speaker, Vector2(DIALOGUE_PADDING.x, -tab_height), Vector2(minf(names + DIALOGUE_PADDING.x, column), tab_height))
 	_set_rect(dialogue_accent, Vector2(1.0, 1.0), Vector2(3.0, bar_height - 2.0))
 	# The top card grows with its text, left of PAUSE (and of the touch DEBUG button where it shows),
 	# and takes a third row if its words need one there.
@@ -5466,7 +5459,8 @@ func _layout_choices(touch_layout: bool, top: float) -> void:
 			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	if touch_layout:
 		var touch_height: float = maxf(76.0, maxf(touch_choice_1.get_minimum_size().y, touch_choice_2.get_minimum_size().y))
-		var touch_top: float = bottom_bar.position.y - 10.0 - touch_height
+		var question_top: float = speaker.global_position.y if speaker.visible else bottom_bar.position.y
+		var touch_top: float = question_top - 10.0 - touch_height
 		_set_rect(touch_choice_1, Vector2(42.0, touch_top), Vector2(428.0, touch_height))
 		_set_rect(touch_choice_2, Vector2(490.0, touch_top), Vector2(428.0, touch_height))
 		return

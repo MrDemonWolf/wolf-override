@@ -632,7 +632,6 @@
     ['text-muted', 'color', 'konst', 'game_settings.gd', 'MUTED_TEXT'],
     ['title-bg', 'color', 'prop', 'main.tscn', 'CanvasLayer/TitleScreen', 'color'],
     ['pause-backdrop', 'color', 'prop', 'main.tscn', 'CanvasLayer/PauseOverlay', 'color'],
-    ['speaker-rule', 'color', 'prop', 'main.tscn', 'CanvasLayer/BottomBar/SpeakerRule', 'color'],
     ['logo-bg', 'color', 'prop', 'studio_logo.tscn', 'Background', 'color'],
     ['logo-name', 'color', 'prop', 'studio_logo.tscn', 'CompanyName', 'theme_override_colors/font_color'],
     ['bar-track', 'color', 'prop', 'studio_logo.tscn', 'LoadBar', 'color'],

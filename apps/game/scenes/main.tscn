@@ -323,14 +323,6 @@ offset_bottom = 62.0
 theme_override_font_sizes/font_size = 15
 vertical_alignment = 1
 
-[node name="SpeakerRule" type="ColorRect" parent="CanvasLayer/BottomBar"]
-offset_left = 143.0
-offset_top = 14.0
-offset_right = 144.0
-offset_bottom = 68.0
-mouse_filter = 2
-color = Color(0.52, 0.72, 0.81, 0.43)
-
 [node name="Story" type="Label" parent="CanvasLayer/BottomBar"]
 auto_translate_mode = 2
 offset_left = 160.0

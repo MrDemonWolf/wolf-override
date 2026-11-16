@@ -463,8 +463,14 @@ func _measure_shown(context: String) -> void:
 		_expect(rows.size() <= 2 and longest <= 42, "%s: the shown box takes %d rows, the longest %d characters: %s" % [context, rows.size(), longest, story.text.c_escape()])
 	else:
 		rows_at_200 = maxi(rows_at_200, rows.size())
-	_expect(not inline and (speaker.text.is_empty() or speaker.text in tags), "%s: one speaker, named in the speaker column" % context)
+	_expect(not inline and (speaker.text.is_empty() or speaker.text in tags), "%s: one speaker, named in the speaker tab" % context)
 	var box: Rect2 = bar.get_global_rect()
+	if speaker.visible:
+		var tab: Rect2 = speaker.get_global_rect()
+		_expect(tab.position.y >= 0.0 and tab.end.y <= box.position.y + 0.5, "%s: speaker tab stays above the panel and on screen" % context)
+		if game.waiting_for_choice and game.touch_enabled and not game.controller_active:
+			for answer: Button in [game.touch_choice_1, game.touch_choice_2]:
+				_expect(answer.get_global_rect().end.y <= tab.position.y + 0.5, "%s: touch answers leave the speaker tab clear" % context)
 	_expect(box.position.x >= 0.0 and box.end.x <= 960.0 and box.position.y >= 0.0 and box.end.y <= 540.0, "%s: the dialogue box stays on the canvas (%s)" % [context, box])
 	_expect(story.position.y + story.size.y <= bar.size.y + 0.5 and story.get_line_count() * story.get_line_height() <= story.size.y + 0.5, "%s: the words fit inside the box" % context)
 
@@ -550,7 +556,7 @@ func _check_first_control() -> void:
 	await _play(14.0, "opening lines")
 	_expect(speaker.text in ["WOLF", (game.call("_first_name") as String).to_upper()] or game.status_line == Main.STAKES_LINE, "WOLF and the engineer each get their own boxes")
 	if not speaker.text.is_empty():
-		_expect(bar.size.x > narration_width, "a speaker's box adds the name column (%s vs %s)" % [bar.size.x, narration_width])
+		_expect(is_equal_approx(bar.size.x, narration_width) and speaker.position.y + speaker.size.y <= 0.5, "a speaker tab sits above the shared words panel")
 
 
 ## The stakes and the relay question at the breaker; a box per speaker as WOLF answers.
