@@ -191,18 +191,16 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	_expect(str(game.get("status_line")).contains("Records worker's archive marked for deletion"), "purge display establishes evidence stakes without inventory")
 	_expect(not tutorial_prompt.visible, "reading the display clears the opening tutorial")
-	var start_x: float = human.position.x
-	if not _require(await walk_to(human, 350.0), "active engineer reaches breaker by moving right"):
+	_expect(not human.controlled, "the display exchange holds movement until read")
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the display and every preserved opening box"):
 		return
-	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
-	_expect(str(game.get("status_line")).contains("Records worker's archive marked for deletion"), "walking straight on past the display leaves its text up to be read")
-	# The exchange follows once the display's text has been read, and the stakes wait for it to be read
-	# in turn. Each line shows box by box, each box up its reading time: about 15 s of standing still.
-	_expect(await wait_until(func() -> bool:
-		watch_exchange.call()
-		return str(game.get("status_line")) == "WOLF: That purge erases what the witness saved. We need to save what we can.", 2400), "once the display's text has been up long enough to read, WOLF urges preservation without claiming all proof is lost")
 	process_frame.disconnect(watch_exchange)
 	_expect(exchange_shown[0], "the opening exchange shows again after the display's text and before the stakes")
+	var start_x: float = human.position.x
+	if not _require(await walk_to_reading_on(human, 350.0), "active engineer reads the warning and reaches the breaker by moving right"):
+		return
+	_expect(human.position.x > start_x and wolf.position.x > 225.0 and wolf.position.x < human.position.x, "WOLF follows the engineer autonomously")
+	_expect(game.get("stakes_spoken") and game.get("dialogue_cleared") and str(game.get("status_line")) == Main.STAKES_LINE, "WOLF's preservation warning is read before proceeding")
 	if not _require(await walk_to(human, 450.0), "engineer can move beyond the breaker"):
 		return
 	if not _require(await walk_to(human, 350.0), "engineer can backtrack to the breaker"):
@@ -241,8 +239,7 @@ func _run() -> void:
 	await create_timer(0.1).timeout
 	_expect(wolf.body_sprite.position.distance_to(Main.WOLF_SPRITE_REST) > 2.0, "WOLF visibly reacts to the disclosed risk")
 	_expect(game.call("_objective") == "ARM THE BREAKER", "honest answer advances the objective")
-	await tap(&"interact")
-	if not _require(state.breaker_armed, "breaker arms after choice"):
+	if not _require(await continue_until(game, func() -> bool: return state.breaker_armed and human.controlled, TALK_FRAMES), "read WOLF's reply and arm the breaker after the choice"):
 		return
 	_expect(game.call("_objective") == "OPEN THE SEAL", "powered relay becomes the objective")
 	if not _require(await walk_to(human, 605.0), "engineer reaches relay with WOLF following"):
@@ -425,8 +422,7 @@ func _run() -> void:
 	_expect(str(game.get("status_line")) == "WOLF: No. I won't take that risk blind. Use the manual bypass.", "WOLF refuses the live contact and names the manual bypass")
 	await create_timer(0.1).timeout
 	_expect(wolf.body_sprite.position.x < -2.0, "WOLF visibly steps back from the unwarned request")
-	await tap(&"interact")
-	if not _require(state.breaker_armed, "fallback breaker arms"):
+	if not _require(await continue_until(game, func() -> bool: return state.breaker_armed and human.controlled, TALK_FRAMES), "read the refusal and arm the fallback breaker"):
 		return
 	if not _require(await walk_to(human, 605.0), "engineer reaches manual bypass on fallback play"):
 		return
@@ -552,23 +548,15 @@ func _run() -> void:
 	await tap(&"interact")
 	await process_frame
 	_expect(float(game.get("name_card_remaining")) == 0.0 and (not top_card.visible if game.get("bottom_bar").visible else top_card.visible and hud.text == HudText.card(str(game.call("_objective")))), "the first USE skips the name card; dialogue owns attention before the goal follows")
-	if not _require(await walk_to(human, 350.0), "engineer reaches breaker on the disclose-then-bypass route"):
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the display exchange after skipping the name card"):
 		return
-	await tap(&"interact")
-	_expect(str(game.get("status_line")).begins_with("WOLF: That purge erases") and not game.get("waiting_for_choice"), "the stakes line comes before the breaker question on every new run")
-	# A shorter warning may finish and resume interrupted opening lines; neither may open the choice.
-	for _frame in range(400):
-		await physics_frame
-	_expect(not game.get("waiting_for_choice") and str(game.call("_context_hint")) in ["E: continue.", "E: talk to WOLF about the relay."] and (str(game.get("status_line")).begins_with("WOLF: That purge erases") or (game.get("opening_lines") as Array).has(game.get("status_line"))), "the warning or interrupted opening lines remain readable, and the relay question waits for USE regardless of warning length")
-	# USE reads any resumed opening boxes before it asks; eight bounds the current short sequence.
-	for _press: int in 8:
-		await tap(&"interact")
-		if game.get("waiting_for_choice"):
-			break
-	_expect(game.get("waiting_for_choice") and str(game.get("status_line")).begins_with("WOLF: That relay's tagged COOLANT FAULT"), "going on through the stakes and any resumed opening lines, WOLF asks about the relay")
+	if not _require(await walk_to_reading_on(human, 350.0), "read the warning and reach the breaker on the disclose-then-bypass route"):
+		return
+	_expect(game.get("stakes_spoken") and not game.get("waiting_for_choice"), "the preservation warning is read before the next relay question")
+	if not _require(await continue_until(game, func() -> bool: return bool(game.get("waiting_for_choice")), TALK_FRAMES), "a fresh USE opens the relay question after the warning"):
+		return
 	await tap(&"choice_1")
-	await tap(&"interact")
-	if not _require(state.breaker_armed, "breaker arms on the disclose-then-bypass route"):
+	if not _require(await continue_until(game, func() -> bool: return state.breaker_armed and human.controlled, TALK_FRAMES), "read WOLF's reply and arm the breaker on the disclose-then-bypass route"):
 		return
 	# No spot between the relay and the MANUAL BYPASS falls back to "go to the relay".
 	var armed_x: float = human.position.x

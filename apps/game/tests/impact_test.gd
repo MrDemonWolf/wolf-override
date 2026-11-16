@@ -218,6 +218,7 @@ func _run() -> void:
 	game.call("_interact_breaker")
 	game.call("_choose", State.PRESS)
 	var pre_save: Dictionary = (game.get("beat_snapshot") as Dictionary).duplicate(true)
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "the refusal can be read without creating a checkpoint")
 	_expect(await walk_to(human, 450.0), "the engineer moves on before any save exists")
 	game.call("_fail_beat", "Test knockdown.")
 	_expect(await retry(game, 240), "a knockdown before the first checkpoint still hands back")

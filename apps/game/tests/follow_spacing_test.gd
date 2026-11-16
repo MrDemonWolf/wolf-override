@@ -46,6 +46,8 @@ func _run() -> void:
 	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor start")
 	_expect(wolf.position.x < human.position.x, "WOLF starts on the engineer's left, away from where he faces")
+	game.call("_speak_stakes")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the corridor exchange before measuring free following")
 	_expect(await walk_to(human, 450.0), "the engineer walks right along the corridor")
 	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor at rest after walking right")

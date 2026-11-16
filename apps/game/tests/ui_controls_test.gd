@@ -188,6 +188,7 @@ func _run() -> void:
 	await process_frame
 	use.button_up.emit()
 	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as Control).visible, "touch use reads the display and clears the tutorial")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "the display exchange is read before testing exploration controls")
 	# Holding the touch USE button cranks the corridor's MANUAL BYPASS; Pause lets go and keeps the turns made.
 	var crank_state: M0State = game.get("state") as M0State
 	crank_state.record_choice(M0State.PRESS)

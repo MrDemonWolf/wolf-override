@@ -234,8 +234,7 @@ func _check_trust_boxes() -> void:
 	_expect((game.get("box_queue") as Array).is_empty() and str(game.get("status_line")) == "WOLF: Picked.", "answering the choice drops the boxes from before it")
 	# In play: following the hint bar at first control (E at the purge display, during the first box)
 	# still shows the second box and the opening exchange, in order, after the display's own line. The
-	# display's line is an aside (_aside), so the first box, not yet read (on the first controllable
-	# frames it waits for the first step), comes back after it too; the breaker's stakes cut in instead.
+	# stopped display and breaker exchanges both preserve the unread first box.
 	for at_breaker: bool in [false, true]:
 		game.call("debug_new_game", true)
 		await process_frame
@@ -248,17 +247,14 @@ func _check_trust_boxes() -> void:
 		Input.action_press(&"interact")
 		await process_frame
 		Input.action_release(&"interact")
-		# Up to 25 s of game time for the boxes to play out (the wall clock only guards against a hang).
-		await wait_game_seconds(25.0, func() -> bool:
+		_expect(await continue_until(game, func() -> bool:
 			var line: String = str(game.get("status_line"))
 			if seen.is_empty() or seen.back() != line:
 				seen.append(line)
-			return line == box_3)
+			return line == box_3, TALK_FRAMES), "the interrupted opening can be read through to its exchange")
 		var cut_in: String = seen[1] if seen.size() > 1 else ""
-		var expected: Array[String] = [box_1, cut_in, box_2, box_3]
-		if not at_breaker:
-			expected.insert(2, box_1)
-		_expect(seen == expected and cut_in != box_1 and cut_in != box_2, "E at the %s during the first box: its line, then %sthe second box and the exchange, in order (seen %s)" % ["breaker" if at_breaker else "purge display", "" if at_breaker else "the unread first box, ", str(seen).c_escape()])
+		var expected: Array[String] = [box_1, cut_in, box_1, box_2, box_3]
+		_expect(seen == expected and cut_in != box_1 and cut_in != box_2, "E at the %s preserves the unread first box, second box and exchange in order (seen %s)" % ["breaker" if at_breaker else "purge display", str(seen).c_escape()])
 
 
 ## A fresh junction entry: the engineer's goal, WOLF's run shown and his warning, the goal-only hint.

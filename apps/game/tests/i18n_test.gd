@@ -872,8 +872,8 @@ func _check_touch_words(code: String, game: Main) -> void:
 ## Every short message of [param code]'s catalogs (HUD_MESSAGE_CHARS or fewer characters, no BBCode),
 ## or under I18n.PSEUDO of the committed translation template (every message the game marks, each
 ## padded 30%), filled with sample inserts ([method _sample_inserts]) as the HUD fills it, drawn where the
-## HUD draws its lines: the hint bar at the keyboard and the touch widths (via the game's own
-## _set_dialogue, which sizes it) and the top card. Each may take at most one row more than its English
+## HUD draws its lines: actual hint templates at the keyboard and touch widths (via the game's own
+## _set_dialogue, which sizes it), and every short message in the top card. Each may take at most one row more than its English
 ## in the same Label, and never more than HUD_MAX_ROWS rows: the hint bar and the card grow with their
 ## rows, so a translation cannot overflow them, but it can push them over the room (PR L9 review: the
 ## HUD hints need the fit check). English is the baseline and is not judged itself; the HUD's labels
@@ -894,14 +894,27 @@ func _check_hud_rows(code: String, game: Main) -> void:
 			if msgid.length() <= HUD_MESSAGE_CHARS and not msgid.contains("[") and not messages.has(msgid):
 				messages.append(msgid)
 	_check(messages.size() > 100, "%s: the HUD row check reads the language's catalog (%d short messages)" % [code, messages.size()])
+	# Dialogue paragraphs use pagination, not the hint bar. Read hint candidates from their actual
+	# producer and its named constants so new hints join this check without a second string list.
+	var main_source: String = game.get_script().source_code
+	_check(main_source.contains("func _context_hint()") and main_source.contains("func _objective()"), "the hint row check finds its source boundaries")
+	var hint_source: String = main_source.get_slice("func _context_hint()", 1).get_slice("func _objective()", 0).c_unescape()
+	var constants: Dictionary = game.get_script().get_script_constant_map()
+	for name: String in constants:
+		if name.ends_with("_HINT") and constants[name] is String:
+			hint_source += "\n" + str(constants[name])
 	var widest: int = 0
+	var hint_count: int = 0
 	for touch: bool in [false, true]:
 		game.touch_enabled = touch
 		for msgid: String in messages:
 			var inserts: Array = _sample_inserts(msgid)
 			var english: String = msgid % inserts if not inserts.is_empty() else msgid
 			var shown: String = I18n.fill(msgid, inserts)
-			var targets: Array[Label] = [game.context_hint_text]
+			var targets: Array[Label] = []
+			if hint_source.contains(msgid):
+				targets.append(game.context_hint_text)
+				hint_count += 1
 			if not touch:
 				targets.append(game.hud)
 			for label: Label in targets:
@@ -915,6 +928,8 @@ func _check_hud_rows(code: String, game: Main) -> void:
 				widest = maxi(widest, rows[1])
 				var where: String = ("touch hint bar" if touch else "hint bar") if label == game.context_hint_text else "top card"
 				_check(rows[1] <= mini(rows[0] + 1, HUD_MAX_ROWS) or rows[1] <= rows[0], "%s, %s: %s takes %d rows (English %d)" % [code, where, shown.c_escape().left(70), rows[1], rows[0]])
+	# At least thirty real hint templates per input width guards against an empty or wrong source slice.
+	_check(hint_count >= 60, "%s: actual hint templates are measured at both input widths (%d)" % [code, hint_count])
 	game.touch_enabled = false
 	game.call("_refresh_ui")
 	print("%s: %d HUD messages laid out; the most rows any took: %d" % [code, messages.size(), widest])

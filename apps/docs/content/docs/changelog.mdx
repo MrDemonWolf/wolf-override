@@ -257,6 +257,9 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 
 ### Development
 
+- Route, movement and sound checks read stopped conversations before using the next station. Focused headless checks only.
+- Language checks measure actual hint templates in the hint bar; dialogue keeps its separate pagination checks.
+
 - Debug drawings protect the floating move pad’s ring and thumb bounds. Headless checks only.
 
 - A floating phone move pad shares the engineer’s movement path and cancels on Pause; simultaneous MOVE + USE passed headless checks. The pad and extra USE button hide during ordinary dialogue; hidden touch presses release their actions. Phone stills checked at 100% and 200%. Device checks remain unfinished.

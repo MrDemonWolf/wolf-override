@@ -877,9 +877,9 @@ func _check_zones_keep_clear() -> void:
 			names.append(str(entry["name"]))
 		var expected: Array[String] = ["story text"]
 		if layout == "touch":
-			expected.append("pause_button")
+			expected.append_array(["pause_button", "touch_move_pad", "touch_use"])
 		_expect(expected.all(func(name: String) -> bool: return names.has(name)), "the %s layout protects visible dialogue and Pause (%s)" % [layout, names])
-		_expect(not names.has("context_hint_text text") and not names.has("touch_left") and not names.has("touch_right") and not names.has("touch_use"), "hidden reading controls do not reserve debug-overlay space")
+		_expect(not names.has("context_hint_text text") and not names.has("touch_left") and not names.has("touch_right"), "hidden hint text and obsolete arrows do not reserve debug-overlay space")
 		var hint_text: Rect2 = DebugZones.text_rect(game.get_node("CanvasLayer/ContextHint/Text") as Label)
 		var hint_box: Rect2 = (game.get_node("CanvasLayer/ContextHint/Text") as Control).get_global_rect()
 		_expect(hint_text.has_area() and hint_text.size.x < hint_box.size.x, "the hint's protected area is its text, not its whole box (%s in %s)" % [hint_text, hint_box])
@@ -890,6 +890,15 @@ func _check_zones_keep_clear() -> void:
 		_expect(_drawn_names(geometry) >= (15 if layout == "keyboard" else 14), "corridor, %s layout: most names still find room (%d)" % [layout, _drawn_names(geometry)])
 		var camera_tick: Dictionary = _entry(geometry["zones"], "name", "camera x%.2f" % (game.get("intro_camera") as Camera2D).zoom.x)
 		_expect(camera_tick.has("label_rect"), "corridor, %s layout: the camera's centre is named on the bottom edge" % layout)
+	game.call("_converse", str(game.get("status_line")))
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	await settle(2)
+	var reading_geometry: Dictionary = tools.dump()["geometry"]
+	var reading_controls: Array = reading_geometry["keep_clear"]["controls_and_text"]
+	_expect(_entry(reading_controls, "name", "touch_use").is_empty() and _entry(reading_controls, "name", "touch_move_pad").is_empty(), "a stopped conversation does not reserve hidden exploration controls")
+	_expect(_labels_clear(reading_geometry).is_empty(), "debug labels remain clear during a stopped conversation")
+	game.call("_tell", str(game.get("status_line")))
 	# The engineer at the bypass: the purge display's range is wholly off screen.
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")

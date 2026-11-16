@@ -56,6 +56,7 @@ func _route_wolf_takes_relay() -> void:
 	await _ask_relay()
 	await _press(&"choice_1", "telling WOLF the risk at the breaker")
 	_expect(started.has(&"actuator"), "WOLF's answer at the relay is heard as his joints move (heard %s)" % [started])
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the disclosed-risk reply before arming")
 	await _press(&"interact", "arming the corridor breaker")
 	await _place(605.0, 520.0)
 	_expect(_fault_shown(), "the live relay wears its COOLANT FAULT tag")
@@ -80,6 +81,7 @@ func _route_bypass() -> void:
 	await settle(5)
 	await _ask_relay()
 	await _press(&"choice_2", "pressing WOLF at the breaker")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the refusal before arming")
 	await _press(&"interact", "arming the corridor breaker after his refusal")
 	await _press(&"interact", "asking WOLF again at the live relay", 605.0)
 	_expect(started.has(&"actuator"), "WOLF's refusal at the relay is heard (heard %s)" % [started])
@@ -137,11 +139,7 @@ func _leave_records() -> void:
 ## At the breaker: USE until WOLF asks about the relay (the stakes line may come first).
 func _ask_relay() -> void:
 	await _place(350.0, 290.0)
-	for _attempt: int in 3:
-		if bool(game.get("waiting_for_choice")):
-			break
-		await _press(&"interact", "reading on at the breaker", -1.0, false)
-	_expect(bool(game.get("waiting_for_choice")), "WOLF asks about the relay at the breaker")
+	_expect(await continue_until(game, func() -> bool: return bool(game.get("waiting_for_choice")), TALK_FRAMES), "WOLF asks about the relay after every preceding page is read")
 
 
 ## The safe point: secure it (first visit), save again, then go on into Records Access.
@@ -162,12 +160,15 @@ func _safe_point() -> void:
 ## Records Access: the purge copy, the mirror (by [param mirror_route]), the first copy and its
 ## closing shot.
 func _records(mirror_route: String) -> void:
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the Records entry exchange before using a source")
 	await _press(&"interact", "copying the purge-order trace", 190.0)
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the copied purge source before the next station")
 	await _press(&"interact", "opening the mirror index", 520.0, false)
 	# WOLF reads it from beside the port.
 	await _place(520.0, float((game.get_script() as Script).get_script_constant_map()["WOLF_MIRROR_X"]))
 	await _press(&"choice_1" if mirror_route == "wolf" else &"choice_2", "copying the mirror timestamp (%s)" % mirror_route)
 	_expect((game.get("state") as M0State).mirror_route == mirror_route, "the mirror is copied by the chosen route")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the mirror result before securing the copy")
 	await _press(&"interact", "securing the first copy at the Records exit", 830.0)
 	_expect(started.has(&"records_arc"), "the first copy lets the exit go with its arc (heard %s)" % [started])
 	# No closing shot holds the engineer (STORY-8): control stays while the closing lines run, and USE at
