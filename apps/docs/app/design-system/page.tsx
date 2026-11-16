@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import SiteHeader from '../site-header';
 import SiteFooter from '../site-footer';
-import { card, inlineLink, landingRoot, landingWidth, sectionCopy } from '../landing-classes';
+import { bulletList, card, chipLink, inlineLink, landingRoot, landingWidth, sectionCopy, textLink } from '../landing-classes';
 import recordsCapture from '../images/records-access-doors-capture.png';
 import recordsCapture480 from '../images/records-access-doors-capture-480.webp';
 import junctionCapture from '../images/service-junction-doors-capture.png';
@@ -122,7 +122,6 @@ const kicker = 'hud-label mb-3';
 const sectionHeading = 'mb-4 text-title font-bold';
 const sectionBox = `${landingWidth} border-t border-t-line py-16 phone:py-12`;
 const subHeading = 'mt-10 mb-3 font-heading text-[1.15rem] font-bold';
-const bulletList = 'flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent';
 
 /** One section of the page: an anchor target with its number, heading and a one-line TL;DR. */
 function Section({ id, index, title, tldr, children }: { id: SectionId; index: number; title: string; tldr: string; children: ReactNode }) {
@@ -204,7 +203,7 @@ export default function DesignSystemPage() {
           <p className="mt-3 text-caption text-muted">Logos, wolf mark, screenshots, key art, cover, facts and approved copy in one file.</p>
           <nav aria-label="On this page" className="mt-10 flex flex-wrap gap-2">
             {sections.map(([id, title]) => (
-              <a key={id} href={`#${id}`} className="inline-flex min-h-11 items-center rounded-control border border-line-strong px-4 hover-always:border-accent hover-always:text-accent">
+              <a key={id} href={`#${id}`} className={chipLink}>
                 {title}
               </a>
             ))}
@@ -345,8 +344,8 @@ export default function DesignSystemPage() {
             </div>
           </div>
           <p className={`${sectionCopy} mt-6`}>
-            Licence: <a className="text-accent underline underline-offset-4" href="https://openfontlicense.org/">SIL Open Font License 1.1</a>. The licence texts ship beside the fonts in the{' '}
-            <a className="text-accent underline underline-offset-4" href={`${repoUrl}/tree/main/apps/docs/app/fonts`}>source repository</a>.
+            Licence: <a className={textLink} href="https://openfontlicense.org/">SIL Open Font License 1.1</a>. The licence texts ship beside the fonts in the{' '}
+            <a className={textLink} href={`${repoUrl}/tree/main/apps/docs/app/fonts`}>source repository</a>.
           </p>
         </Section>
 
@@ -373,7 +372,7 @@ export default function DesignSystemPage() {
           <ul className={`${bulletList} max-w-[62ch]`}>
             <li><strong className="text-text">All current art is provisional</strong> and may change before release.</li>
             <li><strong className="text-text">Made with AI assistance:</strong> the key art and the game&apos;s art were made with AI image tools, then reviewed and approved by Nathanial Henniges. The wolf mark started as an AI concept (ChatGPT Create) and was redrawn by the project as SVG; the logo sets the name in Montserrat letter shapes beside it.</li>
-            <li>Details for every file: <Link className="text-accent underline underline-offset-4" href="/docs/credits/#provisional-art">Credits</Link> and the <a className="text-accent underline underline-offset-4" href={`${repoUrl}/blob/main/apps/game/assets/manifest.json`}>asset register</a>.</li>
+            <li>Details for every file: <Link className={textLink} href="/docs/credits/#provisional-art">Credits</Link> and the <a className={textLink} href={`${repoUrl}/blob/main/apps/game/assets/manifest.json`}>asset register</a>.</li>
           </ul>
           <h3 className={subHeading}>AI disclosure</h3>
           {/* The approved text (lib/press-kit.ts aiDisclosure); press may quote it as it is, as stores will. */}
@@ -413,7 +412,7 @@ export default function DesignSystemPage() {
             {assetTerms.map((term) => <li key={term}>{term}</li>)}
           </ul>
           <p className={`${sectionCopy} mt-4`}>
-            These are the press terms. The <Link className="text-accent underline underline-offset-4" href="/docs/legal/">Legal page</Link> covers the licences for everything else in the project.
+            These are the press terms. The <Link className={textLink} href="/docs/legal/">Legal page</Link> covers the licences for everything else in the project.
           </p>
         </Section>
 
@@ -430,7 +429,7 @@ export default function DesignSystemPage() {
           <ul className="flex flex-wrap gap-2">
             {pressLinks.map((link) => (
               <li key={link.url}>
-                <a href={link.url} className="inline-flex min-h-11 items-center rounded-control border border-line-strong px-4 hover-always:border-accent hover-always:text-accent">
+                <a href={link.url} className={chipLink}>
                   {link.label}&nbsp;<span aria-hidden="true">↗</span>
                 </a>
               </li>
