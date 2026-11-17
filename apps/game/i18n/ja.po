@@ -3404,3 +3404,280 @@ msgstr "%s：次の情報源を調べる。"
 # Machine-translated by Codex (OpenAI), unreviewed; 2026-10-30.
 msgid "Chapter 1 complete. PLAY AGAIN starts a fresh run."
 msgstr "第1章完了。もう一度プレイで最初から始める。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Settings tab for text size and reduced motion.
+#. i18n: speaker=ui
+msgid "ACCESSIBILITY"
+msgstr "アクセシビリティ"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Controller rebinding prompt; %s is the action name. Menu cancels capture.
+#. i18n: speaker=ui
+#, c-format
+msgid "Press a controller input for %s. Menu cancels."
+msgstr "「%s」に割り当てるコントローラーの入力を押す。メニューでキャンセル。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#. TRANSLATORS: Pause notice after the controller in use disconnects; reconnection alone never resumes play.
+#. i18n: speaker=ui
+msgid "Controller disconnected. Resume when ready."
+msgstr "コントローラーが切断されました。準備ができたら再開してください。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Volume changes apply immediately."
+msgstr "音量の変更はすぐに反映されます。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "QUIT"
+msgstr "終了"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "Show objective"
+msgstr "目標を表示"
+
+# machine-translated by Codex (OpenAI), unreviewed
+msgid "VIEW"
+msgstr "ビュー"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "TEXT SPEED"
+msgstr "文字表示速度"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Slow"
+msgstr "遅い"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Normal"
+msgstr "標準"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Fast"
+msgstr "速い"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "Instant"
+msgstr "即時"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "AUTO-ADVANCE"
+msgstr "自動送り"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Accessibility reading preference; UI only.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd
+msgid "DIALOGUE BACKING"
+msgstr "会話の背景"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Cross"
+msgstr "クロス"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Circle"
+msgstr "丸"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Square"
+msgstr "四角"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Triangle"
+msgstr "三角"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Create"
+msgstr "クリエイト"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "View"
+msgstr "ビュー"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Options"
+msgstr "オプション"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Menu"
+msgstr "メニュー"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Left stick press"
+msgstr "左スティック押し込み"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Right stick press"
+msgstr "右スティック押し込み"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "D-pad up"
+msgstr "十字キー上"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "D-pad down"
+msgstr "十字キー下"
+
+# machine-translated, unreviewed
+#. TRANSLATORS: Controller button name or asset credit; UI only. Keep Kenney, univeous, CC0 and MIT unchanged.
+#. i18n: speaker=ui
+#: scripts/game_settings.gd scripts/main.gd
+msgid "Controller prompts: Kenney (CC0), with the font conversion by univeous (MIT)."
+msgstr "コントローラーアイコン：Kenney（CC0）。フォント変換：univeous（MIT）。"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6194
+#: scripts/main.gd:6209
+#: scripts/main.gd:6243
+msgid "Continue"
+msgstr "続ける"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+#: scripts/main.gd:6329
+msgid "Leave through door"
+msgstr "扉から出る"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6195
+msgid "Inspect source"
+msgstr "資料を調べる"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6209
+msgid "Follow service line"
+msgstr "整備通路を進む"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6212
+msgid "Copy purge trace"
+msgstr "消去の記録をコピー"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6216
+msgid "Examine mirror"
+msgstr "ミラーポートを調べる"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6219
+msgid "Secure copy"
+msgstr "コピーを保管"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+msgid "Enter records"
+msgstr "記録室に入る"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6222
+#: scripts/main.gd:6230
+msgid "Read display"
+msgstr "画面を読む"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6227
+msgid "Save checkpoint"
+msgstr "チェックポイントを保存"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6236
+#, c-format
+msgid "Crank bypass · %d/%d"
+msgstr "バイパスを回す · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+msgid "Talk to WOLF"
+msgstr "WOLFと話す"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6244
+#: scripts/main.gd:6276
+msgid "Arm breaker"
+msgstr "ブレーカーを入れる"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6248
+msgid "Signal WOLF"
+msgstr "WOLFに合図する"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6278
+msgid "Reset breaker"
+msgstr "ブレーカーを戻す"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6282
+#, c-format
+msgid "Crank valve · %d/%d"
+msgstr "バルブを回す · %d/%d"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6323
+msgid "Release exit bolt"
+msgstr "出口のボルトを外す"
+
+# machine-translated by Codex (OpenAI), unreviewed
+#: scripts/main.gd:6342
+msgid "Drop tank on mark"
+msgstr "印の上にタンクを落とす"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "ここへ歩く"

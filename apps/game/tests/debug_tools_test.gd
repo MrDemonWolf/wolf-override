@@ -102,7 +102,7 @@ func _check_keyboard_code_and_storage() -> void:
 	_expect(tools.note.visible and tools.note_label.text == DebugTools.UNLOCKED_NOTE and tools.layer.visible, "the title shows 'Debug tools unlocked'")
 	_expect(game.get("title_open") and not game.get("intro_active"), "typing the code does not start a game")
 	var note_rect: Rect2 = tools.note.get_global_rect()
-	for path: String in ["Brand", "LogoMark", "TitleLine", "GameTitle", "Subtitle", "NewGameButton", "ContinueButton", "ContinueNote", "CreditsButton", "SettingsButton", "ChangelogButton", "Credit", "VersionLabel"]:
+	for path: String in ["Brand", "LogoMark", "TitleLine", "GameTitle", "Subtitle", "MenuScroll/MenuMargin/MenuList/NewGameButton", "MenuScroll/MenuMargin/MenuList/ContinueButton", "MenuScroll/MenuMargin/MenuList/ContinueNote", "MenuScroll/MenuMargin/MenuList/CreditsButton", "MenuScroll/MenuMargin/MenuList/SettingsButton", "ChangelogButton", "Credit", "VersionLabel"]:
 		_expect(not note_rect.intersects((game.get_node("CanvasLayer/TitleScreen/" + path) as Control).get_global_rect()), "the title's note leaves %s clear" % path)
 	var config: ConfigFile = GameSettings.load_config(_settings_path())
 	_expect(GameSettings.boolean(config, DebugTools.SETTINGS_SECTION, DebugTools.SETTINGS_KEY, false), "the unlock is stored in the settings file")
@@ -174,7 +174,7 @@ func _check_controller_code() -> void:
 		await _tap_pad(button)
 	await _tap_pad(JOY_BUTTON_B)
 	_expect(not tools.available, "the code needs its last A")
-	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	new_game.grab_focus()
 	await _tap_pad(JOY_BUTTON_A)
 	_expect(tools.available and tools.unlocked and tools.note_label.text == DebugTools.UNLOCKED_NOTE, "Up Up Down Down Left Right Left Right B A unlocks the tools")
@@ -349,7 +349,7 @@ func _check_overlay_steps_aside() -> void:
 	await _touch(Vector2(480.0, 230.0))
 	await settle(2)
 	_expect(game.get("waiting_for_choice"), "the tap answered nothing")
-	_expect(choices[0].get_global_rect().position.x < DebugOverlay.footprint(false).end.x, "the touch layout's first answer sits in the overlay's column")
+	_expect(choices[0].get_global_rect().position.x < DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y).end.x, "the touch layout's first answer sits in the overlay's column")
 	_expect(not tools.overlay.visible and not tools.is_processing(), "in the touch layout the overlay steps aside for the answers instead of covering answer 1")
 	_expect(tools.debug_button.visible, "the DEBUG button stays during a touch question")
 	for choice: Control in choices:
@@ -495,7 +495,7 @@ func _check_touch_button_and_menu_inputs() -> void:
 	_expect(button.visible and tools.layer.visible and button.focus_mode == Control.FOCUS_NONE, "touch play shows the DEBUG button, which keyboard and controller focus skip")
 	var rect: Rect2 = button.get_global_rect()
 	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the DEBUG button is on screen")
-	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TouchControls/Use", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/NewGameButton", "CanvasLayer/TopBar"]:
+	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TouchControls/Use", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton", "CanvasLayer/TopBar"]:
 		_expect(not rect.intersects((game.get_node(path) as Control).get_global_rect()), "the DEBUG button never covers %s" % path.get_file())
 	var pause_rect: Rect2 = (game.get_node("CanvasLayer/PauseButton") as Control).get_global_rect()
 	_expect(not rect.grow(8.0).intersects(pause_rect), "the DEBUG button leaves a real gap before PAUSE, at its theme's full size (%s, PAUSE %s)" % [rect, pause_rect])
@@ -524,10 +524,21 @@ func _check_touch_button_and_menu_inputs() -> void:
 	game.call("_resume_game")
 	await process_frame
 	_expect(button.visible, "it comes back on resume")
-	await _tap_pad(JOY_BUTTON_X)
-	_expect(not button.visible, "controller play hides the DEBUG button")
+	var axis: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	axis.axis = JOY_AXIS_TRIGGER_LEFT
+	axis.axis_value = 1.0
+	Input.parse_input_event(axis)
+	await settle(3)
+	_expect(not button.visible, "controller axis input hides the DEBUG button through the shared owner")
+	axis.axis_value = 0.0
+	Input.parse_input_event(axis)
+
 	await _touch(Vector2(480.0, 200.0))
 	_expect(button.visible, "touch brings it back")
+	await _tap_pad(JOY_BUTTON_X)
+	_expect(not button.visible, "controller button input also hides DEBUG")
+	await _touch(Vector2(480.0, 200.0))
+	_expect(button.visible, "touch restores DEBUG after a controller button")
 	var menu: DebugMenu = tools.menu
 	tools.menu_requested.connect(_on_menu_requested)
 	button.pressed.emit()
@@ -575,7 +586,9 @@ func _check_zones_corridor() -> void:
 	var legend_rect: Rect2 = zones.legend.get_global_rect()
 	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(legend_rect), "the legend is on screen (%s)" % legend_rect)
 	for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/TitleScreen/LogoMark", "CanvasLayer/TitleScreen/Brand"]:
-		_expect(not legend_rect.intersects((game.get_node(path) as Control).get_global_rect()), "the legend leaves %s clear" % path.get_file())
+		var control: Control = game.get_node(path) as Control
+		if control.is_visible_in_tree():
+			_expect(not legend_rect.intersects(control.get_global_rect()), "the legend leaves %s clear" % path.get_file())
 	_expect(not legend_rect.intersects(tools.overlay.get_global_rect()), "the legend leaves the state card clear")
 	for choice: String in ["touch_choice_1", "touch_choice_2"]:
 		var button: Control = game.get(choice) as Control
@@ -641,8 +654,8 @@ func _check_zones_corridor() -> void:
 	var human: M0Actor = game.get_node("Human") as M0Actor
 	_expect(not gap.is_empty() and is_equal_approx(float(gap["x_range"][1]) - float(gap["x_range"][0]), M0Actor.FOLLOW_GAP * 2.0) and is_equal_approx(float(gap["x_range"][0]), human.position.x - M0Actor.FOLLOW_GAP), "WOLF's follow gap is drawn around the engineer")
 	var camera_limits: Dictionary = _entry(geometry["zones"], "name", "camera centre limits")
-	var view_width: float = float(game.get_script().get_script_constant_map()["GAMEPLAY_VIEW_WIDTH"])
-	_expect(not camera_limits.is_empty() and is_equal_approx(float(camera_limits["x_range"][0]), view_width * 0.5) and is_equal_approx(float(camera_limits["x_range"][1]), 960.0 - view_width * 0.5), "the camera's centre limits come from the play view's width")
+	var view_width: float = float(game.call("gameplay_view_width"))
+	_expect(not camera_limits.is_empty() and is_equal_approx(float(camera_limits["x_range"][0]), Main.L1_CORRIDOR_MIN_VIEW_X + view_width * 0.5) and is_equal_approx(float(camera_limits["x_range"][1]), 960.0 - view_width * 0.5), "the camera's centre limits come from the play view's width")
 	# They follow the camera: on screen each range starts where the canvas puts its world x.
 	human.position.x = 700.0
 	await create_timer(1.5).timeout
@@ -691,7 +704,7 @@ func _check_zones_corridor() -> void:
 	await settle(2)
 	geometry = tools.dump()["geometry"]
 	var covered_world: bool = _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("covered") == true and _entry(geometry["render_boxes"], "path", "Human/BodySprite").get("active") == false
-	_expect((geometry["zones"] as Array).is_empty() and (geometry["hitboxes"] as Array).is_empty() and covered_world and _entry(geometry["render_boxes"], "path", "CanvasLayer/TitleScreen/NewGameButton").get("active") == true, "on the title only the title's own boxes are drawn; the world under it is reported as covered")
+	_expect((geometry["zones"] as Array).is_empty() and (geometry["hitboxes"] as Array).is_empty() and covered_world and _entry(geometry["render_boxes"], "path", "CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton").get("active") == true, "on the title only the title's own boxes are drawn; the world under it is reported as covered")
 	tools.set_overlay_mode(DebugTools.Overlay.OFF)
 	_expect(_idle(tools), "turned off, the zone drawing costs nothing")
 	tools.set_overlay_mode(DebugTools.Overlay.ZONES)
@@ -747,7 +760,7 @@ func _check_zones_records() -> void:
 	human.position.x = float(purge["x_range"][1])
 	_expect(str(game.call("_context_hint")).contains("purge"), "at the purge queue range's edge the hint offers the purge queue")
 	human.position.x = float(purge["x_range"][1]) + 1.0
-	_expect(not str(game.call("_context_hint")).contains("E: copy the purge"), "just past it the purge queue is out of reach")
+	_expect(not str(game.call("_context_hint")).contains("Copy purge trace"), "just past it the purge queue is out of reach")
 	_expect(is_equal_approx(float(_entry(geometry["zones"], "name", "WOLF: mirror").get("x", -1.0)), float(constants["WOLF_MIRROR_X"])), "WOLF's mirror spot is drawn")
 	_expect(_entry(geometry["zones"], "name", "use: relay").is_empty() and _entry(geometry["hitboxes"], "name", "blast").is_empty(), "nothing from the other rooms is drawn")
 	_expect(_entry(geometry["hitboxes"], "path", "Door/CollisionShape2D").get("active") == false, "the corridor seal, out of play, is not in force here")
@@ -862,10 +875,11 @@ func _check_zones_keep_clear() -> void:
 		var names: Array[String] = []
 		for entry: Dictionary in clear["controls_and_text"]:
 			names.append(str(entry["name"]))
-		var expected: Array[String] = ["pause_button", "context_hint_text text", "story text"]
+		var expected: Array[String] = ["story text"]
 		if layout == "touch":
-			expected.append_array(["touch_left", "touch_right", "touch_use"])
-		_expect(expected.all(func(name: String) -> bool: return names.has(name)), "the %s layout protects PAUSE, the hint and dialogue text%s (%s)" % [layout, " and the touch controls" if layout == "touch" else "", names])
+			expected.append_array(["pause_button", "touch_move_pad", "touch_use"])
+		_expect(expected.all(func(name: String) -> bool: return names.has(name)), "the %s layout protects visible dialogue and Pause (%s)" % [layout, names])
+		_expect(not names.has("context_hint_text text") and not names.has("touch_left") and not names.has("touch_right"), "hidden hint text and obsolete arrows do not reserve debug-overlay space")
 		var hint_text: Rect2 = DebugZones.text_rect(game.get_node("CanvasLayer/ContextHint/Text") as Label)
 		var hint_box: Rect2 = (game.get_node("CanvasLayer/ContextHint/Text") as Control).get_global_rect()
 		_expect(hint_text.has_area() and hint_text.size.x < hint_box.size.x, "the hint's protected area is its text, not its whole box (%s in %s)" % [hint_text, hint_box])
@@ -876,6 +890,15 @@ func _check_zones_keep_clear() -> void:
 		_expect(_drawn_names(geometry) >= (15 if layout == "keyboard" else 14), "corridor, %s layout: most names still find room (%d)" % [layout, _drawn_names(geometry)])
 		var camera_tick: Dictionary = _entry(geometry["zones"], "name", "camera x%.2f" % (game.get("intro_camera") as Camera2D).zoom.x)
 		_expect(camera_tick.has("label_rect"), "corridor, %s layout: the camera's centre is named on the bottom edge" % layout)
+	game.call("_converse", str(game.get("status_line")))
+	game.set("touch_enabled", true)
+	game.call("_refresh_ui")
+	await settle(2)
+	var reading_geometry: Dictionary = tools.dump()["geometry"]
+	var reading_controls: Array = reading_geometry["keep_clear"]["controls_and_text"]
+	_expect(_entry(reading_controls, "name", "touch_use").is_empty() and _entry(reading_controls, "name", "touch_move_pad").is_empty(), "a stopped conversation does not reserve hidden exploration controls")
+	_expect(_labels_clear(reading_geometry).is_empty(), "debug labels remain clear during a stopped conversation")
+	game.call("_tell", str(game.get("status_line")))
 	# The engineer at the bypass: the purge display's range is wholly off screen.
 	game.set("touch_enabled", false)
 	game.call("_refresh_ui")
@@ -986,7 +1009,9 @@ func _check_zones_controller_toggles() -> void:
 	await _tap_pad(JOY_BUTTON_LEFT_SHOULDER)
 	_expect(not zones.layers[DebugZones.ZONES] and zones.layers[DebugZones.HITBOXES] and zones.layers[DebugZones.RENDER], "LB turns the zones off")
 	await _tap_pad(JOY_BUTTON_RIGHT_SHOULDER)
+	(game.get("top_card") as Control).hide()
 	await _tap_pad(JOY_BUTTON_BACK)
+	_expect(not (game.get("top_card") as Control).visible, "View belongs to the debug zones while they are open, without recalling the objective")
 	_expect(not zones.layers[DebugZones.HITBOXES] and not zones.layers[DebugZones.RENDER] and not (zones.legend_buttons[DebugZones.RENDER] as Button).button_pressed, "RB and View turn the hitboxes and the render boxes off, and the legend follows")
 	for button: JoyButton in [JOY_BUTTON_LEFT_SHOULDER, JOY_BUTTON_RIGHT_SHOULDER, JOY_BUTTON_BACK]:
 		await _tap_pad(button)
@@ -1020,9 +1045,9 @@ func _check_capture_bounded_wait() -> void:
 	var silent: Node = Node.new()
 	silent.add_user_signal("never")
 	tools.frame_drawn_signal = Signal(silent, "never")
-	var start: int = get_frame()
+	var start: int = Engine.get_process_frames()
 	var paths: Dictionary = await tools.capture_with_boxes()
-	var waited: int = get_frame() - start
+	var waited: int = Engine.get_process_frames() - start
 	_expect(waited <= DebugTools.FRAME_WAIT_LIMIT + 2, "the capture gives up waiting for a drawn frame after %d frames (%d)" % [DebugTools.FRAME_WAIT_LIMIT, waited])
 	_expect(paths.get("with_boxes") == false and str(paths.get("png", "x")).is_empty() and FileAccess.file_exists(str(paths.get("json", ""))), "it still writes the dump, with no stale screenshot and with_boxes false (%s)" % [paths])
 	_expect(not tools.zones.visible and not tools.zones.layers[DebugZones.RENDER] and tools.zones.layers[DebugZones.ZONES] and not tools.get("_capturing_boxes"), "and puts the page and the categories back")
@@ -1061,6 +1086,7 @@ func _labels_clear(geometry: Dictionary) -> String:
 	return ""
 
 
+## How many zones and hitboxes in [param geometry] (a capture's geometry block) have a name drawn.
 func _drawn_names(geometry: Dictionary) -> int:
 	var count: int = 0
 	for list: String in ["zones", "hitboxes"]:
@@ -1070,6 +1096,7 @@ func _drawn_names(geometry: Dictionary) -> int:
 	return count
 
 
+## A Rect2 from a capture's [x, y, width, height] array (screen px).
 func _rect(values: Array) -> Rect2:
 	return Rect2(float(values[0]), float(values[1]), float(values[2]), float(values[3]))
 
@@ -1123,7 +1150,7 @@ func _check_menu_keyboard_and_controller() -> void:
 	_expect(tools.overlay.visible and tools.is_processing(), "the overlay stays up and refreshing beside the open menu")
 	await process_frame
 	var card: Rect2 = menu.panel.get_global_rect()
-	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(card) and not card.intersects(tools.overlay.get_global_rect()) and not card.intersects(DebugOverlay.footprint(false)), "the menu card is on screen and clear of the overlay's column (%s)" % card)
+	_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(card) and not card.intersects(tools.overlay.get_global_rect()) and not card.intersects(DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y)), "the menu card is on screen and clear of the overlay's column (%s)" % card)
 	for path: String in ["CanvasLayer/PauseButton", "CanvasLayer/TopBar"]:
 		_expect(not card.intersects((game.get_node(path) as Control).get_global_rect()), "the menu card leaves %s clear" % path.get_file())
 	var focus: Control = root.gui_get_focus_owner()
@@ -1266,7 +1293,7 @@ func _check_note_placement() -> void:
 		_expect(Rect2(0.0, 0.0, 960.0, 540.0).encloses(rect), "the %s note is on screen (%s)" % [layout, rect])
 		for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint", "CanvasLayer/BottomBar", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TouchControls/Use"]:
 			_expect(not rect.intersects((game.get_node(path) as Control).get_global_rect()), "the %s note leaves %s clear" % [layout, path.get_file()])
-		for other: Rect2 in [DebugOverlay.footprint(false), DebugMenu.STEP_BAR_RECT, DebugZones.LEGEND_RECT, tools.debug_button.get_global_rect()]:
+		for other: Rect2 in [DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y), DebugMenu.STEP_BAR_RECT, DebugZones.LEGEND_RECT, tools.debug_button.get_global_rect()]:
 			_expect(not rect.intersects(other), "the %s note leaves %s clear (%s)" % [layout, other, rect])
 		for answers: Array in [[Vector2(42.0, 88.0), Vector2(428.0, 76.0)], [Vector2(396.0, 88.0), Vector2(522.0, 40.0)]]:
 			_expect(not rect.intersects(Rect2(answers[0], answers[1])), "the %s note leaves the answer row clear" % layout)
@@ -1280,7 +1307,7 @@ func _check_note_placement() -> void:
 		_expect(band.is_equal_approx(DebugTools.NOTE_RECT) and band.end.y <= 78.0, "with no zones legend the %s note sits in the top band (%s)" % [layout, band])
 		for path: String in ["CanvasLayer/TopBar", "CanvasLayer/PauseButton", "CanvasLayer/TutorialPrompt", "CanvasLayer/ContextHint", "CanvasLayer/BottomBar", "CanvasLayer/TouchControls/Left", "CanvasLayer/TouchControls/Right", "CanvasLayer/TouchControls/Use"]:
 			_expect(not band.intersects((game.get_node(path) as Control).get_global_rect()), "the %s band note leaves %s clear" % [layout, path.get_file()])
-		for other: Rect2 in [tools.overlay.get_global_rect(), DebugOverlay.footprint(false), DebugMenu.STEP_BAR_RECT, tools.debug_button.get_global_rect()]:
+		for other: Rect2 in [tools.overlay.get_global_rect(), DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y), DebugMenu.STEP_BAR_RECT, tools.debug_button.get_global_rect()]:
 			_expect(not band.intersects(other), "the %s band note leaves %s clear (%s)" % [layout, other, band])
 		_expect(tools.note_label.get_line_count() <= 2 and tools.note_label.get_visible_line_count() == tools.note_label.get_line_count(), "a capture's path fits the band note's two lines (%d)" % tools.note_label.get_line_count())
 	# A jump's note never covers the actors or the junction's tank, with or without the zones page.
@@ -1842,6 +1869,7 @@ func _frame_probe() -> Node:
 	return probe
 
 
+## Deletes this run's save file and its .tmp sidecar.
 func _clean_save() -> void:
 	for path: String in [base + "-save.json", base + "-save.json.tmp"]:
 		remove_file(path)
@@ -1873,12 +1901,15 @@ func _edges_match(game: Node2D, rule: StringName, range: Variant, half_open: boo
 	return bool(game.call(rule, low)) and bool(game.call(rule, inside_high)) and not bool(game.call(rule, low - 0.5)) and not bool(game.call(rule, outside_high))
 
 
+## True when [param rule] (a Callable taking a world x) holds at both ends of [param range]
+## ([low, high], world px) and fails half a px outside each: the drawn zone and the rule agree.
 func _edges_match_static(rule: Callable, range: Variant) -> bool:
 	var low: float = float(range[0])
 	var high: float = float(range[1])
 	return rule.call(low) and rule.call(high) and not rule.call(low - 0.5) and not rule.call(high + 0.5)
 
 
+## Counts each time the tools ask for the menu (connected to their signal).
 func _on_menu_requested() -> void:
 	menu_requests += 1
 
@@ -1906,10 +1937,12 @@ func _show_capture_note(game: Node2D, tools: DebugTools, touch: bool) -> void:
 	await process_frame
 
 
+## [param game]'s debug tools.
 func _tools(game: Node2D) -> DebugTools:
 	return game.get("debug_tools") as DebugTools
 
 
+## The settings file of this run's game: [member base] (unique per process) plus ".cfg".
 func _settings_path() -> String:
 	return base + ".cfg"
 
@@ -1932,6 +1965,7 @@ func _junction_state(door_blown: bool) -> M0State:
 	return state
 
 
+## Types [param word] one key tap per letter, as the unlock codes are typed.
 func _type(word: String) -> void:
 	for letter: String in word:
 		await tap_key(OS.find_keycode_from_string(letter))
@@ -1969,6 +2003,7 @@ func _send_letter(letter: String, shift: bool) -> void:
 		await process_frame
 
 
+## Sends controller button [param index] pressed or released and waits one process frame.
 func _send_pad(index: JoyButton, pressed: bool) -> void:
 	var event: InputEventJoypadButton = InputEventJoypadButton.new()
 	event.button_index = index
@@ -1977,6 +2012,7 @@ func _send_pad(index: JoyButton, pressed: bool) -> void:
 	await process_frame
 
 
+## Presses and releases controller button [param index], a frame each.
 func _tap_pad(index: JoyButton) -> void:
 	await _send_pad(index, true)
 	await _send_pad(index, false)

@@ -469,7 +469,7 @@ const WOLF_CLEAR_X: float = BREAKER_X - BREAKER_HALF_WIDTH - 6.0 - M0Actor.WOLF_
 const CHOICE_X: float = RUBBLE_X - M0State.HUMAN_HALF_WIDTH
 ## The tank hangs centred here and lands with its base on the floor. At the play framing (zoom 1.35,
 ## camera y 360) its top (y 298) sits at screen y ~186, below the answer buttons
-## (Main.CHOICE_ROW_TOP), and its base (y 382) clears the sentry's scanner fin (Sentry.DRAWN_HEIGHT)
+## (placed by Main._layout_choices), and its base (y 382) clears the sentry's scanner fin (Sentry.DRAWN_HEIGHT)
 ## as it patrols underneath.
 const TANK_REST_Y: float = 340.0
 const TANK_SIZE: Vector2 = TANK_PIXELS * TANK_ART_SCALE

@@ -16,8 +16,10 @@ limit="${SUITE_TIMEOUT:-240}"
 # takes on the wall clock. These measure the opening's beats against bounds of 0.02 to 0.1 s, finer than
 # one frame when four suites share the CPU (a frame then lasts 0.1 s or more, and the game moves a whole
 # frame at once), so in real time they failed under load (PR #140's stress runs). Each checks it got the
-# flag (GameSuite._expect_fixed_fps); tests/support/game_suite.gd's start_clock says more.
-fixed_fps_suites=(opening_timing_test opening_early_press_test)
+# flag (GameSuite._expect_fixed_fps); dock_bay_test also needs one render update per physics step
+# to measure camera speed; approved_wording_test measures 0.14 s lamp flashes and six-frame
+# responses. tests/support/game_suite.gd's start_clock says more.
+fixed_fps_suites=(opening_timing_test opening_early_press_test dock_bay_test approved_wording_test)
 
 # Internal: `check-game.sh --suite NAME LOG_DIR WORK_DIR` runs one suite and writes NAME.result.
 if [ "${1:-}" = "--suite" ]; then
@@ -73,6 +75,11 @@ before="$(git status --porcelain -- apps/game)"
 python3 scripts/export_changelog.py --output "$work/changelog.txt"
 if ! cmp -s "$work/changelog.txt" apps/game/assets/changelog.txt; then
   echo "apps/game/assets/changelog.txt is out of date: run python3 scripts/export_changelog.py and commit the result" >&2
+  exit 1
+fi
+# The theme's colours and default font size are generated from the UI token file (brief 2.7); the
+# committed theme must match, and the token file must keep its limits. The script prints what is wrong.
+if ! python3 scripts/export_ui_tokens.py --check; then
   exit 1
 fi
 

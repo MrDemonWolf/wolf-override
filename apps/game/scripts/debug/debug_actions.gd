@@ -198,6 +198,10 @@ func jump(id: StringName) -> String:
 			for _press: int in 4:
 				if game.waiting_for_choice:
 					break
+				# A jump skips presentation time while preserving the same authored interaction route.
+				game.call("_sync_dialogue_boxes")
+				game.call("_sync_dialogue_reveal")
+				game.dialogue_reveal.complete()
 				game.debug_interact()
 		_:
 			if not build_state(id).save_to_disk(game.save_path):

@@ -8,24 +8,59 @@ description: Every action on keyboard, controller and touch in the current sourc
 
 - **You control the engineer.** WOLF is an independent companion.
 - **These are the defaults.** In-game prompts always show your current bindings.
-- **Few buttons.** Every room uses the same small set: move, interact, the two answers and pause. There are no other buttons to learn.
+- **Few buttons.** Every room uses the same small set: move, interact, the two answers and pause. Objective recall is optional.
+
+## Switching inputs
+
+- A tap enables touch controls on desktop builds too.
+- Keyboard and controller presses switch away from touch controls.
+- Mouse movement alone keeps the current prompts.
+- On-screen **PAUSE** follows touch controls; keyboard and controller keep their mapped pause action.
+
+## If a controller disconnects
+
+- Losing the controller in use pauses play and releases held actions.
+- Reconnecting keeps the game paused until you choose **RESUME**.
+- Keyboard and touch can also resume play.
+
+## Leave the game
+
+1. Open Pause and choose **RETURN TO TITLE**.
+2. On a desktop or handheld PC, choose **QUIT** at the end of the title menu.
+
+- Phones and web builds use their system controls to leave the app or page.
+- Progress resumes from the last checkpoint; see [Saving and retrying](/docs/controls/saves/).
 
 ## All actions
 
 | Action | Keyboard | Controller | Touch |
 | --- | --- | --- | --- |
-| Move | A / D or ← / → | Left stick or D-pad | Hold ◀ / ▶ |
-| Interact; next line in the opening or closing scene | E | A | USE (reads CONTINUE in those scenes) |
+| Move | A / D or ← / → | Left stick or D-pad | Drag the move pad |
+| Interact; advance stopped dialogue | E | A | Tap action pill or dialogue |
 | Retry after a knockdown | E | A | USE (reads RETRY) |
-| Crank a wheel ([how](#hold-to-crank)) | Hold E | Hold A | Hold USE (reads CRANK) |
+| Crank a wheel ([how](#hold-to-crank)) | Hold E | Hold A | Hold action pill |
 | Answer 1 / Answer 2 | 1 / 2, or click | X / Y | Tap the answer |
-| Pause or resume | Esc | Start | PAUSE; tap RESUME |
+| Recall the current objective | Tab | View | Open PAUSE |
+| Pause or resume | Esc | Menu | PAUSE; tap RESUME |
 | Back in menus | Esc | B | Android Back |
-| Cancel a rebind | Esc or CANCEL REBIND | — | Android Back |
+| Cancel a rebind | Esc or CANCEL REBIND | Menu | Android Back |
 | Cycle the provisional engineer name | I (fixed) | — | — |
 
-- **Rebind** Move, Interact, both answers and Pause in [Settings](/docs/controls/settings/#controls).
-- **Controller labels are generic.** Your controller may name the same buttons differently.
+- **Rebind** Move, Interact, both answers, Pause and Show objective in [Settings](/docs/controls/settings/#controls).
+- **The table uses Xbox names.** In-game glyphs follow the last active pad; unknown pads use Xbox glyphs.
+
+## Controller glyphs
+
+| Pad | Interact | Answers 1 / 2 |
+| --- | --- | --- |
+| Xbox / ROG Ally | A | X / Y |
+| PlayStation | Cross | Square / Triangle |
+| Nintendo | B (bottom button) | Y / X |
+| Steam Deck | A | X / Y |
+
+- Changing glyphs keeps the physical bindings the same.
+- Remapping updates both the glyph and its readable tooltip.
+- Controller and assistive-app behavior still needs hands-on checks.
 - **Retry timing:** see [Knockdowns](/docs/controls/saves/#knockdowns).
 
 ## Hold to crank
@@ -33,7 +68,7 @@ description: Every action on keyboard, controller and touch in the current sourc
 **Crank** means turning a wheel by holding interact. Two wheels need it: the corridor's **MANUAL BYPASS** and the Service Junction's **VALVE**.
 
 1. Walk up to the wheel. The prompt says **HOLD**.
-2. Hold interact (**E**, controller **A**, or **CRANK** on touch).
+2. Hold interact (**E**, controller **A**, or the action pill on touch).
 3. Keep holding until it is done.
 
 - **It starts at once.** The wheel gives a little with a soft click the moment you press.
@@ -57,6 +92,29 @@ description: Every action on keyboard, controller and touch in the current sourc
 
 </Details>
 
+## Read the story
+
+- **When a conversation stops movement,** press Interact or tap dialogue to advance. Its final page returns movement.
+- **Timed walk-and-talk keeps movement and USE available**, including on touch.
+- **Brief speech follows its speaker** when it fits safely; otherwise it uses the lower reading area.
+- **Routine hints, objectives, station names and tutorial panels hide during dialogue** and return when exploring.
+- **Urgent warnings stay visible:** save failures, recovery prompts and live hazards.
+- **The objective returns after dialogue clears.** It shows the current goal without a room heading, then fades.
+- **Forgot the goal?** Open Pause to see it above Resume during play.
+- **Question pages wait for input.** Press Interact or tap dialogue while the continue triangle shows; choose an answer when ready.
+
+## Click or tap the room
+
+- **Click or tap a machine** to walk up and use it through the same interaction as keyboard **E**.
+- **Point at a machine out of reach** with the mouse and a small **Walk here** label appears on it; clicking walks you over.
+- **Floor input:** desktop clicks walk on release. Touch starts the pad in the empty left zone; other floor taps walk on release.
+- **Drag away before release** to cancel. Manual movement takes over from a queued walk.
+- **A distant wheel** needs a second press when reached; walking up never starts a crank automatically.
+- **Tap dialogue** to read the next page or line without activating a machine behind it.
+- **Menus and touch buttons** take priority over the room beneath them.
+
+<Callout title="Current checks">Pointer cancellation, navigation and viewport event routing have headless checks. Physical touch and mouse play remain unverified.</Callout>
+
 ## Keyboard and mouse
 
 - **Answers appear as buttons** on screen when a choice is waiting, so you can click them.
@@ -65,23 +123,26 @@ description: Every action on keyboard, controller and touch in the current sourc
 ## Controller
 
 - **The selected menu item** shows a cyan outline inside its border.
+- **Hold a D-pad or left-stick direction** to keep moving through menu controls. Releasing it stops; changing pages or leaving the app clears the held direction.
+- **Right stick** scrolls a long menu page, the credits or the changelog. **LT** and **RT** move it one page up or down.
 - **Closing Settings** from the title returns the selection to **SETTINGS**.
 
 ## Touch (iOS and Android builds)
 
-- **The arrow buttons hide** during the opening, the closing scene and while a question waits.
+- **Move:** press an empty area on the left, then slide left or right. Objects take priority over the pad.
 - **PAUSE** opens Resume, Settings and Return to Title (Skip Opening during the opening).
 - **Leaving the app** during play pauses the game.
 - **Android Back** steps back one menu, and pauses play. It closes the game only from the title screen.
 - **Touch menus show no outline.** The first arrow key or controller press selects an item without using it.
-- **The USE button changes its name:** **CRANK** at a crank, **DROP** at the tank release, **USE** elsewhere.
-- **Answers** replace the arrows and **USE** at the bottom, side by side, within thumb reach.
+- **Tap the action pill near a station** to use it. A **HOLD** cue means keep holding it.
+- **The separate USE button hides** while the pill offers that action. It remains available for other play and recovery prompts.
+- **Answers** replace movement and **USE** controls at the bottom, side by side, within thumb reach.
 
 <Details>
 <Summary>Where things sit on a touch screen</Summary>
 
-- The hint line sits between the arrows and **USE**, so neither covers it.
-- With **TEXT SIZE** above 100%, the dialogue box moves into that space too, with the hint line just above it.
+- Dialogue and control visibility follow [Read the story](#read-the-story).
+- Larger text splits into more dialogue pages inside the safe area.
 - Touch answers show their words only, without the 1 and 2 of the keyboard.
 - The camera sits a little lower on touch, so feet and machine bases stay above the buttons. It stays there while answers show.
 

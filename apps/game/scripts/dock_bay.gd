@@ -51,10 +51,8 @@ const COOL: Color = Color8(150, 200, 235)
 const HUMAN_MIN_X: float = -606.0
 const WOLF_MIN_X: float = HUMAN_MIN_X - M0Actor.HUMAN_REACH + M0Actor.WOLF_REACH
 const ROOM_RIGHT: float = 8.0
-## The plate's left edge (world px), and the furthest left a view of the room shows: 14 px past the end
-## wall's cut (-626), so the dark margin the plate paints beyond the wall (x -680 .. -626) stays out of
-## view.
-const ROOM_LEFT: float = -680.0
+## The furthest left a view of the room shows (world px): 14 px past the end wall's cut (-626), so the
+## dark margin the plate paints beyond the wall (x -680 .. -626, from PLATE_AT.x) stays out of view.
 const VIEW_LEFT: float = -640.0
 
 ## D2, the Director's door: the leaf (36.2 x 83.5 world px at 5.5 px per world px, a 0.9 x 2.1 m
@@ -190,7 +188,7 @@ const BEACON_PEAK: float = 0.55
 const BEACON_TROUGH: float = 0.12
 const BEACON_LENS_TROUGH: float = 0.6
 ## WOLF's pieces on the pad: lying belly-down while he charges (wolf-lie-pad, 8 px per world px) and
-## getting up off it (wolf-rise, 6 px per world px). Main's _wolf_pose draws each at the standing piece's
+## getting up off it (wolf-rise, 6 px per world px). Main.wolf_pose draws each at the standing piece's
 ## density (8) over its own, times WOLF_ART_SCALE, so he keeps one size whatever his pose.
 const WOLF_LIE: Texture2D = preload("res://assets/characters/wolf-lie-pad.png")
 const WOLF_RISE: Texture2D = preload("res://assets/characters/wolf-rise.png")

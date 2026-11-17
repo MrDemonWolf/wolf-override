@@ -321,10 +321,13 @@ func _draw_us(item: CanvasItem) -> float:
 	return snappedf(float(sorted[sorted.size() / 2]), 0.1)
 
 
+## Connected to the timed item's draw signal: notes when its _draw began (microseconds).
 func _on_timed_draw() -> void:
 	draw_started = Time.get_ticks_usec()
 
 
+## Called deferred after each timed frame: adds the time since the item's draw began (microseconds) to the
+## samples and clears the start, so a frame in which it did not draw adds nothing.
 func _end_timed_draw() -> void:
 	if draw_started > 0:
 		draw_samples.append(float(Time.get_ticks_usec() - draw_started))
@@ -339,6 +342,8 @@ func _counts() -> Dictionary:
 	return counts
 
 
+## The spread of [param values] as a Dictionary with "max", "mean", "p50", "p90" and "p99", in the
+## values' own unit and rounded to 0.0001; empty for no values.
 func _stats(values: PackedFloat64Array) -> Dictionary:
 	var sorted: Array = Array(values)
 	sorted.sort()
@@ -356,11 +361,13 @@ func _stats(values: PackedFloat64Array) -> Dictionary:
 	}
 
 
+## Waits [param count] process frames.
 func _frames(count: int) -> void:
 	for _i: int in range(count):
 		await process_frame
 
 
+## Deletes the user:// (or absolute) file at [param path] if there is one.
 func _remove(path: String) -> void:
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

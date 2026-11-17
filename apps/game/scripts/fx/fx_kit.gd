@@ -106,6 +106,7 @@ static func multiply() -> CanvasItemMaterial:
 	return material
 
 
+## A new Gradient with [param offsets] (0 to 1 along the ramp) and the colour at each.
 static func _new_ramp(offsets: Array[float], colors: Array[Color]) -> Gradient:
 	var gradient: Gradient = Gradient.new()
 	gradient.offsets = PackedFloat32Array(offsets)
@@ -113,10 +114,12 @@ static func _new_ramp(offsets: Array[float], colors: Array[Color]) -> Gradient:
 	return gradient
 
 
+## The cached resource under [param key], or null when it was never made or no kit is open.
 static func _find(key: Array) -> Resource:
 	return _current._cache.get(key) as Resource if _current != null else null
 
 
+## Stores [param resource] under [param key] in the open kit; does nothing when no kit is open.
 static func _keep(key: Array, resource: Resource) -> void:
 	if _current != null:
 		_current._cache[key] = resource

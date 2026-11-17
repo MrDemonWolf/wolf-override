@@ -2,6 +2,7 @@ extends "res://tests/support/game_suite.gd"
 ## Settings: values saved and loaded, hostile settings files, rebinding keys and controller buttons, the
 ## display page, the LANGUAGE row (localization PR L6) and the menus' text in another language (PR L7a).
 ## Bookkeeping, spawning and the waits come from the shared suite kit (tests/support/game_suite.gd).
+## UI layout and buffered input need process frames: several physics ticks can precede one input flush.
 
 
 func _run() -> void:
@@ -11,32 +12,48 @@ func _run() -> void:
 	var corrupt: ConfigFile = ConfigFile.new()
 	for key: String in ["fps_limit", "resolution", "msaa_2d"]:
 		corrupt.set_value("video", key, {"bad": true})
-	corrupt.set_value("audio", "Music", {"bad": true})
+	corrupt.set_value("audio", "Effects", {"bad": true})
 	corrupt.set_value("controls", "deadzone", "bad")
 	corrupt.set_value("video", "fullscreen", {})
 	corrupt.set_value("video", "vsync", {})
 	corrupt.set_value("video", "reduced_motion", "bad")
+	corrupt.set_value("dialogue", "text_speed", {})
+	corrupt.set_value("dialogue", "auto_advance", "bad")
+	corrupt.set_value("dialogue", "backing", "bad")
 	corrupt.set_value("bindings", "interact_keyboard", {"type": "key", "code": KEY_I})
 	corrupt.set_value("bindings", "choice_1_keyboard", {"type": "key", "code": KEY_I})
+	corrupt.set_value("audio", "Music", 21.0)
+	corrupt.set_value("audio", "Voice", 64.0)
 	_expect(corrupt.save(path) == OK, "the corrupt settings fixture is written")
 	var game: Node2D = MAIN_SCENE.instantiate() as Node2D
 	game.set("settings_path", path)
 	game.set("save_path", "user://settings-save-test-%s.json" % OS.get_process_id())
 	root.add_child(game)
 	var malformed: ConfigFile = ConfigFile.new()
-	malformed.set_value("audio", "Music", {"bad": true})
+	malformed.set_value("audio", "Effects", {"bad": true})
 	malformed.set_value("controls", "deadzone", "bad")
-	_expect(GameSettings.number(malformed, "audio", "Music", 100.0) == 100.0 and GameSettings.number(malformed, "controls", "deadzone", 0.25) == 0.25, "malformed numeric preferences fall back safely")
-	(game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button).pressed.emit()
+	_expect(GameSettings.number(malformed, "audio", "Effects", 100.0) == 100.0 and GameSettings.number(malformed, "controls", "deadzone", 0.25) == 0.25, "malformed numeric preferences fall back safely")
+	(game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
-	_expect(Engine.max_fps == 60 and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
+	_expect(menu.text_speed.selected == 1 and not menu.auto_advance.button_pressed and is_equal_approx(menu.dialogue_backing.value, UiTokens.number("dialogue.backing")), "damaged reading preferences restore Normal, manual advance and the token backing")
+	menu.text_speed.select(3)
+	menu.auto_advance.set_pressed_no_signal(true)
+	menu.dialogue_backing.set_value_no_signal(0.8)
+	_expect(menu._save_extra(), "reading preferences save through the existing settings owner")
+	var saved_reading: ConfigFile = GameSettings.load_config(path)
+	_expect(saved_reading.get_value("dialogue", "text_speed") == 3 and saved_reading.get_value("dialogue", "auto_advance") == true and is_equal_approx(saved_reading.get_value("dialogue", "backing"), 0.8), "reading preferences persist their actual values")
+	menu.text_speed.select(1)
+	menu.auto_advance.set_pressed_no_signal(false)
+	menu.dialogue_backing.set_value_no_signal(UiTokens.number("dialogue.backing"))
+	menu._save_extra()
+	_expect(Engine.max_fps == 60 and (menu.volumes["Effects"] as HSlider).value == 100.0 and menu.deadzone.value == 0.25, "malformed saved preferences do not interrupt scene setup")
 	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", false) == "1" and menu.vsync.button_pressed and not menu.reduced_motion.button_pressed, "invalid booleans and reserved loaded bindings restore safe defaults")
 	var resolution_options: OptionButton = game.get("resolution_options") as OptionButton
 	_expect(resolution_options.selected == 1 and resolution_options.get_item_text(1) == "1280 × 720" and game.call("_resolution_size", resolution_options.selected) == Vector2i(1280, 720), "an unreadable window size falls back to the 1280×720 default")
 	_expect(game.call("_resolution_size", 0) == Vector2i(960, 540) and game.call("_resolution_size", 2) == Vector2i(1920, 1080) and game.call("_resolution_size", 7) == Vector2i(1280, 720), "every saved window size keeps its own size; an unknown index opens at the default")
 	_expect(ProjectSettings.get_setting("display/window/size/window_width_override") == 1280 and ProjectSettings.get_setting("display/window/size/window_height_override") == 720 and ProjectSettings.get_setting("display/window/size/viewport_width") == 960, "the first window opens at 1280×720 over the unchanged 960×540 canvas")
 	var impact: Impact = game.get("impact") as Impact
-	_expect(impact != null and not impact.reduce_motion and menu.reduced_motion.is_visible_in_tree(), "Reduced Motion is off by default and sits on the Display tab")
+	_expect(impact != null and not impact.reduce_motion and not menu.reduced_motion.is_visible_in_tree(), "Reduced Motion is off by default and hidden while Display is selected")
 	menu.reduced_motion.button_pressed = true
 	_expect(impact.reduce_motion, "the Reduced Motion toggle reaches the impact kit")
 	impact.add_trauma(1.0)
@@ -45,6 +62,10 @@ func _run() -> void:
 	_expect((game.get_node("IntroCamera") as Camera2D).offset == Vector2.ZERO and Engine.time_scale == 1.0, "with Reduced Motion on, a boom leaves the camera still and skips hit-stop")
 	_expect(paused and menu.is_visible_in_tree() and game.get("title_open"), "settings open before starting a game")
 	_check_display_page(menu)
+	await _check_scrolling_pages(menu)
+	await _check_mobile_chrome(menu)
+	await _check_settings_scaling(game, menu)
+	await _check_controller_tabs(game, menu)
 	await _check_language_row(game, path)
 	await _check_menu_translation(game)
 	var navigation_actions: Array[StringName] = [&"ui_left", &"ui_right", &"ui_up", &"ui_down"]
@@ -57,7 +78,7 @@ func _run() -> void:
 	await process_frame
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
-	var title_settings: Button = game.get_node("CanvasLayer/TitleScreen/SettingsButton") as Button
+	var title_settings: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button
 	_expect(not paused and not game.get("pause_overlay").visible and game.get("title_open"), "controller B closes title settings through native event dispatch")
 	_expect(title_settings.has_focus(), "controller B from title settings leaves the title Settings button focused")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
@@ -94,12 +115,12 @@ func _run() -> void:
 	game.set("touch_enabled", false)
 	title_settings.pressed.emit()
 	menu.tabs.current_tab = 1
-	var music: HSlider = menu.volumes["Music"]
-	music.value = 37.0
+	var effects: HSlider = menu.volumes["Effects"]
+	effects.value = 37.0
 	var master: HSlider = menu.volumes["Master"]
 	master.value = 0.0
 	_expect(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "zero master volume mutes the mixer")
-	_expect(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music"))), 0.37), "music slider changes its live mixer bus")
+	_expect(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Effects"))), 0.37), "effects slider changes its live mixer bus")
 	menu.antialiasing.select(2)
 	menu.antialiasing.item_selected.emit(2)
 	(game.get("fps_options") as OptionButton).select(0)
@@ -108,7 +129,9 @@ func _run() -> void:
 	game.call("_on_resolution_selected", 0)
 	var config: ConfigFile = ConfigFile.new()
 	config.load(path)
-	_expect(config.get_value("audio", "Music") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "resolution") == 0 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
+	_expect(config.get_value("audio", "Effects") == 37.0 and config.get_value("video", "msaa_2d") == 2 and config.get_value("video", "fps_limit") == 30 and config.get_value("video", "resolution") == 0 and config.get_value("video", "reduced_motion") == true, "video saves preserve audio, Reduced Motion and extra graphics preferences")
+	_expect(menu.volumes.size() == 2 and not menu.volumes.has("Music") and not menu.volumes.has("Voice"), "Audio shows only the two controls backed by actual playback")
+	_expect(config.get_value("audio", "Music") == 21.0 and config.get_value("audio", "Voice") == 64.0, "saving active audio controls preserves legacy Music and Voice preferences")
 	_expect(root.msaa_2d == Viewport.MSAA_4X, "edge smoothing applies to the game viewport")
 	menu.tabs.current_tab = 2
 	menu.begin_capture(&"interact", "keyboard")
@@ -123,10 +146,21 @@ func _run() -> void:
 	_expect(menu.prompt(&"choice_1", false) == "1" and not menu.capture_action.is_empty(), "duplicate gameplay binding is rejected without losing the old key")
 	menu._input(key_event(KEY_ESCAPE))
 	_expect(menu.capture_action.is_empty() and paused, "Escape cancels rebinding without unpausing")
+	for kind: String in ["keyboard", "controller"]:
+		var before_binding: String = menu.binding_label(&"choice_1", kind)
+		var before_config: String = FileAccess.get_file_as_string(path)
+		menu.begin_capture(&"choice_1", kind)
+		for pressed: bool in [true, false]:
+			Input.parse_input_event(controller_button(JOY_BUTTON_START, pressed))
+			await settle(2)
+		_expect(menu.capture_action.is_empty() and not menu.cancel_button.visible and paused and menu.is_visible_in_tree(), "Menu cancels %s capture without closing Settings or unpausing" % kind)
+		_expect(menu.binding_label(&"choice_1", kind) == before_binding and FileAccess.get_file_as_string(path) == before_config, "Menu cancellation preserves %s bindings and the saved file" % kind)
+		_expect(game.get("controller_active"), "a captured controller press still updates the shared input owner")
 	menu.begin_capture(&"choice_1", "controller")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
-	await process_frame
-	_expect(menu.prompt(&"choice_1", true) == "B" and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation")
+	# Native input is buffered; allow its dispatch before checking the capture result.
+	await settle(2)
+	_expect(menu.prompt(&"choice_1", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_B) and paused and menu.is_visible_in_tree() and menu.capture_action.is_empty(), "controller B rebind is consumed before menu cancellation (prompt=%s paused=%s visible=%s capture=%s)" % [menu.prompt(&"choice_1", true), paused, menu.is_visible_in_tree(), menu.capture_action])
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	menu.begin_capture(&"move_left", "controller")
@@ -134,14 +168,14 @@ func _run() -> void:
 	axis.axis = JOY_AXIS_RIGHT_X
 	axis.axis_value = -0.8
 	menu._input(axis)
-	_expect(menu.prompt(&"move_left", true) == "AXIS 2 −", "stick direction can be rebound")
+	_expect(menu.prompt(&"move_left", true) == ControllerGlyphs.axis(&"xbox", JOY_AXIS_RIGHT_X, -1.0), "stick direction can be rebound")
 	menu.deadzone.value = 0.4
 	_expect(is_equal_approx(InputMap.action_get_deadzone(&"move_left"), 0.4), "stick deadzone applies to gameplay")
 	config.load(path)
-	_expect(config.get_value("bindings", "interact_keyboard").code == KEY_Q and config.get_value("audio", "Music") == 37.0, "remapping preserves audio and display settings")
+	_expect(config.get_value("bindings", "interact_keyboard").code == KEY_Q and config.get_value("audio", "Effects") == 37.0, "remapping preserves audio and display settings")
 	var saved: ConfigFile = config
 	menu.reset_controls()
-	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", true) == "X", "reset restores keyboard and controller defaults")
+	_expect(menu.prompt(&"interact", false) == "E" and menu.prompt(&"choice_1", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_X), "reset restores keyboard and controller defaults")
 	var reset_config: ConfigFile = ConfigFile.new()
 	reset_config.load(path)
 	_expect(not reset_config.has_section_key("bindings", "interact_keyboard"), "reset clears saved overrides")
@@ -154,8 +188,8 @@ func _run() -> void:
 	reloaded.set("settings_path", path)
 	root.add_child(reloaded)
 	var restored: GameSettings = reloaded.get("settings_menu") as GameSettings
-	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == "B" and restored.prompt(&"move_left", true) == "AXIS 2 −", "reopening restores key, button and stick bindings")
-	_expect((restored.volumes["Music"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
+	_expect(restored.prompt(&"interact", false) == "Q" and restored.prompt(&"choice_1", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_B) and restored.prompt(&"move_left", true) == ControllerGlyphs.axis(&"xbox", JOY_AXIS_RIGHT_X, -1.0), "reopening restores key, button and stick bindings")
+	_expect((restored.volumes["Effects"] as HSlider).value == 37.0 and restored.antialiasing.selected == 2 and Engine.max_fps == 30, "reopening restores volume and graphics preferences")
 	_expect((reloaded.get("resolution_options") as OptionButton).selected == 0, "a saved 960×540 window size still wins over the 1280×720 default")
 	_expect(restored.reduced_motion.button_pressed and (reloaded.get("impact") as Impact).reduce_motion, "reopening restores Reduced Motion and applies it to the impact kit")
 	restored.reduced_motion.button_pressed = false
@@ -165,7 +199,16 @@ func _run() -> void:
 	# Past the tutorial prompt, which is the one prompt on the first frames, the hint bar shows.
 	reloaded.set("tutorial_step", 2)
 	reloaded.call("_refresh_ui")
-	_expect((reloaded.get_node("CanvasLayer/ContextHint/Text") as Label).text.begins_with("Q:"), "interaction hint follows remapped key")
+	# The station action and its binding are separate labels: Text carries the short action, Glyph
+	# the key that fires it, so the remap has to show in Glyph and the key itself has to be USE.
+	var hint_row: Control = reloaded.get_node("CanvasLayer/ContextHint") as Control
+	var hint_glyph: Label = hint_row.get_node("Glyph") as Label
+	var hint_text: String = (hint_row.get_node("Text") as Label).text
+	var remapped_key: InputEventKey = InputEventKey.new()
+	remapped_key.keycode = KEY_Q
+	remapped_key.physical_keycode = KEY_Q
+	remapped_key.pressed = true
+	_expect(hint_row.visible and hint_glyph.visible and hint_glyph.text == "Q" and hint_glyph.accessibility_name == restored.describe_prompts("Q") and hint_text == str(reloaded.call("_context_hint")) and not hint_text.is_empty() and not hint_text.contains("Q") and InputMap.event_is_action(remapped_key, &"interact"), "interaction hint follows remapped key (glyph %s, action %s)" % [hint_glyph.text, hint_text])
 	restored.reset_controls()
 	for bus: String in GameSettings.BUSES:
 		restored._apply_volume(bus, 100.0)
@@ -185,7 +228,7 @@ func _run() -> void:
 	root.add_child(swapped_game)
 	var swapped: GameSettings = swapped_game.get("settings_menu") as GameSettings
 	_expect(swapped.prompt(&"interact", false) == "1" and swapped.prompt(&"choice_1", false) == "E", "legitimate saved keyboard swaps survive whole-map validation")
-	_expect(swapped.prompt(&"choice_2", true) == "Y", "invalid saved controller code retains its default")
+	_expect(swapped.prompt(&"choice_2", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_Y), "invalid saved controller code retains its default")
 	_expect(swapped.prompt(&"move_left", false) != swapped.prompt(&"move_right", false) and (swapped.prompt(&"move_left", false) == "A" or swapped.prompt(&"move_right", false) == "D"), "conflicting loaded overrides cannot bind opposing movement to one key")
 	swapped.reset_controls()
 	swapped_game.queue_free()
@@ -195,6 +238,8 @@ func _run() -> void:
 	finish("Settings persistence and rebinding checks passed")
 
 
+## A settings file someone tampered with (an Object payload naming a script, a truncated file and the
+## other cases listed below) never runs code from the file.
 func _check_hostile_settings() -> void:
 	var pid: int = OS.get_process_id()
 	var path: String = "user://settings-hostile-%s.cfg" % pid
@@ -214,7 +259,7 @@ func _check_hostile_settings() -> void:
 		root.add_child(game)
 		var menu: GameSettings = game.get("settings_menu") as GameSettings
 		_expect(not Engine.has_meta("wolf_settings_poc"), "%s does not run code from the settings file" % label)
-		_expect(Engine.max_fps == 60 and menu.vsync.button_pressed and (menu.volumes["Music"] as HSlider).value == 100.0 and menu.prompt(&"interact", false) == "E", "%s loads default settings" % label)
+		_expect(Engine.max_fps == 60 and menu.vsync.button_pressed and (menu.volumes["Effects"] as HSlider).value == 100.0 and menu.prompt(&"interact", false) == "E", "%s loads default settings" % label)
 		game.queue_free()
 		await process_frame
 		if Engine.has_meta("wolf_settings_poc"):
@@ -223,16 +268,21 @@ func _check_hostile_settings() -> void:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(file))
 
 
-## Q10 (October 14, 2026): the Display tab, where TEXT SIZE is, keeps its THE DEN / LOCAL CONFIGURATION
+## Q10 (October 14, 2026): the Display tab keeps its THE DEN / LOCAL CONFIGURATION
 ## heading, shows no GPU or renderer line, and says the window size is OS-managed only on phones and
 ## tablets; the V-sync sentence shows everywhere.
 func _check_display_page(menu: GameSettings) -> void:
 	menu.select_tab(0)
+	_expect(menu.pages[0] is ScrollContainer and menu.pages[0].is_ancestor_of(menu.vsync), "Display owns its controls inside the shared scrolling page")
 	var texts: Array[String] = []
 	for label: Node in menu.find_children("*", "Label", true, false):
 		if (label as Label).is_visible_in_tree():
 			texts.append((label as Label).text)
-	_expect("THE DEN  /  LOCAL CONFIGURATION" in texts and menu.text_size.is_visible_in_tree(), "the Display tab keeps the THE DEN / LOCAL CONFIGURATION heading, beside TEXT SIZE")
+	_expect("THE DEN  /  LOCAL CONFIGURATION" in texts and not menu.text_size.is_visible_in_tree(), "Display keeps the terminal heading and leaves text size on Accessibility")
+	_expect(menu.tabs.tab_count == 5 and menu.tabs.get_tab_title(3) == "ACCESSIBILITY", "Settings has the five reviewed tabs in order")
+	menu.select_tab(3)
+	_expect(menu.text_size.is_visible_in_tree() and menu.reduced_motion.is_visible_in_tree() and not menu.vsync.is_visible_in_tree(), "Accessibility shows the existing reading and motion controls separately from Display")
+	menu.select_tab(0)
 	var adapter: String = RenderingServer.get_video_adapter_name()
 	var developer_lines: Array[String] = []
 	for text: String in texts:
@@ -249,6 +299,146 @@ func _check_display_page(menu: GameSettings) -> void:
 	_expect(not menu.note.text.contains("OS-managed"), "the other tabs keep their own notes")
 	menu.mobile = was_mobile
 	menu.select_tab(0)
+
+
+## Every tab uses the same scrolling page, and focus can reach Display's last row without hiding Back.
+func _check_scrolling_pages(menu: GameSettings) -> void:
+	for page: Control in menu.pages:
+		_expect(page is ScrollContainer and (page as ScrollContainer).follow_focus, "every Settings page scrolls to focused controls")
+	menu.select_tab(0)
+	menu.antialiasing.grab_focus()
+	await settle(6)
+	var scroll: ScrollContainer = menu.pages[0] as ScrollContainer
+	_expect(scroll.scroll_vertical > 0 and scroll.get_global_rect().encloses(menu.antialiasing.get_global_rect()), "focus brings the last Display row fully into view (%s; page %s; control %s)" % [scroll.scroll_vertical, scroll.get_global_rect(), menu.antialiasing.get_global_rect()])
+	_expect(not scroll.get_global_rect().intersects((menu.get_node("BackButton") as Control).get_global_rect()), "scrolling rows leave Back outside the page")
+	menu.tabs.grab_focus()
+
+
+## Mobile Settings reserves separate header and Back rows; each tab remains reachable in its own rail.
+func _check_mobile_chrome(menu: GameSettings) -> void:
+	menu.mobile = true
+	menu.layout_for_device()
+	await settle(3)
+	var heading: Control = menu.get_node("Title") as Control
+	var back: Control = menu.get_node("BackButton") as Control
+	_expect(not menu.tabs.visible and menu.tab_rail.visible and not heading.get_global_rect().intersects(back.get_global_rect()), "mobile uses a compact header with Back in its own row")
+	for index: int in menu.tab_buttons.size():
+		menu.tab_buttons[index].pressed.emit()
+		await settle(3)
+		_expect(menu.tabs.current_tab == index and menu.pages[index].visible and menu.tab_buttons[index].button_pressed, "mobile tab %d selects the same page model" % index)
+	_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "the last mobile tab scrolls fully into view")
+	_expect(menu.tab_focus_target() == menu.tab_buttons[GameSettings.GENERAL_TAB], "opening mobile Settings focuses the selected visible tab")
+	var locale: String = TranslationServer.get_locale()
+	for code: String in I18n.offered():
+		I18n.apply_for_checks(code)
+		await settle(3)
+		menu.select_tab(GameSettings.GENERAL_TAB)
+		await settle(3)
+		_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "%s: translated mobile tabs keep General reachable" % code)
+	I18n.apply_for_checks(locale)
+
+	menu.mobile = false
+	menu.layout_for_device()
+	menu.select_tab(0)
+	await settle(3)
+	_expect(menu.tabs.visible and not menu.tab_rail.visible and menu.tab_focus_target() == menu.tabs, "desktop restores the horizontal tab bar")
+
+
+## Every offered text size reflows Settings without compounding, covering desktop and mobile chrome.
+func _check_settings_scaling(game: Node2D, menu: GameSettings) -> void:
+	for mobile_layout: bool in [false, true]:
+		menu.mobile = mobile_layout
+		for factor: float in TextSize.STEPS:
+			menu.text_size.select(TextSize.STEPS.find(factor))
+			menu.text_size.item_selected.emit(TextSize.STEPS.find(factor))
+			game.call("_apply_text_size")
+			menu.select_tab(0)
+			await settle(4)
+			_expect(menu.get_viewport_rect().encloses(menu.get_global_rect()), "%.0f%% mobile=%s: Settings stays inside the canvas during size changes" % [factor * 100, mobile_layout])
+			var heading: Control = menu.get_node("Title") as Control
+			var back: Control = menu.get_node("BackButton") as Control
+			_expect(menu.text_size.get_popup().get_theme_font_size("font_size") == roundi(16 * factor), "option lists follow the selected text size")
+			_expect(menu.vsync.get_theme_font_size("font_size") == roundi(16 * factor), "%.0f%% Settings scales once, including repeated application" % (factor * 100))
+			_expect(not heading.get_global_rect().intersects(back.get_global_rect()), "%.0f%% mobile=%s: heading and Back stay separate" % [factor * 100, mobile_layout])
+			menu.antialiasing.grab_focus()
+			await settle(8)
+			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%.0f%% mobile=%s: focused Display control stays fully visible (%s; %s)" % [factor * 100, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
+			_expect(not menu.pages[0].get_global_rect().intersects(back.get_global_rect()), "%.0f%% mobile=%s: body stays clear of Back" % [factor * 100, mobile_layout])
+			menu.select_tab(GameSettings.GENERAL_TAB)
+			await settle(4)
+			if mobile_layout:
+				_expect(menu.tab_rail.get_global_rect().encloses(menu.tab_buttons[GameSettings.GENERAL_TAB].get_global_rect()), "%.0f%%: mobile General stays reachable" % (factor * 100))
+	var locale: String = TranslationServer.get_locale()
+	for code: String in I18n.offered():
+		I18n.apply_for_checks(code)
+		TextSize.factor = 2.0
+		for mobile_layout: bool in [false, true]:
+			menu.mobile = mobile_layout
+			game.call("_apply_text_size")
+			menu.select_tab(0)
+			await settle(4)
+			menu.antialiasing.grab_focus()
+			await settle(8)
+			_expect(menu.pages[0].get_global_rect().encloses(menu.antialiasing.get_global_rect()), "%s 200%% mobile=%s: focused control fits (%s; %s)" % [code, mobile_layout, menu.pages[0].get_global_rect(), menu.antialiasing.get_global_rect()])
+			menu.select_tab(3)
+			menu.dialogue_backing.grab_focus()
+			await settle(6)
+			_expect(menu.pages[3].get_global_rect().encloses(menu.dialogue_backing.get_global_rect()), "%s 200%% mobile=%s: the last reading preference scrolls into view (page %s; slider %s; focus %s; scroll %s)" % [code, mobile_layout, menu.pages[3].get_global_rect(), menu.dialogue_backing.get_global_rect(), menu.dialogue_backing.has_focus(), (menu.pages[3] as ScrollContainer).scroll_vertical])
+			_expect(not menu.pages[3].get_global_rect().intersects((menu.get_node("BackButton") as Control).get_global_rect()), "reading preferences leave Back available")
+			menu.select_tab(0)
+			if mobile_layout:
+				for button: Button in menu.tab_buttons:
+					var font: Font = button.get_theme_font("font")
+					var padding: float = button.get_theme_stylebox("normal").get_minimum_size().x
+					for word: String in button.tr(button.text).split(" "):
+						var word_width: float = font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, button.get_theme_font_size("font_size")).x
+						_expect(word_width + padding <= button.size.x, "%s: mobile tab keeps %s whole at 200%% (word %.1f, padding %.1f, button %.1f, rail %.1f)" % [code, word, word_width, padding, button.size.x, menu.tab_rail.size.x])
+
+	I18n.apply_for_checks("en")
+	await settle(4)
+	var english_width: float = menu.tab_rail.size.x
+	I18n.apply_for_checks("de")
+	await settle(4)
+	_expect(menu.tab_rail.size.x > english_width, "a language change reflows the rail without changing text size again")
+	I18n.apply_for_checks(locale)
+	menu.text_size.select(0)
+	menu.text_size.item_selected.emit(0)
+	menu.mobile = false
+	game.call("_apply_text_size")
+	menu.select_tab(0)
+	menu.tabs.grab_focus()
+	await settle(4)
+
+
+## Shoulder presses change pages, wrap and skip hidden tabs through native input dispatch on both layouts.
+func _check_controller_tabs(game: Node2D, menu: GameSettings) -> void:
+	for mobile_layout: bool in [false, true]:
+		menu.mobile = mobile_layout
+		game.set("touch_enabled", mobile_layout)
+		game.call("_show_settings")
+		for scenario: Array in [[0, JOY_BUTTON_RIGHT_SHOULDER, 1, false], [0, JOY_BUTTON_LEFT_SHOULDER, 4, false], [4, JOY_BUTTON_RIGHT_SHOULDER, 0, false], [3, JOY_BUTTON_RIGHT_SHOULDER, 0, true], [0, JOY_BUTTON_LEFT_SHOULDER, 3, true]]:
+			menu.tabs.set_tab_hidden(GameSettings.GENERAL_TAB, scenario[3])
+			menu.select_tab(scenario[0])
+			for pressed: bool in [true, false]:
+				Input.parse_input_event(controller_button(scenario[1], pressed))
+				await settle(2)
+			_expect(menu.tabs.current_tab == scenario[2] and root.gui_get_focus_owner() == menu.tab_focus_target(), "mobile=%s: shoulder %s changes tab %s to %s and focuses the visible tab" % [mobile_layout, scenario[1], scenario[0], scenario[2]])
+			_expect(game.get("controller_active"), "Settings tab navigation records controller input")
+	var before_capture: int = menu.tabs.current_tab
+	menu.begin_capture(&"interact", "controller")
+	for pressed: bool in [true, false]:
+		Input.parse_input_event(controller_button(JOY_BUTTON_RIGHT_SHOULDER, pressed))
+		await settle(2)
+	_expect(menu.tabs.current_tab == before_capture and InputMap.action_has_event(&"interact", controller_button(JOY_BUTTON_RIGHT_SHOULDER, true)), "rebinding captures a shoulder button instead of changing tabs")
+	menu.reset_controls()
+	menu.tabs.set_tab_hidden(GameSettings.GENERAL_TAB, false)
+	menu.mobile = false
+	game.set("touch_enabled", false)
+	for pressed: bool in [true, false]:
+		Input.parse_input_event(key_event(KEY_SHIFT, pressed))
+		await settle(2)
+	menu.select_tab(0)
+	game.call("_show_settings")
 
 
 ## LANGUAGE on the GENERAL tab (PR L6, PLAN.md and DESIGN.md "Settings: the LANGUAGE option"):
@@ -327,19 +517,19 @@ func _check_menu_translation(game: Node2D) -> void:
 	catalog.add_message("Press a keyboard input for %s. Esc cancels.", "Pressione uma tecla para %s. Esc cancela.")
 	catalog.add_message("%s  RESUME", "%s  CONTINUAR")
 	# A broken translation (other conversions than the English), as a gap in the PO gates would ship it.
-	catalog.add_message("Press a controller input for %s. Esc cancels.", "Pressione um botão para %d. Esc cancela.")
+	catalog.add_message("Press a controller input for %s. Menu cancels.", "Pressione um botão para %d. Esc cancela.")
 	catalog.add_message("Minus", "Menos", GameSettings.KEY_NAME_CONTEXT)
 	TranslationServer.add_translation(catalog)
-	_expect(menu.prompt(&"pause_game", true) == "START" and menu.prompt(&"pause_game", false) == "Escape", "in English the Pause prompts read START and Escape (and are remembered)")
+	_expect(menu.prompt(&"pause_game", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_START) and menu.prompt(&"pause_game", false) == "Escape", "in English Pause uses the Menu glyph and Escape (and they are remembered)")
 	menu.begin_capture(&"pause_game", "keyboard")
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
 	await process_frame
-	_expect(menu.prompt(&"pause_game", true) == "INÍCIO" and menu.prompt(&"pause_game", false) == "Escape-pt", "a language change forgets the remembered prompts (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
+	_expect(menu.prompt(&"pause_game", true) == ControllerGlyphs.button(&"xbox", JOY_BUTTON_START) and menu.prompt(&"pause_game", false) == "Escape-pt", "a language change updates key names and preserves pad glyphs (%s, %s)" % [menu.prompt(&"pause_game", true), menu.prompt(&"pause_game", false)])
 	var keyboard: Button = menu.binding_buttons["pause_game_keyboard"]
 	_expect(keyboard.text == "Escape-pt" and keyboard.tooltip_text == keyboard.text and keyboard.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "the binding buttons are worked out again in the new language (%s)" % keyboard.text)
 	_expect(menu.note.text == "Pressione uma tecla para Pausa (ação). Esc cancela.", "the rebind prompt is translated whole, with the action's name (%s)" % menu.note.text)
 	menu.begin_capture(&"pause_game", "controller")
-	_expect(menu.note.text == "Press a controller input for Pausa (ação). Esc cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
+	_expect(menu.note.text == "Press a controller input for Pausa (ação). Menu cancels.", "a translated note whose conversions differ from the English shows the English template (its insert still translated), not a blank note (%s)" % menu.note.text)
 	menu.cancel_capture()
 	var symbol: InputEventKey = InputEventKey.new()
 	symbol.physical_keycode = KEY_MINUS
@@ -358,14 +548,14 @@ func _check_menu_translation(game: Node2D) -> void:
 	_expect(menu.key_name(letter) == "E" and menu.key_label_name(KEY_1, KEY_AMPERSAND) == "&", "a letter and a layout's symbol are never sent through tr() (%s, %s)" % [menu.key_name(letter), menu.key_label_name(KEY_1, KEY_AMPERSAND)])
 	TranslationServer.pseudolocalization_enabled = false
 	var pause_menu: Control = game.get("pause_menu") as Control
-	var hint: Label = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/PauseHint") as Label
+	var hint: Label = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/PauseHint") as Label
 	game.call("_show_pause_hint", false)
 	_expect(hint.text == "Escape-pt  CONTINUAR" and hint.auto_translate_mode == Node.AUTO_TRANSLATE_MODE_DISABLED, "Pause's hint fills the translated template with the key's name (%s)" % hint.text)
 	var was_visible: bool = pause_menu.visible
 	pause_menu.show()
 	I18n.apply("en")
 	await process_frame
-	_expect(hint.text == "Escape  RESUME" and menu.note.text == "Press a controller input for Pause. Esc cancels.", "back in English, Pause's hint and the note are English again (%s; %s)" % [hint.text, menu.note.text])
+	_expect(hint.text == "Escape  RESUME" and menu.note.text == "Press a controller input for Pause. Menu cancels.", "back in English, Pause's hint and the note are English again (%s; %s)" % [hint.text, menu.note.text])
 	pause_menu.visible = was_visible
 	I18n.forget(catalog)
 	I18n.apply("en")

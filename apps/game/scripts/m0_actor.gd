@@ -1,7 +1,7 @@
 class_name M0Actor
 extends CharacterBody2D
 ## One of the slice's two walking bodies, the engineer ([member actor_id] "human") or WOLF ("wolf"). Each
-## physics step it moves one of three ways: by the player's move input while [member controlled], towards
+## physics step it moves one of three ways: by player movement or a pointer destination while [member controlled], towards
 ## [member autonomous_target_x] when Main sends it somewhere on its own, or beside [member follow_target]
 ## (WOLF following the engineer). Positions and limits are world px, speeds world px per second. It also
 ## draws the control marker at its feet and dims WOLF while he walks past the engineer.
@@ -9,9 +9,19 @@ extends CharacterBody2D
 @export var actor_id: StringName = &"human"
 @onready var body_sprite: Sprite2D = get_node_or_null("BodySprite") as Sprite2D
 
+## Finite world x means a player pointer walk; INF means none. Authored autonomous targets stay separate.
+var pointer_target_x: float = INF
+## Local virtual-pad axis (-1..1); never writes global InputMap state or WOLF's autonomous target.
+var touch_axis: float = 0.0:
+	set(value):
+		touch_axis = clampf(value, -1.0, 1.0) if is_finite(value) else 0.0
+
 var controlled: bool = false:
 	set(value):
 		controlled = value
+		if not value:
+			pointer_target_x = INF
+			touch_axis = 0.0
 		if _marker != null:
 			_marker.queue_redraw()
 var follow_target: Node2D
@@ -54,6 +64,8 @@ var speed_scale: float = 1.0
 const MARKER_Z: int = 4
 var _marker: Node2D
 
+## World px per second: the player's walk at full input, and the most an actor does walking on their
+## own (times speed_scale), a little faster so a follower closes a gap. Tuned by play; no source recorded.
 const WALK_SPEED: float = 190.0
 const FOLLOW_SPEED: float = 220.0
 ## The unhurried step out from over a machine (settle_x).
@@ -105,6 +117,17 @@ const PASS_TINT_RATE: float = 6.0
 const GRAVITY: float = 900.0
 
 
+## Direction requested by physical controls, or the local thumb when no physical direction is held.
+## Opposing physical inputs still take priority and remain neutral, matching the original InputMap path.
+func player_axis() -> float:
+	return Input.get_axis(&"move_left", &"move_right") if Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right") else touch_axis
+
+
+## Whether any movement input is held, including opposing directions; used by tutorial and hold-cancel rules.
+func has_move_input() -> bool:
+	return Input.is_action_pressed(&"move_left") or Input.is_action_pressed(&"move_right") or touch_axis != 0.0
+
+
 ## Moves the body one physics step ([param delta] seconds): player input (capped at walk_max_x, easing to
 ## settle_x when no input is held), else autonomous_target_x, else the follow spot from follow_x, else
 ## standing still. Sets velocity (world px/s) and the sprite's facing, applies GRAVITY, slides, clamps x
@@ -114,11 +137,19 @@ func _physics_process(delta: float) -> void:
 	var settling: bool = false
 	var edging: bool = false
 	if controlled:
-		var axis: float = Input.get_axis(&"move_left", &"move_right")
+		var axis: float = player_axis()
+		if axis != 0.0:
+			pointer_target_x = INF
+		elif not is_inf(pointer_target_x):
+			var distance: float = pointer_target_x - position.x
+			if absf(distance) <= ARRIVE_TOLERANCE:
+				pointer_target_x = INF
+			else:
+				axis = clampf(distance / (delta * WALK_SPEED), -1.0, 1.0)
 		velocity.x = axis * WALK_SPEED
 		if velocity.x > 0.0:
 			velocity.x = minf(velocity.x, maxf(walk_max_x - position.x, 0.0) / delta)
-		if axis == 0.0 and settle_x >= 0.0:
+		if axis == 0.0 and is_inf(pointer_target_x) and settle_x >= 0.0:
 			velocity.x = clampf(_approach(settle_x, delta), -SETTLE_SPEED, SETTLE_SPEED)
 			settling = true
 	elif autonomous_target_x != NO_TARGET:

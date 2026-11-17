@@ -184,6 +184,11 @@ func rumble(weak: float, strong: float, seconds: float) -> void:
 		Input.vibrate_handheld(int(seconds * 1000.0), strong)
 
 
+## Stops pad vibration on the selected device; pause, disconnect, knockdown and reset share this path.
+func stop_rumble() -> void:
+	Input.stop_joy_vibration(rumble_device)
+
+
 ## Restarts a one-shot particle preset.
 func burst(particles: CPUParticles2D) -> void:
 	if enabled and particles != null:
@@ -192,6 +197,7 @@ func burst(particles: CPUParticles2D) -> void:
 
 ## Guaranteed return to rest: time scale 1.0, camera centred, overlays at their rest colours.
 func reset() -> void:
+	stop_rumble()
 	_stop_serial += 1
 	Engine.time_scale = 1.0
 	trauma = 0.0

@@ -62,12 +62,12 @@ func _init() -> void:
 	margin.add_child(body)
 
 
-## Where a page can be drawn in the 960x540 canvas: its width, from ORIGIN down to the bottom edge
+## Where a page can be drawn in the live canvas: its width, from ORIGIN down to the bottom edge
 ## (every page is shorter), so a control in that column would be under it. [param state_width] is the
 ## state pages' text width (STATE_WIDTH, or narrowed by width_left_of).
-static func footprint(performance_page: bool, state_width: float = STATE_WIDTH) -> Rect2:
+static func footprint(performance_page: bool, canvas_height: float, state_width: float = STATE_WIDTH) -> Rect2:
 	var width: float = (PERFORMANCE_WIDTH if performance_page else state_width) + MARGIN_X * 2.0 + FRAME_SLACK
-	return Rect2(ORIGIN, Vector2(width, 540.0 - ORIGIN.y))
+	return Rect2(ORIGIN, Vector2(width, canvas_height - ORIGIN.y))
 
 
 ## The widest a state page's text can be and still end CLEAR_GAP left of canvas x [param left].
@@ -159,6 +159,7 @@ static func _hazards(data: Dictionary) -> String:
 	return "%s  %s" % [_key("HAZARDS"), " · ".join(armed) if not armed.is_empty() else NONE]
 
 
+## Shows [param text] (BBCode) as the page, [param width] px wide, and shrinks the panel to fit it.
 func _show(width: float, text: String) -> void:
 	body.custom_minimum_size.x = width
 	body.text = text
@@ -166,14 +167,18 @@ func _show(width: float, text: String) -> void:
 	reset_size()
 
 
+## A page's first line (BBCode): "DEBUG", the [param page] name and the two debug keys (F3 steps the
+## overlay's pages, F12 saves a bug capture).
 static func _header(page: String) -> String:
 	return "[b][color=%s]DEBUG  %s[/color][/b]  [color=%s]F3 · F12[/color]" % [ACCENT, page, MUTED]
 
 
+## [param caption] in the accent colour (BBCode): the name in front of a value on a page.
 static func _key(caption: String) -> String:
 	return "[color=%s]%s[/color]" % [ACCENT, caption]
 
 
+## [param value] as text, or the dash (NONE) when that text is empty.
 static func _or_none(value: Variant) -> String:
 	var text: String = str(value)
 	return NONE if text.is_empty() else text

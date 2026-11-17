@@ -7,6 +7,9 @@ description: What each display, audio and control setting does in the WOLF OVERR
 **What this page is for:** what each setting does, one line each.
 
 - **Open Settings** from the title screen or from Pause.
+- **Mobile builds** use a compact heading, a separate Back row, and a scrolling tab rail.
+- **Controller LB and RB** switch tabs, wrap at the ends, and skip hidden tabs. Rebinding still captures shoulder buttons.
+- **Pages scroll** when rows do not fit; keyboard and controller focus bring the selected control into view.
 - **Settings are saved** between launches in `settings.cfg`, next to the [checkpoint file](/docs/controls/saves/#where-saves-live).
 - **A damaged settings file** is ignored, and the defaults load.
 - **Accessibility settings** are gathered on the [Accessibility](/docs/accessibility/) page.
@@ -18,12 +21,10 @@ description: What each display, audio and control setting does in the WOLF OVERR
 | FPS limit | 30, 60, 90, 120 or 144 FPS, or uncapped |
 | V-sync | Matches frames to the display, when supported |
 | Edge smoothing | Off, 2×, 4× or 8× MSAA for 2D edges |
-| Reduced motion | Turns off shake and strobing; shortens flashes ([full list](/docs/accessibility/#reduced-motion)) |
 | Window size | Desktop: 960×540, 1280×720 (default) or 1920×1080 |
 | Fullscreen | Desktop fullscreen; phones and tablets size the window themselves |
-| Text size | 100%, 125%, 150%, 175% or 200% for dialogue, hints, cards and station names |
 
-- **The tab's heading** reads **THE DEN / LOCAL CONFIGURATION**.
+- **On desktop, the heading** reads **THE DEN / LOCAL CONFIGURATION**.
 - **Its note** reads **V-sync may limit the FPS cap.**
 - **On phones and tablets** it starts with **Window size is OS-managed on mobile.**
 - **The menu does not** show your graphics hardware, switch renderers or promise a device reaches the FPS limit.
@@ -38,16 +39,20 @@ description: What each display, audio and control setting does in the WOLF OVERR
 
 </Details>
 
+## Accessibility
+
+- **TEXT SIZE**, **REDUCED MOTION**, **TEXT SPEED**, **AUTO-ADVANCE** and **DIALOGUE BACKING** are on the Accessibility tab.
+- See [Accessibility](/docs/accessibility/) for their effects and limits.
+
 <Details>
 <Summary>Text size details</Summary>
 
-- It enlarges the dialogue, the hint line, the location and name cards, the tutorial prompt, the answer buttons and the station names over the machines.
-- Menus keep their size.
+- It enlarges the dialogue, the hint line, the goal and name cards, the tutorial prompt, the answer buttons and the station names over the machines.
+- Title and pause actions and Settings text scale too; larger Settings rows stack and scroll.
 - It applies at once and is saved.
-- From 150% (from 125% on touch builds, where the box is narrower), the speaker's name moves above the words, so each row keeps its length.
+- Speaker names stay above the dialogue panel. See [Reading](/docs/accessibility/#text-and-reading).
 - Station names grow up to 150%. Above that they stay at 150% and break onto two rows between their words, so neighbouring names stay apart.
-- On touch builds above 100%, the dialogue box stands between the arrows and **USE** instead of under them, with the speaker's name above the words.
-- In the opening and the closing shot, the hint line sits below the top card.
+- Dialogue and control visibility follow [Read the story](/docs/controls/input/#read-the-story).
 - Where the tutorial prompt would cover a station name (the breaker's, at the larger sizes), it moves up into the top card's place as the card leaves. If no such place is free and no box is up, it goes to the bottom of the screen. It hides while a box is up.
 
 </Details>
@@ -57,9 +62,7 @@ description: What each display, audio and control setting does in the WOLF OVERR
 | Slider | What it changes |
 | --- | --- |
 | Master | Every sound |
-| Music | Nothing yet: there is no music |
 | Effects | Every sound effect |
-| Voice | Nothing yet: there is no voice acting |
 
 - **Effects** covers the sounds the game makes itself and a few processed recordings ([sound recordings](/docs/credits/#sound-recordings)).
 - **Only Master and Effects** control those sounds. No display or motion setting mutes them.
@@ -85,12 +88,14 @@ You can change six actions on keyboard and controller:
 | Response 1 | 1 | X |
 | Response 2 | 2 | Y |
 | Pause | Esc | Start |
+| Show objective | Tab | View |
 
 ### Rebind an action
 
-1. Select the binding.
-2. Press the new key, button or stick direction.
-3. To cancel, press **Esc** or **CANCEL REBIND**.
+1. Find the action under **KEYBOARD** or **CONTROLLER**.
+2. Select its binding.
+3. Press the new key, button or stick direction.
+4. To cancel, press **Esc**, controller **Menu**, or **CANCEL REBIND**.
 
 - **One input per action.** Rebinding replaces that action's keyboard (or controller) defaults with the one input you press.
 - **No doubles.** An input already used by another action is rejected.

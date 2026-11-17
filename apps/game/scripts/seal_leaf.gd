@@ -28,8 +28,6 @@ const COLUMN_A_FAR: float = 1.51
 const ART_A_NEAR: float = -2.18
 const ART_A_FAR: float = 1.53
 const ART_HEIGHT_M: float = 3.10
-## The curtain reaches this high (metres) shut; above it the curtain is inside the hood.
-const TOP_M: float = 3.07
 ## How far the curtain rises (metres): its 115 mm bottom bar stays in sight under the hood.
 const TRAVEL: float = 2.935
 ## The hood's shadow on the curtain from the corridor luminaire: full light below START, the darkest
@@ -37,7 +35,8 @@ const TRAVEL: float = 2.935
 const HOOD_SHADOW_START: float = 0.709
 const HOOD_SHADOW_END: float = 2.024
 const HOOD_SHADOW_FLOOR: float = 0.42
-## Rows of the mesh (metres), so the shadow's falloff is smooth.
+## Rows of the mesh (metres up the curtain), so the shadow's falloff is smooth. The last row, 3.07 m, is
+## the curtain's top when shut; above it the curtain is inside the hood.
 const ROWS: PackedFloat32Array = [0.0, 0.4, 0.709, 0.95, 1.2, 1.45, 1.7, 2.024, 2.5, 3.07]
 
 ## A curtain drawn with [param art], the flat seal-curtain piece; [member DoorLeaf.open] 0 is shut, 1

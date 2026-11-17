@@ -46,6 +46,8 @@ func _run() -> void:
 	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor start")
 	_expect(wolf.position.x < human.position.x, "WOLF starts on the engineer's left, away from where he faces")
+	game.call("_speak_stakes")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the corridor exchange before measuring free following")
 	_expect(await walk_to(human, 450.0), "the engineer walks right along the corridor")
 	await frames(SETTLE_FRAMES)
 	_expect_clear(human, wolf, "corridor at rest after walking right")
@@ -309,6 +311,7 @@ func _world_span(actor: M0Actor) -> Vector2:
 	return Vector2(origin + span.x, origin + span.y)
 
 
+## Fails with [param where] when WOLF's and the engineer's visible bodies overlap in world x.
 func _expect_clear(human: M0Actor, wolf: M0Actor, where: String) -> void:
 	var human_span: Vector2 = _world_span(human)
 	var wolf_span: Vector2 = _world_span(wolf)

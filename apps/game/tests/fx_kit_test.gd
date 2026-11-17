@@ -14,6 +14,7 @@ func _run() -> void:
 	finish("FxKit checks passed")
 
 
+## With no Main in the tree no kit is open: every call makes a fresh resource and nothing is cached.
 func _check_without_kit() -> void:
 	_expect(FxKit.cached_count() == 0, "with no Main up there is no kit and nothing cached")
 	var first: GradientTexture2D = _glow_texture()
@@ -23,6 +24,8 @@ func _check_without_kit() -> void:
 	_expect(FxKit.cached_count() == 0, "and none of it is kept")
 
 
+## With the game running: Main's kit is the open one, the rooms and presets share its textures, ramps
+## and additive material, and nothing wrote to a shared resource after it was made.
 func _check_scene() -> void:
 	var game: Node2D = await start_game("fx-kit-test", keep_running)
 	var path: String = str(game.get("save_path"))
@@ -115,6 +118,9 @@ func _describe_all(kit: FxKit) -> Dictionary:
 	return described
 
 
+## What makes [param resource] what it is, as an Array two equal resources share: a gradient texture's
+## size, fill and gradient; a gradient's stops; a material's settings. Used to prove a shared resource
+## was not written to.
 func _describe(resource: Resource) -> Array:
 	if resource is GradientTexture2D:
 		var texture: GradientTexture2D = resource as GradientTexture2D

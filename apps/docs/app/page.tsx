@@ -2,7 +2,7 @@ import Link from 'next/link';
 import SiteHeader from './site-header';
 import SiteFooter from './site-footer';
 import Downloads, { ArrowIcon, getGameHref } from './downloads';
-import { card, inlineLink, landingRoot, landingWidth, sectionCopy, sectionTitle } from './landing-classes';
+import { bulletList, card, inlineLink, landingRoot, landingWidth, sectionCopy, sectionTitle, textLink } from './landing-classes';
 import recordsCapture480 from './images/records-access-doors-capture-480.webp';
 import recordsCapture960 from './images/records-access-doors-capture-960.webp';
 import recordsCapture1600 from './images/records-access-doors-capture-1600.webp';
@@ -59,18 +59,27 @@ const captures = [
   },
 ] as const;
 
-/** What a player can do in the current source build, one short line each and spoiler-free. */
-const playableNow = [
-  'A maintenance corridor, Records Access, the Service Junction and a maintenance annex.',
-  'Steel doors that open as you work through each room.',
-  'Knocked down? Press RETRY to go back to the step you were on.',
-  'An end card when you finish the current slice.',
-  'Keyboard, controller and touch controls.',
-  'Settings for text size, reduced motion, rebinding and toggle holds.',
-] as const;
-
-/** What is planned but not in the build yet. No dates: nothing here has one. */
-const comingNext = ['More chapters of the story.'] as const;
+/**
+ * The gameplay section's two lists, spoiler-free and one short line each: what a player can do in
+ * the current source build, and what is planned but not in it yet (no dates: nothing here has one).
+ * `id` is the heading's id, which names the list's section; `link` is an optional closing link.
+ */
+const buildLists: readonly { id: string; title: string; lines: readonly string[]; link?: { href: string; label: string } }[] = [
+  {
+    id: 'playable-title',
+    title: 'Playable now',
+    lines: [
+      'A maintenance corridor, Records Access, the Service Junction and a maintenance annex.',
+      'Steel doors that open as you work through each room.',
+      'Knocked down? Press RETRY to go back to the step you were on.',
+      'An end card when you finish the current slice.',
+      'Keyboard, controller and touch controls.',
+      'Settings for text size, reduced motion, rebinding and toggle holds.',
+    ],
+    link: { href: '/docs/platforms/#languages', label: 'Languages and translation review status' },
+  },
+  { id: 'coming-title', title: 'Coming', lines: ['More chapters of the story.'] },
+];
 
 // Story and progress: two equal columns, stacked on phones.
 const twoColumns = 'grid grid-cols-[1fr_1fr] gap-20 py-28 compact:gap-10 phone:grid-cols-[1fr] phone:gap-6 phone:py-18';
@@ -80,9 +89,6 @@ const features = [
   ['02', 'Respect his boundaries', 'WOLF may choose to help. If he refuses, take the manual route; essential progress stays in your hands.'],
   ['03', 'Leave a memory', 'Choose how to answer during a disagreement. The game remembers your decision in later dialogue and at a checkpoint.'],
 ] as const;
-
-// Heading of the Playable now and Coming lists in the gameplay section.
-const listTitle = 'mb-4 font-heading text-[1.1rem] font-bold';
 
 export default function HomePage() {
   // Read from apps/game/project.godot at build time (lib/version.ts), the same number the title screen shows.
@@ -127,7 +133,7 @@ export default function HomePage() {
             </nav>
             <p className="mt-3 flex flex-wrap items-center gap-x-3 phone:mt-2 text-caption text-[#bdd0d9]">
               <span>Test builds and source available · No release date</span>
-              <Link className="inline-flex min-h-11 items-center text-accent underline underline-offset-4" href="/docs/changelog/">Version {version}: what changed</Link>
+              <Link className={`${textLink} inline-flex min-h-11 items-center`} href="/docs/changelog/">Version {version}: what changed</Link>
             </p>
           </div>
           {/* Phones show only the art label, over the bottom of the art; the genre already heads the copy.
@@ -172,19 +178,15 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-10 grid grid-cols-[3fr_2fr] gap-6 phone:grid-cols-1 phone:gap-4">
-            <section className={`${card} p-6`} aria-labelledby="playable-title">
-              <h3 id="playable-title" className={listTitle}>Playable now</h3>
-              <ul className="flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent">
-                {playableNow.map((line) => <li key={line}>{line}</li>)}
-              </ul>
-              <Link className={inlineLink} href="/docs/platforms/#languages">Languages and translation review status <span aria-hidden="true">→</span></Link>
-            </section>
-            <section className={`${card} p-6`} aria-labelledby="coming-title">
-              <h3 id="coming-title" className={listTitle}>Coming</h3>
-              <ul className="flex list-disc flex-col gap-2 pl-5 leading-[1.6] text-muted marker:text-accent">
-                {comingNext.map((line) => <li key={line}>{line}</li>)}
-              </ul>
-            </section>
+            {buildLists.map(({ id, title, lines, link }) => (
+              <section key={id} className={`${card} p-6`} aria-labelledby={id}>
+                <h3 id={id} className="mb-4 font-heading text-[1.1rem] font-bold">{title}</h3>
+                <ul className={bulletList}>
+                  {lines.map((line) => <li key={line}>{line}</li>)}
+                </ul>
+                {link ? <Link className={inlineLink} href={link.href}>{link.label} <span aria-hidden="true">→</span></Link> : null}
+              </section>
+            ))}
           </div>
           <div className="mt-16 mb-6 grid grid-cols-3 gap-6 phone:mt-12 phone:grid-cols-[1fr] phone:gap-4">
             {features.map(([index, title, copy]) => (

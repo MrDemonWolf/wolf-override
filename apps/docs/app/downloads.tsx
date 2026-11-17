@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
-import { inlineLink, landingWidth, sectionTitle } from './landing-classes';
+import { bulletList, inlineLink, landingWidth, sectionTitle } from './landing-classes';
 
 /** The guide page with every way to get the game today (test build or source); the hero and this section link it. */
 export const getGameHref = '/docs/get-game/';
@@ -16,6 +16,7 @@ export const plannedPlatforms = [
   { name: 'Android', status: 'no release date' },
 ] as const;
 
+/** Right-pointing arrow for links that lead on (hero doors, the Get the game button); decorative, sized 1.25rem, takes the text colour. */
 export function ArrowIcon() {
   return (
     <svg aria-hidden="true" className="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -24,6 +25,10 @@ export function ArrowIcon() {
   );
 }
 
+/**
+ * The landing page's "Get the build" section (#downloads): what exists today (test builds and source, no
+ * release), the link to the Get the game guide and the planned platforms. A server component with no state.
+ */
 export default function Downloads() {
   return (
     <section
@@ -35,7 +40,7 @@ export default function Downloads() {
         <div>
           <p className="hud-label mb-5">Get the build</p>
           <h2 id="downloads-title" tabIndex={-1} className={sectionTitle}>Try a test build.</h2>
-          <ul className="m-0 flex max-w-[50ch] list-disc flex-col gap-2 pl-5 text-body text-muted marker:text-accent">
+          <ul className={`${bulletList} max-w-[50ch]`}>
             <li>There is no release, installer or release date yet.</li>
             <li>Test builds for macOS and Windows run without Godot. They are unsigned debug builds, kept for 14 days, and need a GitHub account to download.</li>
             <li>Or run the source game in Godot 4.7.2 on Windows, macOS or Linux.</li>

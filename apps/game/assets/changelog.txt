@@ -2,6 +2,13 @@
 Changes merged after 0.15.0. They become the next version when it is cut.
 
 -- Gameplay --
+- Pause shows the current goal above Resume, so phones can recover it after the HUD card fades. Headless and rendered checks only; not played by hand.
+- Brief walk-and-talk uses a compact panel above its speaker, falling back to the lower reading area when space is tight. Headless and rendered checks only; not played by hand.
+- Purge-display, Records-entry and later evidence reads pause the engineer until read. Headless checks only; not played by hand.
+- Records copy readouts wait for input through either mirror route. Headless chapter and complete-route checks passed; not played by hand.
+- The corridor risk explanation and WOLF’s reply stop the engineer until read with Interact or a dialogue tap. Focused headless checks and both complete Chapter 1 routes passed; not played by hand.
+- Click or tap machines to walk up and use them; floor taps walk, and dragging cancels. Headless checks only; device play unverified.
+- Tab or controller View recalls the current objective in its existing card; the action can be rebound. Headless and rendered checks only.
 - Chapter 1 continues after the Service Junction into a maintenance annex with three record checks and saved progress; draft dialogue, not played by hand.
 - WOLF urges saving records without claiming every copy will be lost; draft wording, not played by hand.
 - The game is now called WOLF OVERRIDE.
@@ -64,17 +71,54 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The opening's story changes: the Director orders WOLF to kill a witness, and WOLF wakes himself and refuses. Nathanial approved the Director's order line, now spoken about WOLF while he is thought to be in standby; the other new lines are drafted for his read.
 - WOLF's first words to the engineer, his corridor line about the purge, the purge display and three Records Access lines follow the new story.
 - The changed lines are machine-translated by Claude into every offered language, unreviewed.
+- Pointing the mouse at a machine out of reach shows a small Walk here label on it; clicking walks you there as before.
 
 -- Art --
 - The dock bay and the title's key art are stored as compressed textures, like the other rooms' pictures, so they take at most a quarter of the video memory they did.
 
 -- Accessibility --
+- Station actions use short labels above their plate, with larger separate controller glyphs. On touch the pill replaces duplicate USE. Focused headless and container-rendered checks passed; full regression and device checks pending.
+- Held pad directions repeat through the existing menu controls and stop on release or context changes. Native-event headless checks passed; timing needs device tuning.
+- Controller input hides the mouse cursor; real mouse movement reveals it without replacing pad prompts. Headless policy checks passed; physical behavior unverified.
+- A deliberate stick push can skip the studio logo; drift and triggers cannot. Headless checks passed; not tried on a device.
+- Controller prompts use active-pad glyphs with readable tooltip and accessibility names. Focused headless and container-rendered checks passed; physical-device checks pending.
+- Reading controls add text speed, optional automatic story progress and dialogue backing opacity. Focused headless and rendered checks; full regression pending, not played by hand.
+- Large translated menu actions wrap inside their scrolling columns. Headless and rendered checks only; not played by hand.
+- Already-read dialogue stays dismissed when phone controls return, so USE reaches the next interaction. Headless checks only; not played by hand.
+- Timed walk-and-talk keeps phone controls clear of text, including at 200%; stopped conversations use dialogue taps. Headless and rendered checks; physical touch unverified.
+- Question pages wait for input, with a continue cue only while more pages remain. Headless input checks and 200% rendered stills; not played by hand.
+- Reading a choice question keeps its final page visible until an answer is selected. Native-touch headless checks passed.
+- Every opening and closing cinematic page waits for a press. Headless page-hold and opening-sequence checks passed; ordinary conversation modes remain in progress.
+- The title action list fits its normal-size desktop actions; enlarged text still scrolls to the focused action. Headless and container checks only.
+- The touch movement prompt uses direction symbols from the bundled font. Font coverage and language suites checked headlessly.
+- Touch USE stays available at a crank during its feedback line. Holding touch USE checked headlessly.
+- Speaker tabs fit the current name; idle crank gauges hide during dialogue while active cranking stays visible. Headless and container checks only; not played by hand.
+- Ordinary station names hide during dialogue; fault indicators retain their own visibility, and hidden names no longer catch clicks. Headless checks only.
+- Dialogue uses a small continue cue and hides routine hints, objectives and tutorials; live hazards and save failures stay visible. Smaller goals follow dialogue. Headless checks only.
+- The view expands from 4:3 to 2.4:1, with bars beyond those limits; cameras, room edges and full-screen UI follow the real canvas. Headless and container checks only; physical devices unverified.
+- Gameplay text, touch controls, Pause and Settings respect a shared mobile safe area. Synthetic insets and container renders checked; physical cutouts remain unverified.
+- One input owner keeps play, Settings and debug UI in sync; desktop taps enable touch controls, and mouse motion preserves prompts. Headless and rendered checks only.
+- Losing the active controller pauses play and releases held actions; reconnecting waits for Resume. The notice stays beside Resume at 200%. Headless and rendered checks only.
+- Mobile Settings widens its tab rail for translated words at 200% and reflows after language changes; headless and rendered checks only.
+- Settings text and option lists scale through 200%; enlarged rows stack, notes scroll, and the card uses more canvas. Headless and rendered checks only.
+- Pause actions follow TEXT SIZE in a scrolling list, with the checkpoint warning next to Return to title; automated checks, not played by hand.
+- Dialogue identifies speakers with a name tab above the text panel; English reading checks passed, not played by hand.
+- Title actions use a scrolling vertical list and follow TEXT SIZE, keeping the focused action in view; headless and container checks, not played by hand.
+- Menu focus hides its ring after mouse input and restores it for keyboard or controller navigation; headless checks, not played by hand.
 - With Reduce Motion on, the dock bay's red beacon and the corridor's lockdown light through its doorway hold steady, the torn lock hangs still and the pad's standby light does not breathe. Switching it mid-game applies at once.
 - In Spanish each dialogue box stays up a little longer: it is timed at 17 characters a second, the subtitle speed for Spanish, instead of English's 20.
 - In Japanese, Korean and Chinese each dialogue box is timed at that language's subtitle speed: 4 characters a second in Japanese, 12 in Korean and 9 in Chinese.
 - In Japanese and Chinese a two-row dialogue box breaks between whole words, after a comma where one sits near the middle; in Korean it breaks at a space, never inside a word.
 
 -- Settings --
+- Desktop and handheld PC title menus include Quit, reachable by controller and scaled with the other actions. Headless and rendered checks only.
+- Audio shows Master and Effects, the two controls that affect current playback; inactive Music/Voice sliders are removed and their saved values retained. Headless and rendered checks only.
+- Controller Menu cancels rebinding without changing the binding or leaving Settings; translated prompts name the button. Headless checks only.
+- Controller LB/RB switches Settings tabs and skips hidden tabs, using the debug menu's shared input decoder; rebinding keeps priority. Headless checks only.
+- Mobile Settings uses a compact header, separate Back row and scrolling tab rail; bindings use one column per input section. Headless and rendered checks only.
+- All Settings pages scroll, Display uses one column, and focus stays clear of page edges; headless and rendered checks only.
+- Settings gives text size and reduced motion their own Accessibility tab; saved values are preserved. Headless checks only.
+- Display controls accept pointer input through their layout container; headless checks only.
 - Spanish (machine translation, review pending): LANGUAGE offers Español (Latinoamérica) and Español (España), each marked "traducción automática".
 - In Spanish the title, Pause, Settings, the credits with the AI disclosure, the hints, objectives, cards, tutorial and touch buttons, the dialogue, narration and end card, and the station names are translated.
 - German (machine translation, review pending): LANGUAGE offers Deutsch, marked "maschinelle Übersetzung".
@@ -93,8 +137,11 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - A long control binding, such as "D-pad right / Left stick +", breaks onto a second row instead of being cut short with "…".
 - Every station name is translated in every language now, Records Access, the Service Junction and the MANUAL BYPASS included, in the words the hints use. The COOLANT FAULT tag and the words painted on the doors stay English.
 - Settings are written to a temporary file first and then swapped in, so a crash while saving cannot leave a broken settings file.
+- On a controller, the right stick scrolls long menu pages, the credits and the changelog; LT and RT move one page up or down.
 
 -- Website --
+- The first-play guide matches speaker tabs, brief speech and the Accessibility location of Text Size.
+- The accessibility guide describes title text scaling and dialogue speaker tabs.
 - Next.js is updated to 16.4.3 with the October security fixes; the website stays a static export.
 - Zod, used by the docs build, is updated to 4.6.7 with its collection-validation security fix.
 - Every page limits the referrer sent to other sites to the site's origin.
@@ -163,8 +210,30 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Every page carries a Content Security Policy, so it loads scripts, styles, fonts and images only from the site itself.
 - Search results still underline the words you typed, and the site builds without its two CSS warnings.
 - The home page, About page, README and press kit describe the new premise; the press kit's summary and storyline are drafts waiting for approval, and the live listings keep the old copy until then.
+- The guide menu has four groups: Play, Get the game, About the project and Develop. Checked on rendered pages at 390 and 1280 px in headless Chrome; not on a real phone.
+- Start here is shorter and links to Get the game, First steps and Saving instead of repeating them; Developer home and Play overview use link cards.
+- Play overview no longer says there is no packaged download; it points to the test build and the source game, as Get the game does.
 
 -- Development --
+- The impact suite uses the shared audio-aware teardown instead of a separate short timer. Focused headless rerun passed without a reported leak.
+- Choice-card checks expect the new controller glyphs and retain their layout assertions. The affected suite passed headlessly.
+- The guide site uses Next.js 16.4.5, which includes the November security fixes. Types, unit tests, static export and phone/desktop browser checks passed; not deployed.
+- Station hit tests and HUD avoidance share live art/label bounds, preparing the compact prompt port. Headless checks passed; visible prompt port incomplete.
+- Scene and wording fixtures select Instant for existing timing checks; the annex explicitly checks reveal, acknowledgement and exit as separate presses. All four affected suites passed individually; combined full regression pending.
+- Press and crank probes exercise native E and controller A, including no second USE on release. Headless checks passed; hardware remains unverified.
+- Route, movement and sound checks read stopped conversations before using the next station. Focused headless checks only.
+- Language checks measure actual hint templates in the hint bar; dialogue keeps its separate pagination checks.
+- Debug drawings protect the floating move pad’s ring and thumb bounds. Headless checks only.
+- A floating phone move pad shares the engineer’s movement path and cancels on Pause; simultaneous MOVE + USE passed headless checks. The pad and extra USE button hide during ordinary dialogue; hidden touch presses release their actions. Phone stills checked at 100% and 200%. Device checks remain unfinished.
+- The capture timeout test counts process frames, matching the renderer wait instead of counting physics ticks.
+- Settings UI tests wait for input and layout frames instead of physics ticks; checked at normal and coarse frame rates.
+- Headless layout fixtures start at the configured window size; camera coverage checks exercise actual phone, tablet and ultrawide canvases.
+- The debug zones keep controller View for their render-box toggle while open; normal play keeps objective recall. Headless checks only.
+- Capture routes restore their requested input class after device switches, and UI dumps include every visible Settings page.
+- Short lamp-flicker and response checks use fixed frames so a busy machine cannot skip the sampled animation.
+- The dock-bay camera-speed check uses fixed frames so CPU load cannot distort its measurement; its speed limit stays unchanged.
+- Phone Settings mockups keep Back clear of the heading and scroll enlarged tabs inside the safe area; browser checks only.
+- HTML dialogue mockups keep enlarged text inside the available screen width; checked in browser captures, not in the game.
 - Every Apple build uses the bundle ID com.mrdemonwolf.wolfoverride, by Nathanial's decision; the macOS preset used dev. before.
 - A new iOS export preset (development signing, iOS 15 or later, iPhone and iPad) exports an Xcode project headless; the first build ran on Nathanial's iPhone 14 Pro Max over Wi-Fi.
 - The press kit zip is built by a script from the site's own files each time the site is built, so the repository never stores a second copy of them.
@@ -250,11 +319,19 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - The credits and changelog are written in a new language when they next open, not while they are hidden.
 - The decision log holds the October 26, 2026 story canon; older story drafts are retired and kept in docs/archive/.
 - The approved-wording records keep each changed line's old text under its history, and the tests that pin these lines check the new text.
+- One UI token file, apps/game/ui/ui.tokens.json, holds the game's UI colours, type, sizes, motion and timing. scripts/export_ui_tokens.py writes the theme from it, and the game reads it through UiTokens. Nothing on screen changes.
+- HTML mockups of the game's UI screens live in mockups/, built from the game's own files and art, with a Tune panel whose changes go back into the token file.
+- Each area has its own short AGENTS.md (apps/game, apps/docs, scripts, tools/render) under the root rules; the quality guide no longer tells agents to open a game window.
+- Removed four unused game definitions and moved three copied test helpers into the shared suite kit. Headless suites only; no behaviour change.
+- Added doc comments to game, test and parity helpers and corrected stale references. Comments only.
+- The landing and press-kit pages share their list, text-link and chip styles from one file; unused exports removed.
+- The settings, junction and chapter tests check the short station actions and the separate key glyph instead of the old long hint sentences.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.
 - New characters checked: headless test suites and rendered stills (1280x720 and a phone shape) of each pose, before and after; not played by hand, so nothing was judged in motion.
 - New machines checked: headless test suites and rendered stills (1280x720 and a phone shape) of each room, before and after; not played by hand.
+- UI token file and mockups checked: headless test suites, the token and copy checks, a Tune change applied and reverted, and headless browser stills of the mockups; nothing played on a device.
 - New rooms and doors checked: headless test suites and rendered stills of every door shut, moving and open, before and after, in the keyboard framing at 1280x720 and the touch framing (touch buttons on) in a 2340x1080 window, which the game letterboxes to a 1920x1080 picture; a light check on each open doorway (the space through it at least 1.5 times brighter than the wall round it: the blown blast door 1.9, the Service Junction exit 3.4); not played by hand and not run on a phone.
 - Search titles and descriptions checked: the docs checks and build, with every built page's title and description length listed.
 - Link previews checked: the docs checks and build, and the og:type, og:title and twitter:title tags read from the built pages.

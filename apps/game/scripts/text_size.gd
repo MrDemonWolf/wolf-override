@@ -1,9 +1,9 @@
 class_name TextSize
 extends RefCounted
-## The TEXT SIZE setting (Settings, DISPLAY tab; STORY-3): one factor, 100% to 200%, that the dialogue
+## The TEXT SIZE setting (Settings, ACCESSIBILITY tab; STORY-3): one factor, 100% to 200%, that the dialogue
 ## box, the hint bar, the tutorial prompt, the top cards, the answer buttons and the station name
-## labels multiply their font sizes by (the station names up to WORLD_MAX_FACTOR). Menus keep their
-## own sizes.
+## labels multiply their font sizes by (the station names up to WORLD_MAX_FACTOR). Title and pause
+## action lists and Settings scale and scroll.
 
 ## The sizes Settings offers, as factors.
 const STEPS: Array[float] = [1.0, 1.25, 1.5, 1.75, 2.0]
@@ -17,6 +17,18 @@ static var factor: float = 1.0
 ## [param base] px at the current text size.
 static func px(base: int) -> int:
 	return roundi(base * factor)
+
+
+## Scales a menu control from its authored font/minimum height, cached to avoid compounding.
+## Buttons wrap so large translated actions cannot force their scrolling column outside its card.
+static func apply_control(control: Control) -> void:
+	if not control.has_meta(&"menu_font_base"):
+		control.set_meta(&"menu_font_base", control.get_theme_font_size(&"font_size"))
+		control.set_meta(&"menu_minimum_base", control.custom_minimum_size.y)
+	control.add_theme_font_size_override(&"font_size", px(int(control.get_meta(&"menu_font_base"))))
+	control.custom_minimum_size.y = px(int(control.get_meta(&"menu_minimum_base")))
+	if control is Button:
+		(control as Button).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
 
 ## The nearest offered step to [param value] (a saved or hand-edited setting).

@@ -64,7 +64,7 @@ const LEADER_STEPS: int = 6
 ## The candidate sprites and controls are gathered again this often while shown; their rects every frame.
 const REFRESH_SECONDS: float = 0.25
 ## The legend: between the top card (ends x 466) and the DEBUG button (from about x 768), above the
-## title's brand line (y 106) and the answer row (y 88), so it covers no game control.
+## answer row (y 88), so it covers no game control. On the title it moves over the art's left corner.
 const LEGEND_RECT: Rect2 = Rect2(474.0, 10.0, 262.0, 58.0)
 ## The legend buttons keep the theme's button look with tighter padding, so all three fit.
 const LEGEND_BUTTON_PADDING: Vector2 = Vector2(6.0, 2.0)
@@ -320,6 +320,9 @@ func refresh_now() -> void:
 ## While shown: redraws every frame, and gathers the render candidates again every REFRESH_SECONDS
 ## ([param delta] in seconds).
 func _process(delta: float) -> void:
+	# The title's studio heading now uses the right-hand top band; the art's left corner is clear.
+	if legend != null:
+		legend.position = Vector2(48.0, LEGEND_RECT.position.y) if _title_open() else LEGEND_RECT.position
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
 		_candidates = _gather_candidates()
@@ -406,8 +409,7 @@ func _world_view() -> Rect2:
 ## Where Main holds the play camera's centre (Main._update_gameplay_camera): half its view in from
 ## each end of the 960 px room.
 func _camera_centre_limits() -> Vector2:
-	var half_view: float = Main.GAMEPLAY_VIEW_WIDTH * 0.5
-	return Vector2(half_view, 960.0 - half_view)
+	return game.gameplay_camera_limits()
 
 
 ## True while the title is up (or no game is wired): the rules' zones and hitboxes are left out then, and only
@@ -489,7 +491,7 @@ func zone_items() -> Array[Item]:
 			list.append(heading)
 	# The camera's centre is held between these; the marker is where it is now.
 	var limits: Vector2 = _camera_centre_limits()
-	list.append(_range(ZONES, "camera centre limits", limits.x, limits.y, Row.CAMERA, "GAMEPLAY_VIEW_WIDTH / 2 .. 960 - GAMEPLAY_VIEW_WIDTH / 2", false))
+	list.append(_range(ZONES, "camera centre limits", limits.x, limits.y, Row.CAMERA, "live viewport half-width inside the room", false))
 	var camera: Camera2D = game.intro_camera
 	if camera != null:
 		var centre: Item = _spot(ZONES, "camera x%.2f" % camera.zoom.x, camera.get_screen_center_position().x, Row.CAMERA, "IntroCamera screen centre")
@@ -610,7 +612,7 @@ func shape_item(shape_node: CollisionShape2D) -> Item:
 ## Main's controls that nothing drawn may cover, by name: the touch arrows, USE, the answers and PAUSE.
 func keep_clear_controls() -> Dictionary:
 	return {
-		"touch_left": game.touch_left, "touch_right": game.touch_right, "touch_use": game.touch_use,
+		"touch_left": game.touch_left, "touch_right": game.touch_right, "touch_use": game.touch_use, "touch_move_pad": game.touch_move_pad,
 		"touch_choice_1": game.touch_choice_1, "touch_choice_2": game.touch_choice_2, "pause_button": game.pause_button,
 	}
 
@@ -633,7 +635,8 @@ func _begin_pass() -> void:
 		for property: String in controls:
 			var control: Control = controls[property] as Control
 			if control != null and control.is_visible_in_tree() and effective_alpha(control) >= MIN_ALPHA:
-				_add_clear(control, control.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, control.size), property)
+				var bounds: Rect2 = control.visual_rect() if control is TouchMovePad else Rect2(Vector2.ZERO, control.size)
+				_add_clear(control, control.get_global_transform_with_canvas() * bounds, property)
 		var labels: Dictionary = keep_clear_text()
 		for property: String in labels:
 			var label: Label = labels[property] as Label
@@ -1052,7 +1055,7 @@ func _world_to_screen(point: Vector2) -> Vector2:
 
 ## The canvas on show (960x540, wider on a wide window).
 func _view() -> Rect2:
-	return get_viewport().get_visible_rect() if is_inside_tree() else Rect2(0.0, 0.0, 960.0, 540.0)
+	return game.screen_shape.visible_rect if game != null else Rect2(Vector2.ZERO, ScreenShape.design_size)
 
 
 ## The floor line (RoomDepth.FLOOR_Y) as a screen y (canvas px), where the rule lanes start.

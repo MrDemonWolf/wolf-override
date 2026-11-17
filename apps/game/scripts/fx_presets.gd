@@ -11,6 +11,8 @@ const DUST: Color = Color("#c9b9a0")
 const STEAM: Color = Color("#bfe8ff")
 
 
+## A spark shower in [param color]: 24 sparks thrown up and out, falling back within 0.45 s. One-shot;
+## fire it with Impact.burst().
 static func sparks(color: Color = Palette.CYAN) -> CPUParticles2D:
 	var particles: CPUParticles2D = _one_shot("Sparks", 24, 0.45)
 	particles.direction = Vector2(0.0, -1.0)
@@ -28,6 +30,8 @@ static func sparks(color: Color = Palette.CYAN) -> CPUParticles2D:
 	return particles
 
 
+## A puff of dust: 16 soft dots that spread upward and fade within 0.6 s. One-shot; fire it with
+## Impact.burst().
 static func dust_burst() -> CPUParticles2D:
 	var particles: CPUParticles2D = _one_shot("Dust", 16, 0.6)
 	particles.direction = Vector2(0.0, -1.0)
@@ -183,6 +187,9 @@ static func place(particles: CPUParticles2D, parent: Node, particles_name: Strin
 	return particles
 
 
+## The start of every burst preset: a CPUParticles2D named [param particles_name] that is not emitting
+## yet and throws [param amount] particles almost at once (explosiveness 0.95), each living
+## [param lifetime] seconds. The caller sets direction, speed, colour and texture.
 static func _one_shot(particles_name: String, amount: int, lifetime: float) -> CPUParticles2D:
 	var particles: CPUParticles2D = CPUParticles2D.new()
 	particles.name = particles_name
@@ -212,5 +219,7 @@ static func _chip_texture() -> GradientTexture2D:
 	return FxKit.linear([0.0, 1.0], [Color.WHITE, Color(0.8, 0.8, 0.8)], true, 3, 3)
 
 
+## A soft round dot [param size] px across, white at the centre and clear at the rim: FxKit's shared
+## radial texture, so nothing writes to it.
 static func _dot_texture(size: int) -> GradientTexture2D:
 	return FxKit.radial(size, [0.0, 0.5, 1.0], [Color.WHITE, Color(1.0, 1.0, 1.0, 0.5), Color(1.0, 1.0, 1.0, 0.0)])

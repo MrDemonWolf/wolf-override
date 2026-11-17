@@ -1,0 +1,289 @@
+<!doctype html>
+<!--
+  M09: Settings on the ROG Ally (2023) with its built-in Xbox pad (design brief 7.3 M09, built from
+  3.1 layout rules, 3.2 the handheld (H) column of the settings tree, 4.2 button map, 4.4 glyphs,
+  4.6 pad rebind, 2.2-2.4 the handheld profile: TEXT SIZE 125%, rows 48 canvas px).
+
+  What this page is for: judge the full-screen settings on the Ally, pad first, before Godot work.
+
+  How the page is built (markup and per-screen data only, brief 7.1; no inline style values, no
+  page script):
+  - One <template id="m09-settings"> holds the whole screen once: the title key art, today's
+    backdrop and the full-screen terminal panel (3.1 step 5) with the title, the five tabs
+    (data-wo-tab), one scrolling body holding all five pages (data-wo-page) with every H-column row
+    of 3.2, and the footer.
+  - Each stage below is that template (data-wo-template="m09-settings"). A stage sets its state
+    with frame data only: data-wo-current (the control that holds focus), data-wo-list (an open
+    list) and a data-wo-include-set script (the selected tab, the body's scroll, a capture). Every
+    stage holds all five pages, so LB, RB, a click or a tap on a tab shows that tab's rows.
+  - Shared from other pages, not copied: the footer and the rebind footer are M08's
+    (m08-settings-desktop.html#m08-footer and #m08-footer-rebind); the dialogue preview is M10's
+    (m10-settings-phone.html#settings-preview).
+  - Every look comes from mockups/shared/wo.css and every behaviour from mockups/shared/wo.js:
+    tabs, lists, switches, sliders, holds, focus (data-wo-current), glyphs (data-wo-glyph, from
+    main.gd's bindings), the open motion (data-wo-open="screen"), the body's scroll (data-wo-scroll)
+    and the strip's input, TEXT SIZE, motion and Speaker switches.
+  - Sliders carry data-wo-step (one D-pad press, 3.2 "single-press steps") for the shared stepper.
+    The 5-point step for 0-100 sliders is a proposal (no source); 0.05 for STICK DEAD ZONE is 3.2's.
+  - The rows are written once here. When the shared 3.2 settings data file and row renderer land
+    (3.1 rule 1: one model, one row helper), they replace this template's rows.
+  - The review stills (URL states and pad presses) and their checks are listed in data/m09.json.
+
+  Words: UI labels from the build (game_settings.gd, main.gd, main.tscn) and from the brief's
+  settings tree (3.2). The rebind note is the build's ("Press a controller input for %s.") with
+  4.6's Menu cancel. Proposal copy: the FRAME LIMIT note, the WINDOW SIZE note, the KEYBOARD KEYS
+  button and note, the DEVICE PROFILE note, SELECT and HOLD. The one dialogue line is WOLF's,
+  already in the build ("I've got the contact. Give me a moment."). No story text.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings, ROG Ally (2023)</title>
+<link rel="stylesheet" href="shared/wo.css">
+<script src="shared/wo.js" defer></script>
+</head>
+<body class="mk-page" data-wo-nav data-wo-strip="speaker">
+
+<!-- The whole settings screen, once. Defaults are the H column of brief 3.2 on the 120 Hz Ally; no
+     tab is selected here, so each stage picks its own. Every control has a data-wo-id, so a stage
+     can name it in data-wo-current or change it in its include set. A select carries its list
+     (.wo-popup data-wo-list) in the same .wo-row-control, so pad A, a click or a tap opens it.
+     The wrapping layer plays the screen-open motion (motion.screen.in) once. -->
+<template id="m09-settings">
+  <div class="wo-layer" data-wo-open="screen">
+    <div class="wo-plate"><img src="../apps/game/assets/title-corridor-key-art-provisional.png" alt=""></div>
+    <div class="wo-backdrop"></div>
+    <div class="wo-safe wo-terminal-panel wo-settings" data-wo-probe="panel">
+      <!-- The title alone: THE DEN / LOCAL CONFIGURATION is the desktop card's caption (3.1 step 5),
+           and on a 7-inch screen the line goes to the rows instead. -->
+      <header class="wo-settings-head">
+        <div class="wo-t-h1">SYSTEM SETTINGS</div>
+      </header>
+      <!-- LB and RB beside the tabs (brief 7.3 M09). -->
+      <div class="wo-tabs" role="tablist" data-wo-probe="tabs">
+        <span data-wo-glyph="tab_prev"></span>
+        <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="display">DISPLAY</button>
+        <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="audio">AUDIO</button>
+        <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="controls">CONTROLS</button>
+        <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="accessibility">ACCESSIBILITY</button>
+        <button class="wo-tab" type="button" role="tab" aria-selected="false" data-wo-tab="general">GENERAL</button>
+        <span data-wo-glyph="tab_next"></span>
+      </div>
+      <div class="wo-settings-body" role="tabpanel" data-wo-probe="body">
+
+        <!-- DISPLAY (3.2 H): WINDOW MODE defaults to Fullscreen, so WINDOW SIZE is greyed. MONITOR
+             ("rarely") and the docked SCREEN EDGE MARGIN are not shown. FRAME LIMIT: 30 / 40 / 60 /
+             120 / Match display, default 60. V-sync is on and the Ally runs at 120 Hz, so 120 FPS is
+             greyed (3.2: at or above the refresh rate); the note says why, as on M08. -->
+        <div class="wo-rows" data-wo-page="display">
+          <div class="wo-row"><span class="wo-row-label">WINDOW MODE</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="window-mode"><span aria-hidden="true">◀</span><span>FULLSCREEN</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="WINDOW MODE" data-wo-list="window-mode"><span class="wo-popup-item" role="option">WINDOWED</span><span class="wo-popup-item" role="option" aria-selected="true">FULLSCREEN</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">WINDOW SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" disabled data-wo-id="window-size"><span>1920 × 1080</span></button></span><span class="wo-row-note">Only in Windowed mode.</span></div>
+          <div class="wo-row"><span class="wo-row-label">V-SYNC</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="V-SYNC" aria-checked="true" tabindex="0" data-wo-focus data-wo-id="vsync"></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">FRAME LIMIT</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="frame-limit"><span aria-hidden="true">◀</span><span>60 FPS</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="FRAME LIMIT" data-wo-list="frame-limit" data-wo-probe="frame-limit-list"><span class="wo-popup-item" role="option">30 FPS</span><span class="wo-popup-item" role="option">40 FPS</span><span class="wo-popup-item" role="option" aria-selected="true">60 FPS</span><span class="wo-popup-item" role="option" aria-disabled="true">120 FPS</span><span class="wo-popup-item" role="option">MATCH DISPLAY (120 Hz)</span></span></span><span class="wo-row-note">V-sync on: MATCH DISPLAY already runs at 120 Hz.</span></div>
+          <div class="wo-row"><span class="wo-row-label">SHOW FPS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SHOW FPS" aria-checked="false" tabindex="0" data-wo-focus data-wo-id="show-fps"></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">EDGE SMOOTHING</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="edge-smoothing"><span aria-hidden="true">◀</span><span>OFF</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="EDGE SMOOTHING" data-wo-list="edge-smoothing"><span class="wo-popup-item" role="option" aria-selected="true">OFF</span><span class="wo-popup-item" role="option">2× MSAA</span><span class="wo-popup-item" role="option">4× MSAA</span><span class="wo-popup-item" role="option">8× MSAA</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">BATTERY SAVER</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="BATTERY SAVER" aria-checked="false" tabindex="0" data-wo-focus data-wo-id="battery-saver"></span></span><span class="wo-row-note">On: 30 FPS cap, edge smoothing off.</span></div>
+        </div>
+
+        <!-- AUDIO (3.2): five sliders 0 to 100, default 100, and MUTE WHEN UNFOCUSED. -->
+        <div class="wo-rows" data-wo-page="audio">
+          <div class="wo-row"><span class="wo-row-label">MASTER</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="MASTER" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-step="5" tabindex="0" data-wo-focus data-wo-id="master"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100%</span></span></div>
+          <div class="wo-row"><span class="wo-row-label">MUSIC</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="MUSIC" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-step="5" tabindex="0" data-wo-focus data-wo-id="music"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100%</span></span></div>
+          <div class="wo-row"><span class="wo-row-label">EFFECTS</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="EFFECTS" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-step="5" tabindex="0" data-wo-focus data-wo-id="effects"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100%</span></span></div>
+          <div class="wo-row"><span class="wo-row-label">VOICE</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="VOICE" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-step="5" tabindex="0" data-wo-focus data-wo-id="voice"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100%</span></span></div>
+          <div class="wo-row"><span class="wo-row-label">UI SOUNDS</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="UI SOUNDS" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" data-wo-step="5" tabindex="0" data-wo-focus data-wo-id="ui-sounds"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">100%</span></span></div>
+          <div class="wo-row"><span class="wo-row-label">MUTE WHEN UNFOCUSED</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="MUTE WHEN UNFOCUSED" aria-checked="true" tabindex="0" data-wo-focus data-wo-id="mute-unfocused"></span></span></div>
+        </div>
+
+        <!-- CONTROLS (3.2 H): the controller comes first. Each binding draws main.gd's own pad
+             bindings (data-wo-glyph with the action name), so a remap (?bind=) shows here too.
+             Keyboard keys stay folded while a pad is used (Microsoft handheld G2: keyboard icons
+             hidden unless in use). The rebind note shows only while INTERACT captures (stage 2). -->
+        <div class="wo-rows" data-wo-page="controls">
+          <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">CONTROLLER</div>
+          <div class="wo-row"><span class="wo-row-label">MOVE LEFT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-move-left"><span data-wo-glyph="move_left" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+          <div class="wo-row"><span class="wo-row-label">MOVE RIGHT</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-move-right"><span data-wo-glyph="move_right" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+          <div class="wo-row"><span class="wo-row-label">INTERACT / CONTINUE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-interact"><span data-wo-glyph="interact" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span><span class="wo-row-note" hidden data-wo-probe="rebind-note">Press a controller input for Interact / continue. <span data-wo-glyph="pause_game" data-wo-glyph-input="pad"></span> cancels.</span></div>
+          <div class="wo-row"><span class="wo-row-label">RESPONSE 1</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-response-1"><span data-wo-glyph="choice_1" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+          <div class="wo-row"><span class="wo-row-label">RESPONSE 2</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-response-2"><span data-wo-glyph="choice_2" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+          <div class="wo-row"><span class="wo-row-label">PAUSE</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="pad-pause"><span data-wo-glyph="pause_game" data-wo-glyph-input="pad" data-wo-glyph-all></span></button></span></div>
+          <div class="wo-row"><span class="wo-row-label">BUTTON PROMPTS</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="prompts"><span aria-hidden="true">◀</span><span>AUTO (XBOX)</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="BUTTON PROMPTS" data-wo-list="prompts"><span class="wo-popup-item" role="option" aria-selected="true">AUTO (XBOX)</span><span class="wo-popup-item" role="option">KEYBOARD</span><span class="wo-popup-item" role="option">XBOX</span><span class="wo-popup-item" role="option">PLAYSTATION</span><span class="wo-popup-item" role="option">NINTENDO</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">VIBRATION</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="vibration"><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="VIBRATION" data-wo-list="vibration"><span class="wo-popup-item" role="option">OFF</span><span class="wo-popup-item" role="option">25%</span><span class="wo-popup-item" role="option">50%</span><span class="wo-popup-item" role="option">75%</span><span class="wo-popup-item" role="option" aria-selected="true">100%</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">STICK DEAD ZONE</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="STICK DEAD ZONE" aria-valuemin="0.1" aria-valuemax="0.8" aria-valuenow="0.25" data-wo-step="0.05" tabindex="0" data-wo-focus data-wo-id="dead-zone"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">0.25</span></span></div>
+          <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">KEYBOARD</div>
+          <div class="wo-row"><span class="wo-row-label">KEYBOARD KEYS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-id="keyboard-keys">SHOW KEYS</button></span><span class="wo-row-note">Hidden while you use the controller.</span></div>
+          <div class="wo-rows-head wo-t-caption wo-t-muted" role="heading" aria-level="3">ALL INPUTS</div>
+          <div class="wo-row"><span class="wo-row-label">CLICK / TAP TO INTERACT</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="CLICK / TAP TO INTERACT" aria-checked="true" tabindex="0" data-wo-focus data-wo-id="click-tap"></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">TOGGLE HOLDS</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="TOGGLE HOLDS" aria-checked="false" tabindex="0" data-wo-focus data-wo-id="toggle-holds"></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">RESTORE DEFAULT CONTROLS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold data-wo-id="restore"><span data-wo-glyph="ui_accept"></span>HOLD</button></span></div>
+        </div>
+
+        <!-- ACCESSIBILITY (3.2): TEXT SIZE shows the handheld default 125% (the whole screen is drawn
+             at it; data-wo-text-size is the hook M08 named for a shared reader of the frame's size).
+             The live dialogue preview (3.1 step 9) sits row-wide right under the four dialogue rows
+             (as on M08), so every row keeps the one label column and the end of the page shows the
+             preview whole beside the rows that change it, whatever its height (name tab or
+             portrait). -->
+        <div class="wo-rows" data-wo-page="accessibility">
+          <div class="wo-row"><span class="wo-row-label">TEXT SIZE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus data-wo-id="text-size"><span aria-hidden="true">◀</span><span data-wo-text-size>125%</span><span aria-hidden="true">▶</span></button></span><span class="wo-row-note">Default on handhelds.</span></div>
+          <div class="wo-row"><span class="wo-row-label">REDUCED MOTION</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="REDUCED MOTION" aria-checked="false" tabindex="0" data-wo-focus data-wo-id="reduced-motion"></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">SCREEN SHAKE</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="shake"><span aria-hidden="true">◀</span><span>100%</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="SCREEN SHAKE" data-wo-list="shake"><span class="wo-popup-item" role="option">0%</span><span class="wo-popup-item" role="option">25%</span><span class="wo-popup-item" role="option">50%</span><span class="wo-popup-item" role="option">75%</span><span class="wo-popup-item" role="option" aria-selected="true">100%</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">FLASHING LIGHTS</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="flashing"><span aria-hidden="true">◀</span><span>ON</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="FLASHING LIGHTS" data-wo-list="flashing"><span class="wo-popup-item" role="option" aria-selected="true">ON</span><span class="wo-popup-item" role="option">REDUCED</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">TEXT SPEED</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="text-speed"><span aria-hidden="true">◀</span><span>NORMAL</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="TEXT SPEED" data-wo-list="text-speed"><span class="wo-popup-item" role="option">SLOW</span><span class="wo-popup-item" role="option" aria-selected="true">NORMAL</span><span class="wo-popup-item" role="option">FAST</span><span class="wo-popup-item" role="option">INSTANT</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">AUTO-ADVANCE</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="auto-advance"><span aria-hidden="true">◀</span><span>OFF</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="AUTO-ADVANCE" data-wo-list="auto-advance"><span class="wo-popup-item" role="option" aria-selected="true">OFF</span><span class="wo-popup-item" role="option">1×</span><span class="wo-popup-item" role="option">2×</span><span class="wo-popup-item" role="option">5×</span><span class="wo-popup-item" role="option">10×</span></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">DIALOGUE BACKING</span><span class="wo-row-control"><span class="wo-slider" role="slider" aria-label="DIALOGUE BACKING" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-wo-step="5" tabindex="0" data-wo-focus data-wo-id="dialogue-backing"><span class="wo-slider-track"><span class="wo-slider-fill"></span><span class="wo-slider-grab"></span></span></span><span class="wo-t-body">50%</span></span></div>
+          <div class="wo-row"><span class="wo-row-label">SPEAKER NAMES</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="SPEAKER NAMES" aria-checked="true" tabindex="0" data-wo-focus data-wo-id="speaker-names"></span></span></div>
+          <div data-wo-template="m10-settings-phone.html#settings-preview" data-wo-probe="preview"></div>
+        </div>
+
+        <!-- GENERAL (3.2 H). LANGUAGE has no list here: it would copy languages.json, and no shared
+             reader for it exists yet (as on M08). RESET is hold to confirm (Celeste v1.4). -->
+        <div class="wo-rows" data-wo-page="general">
+          <div class="wo-row"><span class="wo-row-label">LANGUAGE</span><span class="wo-row-control"><button class="wo-select" type="button" data-wo-focus data-wo-id="language"><span aria-hidden="true">◀</span><span>English</span><span aria-hidden="true">▶</span></button></span></div>
+          <div class="wo-row"><span class="wo-row-label">DEVICE PROFILE</span><span class="wo-row-control"><button class="wo-select" type="button" aria-haspopup="listbox" data-wo-focus data-wo-id="device-profile"><span aria-hidden="true">◀</span><span>AUTO (HANDHELD)</span><span aria-hidden="true">▶</span></button><span class="wo-popup" role="listbox" aria-label="DEVICE PROFILE" data-wo-list="device-profile"><span class="wo-popup-item" role="option" aria-selected="true">AUTO (HANDHELD)</span><span class="wo-popup-item" role="option">DESKTOP</span><span class="wo-popup-item" role="option">HANDHELD</span><span class="wo-popup-item" role="option">TOUCH</span></span></span><span class="wo-row-note">A change asks first, then resets the defaults.</span></div>
+          <div class="wo-row"><span class="wo-row-label">PAUSE WHEN UNFOCUSED</span><span class="wo-row-control"><span class="wo-toggle" role="switch" aria-label="PAUSE WHEN UNFOCUSED" aria-checked="true" tabindex="0" data-wo-focus data-wo-id="pause-unfocused"></span></span></div>
+          <div class="wo-row"><span class="wo-row-label">RESET ALL SETTINGS</span><span class="wo-row-control"><button class="wo-btn wo-terminal" type="button" data-wo-focus data-wo-hold data-wo-id="reset-all"><span data-wo-glyph="ui_accept"></span>HOLD</button></span></div>
+        </div>
+
+      </div>
+      <!-- The footer prompt bar (3.1 step 7): M08's one copy. A stage in a rebind swaps it for
+           M08's rebind footer, where only Menu (or a tap on CANCEL REBIND) cancels. -->
+      <div class="wo-footer" data-wo-template="m08-settings-desktop.html#m08-footer" data-wo-probe="footer"></div>
+    </div>
+  </div>
+</template>
+
+<!-- State 1: CONTROLS, pad first. MOVE LEFT holds focus, so the first D-pad press moves from it. -->
+<section class="mk-stage" aria-label="State 1: CONTROLS, controller bindings first" data-m09-state="controls">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="pad-move-left">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='controls']": {"aria-selected": "true"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<!-- State 2: a pad rebind in progress on INTERACT / CONTINUE (4.6). A and B would be captured, so
+     only Menu cancels: the footer is M08's rebind footer (CANCEL REBIND, Menu; clickable and
+     tappable). The LB and RB glyphs stay in the strip: taking them out here lets the strip cut
+     GENERAL mid-word, so hiding them during a capture waits for the shared tab-strip fix. -->
+<section class="mk-stage" aria-label="State 2: pad rebind, Menu cancels" data-m09-state="rebind">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="pad-interact">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='controls']": {"aria-selected": "true"},
+        "[data-wo-id='pad-interact']": {"class": "is-capturing"},
+        ".wo-row:has([data-wo-id='pad-interact']) > .wo-row-note": {"hidden": null},
+        "[data-wo-template='m08-settings-desktop.html#m08-footer']": {"data-wo-template": "m08-settings-desktop.html#m08-footer-rebind"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<!-- State 3: DISPLAY with FRAME LIMIT open. The body is scrolled so FRAME LIMIT's row sits at its
+     top (0.94 of the range, measured at TEXT SIZE 125% with the list open), which gives the list the
+     most room under it. The last choice still reaches the body's fade until an open list leaves the
+     scroller (a shared wo.js piece). -->
+<section class="mk-stage" aria-label="State 3: DISPLAY, FRAME LIMIT open" data-m09-state="display">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="frame-limit" data-wo-list="frame-limit">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='display']": {"aria-selected": "true"},
+        ".wo-settings-body": {"data-wo-scroll": "0.94"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<!-- State 4: AUDIO. Each slider steps once per D-pad press (4.2 Menus); its value shows beside it. -->
+<section class="mk-stage" aria-label="State 4: AUDIO" data-m09-state="audio">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="master">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='audio']": {"aria-selected": "true"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<!-- State 5: ACCESSIBILITY at the top: TEXT SIZE at 125%, the handheld default. -->
+<section class="mk-stage" aria-label="State 5: ACCESSIBILITY, TEXT SIZE 125%" data-m09-state="accessibility">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="text-size">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='accessibility']": {"aria-selected": "true"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<!-- State 6: ACCESSIBILITY scrolled to its end: the live preview shows whole right under SPEAKER
+     NAMES, which has focus (it turns the preview's name tab on and off; 3.1 step 9). -->
+<section class="mk-stage" aria-label="State 6: ACCESSIBILITY, dialogue preview" data-m09-state="preview">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="speaker-names">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='accessibility']": {"aria-selected": "true"},
+        ".wo-settings-body": {"data-wo-scroll": "1"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<!-- State 7: GENERAL. DEVICE PROFILE makes a wrong guess cost one change (2.4). -->
+<section class="mk-stage" aria-label="State 7: GENERAL" data-m09-state="general">
+  <section class="mk-device" data-wo-device="ally" data-wo-fit="width">
+    <div class="wo-frame" data-wo-template="m09-settings" data-wo-current="device-profile">
+      <script type="application/json" data-wo-include-set>{
+        ".wo-tab[data-wo-tab='general']": {"aria-selected": "true"}
+      }</script>
+    </div>
+  </section>
+</section>
+
+<main class="mk-main">
+  <h1><img src="../apps/game/assets/logo-mark.svg" alt=""> M09 Settings, ROG Ally (2023)</h1>
+  <p class="mk-lead">What this page is for: judge the full-screen settings on the ROG Ally (2023), Xbox pad first.</p>
+  <section class="mk-section">
+    <h2>The seven states above</h2>
+    <ol class="mk-note">
+      <li>CONTROLS: controller bindings come first. Keyboard keys stay folded while a pad is used.</li>
+      <li>Pad rebind: A and B would be captured, so <strong>Menu</strong> cancels. CANCEL REBIND stays tappable.</li>
+      <li>DISPLAY: FRAME LIMIT is open. Choices 30, 40, 60, 120 and Match display. 120 is greyed: V-sync on a 120 Hz screen already caps there.</li>
+      <li>AUDIO: one slider per sound.</li>
+      <li>ACCESSIBILITY: TEXT SIZE is 125%, the handheld default.</li>
+      <li>ACCESSIBILITY, at its end: the live dialogue preview sits under the dialogue rows.</li>
+      <li>GENERAL: DEVICE PROFILE fixes a wrong guess in one change. RESET is hold to confirm.</li>
+    </ol>
+  </section>
+  <section class="mk-section">
+    <h2>How to use it</h2>
+    <ul class="mk-note">
+      <li>Every state is the same screen. Each one holds all five tabs.</li>
+      <li>Press LB or RB, or tap a tab, to switch tabs in the state you are in.</li>
+      <li>The D-pad or the arrow keys walk the rows of the state in focus.</li>
+      <li>Set Input to pad, then touch, in the strip. A tap shows touch prompts, never keyboard ones.</li>
+      <li>Every frame is the ROG Ally (2023): 1920 × 1080, rows 48 canvas px, TEXT SIZE 125%.</li>
+      <li>Speaker in the strip switches the preview between the name tab and the placeholder portrait.</li>
+      <li>The review stills and their checks are listed in data/m09.json.</li>
+    </ul>
+  </section>
+  <section class="mk-section">
+    <h2>Shared pieces (November 11)</h2>
+    <ul class="mk-note">
+      <li>Built: the body scrolls to keep the focused row in view, with one gap of look-ahead.</li>
+      <li>Built: D-pad left and right step a slider by data-wo-step and cycle a choice.</li>
+      <li>Built: D-pad up and down walk an open list; A picks; B or Menu closes it.</li>
+      <li>Built: after LB or RB, focus moves to the new page's first row.</li>
+      <li>Built: an open list floats over the scrolling body.</li>
+      <li>Built: the five tabs fit the Ally's strip at 125% (H3 tabs, tighter padding).</li>
+      <li>Built: the row is the one focus mark, and labels clear the row's edge.</li>
+      <li>Still open: no drawn scroll bar yet. A fade at the top or bottom shows that more lies there.</li>
+      <li>Still open: LB and RB show twice, beside the tabs (M09) and in M08's footer (3.1 step 7). One place should be picked.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

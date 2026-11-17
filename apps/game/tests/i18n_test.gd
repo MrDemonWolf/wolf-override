@@ -41,7 +41,7 @@ extends "res://tests/support/game_suite.gd"
 ##   speaker unchanged; in another language each speaker's words are translated apart from the tag (the
 ##   Director's tag by its own message), knockdown cards and restore lines apart, WOLF's callback with the
 ##   saved answer translated and the end card's {name} filled after tr(); the committed template holds
-##   every story message with its story mark, no msgid holds a speaker's tag, and the 26 gender-risk lines
+##   every story message with its story mark, no msgid holds a speaker's tag, and the remaining 25 gender-risk lines
 ##   carry their engineer= marks (slot=choice on the three callbacks); and in a game the opening box, a
 ##   knockdown card, the end card and the answer buttons draw translated, the Director's colour kept, and
 ##   an old save's answer is quoted under pseudolocalization.
@@ -470,7 +470,7 @@ func _check_english_glyphs() -> void:
 	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\\n]|\\\\.)*)\"")
 	var characters: String = ""
 	for dir: String in TEXT_DIRS:
-		for path: String in _files_under(dir, ["gd", "tscn"]):
+		for path: String in files_under(dir, ["gd", "tscn"]):
 			for line: String in FileAccess.get_file_as_string(path).split("\n"):
 				var code: String = line.get_slice("#", 0) if path.ends_with(".gd") else line
 				for found: RegExMatch in literal.search_all(code):
@@ -486,17 +486,6 @@ func _check_english_glyphs() -> void:
 	bare.data = FileAccess.get_file_as_bytes(ROBOTO_FILE)
 	for px: int in [12, 14, 16, 17, 20, 23, 28, 40]:
 		_check(roboto.get_height(px) == bare.get_height(px), "Roboto with its symbols fallback keeps its own line height at %d px (%.0f, bare %.0f)" % [px, roboto.get_height(px), bare.get_height(px)])
-
-
-## Every file under [param dir] (at any depth) whose extension is in [param extensions], as res:// paths.
-func _files_under(dir: String, extensions: Array[String]) -> Array[String]:
-	var found: Array[String] = []
-	for file: String in DirAccess.get_files_at(dir):
-		if file.get_extension() in extensions:
-			found.append(dir.path_join(file))
-	for sub: String in DirAccess.get_directories_at(dir):
-		found.append_array(_files_under(dir.path_join(sub), extensions))
-	return found
 
 
 ## The text [param code] must draw: its picker name, its machine-translation tag, and every message of
@@ -651,6 +640,7 @@ func _hud_catalog() -> Translation:
 	var catalog: Translation = Translation.new()
 	catalog.locale = UNSHIPPED_TEST_LANGUAGE
 	catalog.add_message("%s: talk to WOLF about the relay.", "%s: habla con WOLF del relé.")
+	catalog.add_message("Talk to WOLF", "habla con WOLF")
 	catalog.add_message("%s: crank the manual bypass, %d of %d.", "%s: gira el bypass manual, %d de %d.")
 	catalog.add_message("HOLD %s", "MANTÉN %s")
 	catalog.add_message("The safe point could not save. Press %s here again.", "No se pudo guardar. Pulsa %s otra vez aquí.")
@@ -676,13 +666,14 @@ func _check_key_prompts() -> void:
 	var catalog: Translation = _hud_catalog()
 	TranslationServer.add_translation(catalog)
 	var talk: String = HudText.key("%s: talk to WOLF about the relay.", [HudText.USE])
-	var crank: String = HudText.key("%s: crank the manual bypass, %d of %d.", [HudText.HOLD_USE, 3, 8])
+	var held: StringName = &"HOLD E" # An arbitrary test token; production station pills have no held-key token.
+	var crank: String = HudText.key("%s: crank the manual bypass, %d of %d.", [held, 3, 8])
 	var save: String = HudText.key("The safe point could not save. Press %s here again.", [HudText.USE], "The safe point could not save. Tap USE here again.")
 	var broken: String = HudText.key("%s: save at the safe point.", [HudText.USE])
 	var named: String = HudText.key("%s waits.", ["E"])
 	_check(talk == "E: talk to WOLF about the relay." and crank == "HOLD E: crank the manual bypass, 3 of 8." and save == "The safe point could not save. Press E here again." and named == "E waits.", "key lines keep the English the game compared before (%s; %s; %s)" % [talk, crank, save])
 	I18n.apply(UNSHIPPED_TEST_LANGUAGE)
-	var keys: Dictionary = {HudText.USE: "F", HudText.HOLD_USE: I18n.fill("HOLD %s", ["F"])}
+	var keys: Dictionary = {HudText.USE: "F", held: I18n.fill("HOLD %s", ["F"])}
 	_check(HudText.localise(talk, keys, false) == "F: habla con WOLF del relé.", "the translated template gets the key after tr() (%s)" % HudText.localise(talk, keys, false))
 	_check(HudText.localise(crank, keys, false) == "MANTÉN F: gira el bypass manual, 3 de 8.", "the held key and the turn counts fill the translated template (%s)" % HudText.localise(crank, keys, false))
 	_check(HudText.localise(save, keys, false) == "No se pudo guardar. Pulsa F otra vez aquí." and HudText.localise(save, keys, true) == "No se pudo guardar. Toca USAR otra vez aquí.", "a line with a touch form reads it on touch and the key form elsewhere (%s; %s)" % [HudText.localise(save, keys, false), HudText.localise(save, keys, true)])
@@ -694,8 +685,8 @@ func _check_key_prompts() -> void:
 
 
 ## The HUD in a game (PR L7b), with [method _hud_catalog] for [constant UNSHIPPED_TEST_LANGUAGE]: in the
-## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another, and the first box's
-## prompt fills its key into the translated template; in play the top card, the tutorial and the hint
+## opening the touch button's CONTINUE reads its own context's word while the title's CONTINUE keeps another,
+## with one continue cue; in play the top card, the tutorial and the hint
 ## (keyboard, then touch, where the key is the USE button's word) are translated, and switching back to
 ## English draws the top card in English again at once (NOTIFICATION_TRANSLATION_CHANGED).
 func _check_hud() -> void:
@@ -709,7 +700,7 @@ func _check_hud() -> void:
 	await process_frame
 	var hint: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	_check(game.touch_use.text == "SEGUIR" and String(TranslationServer.translate("CONTINUE")) == "CONTINUAR", "the touch button's CONTINUE has its own context, apart from the title's (%s)" % game.touch_use.text)
-	_check(hint.text.begins_with("E  SEGUIR\n"), "the opening's first prompt fills its key into the translated template (%s)" % hint.text.c_escape())
+	_check(not game.context_hint.visible and game.dialogue_continue.visible, "the opening keeps its continue cue without a duplicate translated instruction panel")
 	game.call("_finish_intro")
 	await process_frame
 	game.call("_refresh_ui")
@@ -724,11 +715,11 @@ func _check_hud() -> void:
 	game.tutorial_step = 2
 	game.human.position.x = 350.0
 	game.call("_refresh_ui")
-	if _check(str(game.call("_context_hint")) == "E: talk to WOLF about the relay.", "at the breaker the hint is still the English line (%s)" % game.call("_context_hint")):
-		_check(hint.text == "E: habla con WOLF del relé.", "the hint draws translated with the key (%s)" % hint.text)
+	if _check(str(game.call("_context_hint")) == "Talk to WOLF", "at the breaker the hint is still the English line (%s)" % game.call("_context_hint")):
+		_check(hint.text == "habla con WOLF", "the short action label translates independently of the binding (%s)" % hint.text)
 		game.touch_enabled = true
 		game.call("_refresh_ui")
-		_check(hint.text == "USAR: habla con WOLF del relé." and game.touch_use.text == "USAR", "on touch the hint's key is the USE button's translated word (%s)" % hint.text)
+		_check(hint.text == "habla con WOLF" and not game.context_hint_glyph.visible, "touch keeps the translated action label without a binding glyph (%s)" % hint.text)
 		game.touch_enabled = false
 	await end_game(game)
 	I18n.forget(catalog)
@@ -883,8 +874,8 @@ func _check_touch_words(code: String, game: Main) -> void:
 ## Every short message of [param code]'s catalogs (HUD_MESSAGE_CHARS or fewer characters, no BBCode),
 ## or under I18n.PSEUDO of the committed translation template (every message the game marks, each
 ## padded 30%), filled with sample inserts ([method _sample_inserts]) as the HUD fills it, drawn where the
-## HUD draws its lines: the hint bar at the keyboard and the touch widths (via the game's own
-## _set_dialogue, which sizes it) and the top card. Each may take at most one row more than its English
+## HUD draws its lines: actual hint templates at the keyboard and touch widths (via the game's own
+## _set_dialogue, which sizes it), and every short message in the top card. Each may take at most one row more than its English
 ## in the same Label, and never more than HUD_MAX_ROWS rows: the hint bar and the card grow with their
 ## rows, so a translation cannot overflow them, but it can push them over the room (PR L9 review: the
 ## HUD hints need the fit check). English is the baseline and is not judged itself; the HUD's labels
@@ -905,14 +896,27 @@ func _check_hud_rows(code: String, game: Main) -> void:
 			if msgid.length() <= HUD_MESSAGE_CHARS and not msgid.contains("[") and not messages.has(msgid):
 				messages.append(msgid)
 	_check(messages.size() > 100, "%s: the HUD row check reads the language's catalog (%d short messages)" % [code, messages.size()])
+	# Dialogue paragraphs use pagination, not the hint bar. Read hint candidates from their actual
+	# producer and its named constants so new hints join this check without a second string list.
+	var main_source: String = game.get_script().source_code
+	_check(main_source.contains("func _context_hint()") and main_source.contains("func _objective()"), "the hint row check finds its source boundaries")
+	var hint_source: String = main_source.get_slice("func _context_hint()", 1).get_slice("func _objective()", 0).c_unescape()
+	var constants: Dictionary = game.get_script().get_script_constant_map()
+	for name: String in constants:
+		if name.ends_with("_HINT") and constants[name] is String:
+			hint_source += "\n" + str(constants[name])
 	var widest: int = 0
+	var hint_count: int = 0
 	for touch: bool in [false, true]:
 		game.touch_enabled = touch
 		for msgid: String in messages:
 			var inserts: Array = _sample_inserts(msgid)
 			var english: String = msgid % inserts if not inserts.is_empty() else msgid
 			var shown: String = I18n.fill(msgid, inserts)
-			var targets: Array[Label] = [game.context_hint_text]
+			var targets: Array[Label] = []
+			if hint_source.contains(msgid):
+				targets.append(game.context_hint_text)
+				hint_count += 1
 			if not touch:
 				targets.append(game.hud)
 			for label: Label in targets:
@@ -926,6 +930,8 @@ func _check_hud_rows(code: String, game: Main) -> void:
 				widest = maxi(widest, rows[1])
 				var where: String = ("touch hint bar" if touch else "hint bar") if label == game.context_hint_text else "top card"
 				_check(rows[1] <= mini(rows[0] + 1, HUD_MAX_ROWS) or rows[1] <= rows[0], "%s, %s: %s takes %d rows (English %d)" % [code, where, shown.c_escape().left(70), rows[1], rows[0]])
+	# At least thirty real hint templates per input width guards against an empty or wrong source slice.
+	_check(hint_count >= 60, "%s: actual hint templates are measured at both input widths (%d)" % [code, hint_count])
 	game.touch_enabled = false
 	game.call("_refresh_ui")
 	print("%s: %d HUD messages laid out; the most rows any took: %d" % [code, messages.size(), widest])
@@ -1036,7 +1042,7 @@ func _check_story_lines() -> void:
 ## compares, so it is what the source marks): every message of StoryText.messages() and every story
 ## line written in place is in it with its `story` mark; every piece of the lines a speaker says (cut
 ## at the tags as the boxes cut them) is a message of StoryText; no msgid opens with a speaker's tag; each
-## of the inventory's 26 gender-risk lines (STRINGS.md) carries an engineer= mark, and WOLF's three
+## of the current 25 gender-risk lines (STRINGS.md) carries an engineer= mark, and WOLF's three
 ## checkpoint callbacks slot=choice as well; the name card and the callbacks keep their breaks.
 func _check_story_marks() -> void:
 	var pot: Dictionary = template_notes()
@@ -1057,9 +1063,9 @@ func _check_story_marks() -> void:
 		_check(story.has(row.get_slice("  ", 0)) and story.has(row.substr(row.find("  ") + 2)), "the end-card row \"%s\" is a topic and words of StoryText" % row)
 	for msgid: String in pot:
 		_check(not (msgid.begins_with("WOLF: ") or msgid.begins_with("DIRECTOR: ") or msgid.begins_with("DIRECTOR / PURGE: ")), "no msgid holds a speaker's tag (\"%s\")" % msgid.c_escape())
-	var gender: Array[String] = [JunctionRoom.VENT_REASON, JunctionRoom.BLAST_REASON, JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON, JunctionRoom.CLOUD_REASON, Main.BYPASS_RELEASED_LINE, Main.BYPASS_OFFER_HINT, Main.RECAP_RELAY_COOPERATE_WORDS, Main.RECAP_RELAY_DISCLOSE_BYPASS_WORDS, Main.RECAP_RELAY_PRESS_WORDS, Main.RECAP_MIRROR_MANUAL_WORDS, Main.RECAP_LANE_REFUSED_WORDS, Main.RECAP_LANE_ALONE_WORDS, Main.RECAP_LANE_BROKE_OFF_WORDS, Main.RUBBLE_LINE, Main.BAIT_YES_WORDS, Main.BAIT_NO_WORDS, Main.SENTRY_LOCK_LINE, Main.SENTRY_LOST_LINE, "Thank you for telling me. I'll take the relay. Arm the breaker.", "I took the relay because you told me the truth.", "I offered the relay; you cranked the bypass. Still with you.", "%s\nMAINTENANCE ENGINEER"]
+	var gender: Array[String] = [JunctionRoom.VENT_REASON, JunctionRoom.BLAST_REASON, JunctionRoom.SENTRY_REASON, JunctionRoom.SENTRY_CHASED_REASON, JunctionRoom.CLOUD_REASON, Main.BYPASS_RELEASED_LINE, Main.RECAP_RELAY_COOPERATE_WORDS, Main.RECAP_RELAY_DISCLOSE_BYPASS_WORDS, Main.RECAP_RELAY_PRESS_WORDS, Main.RECAP_MIRROR_MANUAL_WORDS, Main.RECAP_LANE_REFUSED_WORDS, Main.RECAP_LANE_ALONE_WORDS, Main.RECAP_LANE_BROKE_OFF_WORDS, Main.RUBBLE_LINE, Main.BAIT_YES_WORDS, Main.BAIT_NO_WORDS, Main.SENTRY_LOCK_LINE, Main.SENTRY_LOST_LINE, "Thank you for telling me. I'll take the relay. Arm the breaker.", "I took the relay because you told me the truth.", "I offered the relay; you cranked the bypass. Still with you.", "%s\nMAINTENANCE ENGINEER"]
 	gender.append_array(CALLBACKS)
-	_check(gender.size() == 26, "the inventory's 26 gender-risk lines are listed (%d)" % gender.size())
+	_check(gender.size() == 25, "the current 25 gender-risk lines are listed (%d)" % gender.size())
 	for message: String in gender:
 		_check(pot.has(message) and template_marks(pot[message]).has("engineer"), "the gender-risk line \"%s\" has an engineer= mark" % message.c_escape())
 	for message: String in CALLBACKS:

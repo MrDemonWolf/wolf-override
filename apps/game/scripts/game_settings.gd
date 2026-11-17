@@ -1,6 +1,6 @@
 class_name GameSettings
 extends Control
-## The Settings menu, shared by the title and Pause: its DISPLAY, AUDIO, CONTROLS and GENERAL tabs, built
+## The Settings menu, shared by the title and Pause: its DISPLAY, AUDIO, CONTROLS, ACCESSIBILITY and GENERAL tabs, built
 ## in code by [method configure] from the saved settings file, which every change writes back at once
 ## ([method _save_extra]). GENERAL holds LANGUAGE (localization PR L6, decision D10) and stays hidden
 ## while the game offers one language.
@@ -14,21 +14,23 @@ extends Control
 const BODY_FONT: FontVariation = preload("res://assets/fonts/Roboto-Regular.tres")
 const CONTROL_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Semibold.tres")
 const HEADING_FONT: FontVariation = preload("res://assets/fonts/Montserrat-Bold.tres")
-const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game"]
+const ACTIONS: Array[StringName] = [&"move_left", &"move_right", &"interact", &"choice_1", &"choice_2", &"pause_game", &"show_objective"]
 ## The display name of each of [constant ACTIONS], in its order: English, translated where it is drawn
 ## (the CONTROLS rows auto-translate; the notes call tr()). A static var rather than a const only so the
 ## names can carry the I18n.KEY.tr() marks the translation template is extracted from (a const
 ## initialiser cannot call a method).
-static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr("Move right"), I18n.KEY.tr("Interact / continue"), I18n.KEY.tr("Response 1"), I18n.KEY.tr("Response 2"), I18n.KEY.tr("Pause")]
+static var ACTION_NAMES: Array[String] = [I18n.KEY.tr("Move left"), I18n.KEY.tr("Move right"), I18n.KEY.tr("Interact / continue"), I18n.KEY.tr("Response 1"), I18n.KEY.tr("Response 2"), I18n.KEY.tr("Pause"), I18n.KEY.tr("Show objective")]
+## Spoken face-button names follow physical SDL positions; Steam uses the Xbox letter fallback.
+static var PAD_FACE_NAMES: Dictionary = {&"xbox": ["A", "B", "X", "Y"], &"playstation": [I18n.KEY.tr("Cross"), I18n.KEY.tr("Circle"), I18n.KEY.tr("Square"), I18n.KEY.tr("Triangle")], &"nintendo": ["B", "A", "Y", "X"]}
 ## Display names of the other actions a rebind can clash with (Main's _install_inputs), so the "Already
 ## used by" note never shows an id. The English is the id with "_" as a space, as the note showed before.
 static var OTHER_ACTION_NAMES: Dictionary = {&"cycle_name": I18n.KEY.tr("cycle name")}
 ## The AudioServer buses Settings controls, by id: the ids are the settings file's [audio] keys and the
 ## bus names, never shown.
-const BUSES: Array[String] = ["Master", "Music", "Effects", "Voice"]
+const BUSES: Array[String] = ["Master", "Effects"]
 ## The AUDIO row caption of each of [constant BUSES], in its order (a display name, not the bus id; a
 ## static var for the marks, like ACTION_NAMES).
-static var BUS_CAPTIONS: Array[String] = [I18n.KEY.tr("Master volume"), I18n.KEY.tr("Music volume"), I18n.KEY.tr("Effects volume"), I18n.KEY.tr("Voice volume")]
+static var BUS_CAPTIONS: Array[String] = [I18n.KEY.tr("Master volume"), I18n.KEY.tr("Effects volume")]
 ## Display servers whose DisplayServer.keyboard_get_label_from_physical reads the active keyboard layout
 ## (Godot 4.7.2: DisplayServerX11, DisplayServerWayland, DisplayServerWindows, DisplayServerMacOSBase).
 ## Every other one (headless, Android, iOS, the web) has only the base version, which logs "Not supported
@@ -56,15 +58,17 @@ const DEFAULT_WINDOW_SIZE: int = 1
 ## tablets, where the OS sizes the window; the V-sync sentence applies everywhere.
 const MOBILE_WINDOW_NOTE: String = "Window size is OS-managed on mobile."
 const VSYNC_NOTE: String = "V-sync may limit the FPS cap."
-## The GENERAL tab's index, after the three older tabs so their indices (which the parity capture, the UI
-## dump and the tests use) stay as they were while the tab is hidden (PR L6).
-const GENERAL_TAB: int = 3
+## GENERAL follows ACCESSIBILITY; callers use this index so hiding the language tab keeps page order.
+const GENERAL_TAB: int = 4
 ## The "machine translation" tag's size (px), under a name in the open list and under the LANGUAGE row:
 ## smaller than the 16 px names, so the name row keeps its width (DESIGN.md, "Settings").
 const TAG_FONT_PX: int = 12
 ## The muted blue-grey of secondary text in this menu: the THE DEN / LOCAL CONFIGURATION subtitle, and
 ## since PR L6 the "machine translation" tags, which read as notes beside the names.
 const MUTED_TEXT: Color = Color("#89acbf")
+
+## Visible-menu input reaches the same owner even when rebinding consumes it.
+signal input_seen(event: InputEvent)
 
 ## Reduced Motion changed; Main hands it to the impact kit (no shake or hit-stop, shorter flashes).
 signal reduced_motion_changed(enabled: bool)
@@ -75,10 +79,19 @@ signal text_size_changed(factor: float)
 
 var settings_path: String
 var tabs: TabBar
+var tab_rail: ScrollContainer
+var tab_buttons: Array[Button] = []
+var rows: Array[BoxContainer] = []
+var surface: Panel
+var subtitle: Label
 var vsync: CheckButton
 var antialiasing: OptionButton
 var reduced_motion: CheckButton
 var text_size: OptionButton
+## Reading preferences share the existing saved Settings file; index 3 reveals instantly.
+var text_speed: OptionButton
+var auto_advance: CheckButton
+var dialogue_backing: HSlider
 ## LANGUAGE on the GENERAL tab: one item per offered language, named in its own language (never
 ## translated), each item's metadata its I18n code; an unreviewed language's tag follows as a labelled
 ## separator, so it is a second, smaller row nobody can select.
@@ -93,7 +106,6 @@ var hold_toggle: CheckButton
 var cancel_button: Button
 var capture_action: StringName = &""
 var capture_kind: String = ""
-var display_nodes: Array[CanvasItem] = []
 var pages: Array[Control] = []
 ## A phone or tablet build (iOS or Android): the window is the OS's, and the Display note says so.
 var mobile: bool = OS.has_feature("ios") or OS.has_feature("android")
@@ -106,6 +118,8 @@ var _pad_prompts: Dictionary = {}
 ## NOTIFICATION_TRANSLATION_CHANGED: the notification reaches Main before this child, so Main's own
 ## handler (Pause's hint) would still read the old language's names.
 var _prompts_language: String = ""
+## Cached presentation identity from Main's shared InputMode; never a saved input mapping.
+var _controller_family: StringName = &"xbox"
 ## The language the player picked (or the file held), written back as [general] language; "" while
 ## none was chosen, so the game keeps following the OS (DESIGN.md: no "follow the system" entry; the
 ## first run follows the OS, and a pick is kept).
@@ -139,6 +153,9 @@ func configure(path: String) -> void:
 	refresh_languages()
 	TextSize.factor = TextSize.nearest_step(number(config, "video", "text_size", 1.0))
 	text_size.select(TextSize.STEPS.find(TextSize.factor))
+	text_speed.select(clampi(int(number(config, "dialogue", "text_speed", 1)), 0, 3))
+	auto_advance.set_pressed_no_signal(boolean(config, "dialogue", "auto_advance", false))
+	dialogue_backing.set_value_no_signal(clampf(number(config, "dialogue", "backing", UiTokens.number("dialogue.backing")), 0.0, 1.0))
 	_apply_graphics()
 	for bus: String in BUSES:
 		if AudioServer.get_bus_index(bus) < 0:
@@ -158,7 +175,7 @@ func configure(path: String) -> void:
 			var saved: Variant = config.get_value("bindings", "%s_%s" % [action, kind], {})
 			if saved is Dictionary:
 				var event: InputEvent = _decode_binding(saved)
-				if event != null and _event_kind(event) == kind:
+				if event != null and InputMode.binding_kind(event) == kind:
 					_replace_binding(action, kind, event)
 					overrides["%s_%s" % [action, kind]] = [action, kind, event]
 	# Validate the whole loaded map so legitimate key swaps are preserved.
@@ -168,10 +185,10 @@ func configure(path: String) -> void:
 			var entry: Array = overrides[key]
 			if not _binding_conflict(entry[0], entry[2]).is_empty():
 				for old: InputEvent in InputMap.action_get_events(entry[0]):
-					if _event_kind(old) == entry[1]:
+					if InputMode.binding_kind(old) == entry[1]:
 						InputMap.action_erase_event(entry[0], old)
 				for original: InputEvent in defaults[entry[0]]:
-					if _event_kind(original) == entry[1]:
+					if InputMode.binding_kind(original) == entry[1]:
 						InputMap.action_add_event(entry[0], original)
 				overrides.erase(key)
 				rejected = true
@@ -260,19 +277,17 @@ static func apply_saved_window(window: Window, config: ConfigFile) -> void:
 		window.mode = Window.MODE_FULLSCREEN
 
 
-## Builds every control of the menu in code, once, from configure: the backdrop panel, the tab bar and
-## the four pages (DISPLAY, AUDIO, CONTROLS, GENERAL), the note under the tabs and CANCEL REBIND. Each
-## control is connected to apply its change and save the file at once (_save_extra). Positions are
-## menu px.
+## Builds the backdrop, tabs, five scrolling pages, note and CANCEL REBIND once from configure. Each
+## control is connected to apply its change and save the file at once (_save_extra).
 func _build_menu() -> void:
-	var surface: Panel = Panel.new()
+	surface = Panel.new()
 	surface.position = Vector2(24, 126)
 	surface.size = Vector2(712, 240)
 	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	surface.theme_type_variation = &"TerminalPanel"
 	add_child(surface)
 	move_child(surface, 0)
-	var subtitle: Label = _label(I18n.KEY.tr("THE DEN  /  LOCAL CONFIGURATION"), 13)
+	subtitle = _label(I18n.KEY.tr("THE DEN  /  LOCAL CONFIGURATION"), 13)
 	subtitle.position = Vector2(34, 15)
 	subtitle.modulate = MUTED_TEXT
 	subtitle.add_theme_font_override("font", CONTROL_FONT)
@@ -284,83 +299,60 @@ func _build_menu() -> void:
 	tabs.theme_type_variation = &"TerminalTabBar"
 	tabs.position = Vector2(32, 81)
 	tabs.size = Vector2(696, 38)
-	for caption: String in [I18n.KEY.tr("DISPLAY"), I18n.KEY.tr("AUDIO"), I18n.KEY.tr("CONTROLS"), I18n.KEY.tr("GENERAL")]:
+	for caption: String in [I18n.KEY.tr("DISPLAY"), I18n.KEY.tr("AUDIO"), I18n.KEY.tr("CONTROLS"), I18n.KEY.tr("ACCESSIBILITY"), I18n.KEY.tr("GENERAL")]:
 		tabs.add_tab(caption)
 	add_child(tabs)
 	tabs.tab_changed.connect(select_tab)
-	var display: Control = Control.new()
-	display.position = Vector2(32, 126)
-	display.size = Vector2(696, 240)
-	add_child(display)
-	pages.append(display)
-	for node_name: String in ["FPSLabel", "FPSOptions", "ResolutionLabel", "ResolutionOptions", "FullscreenToggle"]:
-		display_nodes.append(get_node(node_name) as CanvasItem)
-	$FPSLabel.position = Vector2(40, 144)
-	$FPSOptions.position = Vector2(215, 138)
-	$ResolutionLabel.position = Vector2(40, 206)
-	$ResolutionOptions.position = Vector2(215, 200)
-	$FullscreenToggle.position = Vector2(40, 260)
+	var display: VBoxContainer = _page_box()
+	pages.append(display.get_parent().get_parent())
+	for row: Array in [["FPSOptions", I18n.KEY.tr("FPS LIMIT")], ["ResolutionOptions", I18n.KEY.tr("WINDOW SIZE")], ["FullscreenToggle", ""]]:
+		var control: Control = get_node(row[0]) as Control
+		_control_row(display, control, row[1])
 	vsync = CheckButton.new()
 	vsync.text = "V-SYNC"
-	vsync.position = Vector2(404, 14)
-	vsync.size = Vector2(272, 44)
-	display.add_child(vsync)
+	_control_row(display, vsync)
 	vsync.disabled = DisplayServer.get_name() == "headless"
 	vsync.toggled.connect(func(_value: bool) -> void: _apply_graphics(); _save_extra())
-	antialiasing = _option_row(display, I18n.KEY.tr("EDGE SMOOTHING"), Rect2(410, 77, 0, 0), Rect2(410, 111, 270, 42), [I18n.KEY.tr("OFF"), I18n.KEY.tr("2× MSAA"), I18n.KEY.tr("4× MSAA"), I18n.KEY.tr("8× MSAA")])
+	antialiasing = _option_row(display, I18n.KEY.tr("EDGE SMOOTHING"), [I18n.KEY.tr("OFF"), I18n.KEY.tr("2× MSAA"), I18n.KEY.tr("4× MSAA"), I18n.KEY.tr("8× MSAA")])
 	antialiasing.item_selected.connect(func(_index: int) -> void: _apply_graphics(); _save_extra())
+	var accessibility: VBoxContainer = _page_box()
 	reduced_motion = CheckButton.new()
 	reduced_motion.text = "REDUCED MOTION"
 	reduced_motion.tooltip_text = "No camera shake or hit-stop; screen flashes are shorter."
-	reduced_motion.position = Vector2(404, 154)
-	reduced_motion.size = Vector2(272, 40)
-	display.add_child(reduced_motion)
+	_control_row(accessibility, reduced_motion)
 	reduced_motion.toggled.connect(func(value: bool) -> void: reduced_motion_changed.emit(value); _save_extra())
 	# TEXT SIZE scales the play HUD's words and the station names, 100% to 200% (TextSize).
 	var size_captions: Array[String] = []
 	for step: float in TextSize.STEPS:
 		size_captions.append("%d%%" % roundi(step * 100.0))
-	text_size = _option_row(display, I18n.KEY.tr("TEXT SIZE"), Rect2(410, 198, 100, 40), Rect2(520, 196, 160, 40), size_captions)
+	text_size = _option_row(accessibility, I18n.KEY.tr("TEXT SIZE"), size_captions)
 	text_size.tooltip_text = "Scales the dialogue, hints, cards and station names."
 	text_size.item_selected.connect(func(index: int) -> void: TextSize.factor = TextSize.STEPS[index]; text_size_changed.emit(TextSize.factor); _save_extra())
+	text_speed = _option_row(accessibility, I18n.KEY.tr("TEXT SPEED"), [I18n.KEY.tr("Slow"), I18n.KEY.tr("Normal"), I18n.KEY.tr("Fast"), I18n.KEY.tr("Instant")])
+	text_speed.item_selected.connect(func(_index: int) -> void: _save_extra())
+	auto_advance = CheckButton.new()
+	auto_advance.text = "AUTO-ADVANCE"
+	_control_row(accessibility, auto_advance)
+	auto_advance.toggled.connect(func(_enabled: bool) -> void: _save_extra())
+	dialogue_backing = _slider_row(accessibility, I18n.KEY.tr("DIALOGUE BACKING"), 0.0, 1.0, 0.05)
+	dialogue_backing.value_changed.connect(func(_value: float) -> void: _save_extra())
 	var audio: VBoxContainer = _page_box()
-	pages.append(audio)
+	pages.append(audio.get_parent().get_parent())
 	for index: int in BUSES.size():
 		var bus: String = BUSES[index]
 		var slider: HSlider = _slider_row(audio, BUS_CAPTIONS[index], 0, 100, 1)
 		volumes[bus] = slider
 		slider.value_changed.connect(func(value: float) -> void: _apply_volume(bus, value); _save_extra())
-	var controls_scroll: ScrollContainer = ScrollContainer.new()
-	controls_scroll.position = Vector2(40, 128)
-	controls_scroll.size = Vector2(680, 234)
-	controls_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	controls_scroll.follow_focus = true
-	add_child(controls_scroll)
-	pages.append(controls_scroll)
-	var controls: VBoxContainer = VBoxContainer.new()
-	controls.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	controls.add_theme_constant_override("separation", 6)
-	controls_scroll.add_child(controls)
-	var header: HBoxContainer = HBoxContainer.new()
-	controls.add_child(header)
-	for index: int in 3:
-		var column: Label = _label([I18n.KEY.tr("ACTION"), I18n.KEY.tr("KEYBOARD"), I18n.KEY.tr("CONTROLLER")][index], 14)
-		column.custom_minimum_size.x = 220 if index == 0 else 206
-		header.add_child(column)
-	for index: int in ACTIONS.size():
-		var row: HBoxContainer = HBoxContainer.new()
-		controls.add_child(row)
-		var caption: Label = _label(ACTION_NAMES[index], 16)
-		caption.custom_minimum_size.x = 220
-		row.add_child(caption)
-		for kind: String in ["keyboard", "controller"]:
+	var controls: VBoxContainer = _page_box()
+	pages.append(controls.get_parent().get_parent())
+	for kind: String in ["keyboard", "controller"]:
+		controls.add_child(_label(I18n.KEY.tr("KEYBOARD") if kind == "keyboard" else I18n.KEY.tr("CONTROLLER"), 14))
+		for index: int in ACTIONS.size():
 			var button: Button = Button.new()
-			# Key and button names are translated as they are worked out (_refresh_bindings), so the
-			# button must not translate them again.
+			# Binding names are already translated by _refresh_bindings.
 			button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-			button.custom_minimum_size = Vector2(206, 48)
-			button.add_theme_font_size_override("font_size", 15)
-			row.add_child(button)
+			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			_control_row(controls, button, ACTION_NAMES[index])
 			var action: StringName = ACTIONS[index]
 			binding_buttons["%s_%s" % [action, kind]] = button
 			button.pressed.connect(begin_capture.bind(action, kind))
@@ -378,14 +370,11 @@ func _build_menu() -> void:
 	reset.custom_minimum_size.y = 40
 	controls.add_child(reset)
 	reset.pressed.connect(reset_controls)
+	pages.append(accessibility.get_parent().get_parent())
 	_build_general_page()
 	$Title.size.x = 690
 	$BackButton.position = Vector2(32, 414)
 	$BackButton.size = Vector2(180, 38)
-	# Two rows of the 15 px note (about 38 px) fit above BACK at y 414, so a translated note that wraps
-	# is not cut (localization PR L8).
-	note.position = Vector2(40, 372)
-	note.size = Vector2(680, 40)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	# The note is often filled in (an action's name, the Display note's two sentences), so show_note
 	# translates it and the Label must not translate it again.
@@ -399,21 +388,29 @@ func _build_menu() -> void:
 	cancel_button.hide()
 	add_child(cancel_button)
 	cancel_button.pressed.connect(cancel_capture)
+	var rail: VBoxContainer = _page_box()
+	tab_rail = rail.get_parent().get_parent() as ScrollContainer
+	rail.add_theme_constant_override("separation", 8)
+	for index: int in tabs.tab_count:
+		var button: Button = Button.new()
+		button.text = tabs.get_tab_title(index)
+		button.custom_minimum_size.y = 48
+		button.toggle_mode = true
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.pressed.connect(select_tab.bind(index))
+		rail.add_child(button)
+		tab_buttons.append(button)
+	layout_for_device()
 
 
-## The GENERAL page (pages[GENERAL_TAB]), laid out like DISPLAY's left column: the LANGUAGE caption, its
+## The GENERAL page (pages[GENERAL_TAB]), using the shared scrolling rows: the LANGUAGE caption, its
 ## list and the tag note under it. The list and the note draw with I18n.picker_font, so every name and
 ## tag draws in any language, and never translate (I18n.OWN_LANGUAGE_META marks them for the pseudo
 ## audit). [method refresh_languages] fills the list.
 func _build_general_page() -> void:
-	var general: Control = Control.new()
-	general.position = Vector2(32, 126)
-	general.size = Vector2(696, 240)
-	add_child(general)
-	pages.append(general)
-	# The list takes the longest name's width (fit_to_longest_item), at least 300 px: "Español
-	# (Latinoamérica)" is about 250 px, the width DISPLAY could not give (D10).
-	language = _option_row(general, I18n.KEY.tr("LANGUAGE"), Rect2(8, 12, 160, 40), Rect2(183, 12, 300, 40), [])
+	var general: VBoxContainer = _page_box()
+	pages.append(general.get_parent().get_parent())
+	language = _option_row(general, I18n.KEY.tr("LANGUAGE"), [])
 	var font: FontVariation = I18n.picker_font(CONTROL_FONT)
 	language.add_theme_font_override(&"font", font)
 	var popup: PopupMenu = language.get_popup()
@@ -424,8 +421,7 @@ func _build_general_page() -> void:
 	for side: StringName in [&"labeled_separator_left", &"labeled_separator_right"]:
 		popup.add_theme_stylebox_override(side, StyleBoxEmpty.new())
 	language_note = _label("", TAG_FONT_PX)
-	language_note.position = Vector2(183, 56)
-	language_note.size = Vector2(300, 20)
+	language_note.custom_minimum_size.y = 20
 	language_note.modulate = MUTED_TEXT
 	language_note.add_theme_font_override(&"font", font)
 	general.add_child(language_note)
@@ -449,6 +445,7 @@ func refresh_languages() -> void:
 		if not tag.is_empty():
 			language.add_separator(tag)
 	tabs.set_tab_hidden(GENERAL_TAB, offered.size() < 2)
+	tab_buttons[GENERAL_TAB].visible = offered.size() >= 2
 	_show_language()
 
 
@@ -485,19 +482,51 @@ func _notification(what: int) -> void:
 		_show_language()
 		_refresh_bindings()
 		_show_translated_note()
+		call_deferred("layout_for_device")
 
 
-## A page laid out as a column of rows (AUDIO's four volume rows): 680 px wide from (40, 138), as tall
-## as those four 48 px rows and their three 12 px gaps (228 px), so the column fits the rect it is
-## given and the overflow check (I18n.overflows) judges it by a true size; it ends at y 366, above the
-## note at 372.
+## A shared scrolling Settings page at (40, 128), 680×234 canvas px; returns its row column.
+## The caller adds the enclosing ScrollContainer to pages in tab order; padding keeps focus motion clear.
 func _page_box() -> VBoxContainer:
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.position = Vector2(40, 128)
+	scroll.size = Vector2(680, 234)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	add_child(scroll)
+	var margin: MarginContainer = MarginContainer.new()
+	margin.name = "PageMargin"
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for side: String in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 8)
+	scroll.add_child(margin)
 	var box: VBoxContainer = VBoxContainer.new()
-	box.position = Vector2(40, 138)
-	box.size = Vector2(680, 228)
+	box.name = "Rows"
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 12)
-	add_child(box)
+	margin.add_child(box)
 	return box
+
+
+## Adds a 48 canvas px row to parent, with an optional shared-width label and an expanding control.
+## Existing controls are reparented, so their bindings, signals and saved preferences stay intact.
+func _control_row(parent: Control, control: Control, caption: String = "") -> BoxContainer:
+	var row: BoxContainer = BoxContainer.new()
+	row.custom_minimum_size.y = 48
+	parent.add_child(row)
+	rows.append(row)
+	if not caption.is_empty():
+		var label: Label = _label(caption, 16)
+		label.custom_minimum_size.x = 220
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(label)
+	if control.get_parent() != null:
+		control.reparent(row)
+	else:
+		row.add_child(control)
+	control.custom_minimum_size.y = 48
+	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return row
 
 
 ## A new, unparented Label reading [param caption] at [param font_size] (px), centred vertically.
@@ -509,43 +538,26 @@ func _label(caption: String, font_size: int) -> Label:
 	return label
 
 
-## A captioned drop-down on [param page]: a 16 px label reading [param caption] at
-## [param label_rect]'s position (and at its size, unless that is zero, when the label keeps its own),
-## then an OptionButton at [param option_rect] (page px) holding [param items] in order, label first in
-## the tree. Returns the OptionButton; the caller connects it and sets anything else. The DISPLAY
-## page's EDGE SMOOTHING and TEXT SIZE rows and the GENERAL page's LANGUAGE row are made with it.
-func _option_row(page: Control, caption: String, label_rect: Rect2, option_rect: Rect2, items: Array[String]) -> OptionButton:
-	var label: Label = _label(caption, 16)
-	label.position = label_rect.position
-	if label_rect.size != Vector2.ZERO:
-		label.size = label_rect.size
-	page.add_child(label)
+## Adds a labelled option row to page, holding items in order; returns its OptionButton.
+func _option_row(page: Control, caption: String, items: Array[String]) -> OptionButton:
 	var option: OptionButton = OptionButton.new()
-	option.position = option_rect.position
-	option.size = option_rect.size
+	_control_row(page, option, caption)
 	for item: String in items:
 		option.add_item(item)
-	page.add_child(option)
 	return option
 
 
 ## Adds a row to [param parent]: a 220 px caption, an HSlider from [param minimum] to [param maximum] in
 ## [param step]s, and a label showing the value as a percentage (the value itself on a 0..100 slider,
 ## the value x 100 otherwise). Returns the slider; the caller connects it and sets its value.
-func _slider_row(parent: Node, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
-	var row: HBoxContainer = HBoxContainer.new()
-	row.custom_minimum_size.y = 48
-	parent.add_child(row)
-	var label: Label = _label(caption, 17)
-	label.custom_minimum_size.x = 220
-	row.add_child(label)
+func _slider_row(parent: Control, caption: String, minimum: float, maximum: float, step: float) -> HSlider:
 	var slider: HSlider = HSlider.new()
+	var row: BoxContainer = _control_row(parent, slider, caption)
 	slider.min_value = minimum
 	slider.max_value = maximum
 	slider.step = step
 	slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(slider)
 	var value_label: Label = _label("", 16)
 	value_label.custom_minimum_size.x = 64
 	row.add_child(value_label)
@@ -577,21 +589,96 @@ func apply_theme() -> void:
 	menu_theme.set_font("font", "TabBar", CONTROL_FONT)
 	menu_theme.set_font_size("font_size", "TabBar", 16)
 	theme = menu_theme
-	for label: Label in [$FPSLabel, $ResolutionLabel]:
-		label.add_theme_font_size_override("font_size", 16)
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	for button: Button in [$FPSOptions, $ResolutionOptions, $FullscreenToggle, $BackButton]:
-		button.add_theme_font_size_override("font_size", 16)
 
 
-## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 GENERAL) and its note, hiding the others,
+## Reflows the existing menu for mobile builds; desktop retains its horizontal tabs and footer.
+## Header and Back occupy separate rows, and the mobile rail scrolls without moving the page.
+func layout_for_device() -> void:
+	tabs.visible = not mobile
+	tab_rail.visible = mobile
+	subtitle.visible = not mobile
+	$Title.add_theme_font_size_override("font_size", TextSize.px(18 if mobile else 27))
+	$Title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	$Title.size = Vector2(size.x - 64, 0)
+	subtitle.size = Vector2(size.x - 64, 0)
+	$Title.position = Vector2(32, 16 if mobile else subtitle.position.y + subtitle.get_combined_minimum_size().y + 4)
+	var heading_bottom: float = $Title.position.y + $Title.get_combined_minimum_size().y
+	$BackButton.size = Vector2(180, maxf(TextSize.px(38), $BackButton.get_combined_minimum_size().y))
+	$BackButton.position = Vector2(size.x - 212, heading_bottom + 10) if mobile else Vector2(32, size.y - 12 - $BackButton.size.y)
+	cancel_button.size = Vector2(260, maxf(TextSize.px(38), cancel_button.get_combined_minimum_size().y))
+	cancel_button.position = Vector2(size.x - 292, size.y - 12 - cancel_button.size.y)
+	tabs.position.y = heading_bottom + 8
+	tabs.size.x = size.x - 64
+	tabs.size.y = maxf(TextSize.px(38), tabs.get_combined_minimum_size().y)
+	var top: float = $BackButton.position.y + $BackButton.size.y + 12 if mobile else tabs.position.y + tabs.size.y + 8
+	var bottom: float = minf(cancel_button.position.y, size.y - 12) if mobile else minf($BackButton.position.y, cancel_button.position.y)
+	# Fit whole translated words, rather than splitting long captions midway through a word.
+	# The 45% cap leaves the majority of the card for page controls; both columns still scroll.
+	var rail_width: float = 200
+	var rail_margin: MarginContainer = tab_rail.get_node("PageMargin") as MarginContainer
+	var rail_chrome: float = rail_margin.get_theme_constant("margin_left") + rail_margin.get_theme_constant("margin_right") + tab_rail.get_v_scroll_bar().get_combined_minimum_size().x
+	for button: Button in tab_buttons:
+		var font: Font = button.get_theme_font("font")
+		var padding: float = button.get_theme_stylebox("normal").get_minimum_size().x
+		for word: String in button.tr(button.text).split(" "):
+			rail_width = maxf(rail_width, ceilf(font.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, button.get_theme_font_size("font_size")).x + padding + rail_chrome) + 2)
+	rail_width = minf(rail_width, size.x * 0.45)
+	var body_left: float = 48 + rail_width if mobile else 40
+	var body: Rect2 = Rect2(body_left, top, size.x - body_left - 32, bottom - 12 - top)
+	tab_rail.position = Vector2(32, top)
+	tab_rail.size = Vector2(rail_width, body.size.y)
+	for page: Control in pages:
+		page.position = body.position
+		page.size = body.size
+		var margin: MarginContainer = page.get_node("PageMargin") as MarginContainer
+		for side: String in ["left", "right"]:
+			margin.add_theme_constant_override("margin_" + side, ceili(body.size.x * (UIMotion.LIFT_SCALE.x - 1.0) * 0.5) + 2)
+	surface.position = body.position - Vector2(8, 2)
+	surface.size = body.size + Vector2(16, 4)
+	for row: BoxContainer in rows:
+		row.vertical = TextSize.factor >= 1.5
+		if row.get_child(0) is Label:
+			(row.get_child(0) as Label).custom_minimum_size.x = 0 if row.vertical else (144 if mobile else 220)
+	for page: Control in pages:
+		UIMotion.follow_focus(page as ScrollContainer)
+	UIMotion.follow_focus(tab_rail)
+
+
+## Applies TEXT SIZE to Settings once from each control's authored font; reflows rows instead of shrinking text.
+func apply_text_size() -> void:
+	for control: Control in find_children("*", "Control", true, false):
+		if control is Label or control is BaseButton or control is TabBar:
+			if control != $Title:
+				TextSize.apply_control(control)
+		if control is OptionButton:
+			var option: OptionButton = control as OptionButton
+			option.fit_to_longest_item = false
+			option.get_popup().add_theme_font_size_override("font_size", TextSize.px(16))
+			option.get_popup().add_theme_font_size_override("font_separator_size", TextSize.px(TAG_FONT_PX))
+	layout_for_device()
+
+
+## The visible tab control to focus when opening or returning to Settings.
+func tab_focus_target() -> Control:
+	return tab_buttons[tabs.current_tab] if mobile else tabs
+
+
+## Shows page [param index] (0 DISPLAY, 1 AUDIO, 2 CONTROLS, 3 ACCESSIBILITY, 4 GENERAL) and its note, hiding the others,
 ## and cancels a rebind in progress. It does not move the tab bar, whose tab_changed calls it.
 func select_tab(index: int) -> void:
+	if tabs.current_tab != index:
+		tabs.current_tab = index
+		return
+	for tab: int in tab_buttons.size():
+		tab_buttons[tab].set_pressed_no_signal(tab == index)
+	if tab_rail.visible:
+		tab_rail.ensure_control_visible(tab_buttons[index])
 	cancel_capture()
 	for page_index: int in pages.size():
 		pages[page_index].visible = page_index == index
-	for node: CanvasItem in display_nodes:
-		node.visible = index == 0
+	var column: VBoxContainer = pages[index].get_node("PageMargin/Rows") as VBoxContainer
+	note.reparent(column)
+	column.move_child(note, 0)
 	if index == 0:
 		# The Display tab's note: the window-size sentence only where the OS manages the window (Q10).
 		if mobile:
@@ -599,7 +686,10 @@ func select_tab(index: int) -> void:
 		else:
 			show_note(I18n.KEY.tr(VSYNC_NOTE))
 	else:
-		show_note([I18n.KEY.tr("Volume changes apply immediately. Effects carries every sound effect; there is no music or voice yet."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
+		show_note([I18n.KEY.tr("Volume changes apply immediately."), I18n.KEY.tr("Select a binding, then press a key, controller button or move a stick."), I18n.KEY.tr("Scales the dialogue, hints, cards and station names."), I18n.KEY.tr("Until you choose a language, the game uses your system's.")][index - 1])
+
+	# A newly shown page has no settled scroll range when native focus first arrives.
+	UIMotion.follow_focus(pages[index] as ScrollContainer)
 
 
 ## Shows [param message] (English) in the note under the tabs, in the current language: tr(message), with
@@ -621,6 +711,8 @@ func _show_translated_note() -> void:
 	for insert: String in _note_inserts:
 		filled.append(tr(insert))
 	note.text = I18n.fill(_note_message, filled)
+	if tabs != null and tabs.current_tab < pages.size():
+		pages[tabs.current_tab].set_deferred("scroll_vertical", 0)
 
 
 ## Applies the DISPLAY page's vsync (when the toggle is enabled on this platform) and edge smoothing
@@ -653,7 +745,7 @@ func begin_capture(action: StringName, kind: String) -> void:
 	capture_kind = kind
 	# One message per device, so the note names the device in words, not by its id ("keyboard"), and a
 	# translation can phrase each one whole.
-	var message: String = I18n.KEY.tr("Press a keyboard input for %s. Esc cancels.") if kind == "keyboard" else I18n.KEY.tr("Press a controller input for %s. Esc cancels.")
+	var message: String = I18n.KEY.tr("Press a keyboard input for %s. Esc cancels.") if kind == "keyboard" else I18n.KEY.tr("Press a controller input for %s. Menu cancels.")
 	show_note(message, [ACTION_NAMES[ACTIONS.find(action)]])
 	cancel_button.show()
 
@@ -666,20 +758,40 @@ func cancel_capture() -> void:
 		cancel_button.hide()
 
 
+## Changes Settings tabs on LB/RB after Main has noted the active input device; capture keeps priority.
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_visible_in_tree() or not capture_action.is_empty():
+		return
+	var step: int = InputMode.tab_step(event)
+	if step == 0:
+		return
+	var index: int = tabs.current_tab
+	for attempt: int in pages.size():
+		index = wrapi(index + step, 0, pages.size())
+		if not tabs.is_tab_hidden(index):
+			select_tab(index)
+			tab_focus_target().grab_focus()
+			get_viewport().set_input_as_handled()
+			return
+
+
 ## During a rebind (begin_capture), takes the next press of the captured kind ([param event]: a key, a
 ## controller button, or a stick pushed at least 0.65 of the way) and binds it to the action, unless
-## another action already uses it, which the note names instead. Escape cancels. Bound presses are
+## another action already uses it, which the note names instead. Escape or controller Menu cancels. Bound presses are
 ## marked handled and saved at once. Ignores everything outside a rebind or while the menu is hidden.
 func _input(event: InputEvent) -> void:
-	if capture_action.is_empty() or not is_visible_in_tree():
+	if not is_visible_in_tree():
 		return
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+	input_seen.emit(event)
+	if capture_action.is_empty():
+		return
+	if (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE) or (event is InputEventJoypadButton and event.pressed and event.button_index == JOY_BUTTON_START):
 		cancel_capture()
 		show_note(I18n.KEY.tr("Rebind cancelled."))
 		get_viewport().set_input_as_handled()
 		return
-	var pressed: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventJoypadMotion and absf(event.axis_value) >= 0.65)
-	if not pressed or _event_kind(event) != capture_kind:
+	var pressed: bool = (event is InputEventKey and event.pressed and not event.echo) or (event is InputEventJoypadButton and event.pressed) or (event is InputEventJoypadMotion and absf(event.axis_value) >= InputMode.CAPTURE_THRESHOLD)
+	if not pressed or InputMode.binding_kind(event) != capture_kind:
 		return
 	get_viewport().set_input_as_handled()
 	var binding: InputEvent = _decode_binding(_encode_binding(event))
@@ -699,11 +811,6 @@ func _input(event: InputEvent) -> void:
 		show_note(I18n.KEY.tr("Binding saved."))
 
 
-## "keyboard" for a key event, "controller" for a controller button or stick, "" for anything else.
-func _event_kind(event: InputEvent) -> String:
-	return "keyboard" if event is InputEventKey else ("controller" if event is InputEventJoypadButton or event is InputEventJoypadMotion else "")
-
-
 ## The first action other than [param target] (and other than the engine's ui_ actions) that
 ## [param event] already triggers, or an empty StringName when none does.
 func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
@@ -718,7 +825,7 @@ func _binding_conflict(target: StringName, event: InputEvent) -> StringName:
 func _replace_binding(action: StringName, kind: String, event: InputEvent) -> void:
 	_forget_prompts()
 	for old: InputEvent in InputMap.action_get_events(action):
-		if _event_kind(old) == kind:
+		if InputMode.binding_kind(old) == kind:
 			InputMap.action_erase_event(action, old)
 	InputMap.action_add_event(action, event)
 
@@ -769,16 +876,16 @@ func _decode_binding(data: Dictionary) -> InputEvent:
 
 ## Every [param kind] ("keyboard" or "controller") binding of [param action] by name in the current
 ## language, joined by " / ", as the CONTROLS page's buttons show them; "" when it has none.
-func binding_label(action: StringName, kind: String) -> String:
+func binding_label(action: StringName, kind: String, icons: bool = true) -> String:
 	var labels: PackedStringArray = []
 	for event: InputEvent in InputMap.action_get_events(action):
-		if _event_kind(event) == kind:
+		if InputMode.binding_kind(event) == kind:
 			if event is InputEventKey:
 				labels.append(key_name(event))
 			elif event is InputEventJoypadButton:
-				labels.append(_button_label(event.button_index))
+				labels.append(_button_label(event.button_index, icons))
 			elif event is InputEventJoypadMotion:
-				labels.append("%s %s" % [tr("Left stick") if event.axis == JOY_AXIS_LEFT_X else I18n.fill(I18n.KEY.tr("Axis %d"), [event.axis]), "−" if event.axis_value < 0 else "+"])
+				labels.append(_axis_label(event.axis, event.axis_value, icons))
 	return " / ".join(labels)
 
 
@@ -807,7 +914,7 @@ func _prompt_label(action: StringName, controller: bool) -> String:
 		if controller and event is InputEventJoypadButton:
 			return _button_label(event.button_index)
 		if controller and event is InputEventJoypadMotion:
-			return I18n.fill(I18n.KEY.tr("AXIS %d %s"), [event.axis, "−" if event.axis_value < 0 else "+"])
+			return _axis_label(event.axis, event.axis_value, true)
 	return "?"
 
 
@@ -850,18 +957,54 @@ func key_label_name(physical: Key, label: Key) -> String:
 	return tr(name, KEY_NAME_CONTEXT) if I18n.has_words(name) else name
 
 
-## The name of controller button [param index], in the current language: the face buttons keep their
-## printed letters (A, B, X, Y), the rest are translated.
-func _button_label(index: int) -> String:
+## Returns the active family's icon, or its spoken name when [param icons] is false; unknowns keep a number.
+func _button_label(index: int, icons: bool = true) -> String:
+	var glyph: String = ControllerGlyphs.button(_controller_family, index)
+	if icons and not glyph.is_empty():
+		return glyph
+	if index >= JOY_BUTTON_A and index <= JOY_BUTTON_Y:
+		return tr(PAD_FACE_NAMES.get(_controller_family, PAD_FACE_NAMES[&"xbox"])[index])
 	match index:
-		JOY_BUTTON_A: return "A"
-		JOY_BUTTON_B: return "B"
-		JOY_BUTTON_X: return "X"
-		JOY_BUTTON_Y: return "Y"
-		JOY_BUTTON_START: return tr("START")
+		JOY_BUTTON_BACK: return tr("Create") if _controller_family == &"playstation" else ("−" if _controller_family == &"nintendo" else tr("View"))
+		JOY_BUTTON_START: return tr("Options") if _controller_family in [&"playstation", &"steam_deck"] else ("+" if _controller_family == &"nintendo" else tr("Menu"))
+		JOY_BUTTON_LEFT_STICK: return tr("Left stick press")
+		JOY_BUTTON_RIGHT_STICK: return tr("Right stick press")
+		JOY_BUTTON_LEFT_SHOULDER: return "L" if _controller_family == &"nintendo" else ("L1" if _controller_family in [&"playstation", &"steam_deck"] else "LB")
+		JOY_BUTTON_RIGHT_SHOULDER: return "R" if _controller_family == &"nintendo" else ("R1" if _controller_family in [&"playstation", &"steam_deck"] else "RB")
+		JOY_BUTTON_DPAD_UP: return tr("D-pad up")
+		JOY_BUTTON_DPAD_DOWN: return tr("D-pad down")
 		JOY_BUTTON_DPAD_LEFT: return tr("D-pad left")
 		JOY_BUTTON_DPAD_RIGHT: return tr("D-pad right")
 	return I18n.fill(I18n.KEY.tr("BUTTON %d"), [index])
+
+
+## Shared axis presentation for bindings, HUD and spoken descriptions; [param value] is a signed axis half.
+func _axis_label(index: int, value: float, icons: bool) -> String:
+	var glyph: String = ControllerGlyphs.axis(_controller_family, index, value)
+	if icons and not glyph.is_empty():
+		return glyph
+	return "%s %s" % [tr("Left stick") if index == JOY_AXIS_LEFT_X else I18n.fill(I18n.KEY.tr("Axis %d"), [index]), "−" if value < 0.0 else "+"]
+
+
+## Expands visible private-use glyphs to translated names for native accessibility and tooltips.
+## Does not change the drawn words, their wrapping, bindings or story state.
+func describe_prompts(words: String) -> String:
+	for button: int in ControllerGlyphs.BUTTON_KEYS:
+		words = words.replace(ControllerGlyphs.button(_controller_family, button), _button_label(button, false))
+	for axis: int in ControllerGlyphs.AXIS_KEYS:
+		for direction: float in [-1.0, 1.0]:
+			var glyph: String = ControllerGlyphs.axis(_controller_family, axis, direction)
+			if not glyph.is_empty():
+				words = words.replace(glyph, _axis_label(axis, direction, false))
+	return words
+
+
+## Refreshes both binding rows and HUD prompt caches when the active pad's presentation family changes.
+## The caller supplies InputMode's identity; this never remaps physical inputs or writes a preference.
+func show_controller_family(family: StringName) -> void:
+	if family != _controller_family:
+		_controller_family = family
+		_refresh_bindings()
 
 
 ## Drops the remembered prompt labels, so the next prompt call works them out again.
@@ -883,7 +1026,8 @@ func _refresh_bindings() -> void:
 			# the CONTROLS page scrolls.
 			button.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 			button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			button.tooltip_text = button.text
+			button.tooltip_text = binding_label(action, kind, false)
+			button.accessibility_name = "%s: %s" % [tr(ACTION_NAMES[ACTIONS.find(action)]), button.tooltip_text]
 
 
 ## Puts every action in ACTIONS back to the project's default bindings and the dead zone back to 0.25,
@@ -910,6 +1054,9 @@ func _save_extra() -> bool:
 	config.set_value("video", "msaa_2d", antialiasing.selected)
 	config.set_value("video", "reduced_motion", reduced_motion.button_pressed)
 	config.set_value("video", "text_size", TextSize.factor)
+	config.set_value("dialogue", "text_speed", text_speed.selected)
+	config.set_value("dialogue", "auto_advance", auto_advance.button_pressed)
+	config.set_value("dialogue", "backing", dialogue_backing.value)
 	if not _picked_language.is_empty():
 		config.set_value(I18n.CONFIG_SECTION, I18n.CONFIG_KEY, _picked_language)
 	for bus: String in BUSES:
@@ -935,6 +1082,6 @@ func _save_extra() -> bool:
 func _family_bindings(events: Array[InputEvent], kind: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for event: InputEvent in events:
-		if _event_kind(event) == kind:
+		if InputMode.binding_kind(event) == kind:
 			result.append(_encode_binding(event))
 	return result

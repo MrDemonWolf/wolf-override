@@ -1,0 +1,51 @@
+{
+  "about": "M11 review stills and checks (brief 7.3 M11 and the M11 review of November 11). Each group is one capture.mjs run on m11-controller-map.html: node mockups/tools/capture.mjs m11-controller-map.html <devices> <outDir> --states \"<name>:<query>;...\" built from the group's states, with --full when the group says so. Keys starting with @ are capture actions (README, Capture). A --full capture holds every frame and sheet section; with clean=1 each frame is one viewport tall, so it can be cut per frame. A viewport capture shows frame 1 (CONTROLLER MAP: PLAY), the frame the presses act on; each press state waits 400 ms at the end so the focus motion has finished before the still.",
+  "groups": {
+    "frames": {
+      "devices": "ally,desktop",
+      "full": true,
+      "states": {
+        "default": "",
+        "pad": "input=pad",
+        "keyboard": "input=keyboard",
+        "touch": "input=touch",
+        "text150": "input=pad&text=150",
+        "text200": "input=pad&text=200",
+        "clash": "input=pad&bind=interact=X",
+        "reduced": "input=pad&motion=reduced"
+      }
+    },
+    "phone-with-pad": {
+      "devices": "iphone",
+      "full": true,
+      "states": {
+        "pad": "input=pad"
+      }
+    },
+    "presses": {
+      "devices": "ally,desktop",
+      "full": false,
+      "states": {
+        "pad-right": "input=pad&@pad=DPadRight&@wait=400",
+        "pad-left": "input=pad&@pad=DPadLeft&@wait=400",
+        "key-right": "input=keyboard&@key=ArrowRight&@wait=400",
+        "key-left": "input=keyboard&@key=ArrowLeft&@wait=400",
+        "click-next": "@click=[data-mk-state=map-play] [data-wo-padmap-cycle].wo-select&@wait=400",
+        "click-context": "@click=[data-mk-state=map-play] [data-wo-probe=map-footer-context]&@wait=400"
+      }
+    }
+  },
+  "checks": [
+    "Every 4.2 row appears once in each context; no action twice on one button (brief 7.3 M11 accept).",
+    "No button outside 4.1's set: no paddles, M1/M2, gyro or stick clicks (brief 7.3 M11 accept).",
+    "The map changes when a binding changes: USE sits on RT after interact=RT, and A joins NOT USED HERE (brief 7.3 M11 accept).",
+    "D-pad right and the right arrow move frame 1 from PLAY to DIALOGUE; D-pad left and the left arrow move it to CREDITS, wrapping (4.1: every screen works with the D-pad plus A and B). Needs the shared selector fix.",
+    "A click on the selector or on CONTEXT shows the next context.",
+    "At TEXT SIZE 200% on the Ally and the desktop: no callout outside .wo-padmap, no two callouts overlapping, nothing past the safe rect (4.4, XAG101). Needs the shared stacked layout.",
+    "On the iPhone with a pad: no element of the map view past the safe rect. Needs the shared phone layout.",
+    "The tab bar fits at the Ally's 125%; at 200% it scrolls and the selected tab stays whole in view, never under LB or RB. Needs the shared tab size.",
+    "No .is-focus in the markup; no focus ring with mouse or touch input, and none on a desktop frame before the first key or pad press.",
+    "A clash shows words (ALSO ON <action>) as well as colour. Needs the shared renderer change.",
+    "Smallest text on a 1920 x 1080 capture is the Body size or more; glyph letters are Body size."
+  ]
+}

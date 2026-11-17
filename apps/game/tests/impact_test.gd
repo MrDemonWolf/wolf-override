@@ -206,7 +206,7 @@ func _run() -> void:
 	await process_frame
 	game.call("_pause_game")
 	_expect(paused and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible and Engine.time_scale == 1.0, "Pause works during a knockdown and clears the dip")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	_expect(game.get("title_open") and not game.get("fail_active") and intro_fade.color.a == 0.0 and human.body_sprite.rotation_degrees == 0.0, "Return to Title cancels the knockdown")
 
 	# Before any checkpoint the beat snapshot stands in, so the relay memory still survives.
@@ -218,6 +218,7 @@ func _run() -> void:
 	game.call("_interact_breaker")
 	game.call("_choose", State.PRESS)
 	var pre_save: Dictionary = (game.get("beat_snapshot") as Dictionary).duplicate(true)
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "the refusal can be read without creating a checkpoint")
 	_expect(await walk_to(human, 450.0), "the engineer moves on before any save exists")
 	game.call("_fail_beat", "Test knockdown.")
 	_expect(await retry(game, 240), "a knockdown before the first checkpoint still hands back")
@@ -248,11 +249,9 @@ func _run() -> void:
 	game.call("_finish_intro")
 	_expect(await wait_until(func() -> bool: return impact.trauma == 0.0 and camera.offset == Vector2.ZERO, 90), "the lock boom settles")
 
-	game.queue_free()
-	# The mixer releases a stopped clip a few steps later; give it that time before quitting.
-	await create_timer(0.1).timeout
+	# The shared teardown stops voices and waits in real time for mixer/loader threads before exit.
+	await end_game(game)
 	_expect(Engine.time_scale == 1.0, "freeing the game leaves time_scale at 1.0")
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	finish("Impact checks passed")
 
 

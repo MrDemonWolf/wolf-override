@@ -10,7 +10,7 @@ import path from 'node:path';
  */
 
 /** project.godot, from the docs app folder that `next build` and the docs scripts run in. */
-export const projectFile = path.join(process.cwd(), '..', 'game', 'project.godot');
+const projectFile = path.join(process.cwd(), '..', 'game', 'project.godot');
 
 /**
  * Returns `config/version` from the `[application]` section of a project.godot text, or throws when it

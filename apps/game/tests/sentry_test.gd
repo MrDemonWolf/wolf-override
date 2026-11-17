@@ -56,6 +56,8 @@ func _run() -> void:
 	finish("Sentry checks passed")
 
 
+## SentryBrain on its own (no scene): where it can see the engineer, and how it patrols, locks on,
+## chases, loses its mark and holds while paused.
 func _check_brain() -> void:
 	for x: float in [SentryBrain.LANE_ENTRY_X, SentryBrain.COVER_MIN_X, JunctionRoom.ARM_X, SentryBrain.COVER_MAX_X, 500.0]:
 		_expect(not SentryBrain.is_exposed(x), "%.0f is out of the sentry's sight" % x)
@@ -353,6 +355,8 @@ func _check_lock_on() -> void:
 	_expect(dropped.state == &"patrol", "and it gives up the usual 2.5 s later")
 
 
+## DropArm on its own (no scene): the hit window over the floor brackets is the tank's footprint, and
+## the tank's fall, hit, miss and rewind follow from it.
 func _check_arm() -> void:
 	# One rule the floor shows: the brackets are the tank's footprint, and a hit is the sentry's body
 	# over them when the tank lands.
@@ -409,6 +413,8 @@ func _check_arm() -> void:
 	_expect(DropArm.in_cloud(DropArm.MARK_X + DropArm.CLOUD_HALF_WIDTH + M0State.HUMAN_HALF_WIDTH) and not DropArm.in_cloud(DropArm.MARK_X + DropArm.CLOUD_HALF_WIDTH + M0State.HUMAN_HALF_WIDTH + 1.0), "the cloud reaches an engineer whose body touches it")
 
 
+## M0State refuses the lane's events out of order: no drop before the door blows, no clear while the
+## sentry is live, and each happens only once.
 func _check_state_guards() -> void:
 	var state: M0State = completed_records_state(State.DISCLOSE)
 	_expect(not state.drop_sentry() and not state.clear_junction(), "nothing in the lane happens outside the junction")
@@ -423,6 +429,7 @@ func _check_state_guards() -> void:
 	_expect(state.wolf_will_bait() and not completed_records_state(State.PRESS).wolf_will_bait(), "WOLF offers to draw the sentry only with the relay risk disclosed")
 
 
+## The whole lane in the running game, from the sentry's first patrol to the finished save's title.
 func _check_scene() -> void:
 	var game: Node2D = await start_game("sentry-test")
 	var path: String = str(game.get("save_path"))
@@ -434,7 +441,7 @@ func _check_scene() -> void:
 	var arm: DropArm = game.get("drop_arm") as DropArm
 	var touch_use: Button = game.get_node("CanvasLayer/TouchControls/Use") as Button
 	var touch_choice_1: Button = game.get_node("CanvasLayer/TouchControls/Choice1") as Button
-	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
+	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button
 	if not _require(room != null and brain != null and arm != null and room.sentry != null and room.sentry.get_node_or_null("Visual") != null, "Main builds the sentry with its drawing in one Visual child"):
 		return
 	_expect(room.sentry.collision_layer == 0 and room.sentry.collision_mask == 0, "the sentry body never pushes or blocks the actors")
@@ -464,7 +471,7 @@ func _check_scene() -> void:
 	_expect(is_equal_approx(camera.zoom.y, 1.35) and tank_top_screen >= answers_bottom + 8.0, "the hanging tank sits below the keyboard answers (tank top %.0f, answers end %.0f)" % [tank_top_screen, answers_bottom])
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
-	var tank_bottom_touch: float = (room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5 - Main.GAMEPLAY_CAMERA_Y_TOUCH) * camera.zoom.y + 270.0
+	var tank_bottom_touch: float = (room.tank.position.y + JunctionRoom.TANK_SIZE.y * 0.5 - float(game.call("gameplay_camera_y", true))) * camera.zoom.y + 270.0
 	var answers_top: float = minf(touch_choice_1.get_global_rect().position.y, touch_choice_2.get_global_rect().position.y)
 	_expect(answers_top >= tank_bottom_touch + 8.0, "the hanging tank sits above the touch answers at the bottom (tank bottom %.0f, answers start %.0f)" % [tank_bottom_touch, answers_top])
 	game.set("touch_enabled", false)
@@ -529,14 +536,14 @@ func _check_scene() -> void:
 		var line: String = str(game.get("status_line"))
 		var hint: String = str(game.call("_context_hint"))
 		if parked:
-			agreed[0] = agreed[0] and line == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and hint == "E: drop the tank. It's parked on the mark."
+			agreed[0] = agreed[0] and line == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and hint == "Drop tank on mark"
 		else:
 			agreed[0] = agreed[0] and line == "Wait. WOLF hasn't got it on the mark yet." and hint == "Wait for WOLF to park it on the mark."
 		return brain.state == &"fixated" and absf(brain.x - DropArm.MARK_X) <= 0.5 and absf(wolf.position.x - JunctionRoom.WOLF_BAIT_X) <= 4.0, 300), "WOLF crosses to the far end of the lane and the sentry parks on the mark, facing him")
 	_expect(agreed[0], "after an early press the \"Wait\" and its hint hold until the sentry parks, then the line and the hint both say it is on the mark")
 	for _frame: int in 60:
 		await physics_frame
-	_expect(str(game.get("status_line")) == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and str(game.call("_context_hint")).contains("drop the tank. It's parked"), "parked, the go line stays up beside the drop hint; nothing brings back the wait")
+	_expect(str(game.get("status_line")) == "The sentry stops on the mark, its eyes on WOLF. Drop the tank now." and str(game.call("_context_hint")).contains("Drop tank on mark"), "parked, the go line stays up beside the drop hint; nothing brings back the wait")
 	# While WOLF holds it, it watches only him with its red eye and stops scanning: no beam is drawn, so
 	# nothing runs over the engineer, over WOLF or across the EXIT BOLT box between them (round 3b).
 	await physics_frame
@@ -548,7 +555,7 @@ func _check_scene() -> void:
 	_expect(await walk_to(human, JunctionRoom.ARM_X), "the engineer crosses to the panel")
 	_expect(not game.get("fail_active") and brain.state == &"fixated", "crossing while it holds on WOLF is safe")
 	_expect(absf(human.position.x - wolf.position.x) >= M0Actor.WOLF_REACH + M0Actor.HUMAN_REACH, "WOLF drawing it stands clear of the engineer at the release (%.1f px apart)" % absf(human.position.x - wolf.position.x))
-	_expect(str(game.call("_context_hint")).contains("drop the tank. It's parked") and game.call("_drop_ready"), "with it parked the release offers the drop")
+	_expect(str(game.call("_context_hint")).contains("Drop tank on mark") and game.call("_drop_ready"), "with it parked the release offers the drop")
 	await physics_frame
 	_expect(room.mark_lit(), "the floor brackets light up with the sentry's body inside them")
 	game.set("touch_enabled", true)
@@ -576,7 +583,7 @@ func _check_scene() -> void:
 	_expect(await wait_until(func() -> bool: return absf(wolf.position.x - JunctionRoom.WOLF_DOWN_X) <= 2.0, 240) and wolf.body_sprite.flip_h, "after Continue from autosave C WOLF waits by the hatch, facing back at the engineer")
 	_expect(await walk_to(human, JunctionRoom.BOLT_X), "the engineer reaches the exit bolt")
 	_expect(wolf.position.x - M0Actor.WOLF_REACH > human.position.x + M0Actor.HUMAN_REACH - 2.0 * M0Actor.AVOID_TOLERANCE and wolf.position.x - M0Actor.WOLF_REACH > DropArm.MARK_X + JunctionRoom.TANK_SIZE.x * 0.5, "at the bolt the engineer and WOLF both stand clear of each other and of the tank (WOLF %.0f, engineer %.0f)" % [wolf.position.x, human.position.x])
-	_expect(str(game.call("_context_hint")).contains("pop the exit bolt"), "the bolt panel offers USE")
+	_expect(str(game.call("_context_hint")).contains("Release exit bolt"), "the bolt panel offers USE")
 	await tap(&"interact")
 	_expect(game.get("bolt_state") == &"charging", "USE starts the bolt's whine")
 	for _frame: int in 12:
@@ -609,10 +616,11 @@ func _check_scene() -> void:
 	await physics_frame
 	_expect(human.position.x >= JunctionRoom.HATCH_REACH_MIN_X and human.position.x <= JunctionRoom.HATCH_REACH_MAX_X + 1.0, "walking on, the engineer reaches the door and stops behind WOLF (x %.0f)" % human.position.x)
 	_expect(wolf.position.x - M0Actor.WOLF_REACH >= human.position.x + M0Actor.HUMAN_REACH - 1.0, "at the door the engineer and WOLF are not drawn over each other")
-	_expect(str(game.call("_context_hint")) == "E: leave through the door.", "at the door the hint offers the way out")
+	_expect(str(game.call("_context_hint")) == "Leave through door", "at the door the hint offers the way out")
 	await tap(&"interact")
 	var state: M0State = game.get("state") as M0State
-	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE LINE CLEARED"), "USE at the open hatch clears the junction into a closing beat")
+	_expect(state.junction_cleared and game.get("chapter_close_active") and not human.controlled, "USE at the open hatch clears the junction into a closing beat")
+	_expect(not (game.get_node("CanvasLayer/TopBar") as Control).visible and str(game.call("_shown_line")).begins_with("SERVICE LINE CLEARED."), "the closing dialogue confirms completion without a second objective card")
 	var autosave_d: M0State = State.load_from_disk(path)
 	_expect(autosave_d != null and autosave_d.junction_cleared, "autosave D records the cleared junction")
 	await create_timer(0.6).timeout
@@ -692,13 +700,13 @@ func _check_scene() -> void:
 	game.call("_refresh_ui")
 	await tap(&"pause_game")
 	_expect(not paused and game.get("title_open"), "Pause (or Back) on the card goes on to the title instead of pausing")
-	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == MainScript.FINISHED_NOTE, "on a finished save the title offers PLAY AGAIN and says why")
-	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	_expect(not continue_button.disabled and continue_button.text == "PLAY AGAIN" and (game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label).text == MainScript.FINISHED_NOTE, "on a finished save the title offers PLAY AGAIN and says why")
+	var new_game_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	_expect(not new_game_button.visible and is_equal_approx(continue_button.offset_left, new_game_button.offset_left) and game.call("_title_first_button") == continue_button, "NEW GAME would do the same, so PLAY AGAIN stands alone across the row and takes the first focus")
 	var finished_path: String = str(game.get("save_path"))
 	game.set("save_path", finished_path + ".missing")
 	game.call("_refresh_continue")
-	_expect(new_game_button.visible and continue_button.text == "CONTINUE" and continue_button.offset_left > new_game_button.offset_right and game.call("_title_first_button") == new_game_button, "without a finished save NEW GAME and CONTINUE sit side by side again")
+	_expect(new_game_button.visible and continue_button.text == "CONTINUE" and continue_button.get_index() > new_game_button.get_index() and game.call("_title_first_button") == new_game_button, "without a finished save NEW GAME and CONTINUE return in menu order")
 	game.set("save_path", finished_path)
 	game.call("_refresh_continue")
 	var finished_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
@@ -797,14 +805,14 @@ func _check_scene() -> void:
 	crafted["positions"]["human"] = [120.0, 410.0]
 	crafted["positions"]["wolf"] = [64.0, 423.0]
 	crafted["door_blown"] = false
-	_write(path, crafted)
+	_expect(write_text(path, JSON.stringify(crafted)), "the crafted save opens for writing")
 	_expect(State.load_from_disk(path) != null, "the crafted save's positions and flags are otherwise valid")
 	crafted["sentry_down"] = true
-	_write(path, crafted)
+	_expect(write_text(path, JSON.stringify(crafted)), "the crafted save opens for writing")
 	_expect(State.load_from_disk(path) == null, "a v4 save with the sentry down but the door sealed is rejected")
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
-	_expect(continue_button.disabled and (game.get_node("CanvasLayer/TitleScreen/ContinueNote") as Label).text == "Saved checkpoint could not be read.", "the title refuses to continue from it")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
+	_expect(continue_button.disabled and (game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueNote") as Label).text == "Saved checkpoint could not be read.", "the title refuses to continue from it")
 	remove_file(path)
 	remove_file("%s-settings.cfg" % path)
 	game.queue_free()
@@ -1472,6 +1480,8 @@ func _close_cuts_no_label(camera: Camera2D, room: JunctionRoom) -> bool:
 	return true
 
 
+## Holds move_right until the game asks a choice, for at most 300 physics frames (5 s of game time);
+## releases the action and returns whether the choice came.
 func _walk_until_choice(game: Node2D) -> bool:
 	Input.action_press(&"move_right")
 	var asked: bool = await wait_until(func() -> bool: return game.get("waiting_for_choice"), 300)
@@ -1535,12 +1545,6 @@ func _check_drop_window() -> void:
 	windows.sort()
 	_expect(not windows.is_empty() and windows[0] >= 0.5, "pressed at any moment of a patrol pass, the drop hits through a window of at least 0.5 s (%s)" % str(windows))
 	print("Tank window: %.2f s per straight crossing at patrol speed, %.2f s at chase speed, press windows on patrol %s" % [straight, 2.0 * DropArm.HIT_REACH / SentryBrain.CHASE_SPEED, str(windows)])
-
-
-func _write(path: String, data: Dictionary) -> void:
-	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-	file.store_string(JSON.stringify(data))
-	file.close()
 
 
 ## WOLF crosses the lane from the rubble to the far end, answering at many points of the patrol (the

@@ -420,3 +420,21 @@ Each step ships as one small branch with a Mac and iPhone build for Nathanial to
   2. A limiter on the Master bus.
   3. Measure a 30-minute capture with a BS.1770 meter.
 - **How to check:** the meter reading for each profile; Nathanial plays with headphones and on the ROG Ally's speakers.
+
+## Frame review, November 16, 2026 (not from play)
+
+**What this section is for:** new findings from container-rendered stills of commit `ab78b638` (1280×720 keyboard, TEXT SIZE 150%, and a 2796×1290 phone shape). Read by eye by a coding agent; nothing was played and no device was used. Items already covered by B1 to B36 are not repeated. Frames: `.work/audit-ux/frames/` on Nathanial's Mac (not in Git).
+
+| ID | Severity | Screen | What is wrong | Suggested fix |
+|---|---|---|---|---|
+| F1 | High | Title | QUIT is cut in half at 720p and on the phone shape. At 150% SETTINGS is cut and CREDITS and QUIT need scrolling. | Fit the five actions without scrolling at 100%; shrink row height before scrolling. |
+| F2 | High | Corridor, 150% | Station names wrap and collide (COOLANT RELAY over the COOLANT FAULT plate, SAFE POINT on its lamp). | One-line names with a collision rule, or plates. Belongs with B13. |
+| F3 | High | Dialogue | The hint line ("E: arm the breaker.") draws over the speaker tab, so the speaker is hidden. | Separate slots for hint and tab. Belongs with B10. |
+| F4 | Medium | Settings tabs | Focused and selected tabs look the same; two can look lit at once (may partly be the capture driver). | A distinct selected style. |
+| F5 | Medium | Choice | Answers sit at the top and the question at the bottom; at 150% answers cover a station name. | Dock the answers above the dialogue box. |
+| F6 | Medium | Settings | The TEXT SIZE note sits above REDUCED MOTION; the off toggle is small and low contrast; the title shows through beside the panel. | With B3 and B5. |
+| F7 | Low | Pause | The return warning reads as the SETTINGS caption; the lower third is empty. | Regroup with B20. |
+| F8 | Low | Phone title | DEBUG overlaps "PRESENTS" in debug builds. | Move the label. |
+| F9 | Low | Changelog | The capture audit reports missing glyphs (⌘ and CJK characters). | A fallback font. |
+
+Not captured: the Records and Junction routes, a choice on the phone shape, and phone corridor frames at full size (the renders timed out on a loaded machine).

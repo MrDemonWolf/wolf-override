@@ -1,6 +1,6 @@
 extends SceneTree
 ## UI parity dump (never shipped: run.sh copies it into a scratch copy of the game).
-## Drives main.tscn through 13 menu and HUD states and writes, per visible Control under CanvasLayer,
+## Drives main.tscn through menus and HUD states and writes, per visible Control under CanvasLayer,
 ## its class, global rect, theme-resolved font, size and colour, and stylebox description. Run it
 ## before and after a UI refactor and diff the two files: any line that changes is a visual change.
 ## Usage: scripts/parity/run.sh ui <out file>   (headless, --fixed-fps 60, so the waits are frames)
@@ -20,12 +20,14 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 
+## Waits [param frames] process frames, for the UI to lay itself out.
 func _settle(frames: int) -> void:
 	for i: int in frames:
 		await process_frame
 
 
 func _run() -> void:
+	root.size = Vector2i(ProjectSettings.get_setting("display/window/size/window_width_override"), ProjectSettings.get_setting("display/window/size/window_height_override"))
 	for path: String in [SAVE, SETTINGS]:
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
@@ -50,7 +52,9 @@ func _run() -> void:
 	game.call("_show_title_settings")
 	await _settle(20)
 	var menu: GameSettings = game.get("settings_menu") as GameSettings
-	for i: int in 3:
+	for i: int in menu.pages.size():
+		if menu.tabs.is_tab_hidden(i):
+			continue
 		menu.select_tab(i)
 		await _settle(4)
 		await _snap("settings-tab%d" % i)
@@ -91,6 +95,8 @@ func _run() -> void:
 	quit()
 
 
+## Adds one "census" line: how many nodes and Controls the HUD's CanvasLayer holds, and how many nodes
+## the whole scene has.
 func _census() -> void:
 	var layer: Node = game.get_node("CanvasLayer")
 	var controls: int = 0
@@ -102,6 +108,8 @@ func _census() -> void:
 	lines.append("## census CanvasLayer nodes=%d controls=%d scene_nodes=%d" % [all_nodes, controls, game.find_children("*", "", true, false).size()])
 
 
+## [param box] as one line of text: a flat box's colours, border widths, corner radius and shadow, a
+## texture box's texture class, any other box's class, or "-" for none.
 func _box(box: StyleBox) -> String:
 	if box == null:
 		return "-"
@@ -113,6 +121,8 @@ func _box(box: StyleBox) -> String:
 	return box.get_class()
 
 
+## The font [param control] draws with as "file@weight/size" (px); [param size_name] is the theme
+## size to read, "font_size" for plain text or a RichTextLabel's "normal_font_size".
 func _font(control: Control, size_name: String) -> String:
 	var font: Font = control.get_theme_font("font" if size_name == "font_size" else "normal_font")
 	var name: String = font.resource_path.get_file() if font != null else "-"
@@ -121,6 +131,8 @@ func _font(control: Control, size_name: String) -> String:
 	return "%s/%d" % [name, control.get_theme_font_size(size_name)]
 
 
+## Adds a "state" line named [param state], then one line per visible Control under the HUD's
+## CanvasLayer: its path, class, rectangle and what it is drawn with.
 func _dump(state: String) -> void:
 	lines.append("## state %s" % state)
 	var layer: Node = game.get_node("CanvasLayer")

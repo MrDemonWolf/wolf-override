@@ -86,11 +86,8 @@ func _corridor(game: Main, actions: DebugActions, relay: StringName) -> void:
 	_require(game.waiting_for_choice and game.choice_context == "relay", "%s: the relay question is up" % relay)
 	await tap(&"choice_2" if relay == &"press" else &"choice_1", 1)
 	await frames(20)
-	for _step: int in 3:
-		if game.state.breaker_armed:
-			break
-		await tap(&"interact", 1)
-		await frames(20)
+	if not _require(await continue_until(game, func() -> bool: return game.state.breaker_armed and game.human.controlled, TALK_FRAMES), "read WOLF's reply and arm the breaker"):
+		return
 	_require(game.state.breaker_armed, "%s: the breaker is armed" % relay)
 	_require(await walk_to_reading_on(game.human, Main.RELAY_SIDE_X), "%s: the engineer walks to the relay" % relay)
 	if relay == &"press":
@@ -183,6 +180,8 @@ func _records(game: Main, actions: DebugActions, mirror: StringName) -> void:
 	_require(await walk_to_reading_on(game.human, 190.0), "%s: the engineer walks to the purge queue" % mirror)
 	await tap(&"interact", 1)
 	_require(game.state.purge_trace_preserved, "%s: the purge order is copied" % mirror)
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the copied purge source before walking"):
+		return
 	_require(await walk_to_reading_on(game.human, 520.0), "%s: the engineer walks to the mirror port" % mirror)
 	await tap(&"interact", 1)
 	_require(game.waiting_for_choice, "%s: the mirror offers both routes" % mirror)
@@ -190,6 +189,8 @@ func _records(game: Main, actions: DebugActions, mirror: StringName) -> void:
 	await _check_rest(game, "%s: Records, both at the mirror port for the choice" % mirror)
 	await tap(&"choice_1" if mirror == &"wolf" else &"choice_2", 1)
 	_require(game.state.mirror_trace_preserved and game.state.mirror_route == String(mirror), "%s: the mirror timestamp is copied" % mirror)
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the mirror result before checking rest positions"):
+		return
 	await _settle(game)
 	await _check_rest(game, "%s: Records, after the mirror copy (WOLF %s)" % [mirror, game.debug_wolf_why()], false)
 

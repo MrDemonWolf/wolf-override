@@ -79,7 +79,6 @@ const FRAME_WAIT_LIMIT: int = 10
 ## so the button grows to the left, never into the gap. At 78 px it spans x 756..834, clear of the
 ## note (NOTE_RECT, to x 754); the gap to PAUSE is 10 px (14 before PAUSE grew).
 const BUTTON_RECT: Rect2 = Rect2(762.0, 10.0, 72.0, 34.0)
-const PAUSE_LEFT: float = 844.0
 const BUTTON_GAP: float = 10.0
 ## The short note ("Debug tools unlocked", a jump's result, a capture's path), wrapping to two lines;
 ## the menu hides it (it has its own status line). In play it sits in the top band between the top
@@ -158,6 +157,7 @@ var frame_drawn_signal: Signal = Signal()
 ## overlay, note and DEBUG button, and listens for the logo taps.
 func setup(main: Main) -> void:
 	game = main
+	game.input_mode.changed.connect(_queue_view)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process(false)
 	set_physics_process(false)
@@ -231,14 +231,18 @@ func _build() -> void:
 	debug_button.pressed.connect(open_menu)
 	layer.add_child(debug_button)
 	# In the tree the theme's minimum size is known; the button keeps its right edge clear of PAUSE.
-	var button_size: Vector2 = BUTTON_RECT.size.max(debug_button.get_combined_minimum_size())
-	debug_button.size = button_size
-	debug_button.position = Vector2(PAUSE_LEFT - BUTTON_GAP - button_size.x, BUTTON_RECT.position.y)
+	layout_button()
 	# If the theme's minimum grows later (a font or theme change), the button grows to the left.
 	debug_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	UIMotion.attach(debug_button)
 	# The zone drawing keeps its names off the tools' own cards.
 	zones.own_controls = [overlay, debug_button, note, menu.panel, menu.step_bar]
+
+
+## Keeps the touch debug control beside the live Pause rect, including mobile safe-area changes.
+func layout_button() -> void:
+	var size: Vector2 = BUTTON_RECT.size.max(debug_button.get_combined_minimum_size())
+	ScreenShape.set_rect(debug_button, Vector2(game.pause_button.position.x - BUTTON_GAP - size.x, game.screen_shape.safe_rect.position.y + BUTTON_RECT.position.y), size)
 
 
 ## Recomputes availability from the build, the stored unlock and a session lock.
@@ -281,7 +285,7 @@ func _refresh_view(redraw: bool = false) -> void:
 	# answers: its legend is clear of them); a capture with boxes draws it whatever is up.
 	zones.set_shown(available and (_capturing_boxes or (overlay_mode == Overlay.ZONES and not card_up)))
 	var controller: bool = game.controller_active
-	var touch_layout: bool = game.touch_enabled and not controller
+	var touch_layout: bool = game.input_mode.touch_layout()
 	zones.set_device("controller" if controller else ("touch" if touch_layout else "keyboard"))
 	debug_button.visible = available and touch_layout and not menu_open and not card_up
 	if note.visible:
@@ -336,7 +340,7 @@ func state_width() -> float:
 	var prompt: Control = game.tutorial_prompt
 	if prompt.is_visible_in_tree():
 		var rect: Rect2 = prompt.get_global_rect()
-		if DebugOverlay.footprint(false).intersects(rect):
+		if DebugOverlay.footprint(false, game.screen_shape.visible_rect.size.y).intersects(rect):
 			return minf(DebugOverlay.STATE_WIDTH, DebugOverlay.width_left_of(rect.position.x))
 	return DebugOverlay.STATE_WIDTH
 
@@ -375,6 +379,7 @@ func _refresh_overlay() -> void:
 func _input(event: InputEvent) -> void:
 	if game == null:
 		return
+	game._note_input_device(event)
 	if event is InputEventJoypadButton and not event.pressed and (event as InputEventJoypadButton).button_index == _swallow_release:
 		_swallow_release = -1
 		get_viewport().set_input_as_handled()
@@ -383,9 +388,6 @@ func _input(event: InputEvent) -> void:
 		_watch_codes(event)
 	if not available:
 		return
-	# The touch layout follows the last device Main saw; Main notes it after this node has the event.
-	if event is InputEventJoypadButton or event is InputEventScreenTouch or event is InputEventKey:
-		_queue_view()
 	if _rebinding():
 		return
 	if actions.frame_step and not menu_open and _frame_step_input(event):
@@ -460,13 +462,13 @@ func handle_back() -> bool:
 
 
 ## On the zones page, LB, RB or View turns a category on or off; false (and nothing changes) for any
-## other button, or one the player bound to a game action.
+## other button, or one bound to a gameplay action. Objective recall yields while these zones show.
 func _pad_toggle(button: InputEventJoypadButton) -> bool:
 	for category: StringName in DebugZones.CATEGORIES:
 		if DebugZones.CATEGORY_PAD_BUTTONS[category] != button.button_index:
 			continue
 		for action: StringName in InputMap.get_actions():
-			if not String(action).begins_with("ui_") and InputMap.event_is_action(button, action, true):
+			if action != &"show_objective" and not String(action).begins_with("ui_") and InputMap.event_is_action(button, action, true):
 				return false
 		zones.toggle_layer(category)
 		return true

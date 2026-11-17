@@ -46,7 +46,8 @@ func _check_no_urgency() -> void:
 	var lines: Array[String] = []
 	var literal: RegEx = RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
 	var next_speaker: RegEx = RegEx.create_from_string("^(%s|[A-Z][A-Za-z]+): |^[0-9]  ")
-	for file: String in _scripts("res://scripts"):
+	# The debug tools are left out: their labels name WOLF's spots, not lines he says.
+	for file: String in files_under("res://scripts", ["gd"], ["debug"]):
 		var source: String = FileAccess.get_file_as_string(file)
 		for found: RegExMatch in literal.search_all(source):
 			var wolf_speaking: bool = false
@@ -71,18 +72,6 @@ func _check_no_urgency() -> void:
 	for line: String in lines:
 		for word: String in URGENCY:
 			_expect(not line.to_lower().contains(word), "WOLF never hurries the engineer: \"%s\" says \"%s\"" % [line, word])
-
-
-## The game's scripts, without the debug tools (their labels name WOLF's spots, not lines he says).
-func _scripts(folder: String) -> Array[String]:
-	var found: Array[String] = []
-	for file: String in DirAccess.get_files_at(folder):
-		if file.ends_with(".gd"):
-			found.append(folder.path_join(file))
-	for sub: String in DirAccess.get_directories_at(folder):
-		if sub != "debug":
-			found.append_array(_scripts(folder.path_join(sub)))
-	return found
 
 
 # --- WOLF-6 ---------------------------------------------------------------------------------------
@@ -169,11 +158,8 @@ func _check_wolf_takes_no_engineer_step(game: Main, actions: DebugActions) -> vo
 	# The corridor: WOLF takes the contact; the safe point is still the engineer's.
 	actions.jump(&"relay_question")
 	await tap(&"choice_1", 1)
-	for _step: int in 3:
-		if game.state.breaker_armed:
-			break
-		await tap(&"interact", 1)
-		await frames(20)
+	if not _require(await continue_until(game, func() -> bool: return game.state.breaker_armed and game.human.controlled, TALK_FRAMES), "read WOLF's reply and arm the breaker"):
+		return
 	_require(await walk_to_reading_on(game.human, Main.RELAY_SIDE_X), "the engineer walks to the relay")
 	await tap(&"interact", 1)
 	_require(await wait_until(func() -> bool: return game.state.door_open, 300), "WOLF takes the contact and the seal opens")
@@ -227,11 +213,8 @@ func _check_engineer_only_route(game: Main, actions: DebugActions) -> void:
 	actions.jump(&"relay_question")
 	_check_no_meter(game, "corridor")
 	await tap(&"choice_2", 1)
-	for _step: int in 3:
-		if game.state.breaker_armed:
-			break
-		await tap(&"interact", 1)
-		await frames(20)
+	if not _require(await continue_until(game, func() -> bool: return game.state.breaker_armed and game.human.controlled, TALK_FRAMES), "read WOLF's reply and arm the breaker"):
+		return
 	_require(game.state.breaker_armed and game.state.memory.get("choice_id") == M0State.PRESS, "rushed answer, breaker armed")
 	_require(await walk_to_reading_on(game.human, Main.RELAY_SIDE_X), "the engineer walks to the relay")
 	await tap(&"interact", 1)
@@ -252,14 +235,20 @@ func _check_engineer_only_route(game: Main, actions: DebugActions) -> void:
 		await frames(30)
 	_require(game.state.checkpoint_reached and game.state.chapter_id == "records", "the safe point saves and opens Records")
 	_check_no_meter(game, "Records")
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the Records entry exchange"):
+		return
 	_require(await walk_to_reading_on(game.human, 190.0), "the engineer walks to the purge queue")
 	await tap(&"interact", 1)
 	_require(game.state.purge_trace_preserved, "the engineer copies the purge order")
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the copied purge source"):
+		return
 	_require(await walk_to_reading_on(game.human, 520.0), "the engineer walks to the mirror port")
 	await tap(&"interact", 1)
 	_require(game.waiting_for_choice, "the mirror offers both routes")
 	await tap(&"choice_2", 1)
 	_require(game.state.mirror_trace_preserved and game.state.mirror_route == "manual", "the engineer copies the mirror through the port")
+	if not _require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the manual mirror result"):
+		return
 	_require(await walk_to_reading_on(game.human, 830.0), "the engineer walks to the Records exit")
 	await tap(&"interact", 1)
 	_require(game.state.chapter_complete, "the first copy is secured")

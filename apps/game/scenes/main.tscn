@@ -252,8 +252,11 @@ mouse_filter = 2
 layer = 2
 
 [node name="IntroAlarm" type="ColorRect" parent="CanvasLayer"]
-offset_right = 960.0
-offset_bottom = 540.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 color = Color(0.35, 0.03, 0.05, 0)
 
@@ -323,14 +326,6 @@ offset_bottom = 62.0
 theme_override_font_sizes/font_size = 15
 vertical_alignment = 1
 
-[node name="SpeakerRule" type="ColorRect" parent="CanvasLayer/BottomBar"]
-offset_left = 143.0
-offset_top = 14.0
-offset_right = 144.0
-offset_bottom = 68.0
-mouse_filter = 2
-color = Color(0.52, 0.72, 0.81, 0.43)
-
 [node name="Story" type="Label" parent="CanvasLayer/BottomBar"]
 auto_translate_mode = 2
 offset_left = 160.0
@@ -340,6 +335,12 @@ offset_bottom = 76.0
 theme_override_font_sizes/font_size = 17
 autowrap_mode = 3
 vertical_alignment = 1
+
+[node name="ContinueCue" type="Label" parent="CanvasLayer/BottomBar"]
+visible = false
+auto_translate_mode = 2
+mouse_filter = 2
+text = "▶"
 
 [node name="ContextHint" type="Panel" parent="CanvasLayer"]
 offset_left = 253.0
@@ -366,6 +367,20 @@ offset_bottom = 32.0
 theme_override_colors/font_color = Color(0.76, 0.86, 0.91, 1)
 theme_override_font_sizes/font_size = 14
 autowrap_mode = 3
+vertical_alignment = 1
+
+[node name="Hold" type="Label" parent="CanvasLayer/ContextHint"]
+visible = false
+auto_translate_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.76, 0.86, 0.91, 1)
+vertical_alignment = 1
+
+[node name="Glyph" type="Label" parent="CanvasLayer/ContextHint"]
+visible = false
+auto_translate_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 vertical_alignment = 1
 
 [node name="TutorialPrompt" type="Panel" parent="CanvasLayer"]
@@ -477,6 +492,7 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("6_title_art")
 expand_mode = 1
+stretch_mode = 6
 
 [node name="TitleVeil" type="Panel" parent="CanvasLayer/TitleScreen"]
 anchors_preset = 15
@@ -490,88 +506,103 @@ theme_type_variation = &"TitleVeil"
 
 [node name="Brand" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 106.0
+offset_top = 32.0
 offset_right = 832.0
-offset_bottom = 137.0
+offset_bottom = 63.0
 theme_override_colors/font_color = Color(0.61, 0.77, 0.85, 1)
 theme_override_font_sizes/font_size = 18
 text = "MRDEMONWOLF, INC. PRESENTS"
 
 [node name="LogoMark" type="TextureRect" parent="CanvasLayer/TitleScreen"]
-offset_left = 852.0
-offset_top = 48.0
+offset_left = 884.0
+offset_top = 24.0
 offset_right = 940.0
-offset_bottom = 136.0
+offset_bottom = 80.0
 texture = ExtResource("3_logo")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="TitleLine" type="ColorRect" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 153.0
+offset_top = 72.0
 offset_right = 940.0
-offset_bottom = 157.0
+offset_bottom = 76.0
 color = Color(0.10, 0.76, 0.92, 1)
 
 [node name="GameTitle" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 470.0
-offset_top = 175.0
+offset_top = 88.0
 offset_right = 940.0
-offset_bottom = 271.0
+offset_bottom = 152.0
 theme_override_fonts/font = ExtResource("13_display")
-theme_override_font_sizes/font_size = 42
 text = "WOLF OVERRIDE"
 
 [node name="Subtitle" type="Label" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 282.0
+offset_top = 164.0
 offset_right = 940.0
-offset_bottom = 313.0
+offset_bottom = 195.0
 theme_override_colors/font_color = Color(0.68, 0.78, 0.85, 1)
 theme_override_font_sizes/font_size = 20
 text = "CHAPTER 1  /  LOCKDOWN"
 
-[node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen"]
+[node name="MenuScroll" type="ScrollContainer" parent="CanvasLayer/TitleScreen"]
 offset_left = 476.0
-offset_top = 341.0
-offset_right = 700.0
-offset_bottom = 391.0
+offset_top = 204.0
+offset_right = 940.0
+offset_bottom = 481.0
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="MenuMargin" type="MarginContainer" parent="CanvasLayer/TitleScreen/MenuScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MenuList" type="VBoxContainer" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NewGameButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "NEW GAME"
 
-[node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 716.0
-offset_top = 341.0
-offset_right = 940.0
-offset_bottom = 391.0
+[node name="ContinueButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "CONTINUE"
 
-[node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen"]
-offset_left = 476.0
-offset_top = 393.0
-offset_right = 940.0
-offset_bottom = 433.0
+[node name="ContinueNote" type="Label" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.59, 0.70, 0.77, 1)
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 2
 autowrap_mode = 3
 
-[node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 476.0
-offset_top = 437.0
-offset_right = 700.0
-offset_bottom = 481.0
+[node name="SettingsButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "SETTINGS"
+
+[node name="CreditsButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "CREDITS"
 
-[node name="SettingsButton" type="Button" parent="CanvasLayer/TitleScreen"]
-offset_left = 716.0
-offset_top = 437.0
-offset_right = 940.0
-offset_bottom = 481.0
+[node name="QuitButton" type="Button" parent="CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
 theme_override_font_sizes/font_size = 18
-text = "SETTINGS"
+text = "QUIT"
 
 [node name="ChangelogButton" type="Button" parent="CanvasLayer/TitleScreen"]
 offset_left = 48.0
@@ -755,8 +786,11 @@ autowrap_mode = 3
 tooltip_text = "Opens wolfoverride.mrdemonwolf.dev/docs/changelog/ in your browser"
 
 [node name="IntroFade" type="ColorRect" parent="CanvasLayer"]
-offset_right = 960.0
-offset_bottom = 540.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0)
 
@@ -806,49 +840,60 @@ theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 31
 text = "SESSION PAUSED"
 
-[node name="ResumeButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 50.0
-offset_top = 133.0
-offset_right = 400.0
-offset_bottom = 189.0
+[node name="MenuScroll" type="ScrollContainer" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
+offset_left = 32.0
+offset_top = 112.0
+offset_right = 418.0
+offset_bottom = 420.0
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="MenuMargin" type="MarginContainer" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="MenuList" type="VBoxContainer" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ResumeButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "RESUME"
 
-[node name="SettingsButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 50.0
-offset_top = 204.0
-offset_right = 400.0
-offset_bottom = 260.0
+[node name="SettingsButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "SETTINGS"
 
-[node name="PauseHint" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-auto_translate_mode = 2
-offset_left = 50.0
-offset_top = 343.0
-offset_right = 400.0
-offset_bottom = 365.0
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
-theme_override_font_sizes/font_size = 16
-
-[node name="TitleButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 50.0
-offset_top = 275.0
-offset_right = 400.0
-offset_bottom = 331.0
-theme_override_font_sizes/font_size = 19
-text = "RETURN TO TITLE"
-
-[node name="ReturnWarning" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu"]
-offset_left = 36.0
-offset_top = 375.0
-offset_right = 414.0
-offset_bottom = 420.0
+[node name="ReturnWarning" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+layout_mode = 2
+autowrap_mode = 3
 theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
 theme_override_font_sizes/font_size = 14
 text = "Returning keeps your last checkpoint.\nUnsaved progress will be lost."
 horizontal_alignment = 1
+
+[node name="TitleButton" type="Button" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "RETURN TO TITLE"
+
+[node name="PauseHint" type="Label" parent="CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList"]
+layout_mode = 2
+autowrap_mode = 3
+auto_translate_mode = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.67, 0.79, 0.85, 1)
+theme_override_font_sizes/font_size = 16
 
 [node name="SettingsMenu" type="Control" parent="CanvasLayer/PauseOverlay/Panel"]
 visible = false
@@ -865,42 +910,23 @@ theme_override_fonts/font = ExtResource("13_display")
 theme_override_font_sizes/font_size = 31
 text = "SYSTEM SETTINGS"
 
-[node name="FPSLabel" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
-offset_left = 45.0
-offset_top = 125.0
-offset_right = 203.0
-offset_bottom = 157.0
-theme_override_font_sizes/font_size = 19
-text = "FPS LIMIT"
-
 [node name="FPSOptions" type="OptionButton" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 215.0
 offset_top = 115.0
 offset_right = 400.0
 offset_bottom = 163.0
-theme_override_font_sizes/font_size = 18
-
-[node name="ResolutionLabel" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
-offset_left = 45.0
-offset_top = 195.0
-offset_right = 203.0
-offset_bottom = 227.0
-theme_override_font_sizes/font_size = 19
-text = "WINDOW SIZE"
 
 [node name="ResolutionOptions" type="OptionButton" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 215.0
 offset_top = 185.0
 offset_right = 400.0
 offset_bottom = 233.0
-theme_override_font_sizes/font_size = 18
 
 [node name="FullscreenToggle" type="CheckButton" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
 offset_left = 45.0
 offset_top = 254.0
 offset_right = 400.0
 offset_bottom = 299.0
-theme_override_font_sizes/font_size = 18
 text = "FULLSCREEN"
 
 [node name="SettingsNote" type="Label" parent="CanvasLayer/PauseOverlay/Panel/SettingsMenu"]
@@ -917,5 +943,4 @@ offset_left = 45.0
 offset_top = 336.0
 offset_right = 400.0
 offset_bottom = 378.0
-theme_override_font_sizes/font_size = 18
 text = "BACK"

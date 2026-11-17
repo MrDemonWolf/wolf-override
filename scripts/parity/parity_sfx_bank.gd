@@ -7,21 +7,25 @@ static var calls: PackedStringArray = []
 static var frame: int = 0
 
 
+## Logs "frame, play, clip, volume (dB), pitch", then plays as SfxBank does.
 func play(clip: StringName, volume_db: float = 0.0, pitch: float = 1.0) -> AudioStreamPlayer:
 	calls.append("%d\tplay\t%s\t%.2f\t%.3f" % [frame, clip, volume_db, pitch])
 	return super(clip, volume_db, pitch)
 
 
+## Logs "frame, blend, clips, blend (0 to 1), volume (dB)", then blends as SfxBank does.
 func play_blend(clips: Array[StringName], blend: float, volume_db: float) -> void:
 	calls.append("%d\tblend\t%s\t%.3f\t%.2f" % [frame, ",".join(clips), blend, volume_db])
 	super(clips, blend, volume_db)
 
 
+## Logs "frame, stop, clip", then stops as SfxBank does.
 func stop(clip: StringName) -> void:
 	calls.append("%d\tstop\t%s" % [frame, clip])
 	super(clip)
 
 
+## Logs "frame, stop_all", then stops every sound as SfxBank does.
 func stop_all() -> void:
 	calls.append("%d\tstop_all" % frame)
 	super()

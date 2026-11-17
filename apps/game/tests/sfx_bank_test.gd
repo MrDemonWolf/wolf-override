@@ -165,7 +165,7 @@ func _check_clip_names(bank: SfxBank) -> void:
 	var constants: Dictionary = (load("res://scripts/sfx_bank.gd") as Script).get_script_constant_map()
 	var found: int = 0
 	var unknown: Array[String] = []
-	for path: String in _scripts("res://scripts"):
+	for path: String in files_under("res://scripts", ["gd"]):
 		var source: String = FileAccess.get_file_as_string(path)
 		for hit: RegExMatch in pattern.search_all(source):
 			found += 1
@@ -189,14 +189,3 @@ func _check_clip_names(bank: SfxBank) -> void:
 	# The scan has to find the bank's real calls (the game makes several dozen), or it proves nothing.
 	_expect(found >= 40, "the clip-name scan finds the game's sound calls (%d)" % found)
 	_expect(unknown.is_empty(), "every clip name the scripts pass to the sound bank exists, and every stopped or blended one is a loop (unknown: %s)" % ", ".join(unknown))
-
-
-## Every .gd file under [param dir], recursively.
-func _scripts(dir: String) -> Array[String]:
-	var out: Array[String] = []
-	for file: String in DirAccess.get_files_at(dir):
-		if file.ends_with(".gd"):
-			out.append(dir.path_join(file))
-	for sub: String in DirAccess.get_directories_at(dir):
-		out.append_array(_scripts(dir.path_join(sub)))
-	return out

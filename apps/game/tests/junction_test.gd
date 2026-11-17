@@ -209,7 +209,7 @@ func _check_scene() -> void:
 	human.position.x = 700.0
 	_expect(str(game.call("_context_hint")).contains("Head right"), "the secured exit points right from across the room")
 	human.position.x = 830.0
-	_expect(str(game.call("_context_hint")).contains("follow the service line"), "the secured exit offers the service line")
+	_expect(str(game.call("_context_hint")).contains("Follow service line"), "the secured exit offers the service line")
 	var records_room: RecordsRoom = game.get("records_room") as RecordsRoom
 	_expect(is_equal_approx(records_room.exit_leaf.open, 1.0) and records_room.exit_door_shape.disabled, "a completed Records save shows the exit standing open on its floor stop, the doorway clear")
 	# Swing it again, as just after the copy is secured: a USE mid-swing waits for the leaf to reach its
@@ -241,10 +241,10 @@ func _check_scene() -> void:
 	var autosave_a: M0State = State.load_from_disk(path)
 	_expect(autosave_a != null and autosave_a.chapter_id == "junction" and not autosave_a.door_blown and autosave_a.memory == state.memory, "autosave A is written on entry with the relay memory")
 	var a_bytes: PackedByteArray = FileAccess.get_file_as_bytes(path)
-	# Audit 15: a save that worked says so in the hint bar, briefly, in the same word the title uses.
+	# A successful save keeps its confirmation text, but entry dialogue hides routine notifications.
 	var hint_text: Label = game.get_node("CanvasLayer/ContextHint/Text") as Label
 	game.call("_refresh_ui")
-	_expect(hint_text.text == "Checkpoint saved." and (game.get_node("CanvasLayer/ContextHint") as Control).visible, "autosave A says Checkpoint saved. in the hint bar")
+	_expect(hint_text.text == "Checkpoint saved." and not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "autosave A confirms its result without covering the entry dialogue")
 	game.set("waiting_for_choice", true)
 	game.call("_refresh_ui")
 	_expect(not (game.get_node("CanvasLayer/ContextHint") as Control).visible, "the checkpoint note never shows over an open choice")
@@ -253,7 +253,7 @@ func _check_scene() -> void:
 	game.call("_process", 2.1)
 	_expect(hint_text.text != "Checkpoint saved.", "the checkpoint note gives way to the room's own hint after about two seconds")
 	_expect(room.sentry.visual.dormant and room.sentry.visual.body.modulate == Sentry.DORMANT_TINT and not room.sentry.visual.is_lit(), "behind the sealed door the sentry stands powered down: dimmed, eye dark")
-	_expect(game.call("_objective") == "ARM THE BREAKER" and (game.get_node("CanvasLayer/TopBar/HUD") as Label).text.contains("SERVICE JUNCTION"), "entry shows the junction card and first objective")
+	_expect(game.call("_objective") == "ARM THE BREAKER" and not (game.get_node("CanvasLayer/TopBar") as Control).visible and not str(game.call("_shown_box")).is_empty(), "entry preserves the breaker objective while dialogue owns attention")
 	_expect(game.get("wolf_scouting") and wolf.autonomous_target_x == JunctionRoom.WOLF_SEAM_X, "WOLF runs ahead to the valve on his own")
 	# Round 3 item 3: there is no floor at the sealed door (the valve stands in front of it), so the line
 	# says what the picture shows: WOLF at the valve, reading its LINE gauge.
@@ -301,7 +301,9 @@ func _check_scene() -> void:
 	_expect(await walk_to(human, 200.0), "the engineer walks back to the breaker")
 	await _check_vent_edges(game, human, wolf, room, line, a_bytes)
 	_expect(await walk_to(human, 200.0), "the engineer is back at the breaker after the vent checks")
-	_expect(str(game.call("_context_hint")).contains("arm the overload breaker"), "the breaker offers USE")
+	# The dead-valve answer is still on screen here, so the hint row itself is hidden; the action it
+	# will show is checked, and the tap below proves USE arms the line.
+	_expect(str(game.call("_context_hint")) == "Arm breaker", "the breaker offers USE")
 	await tap(&"interact")
 	if not _require(line.state == &"building" and game.call("_objective") == "CRANK THE VALVE", "USE at the breaker arms the line"):
 		return
@@ -325,7 +327,7 @@ func _check_scene() -> void:
 	_expect(not paused and line.state == &"building", "resume keeps the armed line")
 	# Hold USE at the valve: turns persist across a release.
 	_expect(await walk_to(human, 420.0), "the engineer reaches the valve while the line builds")
-	_expect(str(game.call("_context_hint")).begins_with("HOLD E:"), "the live valve asks for a held USE")
+	_expect(str(game.call("_context_hint")).begins_with("Crank valve") and game.call("_hold_station") == &"valve", "the live valve asks for a held USE")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	_expect(touch_use.text == "CRANK", "touch relabels USE to CRANK at the live valve")
@@ -493,7 +495,7 @@ func _check_scene() -> void:
 	_expect(corridor_door.disabled, "the corridor door stays open in the junction")
 	# Return to Title and New Game leave the junction's collision and loops off.
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
 	game.call("_new_game")
 	game.call("_finish_intro")
 	await physics_frame

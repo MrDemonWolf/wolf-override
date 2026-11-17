@@ -19,12 +19,15 @@ extends "res://tests/support/text_boxes_suite.gd"
 func _run() -> void:
 	check_name = "Text boxes"
 	var path: String = await open_text_game("text-boxes-test")
+	# Measure full-page layout and pagination; Normal reveal and first-press ownership have their own suite.
+	game.settings_menu.text_speed.select(3)
 	_check_reading_rule()
 	_check_splitting()
 	_check_language_rules()
 	_check_corpus()
 	_check_cjk_samples()
 	await _check_opening()
+	_check_stopped_pages()
 	await _check_first_control()
 	await _check_corridor()
 	await _check_records_exit()

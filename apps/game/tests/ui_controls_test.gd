@@ -12,6 +12,45 @@ func _run() -> void:
 	game.set("settings_path", path)
 	game.set("save_path", "%s-save.json" % path)
 	root.add_child(game)
+	var first: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
+	var title_scroll: ScrollContainer = game.get_node("CanvasLayer/TitleScreen/MenuScroll") as ScrollContainer
+	var base_font: int = first.get_theme_font_size(&"font_size")
+	var quit_button: Button = first.get_parent().get_node("QuitButton") as Button
+	_expect(quit_button.visible == (not (game.get("settings_menu") as GameSettings).mobile and not OS.has_feature("web")), "Quit is available on desktop and handheld PC, leaving mobile and web exit to the system")
+	_expect(quit_button.pressed.is_connected(Callable(self, "quit")), "Quit closes the running tree through the native engine action")
+	var last: Button = quit_button if quit_button.visible else first.get_parent().get_node("CreditsButton") as Button
+	await settle(4)
+	_expect(title_scroll.get_v_scroll_bar().max_value <= title_scroll.get_v_scroll_bar().page + 1.0, "the normal-size title fits every action without scrolling")
+	last.grab_focus()
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	game.call("_apply_text_size")
+	await frames(2)
+	_expect(first.get_theme_font_size(&"font_size") == base_font * 2, "repeated 200% title scaling does not compound")
+	for layout_frame: int in 4:
+		await process_frame
+	_expect(title_scroll.scroll_vertical > 0, "large title menus scroll to the focused final action")
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
+	await frames(2)
+	_expect(first.get_theme_font_size(&"font_size") == base_font, "title text returns to its authored size")
+	var mouse: InputEventMouseMotion = InputEventMouseMotion.new()
+	game.call("_note_input_device", mouse)
+	game.call("_grab_menu_focus", first)
+	_expect(first.has_focus() and not first.has_focus(true), "mouse menu focus stays navigable without a visible ring")
+	var key: InputEventKey = InputEventKey.new()
+	key.keycode = KEY_DOWN
+	key.pressed = true
+	game.call("_note_input_device", key)
+	_expect(first.has_focus(true), "keyboard input restores the menu focus ring")
+	game.call("_note_input_device", mouse)
+	var drift: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	drift.axis_value = 0.1
+	game.call("_note_input_device", drift)
+	_expect(game.get("mouse_active") and not first.has_focus(true), "idle controller drift does not restore a mouse-hidden focus ring")
+	game.call("_note_input_device", controller_button(JOY_BUTTON_A, true))
+	_expect(first.has_focus(true), "controller input restores the menu focus ring")
+	game.set("controller_active", false)
 	# The title CHANGELOG button opens the exported changelog in the game; the online button keeps the website link.
 	var changelog: Button = game.get_node("CanvasLayer/TitleScreen/ChangelogButton") as Button
 	var changelog_screen: ColorRect = game.get_node("CanvasLayer/TitleScreen/ChangelogScreen") as ColorRect
@@ -19,6 +58,8 @@ func _run() -> void:
 	var changelog_back: Button = changelog_screen.get_node("ChangelogBackButton") as Button
 	var changelog_online: Button = changelog_screen.get_node("ChangelogOnlineButton") as Button
 	var title_logo: Label = game.get_node("CanvasLayer/TitleScreen/GameTitle") as Label
+	# The title's size has one home, the Display role in the UI token file, and no TEXT SIZE factor yet.
+	_expect(title_logo.get_theme_font_size(&"font_size") == UiTokens.px("type.display.size"), "the title is drawn at type.display.size (%d px)" % title_logo.get_theme_font_size(&"font_size"))
 	_expect(changelog.pressed.is_connected(Callable(game, "_show_changelog")) and changelog_online.pressed.is_connected(Callable(game, "_open_changelog")) and str(game.CHANGELOG_URL) == "https://wolfoverride.mrdemonwolf.dev/docs/changelog/" and str(game.SITE_URL).begins_with("https://wolfoverride.mrdemonwolf.dev"), "title changelog opens in the game and the online button points to the public development updates")
 	var changelog_text: String = str(game.get("changelog_text"))
 	var first_heading: String = changelog_text.get_slice("\n", 0)
@@ -69,67 +110,110 @@ func _run() -> void:
 	var project_theme: Theme = ThemeDB.get_project_theme()
 	var ring: StyleBoxFlat = project_theme.get_stylebox("focus", "Button") as StyleBoxFlat if project_theme != null and project_theme.has_stylebox("focus", "Button") else null
 	_expect(ring != null and ring.border_color.is_equal_approx(Color("#8de5f5")) and ring.border_width_left == 2 and ring.expand_margin_left == 0.0 and ring.bg_color.a == 0.0, "the shared theme gives buttons an inset cyan focus ring")
-	var title_new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	var title_new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	var shared_settings: GameSettings = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as GameSettings
-	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (shared_settings.volumes["Music"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
+	_expect(title_new_game.get_theme_stylebox("focus") == ring and shared_settings.vsync.get_theme_stylebox("focus") == ring and (shared_settings.volumes["Effects"] as HSlider).get_theme_stylebox("focus") == ring and shared_settings.deadzone.get_theme_stylebox("focus") == ring, "title and Settings controls, sliders included, share the theme focus ring")
 	var tab_ring: StyleBoxFlat = shared_settings.tabs.get_theme_stylebox("tab_focus") as StyleBoxFlat
 	_expect(tab_ring != null and tab_ring.border_width_left == 2 and tab_ring.expand_margin_left == -4.0, "settings tabs keep their inset focus ring")
 	# The theme pass gave title, pause and HUD buttons one lifted style: the ring rides over the state fill
 	# instead of replacing it, so it stays wider than the button border and keeps a colour hover never uses.
-	var resume: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button
+	var resume: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button
 	var resume_normal: StyleBoxFlat = resume.get_theme_stylebox("normal") as StyleBoxFlat
 	var resume_hover: StyleBoxFlat = resume.get_theme_stylebox("hover") as StyleBoxFlat
 	_expect(resume.get_theme_stylebox("focus") == ring and resume_normal != null and resume_hover != null and ring.border_width_left > resume_normal.border_width_left and not ring.border_color.is_equal_approx(resume_hover.border_color) and resume_normal.shadow_size > 0 and resume_normal.corner_radius_top_left > 0, "pause-menu buttons share the inset ring, heavier than their border and distinct from hover")
 	_expect(title_new_game.get_theme_stylebox("normal") == resume_normal, "title and pause buttons wear the same theme style")
 	# Settings alone keeps the terminal identity: squared controls with the same ring colour and width, squared to match.
-	for bordered_path: String in ["CanvasLayer/PauseOverlay/Panel/SettingsMenu/BackButton", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions", "CanvasLayer/PauseOverlay/Panel/SettingsMenu/ResolutionOptions"]:
-		var bordered: Button = game.get_node(bordered_path) as Button
+	for bordered: Button in [game.get("settings_back_button"), game.get("fps_options"), game.get("resolution_options")]:
 		var bordered_focus: StyleBoxFlat = bordered.get_theme_stylebox("focus") as StyleBoxFlat
 		var bordered_normal: StyleBoxFlat = bordered.get_theme_stylebox("normal") as StyleBoxFlat
 		_expect(bordered_focus != null and bordered_normal != null and bordered_focus.border_color.is_equal_approx(ring.border_color) and bordered_focus.border_width_left == ring.border_width_left and bordered_focus.expand_margin_left == 0.0 and bordered_focus.bg_color.a == 0.0 and bordered_focus.corner_radius_top_left == 0 and bordered_normal.corner_radius_top_left == 0 and bordered_normal.border_width_left < bordered_focus.border_width_left, "%s keeps a squared terminal ring inside its border" % bordered.name)
 	# LANGUAGE (PR L6) is a Settings row like FPS: the same squared ring and style, with the list's own
 	# font chain (I18n.picker_font over Montserrat Semibold) on the button and in the open list.
-	var fps_options: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as Button
+	var fps_options: Button = game.get("fps_options") as Button
 	var language: OptionButton = shared_settings.language
 	var list_font: Font = language.get_theme_font("font")
 	_expect(language.get_theme_stylebox("focus") == fps_options.get_theme_stylebox("focus") and language.get_theme_stylebox("normal") == fps_options.get_theme_stylebox("normal"), "LANGUAGE wears the Settings rows' squared terminal style and ring")
 	_expect(list_font is FontVariation and (list_font as FontVariation).base_font == GameSettings.CONTROL_FONT.base_font and not list_font.fallbacks.is_empty() and language.get_popup().get_theme_font("font") == list_font and language.get_popup().get_theme_font("font_separator") == list_font, "LANGUAGE and its list draw with the list's own font chain")
 	game.call("_new_game")
 	game.call("_finish_intro")
+	var objective_card: Control = game.get_node("CanvasLayer/TopBar") as Control
+	var before_recall: String = str(game.get("status_line"))
+	objective_card.hide()
+	var recall: InputEventKey = InputEventKey.new()
+	recall.physical_keycode = KEY_TAB
+	recall.pressed = true
+	Input.parse_input_event(recall)
+	await frames(2)
+	_expect(objective_card.visible and (game.get("hud") as Label).text.contains(str(game.call("_objective"))), "Tab recalls the current objective in the existing card")
+	_expect(str(game.get("status_line")) == before_recall and not paused, "recalling the objective leaves dialogue and play state alone")
+	recall.pressed = false
+	Input.parse_input_event(recall)
+	objective_card.hide()
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, true))
+	await frames(2)
+	_expect(objective_card.visible and game.get("controller_active"), "controller View recalls the same objective")
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, false))
+	game.call("_pause_game")
+	objective_card.hide()
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, true))
+	await frames(2)
+	_expect(paused and not objective_card.visible, "View leaves Pause unchanged")
+	Input.parse_input_event(controller_button(JOY_BUTTON_BACK, false))
+	game.call("_resume_game")
 	game.set("touch_enabled", true)
 	game.call("_refresh_ui")
 	var touch: Control = game.get_node("CanvasLayer/TouchControls") as Control
 	var right: Button = touch.get_node("Right") as Button
 	var use: Button = touch.get_node("Use") as Button
-	_expect(touch.visible and right.visible and use.visible, "touch movement and use appear during play")
-	right.button_down.emit()
-	_expect(Input.is_action_pressed(&"move_right"), "held touch direction drives the movement action")
+	var move_pad: TouchMovePad = game.get("touch_move_pad") as TouchMovePad
+	_expect(touch.visible and move_pad.visible and not right.visible and use.visible, "the move pad and USE appear during exploration")
+	var thumb: InputEventScreenTouch = InputEventScreenTouch.new()
+	thumb.position = Vector2(100, 200)
+	thumb.pressed = true
+	_expect(move_pad.begin(thumb), "the movement probe claims a free thumb")
+	var drag: InputEventScreenDrag = InputEventScreenDrag.new()
+	drag.position = thumb.position + Vector2(move_pad.radius, 0)
+	move_pad.observe(drag)
+	_expect((game.get("human") as M0Actor).touch_axis > 0.0 and not Input.is_action_pressed(&"move_right"), "thumb movement stays local instead of injecting a global action")
 	game.call("_process", 0.016)
-	right.button_up.emit()
-	_expect(not Input.is_action_pressed(&"move_right") and game.get("tutorial_step") == 1, "releasing touch stops movement and advances the tutorial")
+	thumb.pressed = false
+	move_pad.observe(thumb)
+	_expect((game.get("human") as M0Actor).touch_axis == 0.0 and game.get("tutorial_step") == 1, "releasing the thumb stops movement and advances the tutorial")
+	# Resume the control-binding probe after dialogue; native dialogue taps are covered by touch_move_pad_test.
+	game.call("_drop_box_queue")
+	game.set("status_line", "")
+	game.call("_refresh_ui")
 	await process_frame
 	use.button_down.emit()
 	await process_frame
 	use.button_up.emit()
 	_expect(game.get("tutorial_step") == 2 and not (game.get_node("CanvasLayer/TutorialPrompt") as Control).visible, "touch use reads the display and clears the tutorial")
-	# Holding the touch USE button cranks the corridor's MANUAL BYPASS; Pause lets go and keeps the turns made.
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "the display exchange is read before testing exploration controls")
+	# Holding the touch action pill cranks the corridor's MANUAL BYPASS; Pause lets go and keeps the turns made.
 	var crank_state: M0State = game.get("state") as M0State
 	crank_state.record_choice(M0State.PRESS)
 	crank_state.arm_breaker()
 	(game.get_node("Human") as M0Actor).position.x = 700.0
 	game.call("_refresh_ui")
-	_expect(use.text == "CRANK", "touch USE reads CRANK at the live bypass")
-	use.button_down.emit()
+	await settle(3)
+	var pill: Control = game.get_node("CanvasLayer/ContextHint") as Control
+	_expect(pill.visible and not use.visible, "the live bypass offers one touch action pill")
+	var crank_touch: InputEventScreenTouch = InputEventScreenTouch.new()
+	crank_touch.index = 1
+	crank_touch.position = Tappable.canvas_rect(pill).get_center()
+	crank_touch.pressed = true
+	root.push_input(crank_touch, true)
 	# A second of game time held, as frames (60 physics frames, 1/60 s each) rather than a SceneTree
 	# timer, so the turns are counted after a fixed number of game frames, the way the kit's other
 	# waits count; the crank advances on process deltas, which never sum to less than the physics time
 	# (Godot only drops physics steps when frames come late), so it has had at least a second.
 	await frames(60)
 	var held_turns: int = int(game.get("bypass_ticks"))
-	_expect(held_turns >= 2 and not crank_state.door_open, "holding touch USE cranks the bypass (%d turns after a second)" % held_turns)
+	_expect(held_turns >= 2 and not crank_state.door_open, "holding the touch pill cranks the bypass (%d turns after a second)" % held_turns)
 	game.call("_pause_game")
 	_expect(paused and not Input.is_action_pressed(&"interact"), "Pause lets go of a held USE")
-	use.button_up.emit()
+	crank_touch.pressed = false
+	root.push_input(crank_touch, true)
 	game.call("_resume_game")
 	await create_timer(0.5).timeout
 	_expect(int(game.get("bypass_ticks")) == held_turns and not crank_state.door_open, "the turns made before Pause stay, and nothing cranks without the button held")
@@ -142,8 +226,8 @@ func _run() -> void:
 	controller_event.button_index = JOY_BUTTON_RIGHT_SHOULDER
 	controller_event.pressed = true
 	game.call("_input", controller_event)
-	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with("X  ") and second_choice.text.begins_with("Y  "), "controller choices use compact stacked cards with action prompts")
-	_expect(not right.visible and not use.visible, "controller input hides mobile touch movement controls")
+	_expect(first_choice.size.y == 40.0 and second_choice.position.y > first_choice.position.y and first_choice.text.begins_with(ControllerGlyphs.button(&"xbox", JOY_BUTTON_X) + "  ") and second_choice.text.begins_with(ControllerGlyphs.button(&"xbox", JOY_BUTTON_Y) + "  "), "controller choices use compact stacked cards with action prompts")
+	_expect(not right.visible and not use.visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "controller input hides on-screen touch movement and Pause controls")
 	var touch_event: InputEventScreenTouch = InputEventScreenTouch.new()
 	touch_event.pressed = true
 	game.call("_input", touch_event)
@@ -152,14 +236,29 @@ func _run() -> void:
 	game.call("_refresh_ui")
 	game.call("_pause_game")
 	var overlay: PauseOverlay = game.get_node("CanvasLayer/PauseOverlay") as PauseOverlay
+	var pause_scroll: ScrollContainer = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll") as ScrollContainer
+	var return_action: Button = pause_scroll.get_node("MenuMargin/MenuList/TitleButton") as Button
+	TextSize.factor = 2.0
+	game.call("_apply_text_size")
+	return_action.grab_focus()
+	UIMotion.follow_focus(pause_scroll)
+	for layout_frame: int in 6:
+		await process_frame
+	_expect(resume.get_theme_font_size(&"font_size") == 42 and pause_scroll.scroll_vertical > 0, "paused actions scale to 200% and scroll to the focused return action")
+	TextSize.factor = 1.0
+	game.call("_apply_text_size")
+	root.gui_release_focus()
+	for layout_frame: int in 3:
+		await process_frame
 	_expect(paused and overlay.visible, "pause freezes the game and opens the menu")
 	_expect(root.gui_get_focus_owner() == null, "pause opened in touch mode leaves no focused button")
 	await send_key(KEY_DOWN, true)
 	await send_key(KEY_DOWN, false)
-	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
+	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/ResumeButton") as Button).has_focus(), "the first arrow press in a touch-opened pause menu focuses Resume without moving past it")
+	_expect(not bool(game.get("touch_enabled")) and (pause_scroll.get_node("MenuMargin/MenuList/PauseHint") as Label).text == HudText.card(str(game.call("_objective_card_message"))), "Pause keeps the current goal when keyboard input replaces touch")
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	_expect((game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu") as Control).visible, "settings open while paused")
-	var fps: OptionButton = game.get_node("CanvasLayer/PauseOverlay/Panel/SettingsMenu/FPSOptions") as OptionButton
+	var fps: OptionButton = game.get("fps_options") as OptionButton
 	fps.select(0)
 	game.call("_on_fps_selected", 0)
 	var config: ConfigFile = ConfigFile.new()
@@ -193,7 +292,12 @@ func _run() -> void:
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
 	await process_frame
 	await process_frame
-	_expect(game.get("intro_active") and game.get("intro_step") == 1, "remapped B continues the intro instead of triggering native menu cancel")
+	_expect(game.get("intro_active") and game.get("intro_step") == 0 and (game.get("dialogue_reveal") as DialogueReveal).done(), "remapped B reveals the intro instead of triggering native menu cancel")
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
+	await process_frame
+	Input.parse_input_event(controller_button(JOY_BUTTON_B, true))
+	await settle(2)
+	_expect(game.get("intro_active") and game.get("intro_step") == 1, "the next remapped B advances the revealed intro")
 	Input.parse_input_event(controller_button(JOY_BUTTON_B, false))
 	await process_frame
 	game.call("_finish_intro")
@@ -213,10 +317,10 @@ func _run() -> void:
 	await process_frame
 	menu.reset_controls()
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
-	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/NewGameButton") as Button
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
+	var new_game: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/NewGameButton") as Button
 	_expect(not paused and game.get("title_open") and not overlay.visible and not (game.get_node("Human") as M0Actor).controlled and new_game.has_focus(), "Return to Title hides the pause menu and focuses New Game with actor control stopped")
-	_expect((game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
+	_expect((game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button).disabled, "returning without a saved checkpoint keeps Continue disabled")
 	new_game.pressed.emit()
 	_expect(game.get("intro_active") and (game.get("state") as M0State).memory.is_empty(), "New Game from the returned title clears the previous remembered choice")
 	# Android Back walks out of menus one step at a time and pauses play instead of quitting.
@@ -225,7 +329,7 @@ func _run() -> void:
 	await process_frame
 	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	_expect(paused and overlay.visible, "Back during play opens Pause")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/SettingsButton") as Button).pressed.emit()
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/SettingsButton") as Button).pressed.emit()
 	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	_expect(paused and (game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu") as Control).visible and not settings_menu.visible, "Back in Settings returns to Pause")
 	game.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
@@ -242,7 +346,7 @@ func _run() -> void:
 	await process_frame
 	await _send_escape(true)
 	await _send_escape(false)
-	var title_button: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button
+	var title_button: Button = game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button
 	_expect(paused and game.get("intro_active") and title_button.text == "SKIP OPENING", "Pause during the opening keeps the opening and offers Skip Opening")
 	title_button.pressed.emit()
 	_expect(not paused and not game.get("intro_active"), "Skip Opening resumes into play")
@@ -281,7 +385,7 @@ func _run() -> void:
 	# The END OF SLICE card (decision D) answers touch, controller and keyboard through the real input path.
 	var end_card: Control = game.get_node("CanvasLayer/EndCard") as Control
 	var end_button: Button = end_card.get_node("EndCardContinue") as Button
-	game.set("controller_active", false)
+	game.call("_input", touch_event)
 	game.call("_show_end_card")
 	await process_frame
 	_expect(end_card.visible and end_button.text == "TAP CONTINUE" and not (game.get_node("CanvasLayer/TouchControls") as Control).visible and not (game.get_node("CanvasLayer/PauseButton") as Control).visible, "on touch the END OF SLICE card shows TAP CONTINUE with no play buttons over it")
@@ -370,6 +474,7 @@ func _check_hud_writes_on_change(game: Node2D) -> void:
 	await process_frame
 
 
+## True when controller button [param index] is bound to [param action] in the InputMap.
 func _has_button(action: StringName, index: JoyButton) -> bool:
 	for event: InputEvent in InputMap.action_get_events(action):
 		if event is InputEventJoypadButton and event.button_index == index:
@@ -377,6 +482,7 @@ func _has_button(action: StringName, index: JoyButton) -> bool:
 	return false
 
 
+## Sends Escape pressed or released ([param pressed]) through the kit's send_key.
 func _send_escape(pressed: bool) -> void:
 	await send_key(KEY_ESCAPE, pressed)
 

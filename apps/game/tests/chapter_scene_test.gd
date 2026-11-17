@@ -9,6 +9,8 @@ const State = preload("res://scripts/m0_state.gd")
 func _run() -> void:
 	check_name = "Chapter scene"
 	var game: Node2D = open_game("chapter-scene-test")
+	# Scene transitions use Instant; Normal reveal-before-exit is checked in dialogue_reveal_test.
+	(game.get("settings_menu") as GameSettings).text_speed.select(3)
 	var path: String = str(game.get("save_path"))
 	game.call("_new_game")
 	game.call("_finish_intro")
@@ -16,9 +18,9 @@ func _run() -> void:
 	game.set("state", state)
 	game.call("_sync_scene")
 	(game.get_node("Human") as M0Actor).position.x = 160.0
-	_require(not str(game.call("_context_hint")).contains("enter records"), "checkpoint entry hint stays hidden outside safe-point reach")
+	_require(not str(game.call("_context_hint")).contains("Enter records"), "checkpoint entry hint stays hidden outside safe-point reach")
 	(game.get_node("Human") as M0Actor).position.x = 876.0
-	_require(str(game.call("_context_hint")).contains("enter records"), "checkpoint entry hint appears at the safe point")
+	_require(str(game.call("_context_hint")).contains("Enter records"), "checkpoint entry hint appears at the safe point")
 	game.call("_interact_checkpoint")
 	_require(state.chapter_id == "records" and FileAccess.file_exists(path), "checkpoint opens and saves a second room")
 	game.call("_refresh_ui")
@@ -28,12 +30,16 @@ func _run() -> void:
 	var wolf: M0Actor = game.get_node("Wolf") as M0Actor
 	var main_constants: Dictionary = (game.get_script() as Script).get_script_constant_map()
 	var wolf_mirror_x: float = main_constants["WOLF_MIRROR_X"]
-	_require(human.controlled and not wolf.controlled and wolf.autonomous_target_x == wolf_mirror_x, "only engineer is playable while WOLF starts his own mirror check")
+	_require(not human.controlled and not wolf.controlled and wolf.autonomous_target_x == wolf_mirror_x, "entry dialogue holds the engineer while WOLF starts his own mirror check")
+	_require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "the entry exchange can be read before exploring")
+	_require(human.controlled, "reading the entry exchange returns engineer control")
 	if not await walk_to(human, 190.0):
 		_require(false, "engineer can walk to the purge queue")
 		return
 	await tap(&"interact")
 	_require(state.purge_trace_preserved and game.call("_objective") == "COPY MIRROR INDEX", "purge trace advances objective")
+	_require(game.call("_conversation_active") and not human.controlled, "the copied source holds for the player to read")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "reading the copied source releases movement")
 	# Audit 23: a USE over the middle of a machine steps the engineer out beside it, facing it.
 	_require(await _wait_until(func() -> bool: return float(game.get("engineer_step_x")) < 0.0, 40) and human.position.x + M0Actor.HUMAN_REACH <= RecordsRoom.PURGE_X - RecordsRoom.PURGE_HALF_WIDTH + 18.0 and not human.body_sprite.flip_h and human.controlled, "after copying the purge order the engineer stands beside the purge queue, facing it (x %.0f)" % human.position.x)
 	var purge_save: M0State = State.load_from_disk(path)
@@ -61,6 +67,8 @@ func _run() -> void:
 	for _frame in range(90):
 		await physics_frame
 	_require(absf(wolf.position.x - wolf_mirror_x) <= 2.0 and wolf.body_sprite.flip_h, "after his readout WOLF stays at the mirror port's right, facing it, while the engineer is at it (x %.0f)" % wolf.position.x)
+	_require(game.call("_conversation_active") and not human.controlled, "the mirror readout remains stopped while WOLF holds his reading spot")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "reading the mirror result releases movement")
 	if not await walk_to(human, 700.0):
 		_require(false, "engineer can walk on from the mirror port")
 		return
@@ -82,7 +90,7 @@ func _run() -> void:
 	var closing_story: Label = game.get_node("CanvasLayer/BottomBar/Story") as Label
 	var closing_speaker: Label = game.get_node("CanvasLayer/BottomBar/Speaker") as Label
 	_require(closing_story.text == "FIRST COPY SECURED." and closing_speaker.text.is_empty(), "the closing lines start with their own first box (%s)" % closing_story.text)
-	_require((game.get_node("CanvasLayer/PauseButton") as Button).visible, "the closing lines keep the pause button available")
+	_require((game.get_node("CanvasLayer/PauseButton") as Button).visible == bool(game.get("touch_enabled")), "closing lines show the Pause button only for touch input")
 	await tap(&"pause_game")
 	_require(paused and (game.get_node("CanvasLayer/PauseOverlay") as Control).visible, "pause opens over the closing lines")
 	var paused_age: float = float(game.get("dialogue_age"))
@@ -114,7 +122,7 @@ func _run() -> void:
 	over_safe_point.human_position = Vector2(873.5, 410.0)
 	over_safe_point.save_to_disk(path)
 	game.call("_load_game")
-	_require(absf(human.position.x - (876.0 - 35.0 - M0Actor.HUMAN_REACH + 6.0)) <= 0.5 and not human.body_sprite.flip_h and str(game.call("_context_hint")).contains("enter records"), "Continue over the SAFE POINT console puts the engineer beside it, facing it and in reach (x %.1f)" % human.position.x)
+	_require(absf(human.position.x - (876.0 - 35.0 - M0Actor.HUMAN_REACH + 6.0)) <= 0.5 and not human.body_sprite.flip_h and str(game.call("_context_hint")).contains("Enter records"), "Continue over the SAFE POINT console puts the engineer beside it, facing it and in reach (x %.1f)" % human.position.x)
 	var over_queue: M0State = _checkpoint_state(State.PRESS)
 	over_queue.enter_records()
 	over_queue.preserve_purge_trace()
@@ -139,11 +147,13 @@ func _run() -> void:
 	game.call("_sync_scene")
 	game.call("_interact_checkpoint")
 	_require(str(game.get("status_line")).contains("I refused the live relay"), "second room remembers refusal without blocking progress")
+	_require(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "fallback reads the entry exchange before exploring")
 	human = game.get_node("Human") as M0Actor
 	if not await walk_to(human, 190.0):
 		_require(false, "fallback engineer can reach purge queue")
 		return
 	await tap(&"interact")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "fallback reads the copied source before walking on")
 	if not await walk_to(human, 520.0):
 		_require(false, "fallback engineer can reach mirror port")
 		return
@@ -153,6 +163,7 @@ func _run() -> void:
 	_require(str(game.call("_context_hint")) == "Mirror copied. Head for the exit.", "the manual copy also leaves the mirror port reading as copied")
 	_require(state.memory.get("choice_id") == State.PRESS, "manual route retains accurate earlier choice")
 	_require(not (game.get_node("Wolf") as M0Actor).controlled, "fallback never transfers control to WOLF")
+	_require(await continue_until(game, func() -> bool: return human.controlled, TALK_FRAMES), "fallback reads the manual-port result before leaving")
 	if not await walk_to(human, 830.0):
 		_require(false, "fallback engineer can reach exit")
 		return
@@ -160,8 +171,8 @@ func _run() -> void:
 	var loaded: M0State = State.load_from_disk(path)
 	_require(state.chapter_complete and loaded != null and loaded.mirror_route == "manual", "manual chapter completion saves for Continue")
 	game.call("_pause_game")
-	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/TitleButton") as Button).pressed.emit()
-	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/ContinueButton") as Button
+	(game.get_node("CanvasLayer/PauseOverlay/Panel/PauseMenu/MenuScroll/MenuMargin/MenuList/TitleButton") as Button).pressed.emit()
+	var continue_button: Button = game.get_node("CanvasLayer/TitleScreen/MenuScroll/MenuMargin/MenuList/ContinueButton") as Button
 	_require(game.get("title_open") and not paused and not human.controlled and not continue_button.disabled, "Return to Title refreshes Continue availability after completing the chapter")
 	continue_button.pressed.emit()
 	_require(not game.get("title_open") and (game.get("state") as M0State).to_dict() == loaded.to_dict() and human.controlled, "Continue from the returned title restores the exact completed checkpoint")
@@ -196,7 +207,7 @@ func _run() -> void:
 	_require(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use a station to try again.", "save failure shows in the system hint, not in WOLF's line")
 	human.position.x = 830.0
 	game.call("_refresh_ui")
-	_require(hint_text.text.ends_with("secure the first copy in the container."), "moving to another station brings back its interaction hint after a save failure")
+	_require(hint_text.text == "Secure copy", "moving to another station brings back its interaction hint after a save failure")
 	human.position.x = 190.0
 	game.call("_save_progress")
 	game.set("save_path", path)

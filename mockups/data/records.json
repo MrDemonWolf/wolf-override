@@ -1,0 +1,20 @@
+{
+  "$about": "Records Access, shared by every page that shows it (M04, M06): its plates, entry and exit doors and props, back to front, placed with C3's numbers (code/C3-assets-for-mockups.md section 5). Read by mockups/shared/wo.js composeWorlds through data-wo-world=\"data/records.json\". A page adds its actors at the \"actors\" slot and sets its own camera (wo.js worldConfig). Paths are under apps/game/assets; x, y, w, h in world px.",
+  "camera": "left",
+  "framing": "auto",
+  "grade": true,
+  "pieces": [
+    {"id": "far", "src": "rooms/records-far.png", "layer": "far", "x": 0, "y": 0, "w": 960, "h": 540, "bleed": "bottom"},
+    {"id": "entry-back", "src": "doors/records-entry-back.png", "x": -10, "y": 0, "w": 109.5, "h": 461.5, "brightness": "door_kit.gd:BEYOND_LIFT"},
+    {"id": "entry-wall", "src": "doors/records-entry-wall.png", "x": 56.71, "y": 0, "w": 103, "h": 444.5, "brightness": "door_kit.gd:WALL_LIFT"},
+    {"id": "exit-back", "src": "doors/records-exit-back.png", "x": 851.66, "y": 0, "w": 118.5, "h": 463, "brightness": "door_kit.gd:BEYOND_LIFT"},
+    {"id": "exit-wall", "src": "doors/records-exit-wall.png", "x": 791.96, "y": 0, "w": 101, "h": 444.5, "brightness": "door_kit.gd:WALL_LIFT"},
+    {"id": "mid", "src": "rooms/records-mid.png", "x": 0, "y": 0, "w": 960, "h": 539.6, "bleed": "bottom sides"},
+    {"id": "purge-queue", "src": "props/records-purge-queue.png", "x": 153.57, "y": 367.95, "w": 72.86, "h": 72.05},
+    {"id": "mirror-port", "src": "props/records-mirror-port.png", "x": 488.23, "y": 360.04, "w": 63.54, "h": 79.96},
+    {"id": "container", "src": "props/records-container.png", "x": 775.5, "y": 369, "w": 43, "h": 73},
+    {"slot": "actors"},
+    {"id": "entry-front", "src": "doors/records-entry-front.png", "x": -10, "y": 0, "w": 70, "h": 465.5},
+    {"id": "exit-front", "src": "doors/records-exit-front.png", "x": 889.40, "y": 0, "w": 80.5, "h": 469.5}
+  ]
+}

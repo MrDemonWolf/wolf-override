@@ -24,6 +24,8 @@ var started: Array[StringName] = []
 ## State-changing presses checked, and how many of them were heard within one frame.
 var presses: int = 0
 var heard: int = 0
+## State-changing probes by injected action or native E/A event path.
+var device_counts: Dictionary[StringName, int] = {&"action": 0, &"key": 0, &"pad": 0}
 
 
 func _run() -> void:
@@ -41,7 +43,8 @@ func _run() -> void:
 	await _junction_exit()
 
 	_expect(presses >= 20, "the probe checked the slice's state-changing presses (%d)" % presses)
-	print("Press probe: %d state-changing presses, %d heard within one frame" % [presses, heard])
+	_expect(device_counts[&"key"] >= 1 and device_counts[&"pad"] >= 1, "native E and pad A each exercised a state-changing USE")
+	print("Press probe: %d state-changing presses, %d heard within one frame; devices %s" % [presses, heard, device_counts])
 	# The kit's teardown stops the bank and every player and lets the mixer release them (about 0.5 s
 	# in all, as before) before it frees the game and removes its files.
 	await end_game(game, 0.4)
@@ -56,7 +59,8 @@ func _route_wolf_takes_relay() -> void:
 	await _ask_relay()
 	await _press(&"choice_1", "telling WOLF the risk at the breaker")
 	_expect(started.has(&"actuator"), "WOLF's answer at the relay is heard as his joints move (heard %s)" % [started])
-	await _press(&"interact", "arming the corridor breaker")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the disclosed-risk reply before arming")
+	await _press(&"interact", "arming the corridor breaker", -1.0, true, &"key")
 	await _place(605.0, 520.0)
 	_expect(_fault_shown(), "the live relay wears its COOLANT FAULT tag")
 	await _press(&"interact", "signalling WOLF to take the relay")
@@ -80,7 +84,8 @@ func _route_bypass() -> void:
 	await settle(5)
 	await _ask_relay()
 	await _press(&"choice_2", "pressing WOLF at the breaker")
-	await _press(&"interact", "arming the corridor breaker after his refusal")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the refusal before arming")
+	await _press(&"interact", "arming the corridor breaker after his refusal", -1.0, true, &"pad")
 	await _press(&"interact", "asking WOLF again at the live relay", 605.0)
 	_expect(started.has(&"actuator"), "WOLF's refusal at the relay is heard (heard %s)" % [started])
 	await _place(700.0, 480.0)
@@ -137,11 +142,7 @@ func _leave_records() -> void:
 ## At the breaker: USE until WOLF asks about the relay (the stakes line may come first).
 func _ask_relay() -> void:
 	await _place(350.0, 290.0)
-	for _attempt: int in 3:
-		if bool(game.get("waiting_for_choice")):
-			break
-		await _press(&"interact", "reading on at the breaker", -1.0, false)
-	_expect(bool(game.get("waiting_for_choice")), "WOLF asks about the relay at the breaker")
+	_expect(await continue_until(game, func() -> bool: return bool(game.get("waiting_for_choice")), TALK_FRAMES), "WOLF asks about the relay after every preceding page is read")
 
 
 ## The safe point: secure it (first visit), save again, then go on into Records Access.
@@ -162,12 +163,15 @@ func _safe_point() -> void:
 ## Records Access: the purge copy, the mirror (by [param mirror_route]), the first copy and its
 ## closing shot.
 func _records(mirror_route: String) -> void:
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the Records entry exchange before using a source")
 	await _press(&"interact", "copying the purge-order trace", 190.0)
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the copied purge source before the next station")
 	await _press(&"interact", "opening the mirror index", 520.0, false)
 	# WOLF reads it from beside the port.
 	await _place(520.0, float((game.get_script() as Script).get_script_constant_map()["WOLF_MIRROR_X"]))
 	await _press(&"choice_1" if mirror_route == "wolf" else &"choice_2", "copying the mirror timestamp (%s)" % mirror_route)
 	_expect((game.get("state") as M0State).mirror_route == mirror_route, "the mirror is copied by the chosen route")
+	_expect(await continue_until(game, func() -> bool: return not game.call("_conversation_active"), TALK_FRAMES), "read the mirror result before securing the copy")
 	await _press(&"interact", "securing the first copy at the Records exit", 830.0)
 	_expect(started.has(&"records_arc"), "the first copy lets the exit go with its arc (heard %s)" % [started])
 	# No closing shot holds the engineer (STORY-8): control stays while the closing lines run, and USE at
@@ -176,14 +180,15 @@ func _records(mirror_route: String) -> void:
 	await _read_on(830.0)
 
 
-## Presses USE through the boxes of the line on screen (no state changes) up to its last one, with the
-## engineer first placed at [param at_x] when it is 0 or more (see _press). At most 6 presses: more
-## than any line here has boxes, so the cap only keeps a stuck line from hanging the suite.
+## Finishes stopped speech, or reveals a closing shot's last page before its state-changing USE.
+## The old fixture ceiling was six pages: allow reveal + advance per page and one final dismissal.
 func _read_on(at_x: float = -1.0) -> void:
-	for _box: int in 6:
-		if int(game.get("dialogue_index")) >= (game.get("dialogue_boxes") as Array).size() - 1:
+	for _box: int in 6 * 2 + 1:
+		var last_read: bool = int(game.get("dialogue_index")) >= (game.get("dialogue_boxes") as Array).size() - 1 and (game.get("dialogue_reveal") as DialogueReveal).done()
+		if game.get("dialogue_cleared") or last_read and not game.call("_conversation_active"):
 			return
 		await _press(&"interact", "reading on", at_x, false)
+	_expect(false, "the reading helper finishes the authored speech before its fixture ceiling")
 
 
 ## WOLF asks at the rubble line how to bring the sentry down, and [param response] answers.
@@ -199,20 +204,29 @@ func _lane_answer(response: int, label: String) -> void:
 
 
 ## One press of [param action] (with the engineer first placed at [param at_x] when it is 0 or more)
-## through the game's own input, as a key, button or tap does it. When the press changes the game's
-## state it must start a sound within one frame and change what the screen says; [param must_change]
-## also requires that it changes the state.
-func _press(action: StringName, label: String, at_x: float = -1.0, must_change: bool = true) -> void:
+## through the game's own input. [param device] selects action injection or native key/pad USE;
+## native USE stays down for three process frames and release must not fire it again. State changes
+## must start a sound and visible feedback within one frame; [param must_change] requires a change.
+func _press(action: StringName, label: String, at_x: float = -1.0, must_change: bool = true, device: StringName = &"action") -> void:
+	if not _expect(device == &"action" or action == &"interact", "native press probes use the default USE binding"):
+		return
+	label = "%s [%s]" % [label, device]
 	if at_x >= 0.0:
 		await _place(at_x, wolf.position.x)
 	await process_frame
 	var before: String = _fingerprint()
 	var said: String = _screen_text()
 	started.clear()
-	Input.action_press(action)
+	if action == &"interact":
+		use_input(true, device)
+	else:
+		Input.action_press(action)
 	# The frame the game sees the press.
 	await process_frame
-	Input.action_release(action)
+	if device != &"action":
+		_expect(_fingerprint() != before, "%s changes puzzle state on the press frame, not just the prompt family" % label)
+	if device == &"action":
+		Input.action_release(action)
 	var heard_at: int = 0 if not started.is_empty() else -1
 	var shown_at: int = 0 if _screen_text() != said else -1
 	await process_frame
@@ -220,12 +234,19 @@ func _press(action: StringName, label: String, at_x: float = -1.0, must_change: 
 		heard_at = 1
 	if shown_at < 0 and _screen_text() != said:
 		shown_at = 1
+	if device != &"action":
+		await process_frame
+		var held_state: String = _fingerprint()
+		use_input(false, device)
+		await process_frame
+		_expect(_fingerprint() == held_state, "%s does not fire USE again on release" % label)
 	var changed: bool = _fingerprint() != before
 	if must_change:
 		_expect(changed, "%s changes the game's state" % label)
 	if not changed:
 		return
 	presses += 1
+	device_counts[device] += 1
 	if _expect(heard_at >= 0, "%s starts a sound within one frame (heard %s)" % [label, started]):
 		heard += 1
 	_expect(shown_at >= 0, "%s changes what the screen says within one frame" % label)
@@ -241,12 +262,13 @@ func _fingerprint() -> String:
 	return JSON.stringify(data)
 
 
-## What the screen says: the dialogue box, the hint bar (and whether it shows) and the top card.
+## Visible text feedback includes dialogue, hints, objectives and the continue cue; dismissing one is feedback too.
 func _screen_text() -> String:
 	var hint: Panel = game.get_node("CanvasLayer/ContextHint") as Panel
-	return "%s|%s|%s|%s|%s" % [(game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text, hint.visible, (hint.get_node("Text") as Label).text, (game.get_node("CanvasLayer/TopBar/HUD") as Label).text]
+	return "%s|%s|%s|%s|%s|%s|%s|%s" % [(game.get_node("CanvasLayer/BottomBar/Speaker") as Label).text, (game.get_node("CanvasLayer/BottomBar/Story") as Label).text, hint.visible, (hint.get_node("Text") as Label).text, (game.get_node("CanvasLayer/TopBar/HUD") as Label).text, (game.get_node("CanvasLayer/BottomBar") as Control).visible, (game.get_node("CanvasLayer/TopBar") as Control).visible, (game.get("dialogue_continue") as Control).visible]
 
 
+## True while the bypass's COOLANT FAULT tag can be seen: in the tree, visible and not faded out.
 func _fault_shown() -> bool:
 	return bypass.fault_tag.is_visible_in_tree() and bypass.fault_tag.self_modulate.a > 0.0
 

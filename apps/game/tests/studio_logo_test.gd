@@ -16,6 +16,7 @@ func _run() -> void:
 	# The background-load cases run first, so the title's scripts compile on worker threads as at launch.
 	await _check_timeline()
 	await _check_reduced_motion()
+	await _check_safe_layout()
 	await _check_handover()
 	await _check_skip_waits_for_load()
 	await _check_skip_inputs()
@@ -26,6 +27,7 @@ func _run() -> void:
 	finish()
 
 
+## When the logo is skipped (the --skip-logo flag, a headless run) and what a launch does meanwhile.
 func _check_skip_rules() -> void:
 	_expect(StudioLogo.wants_skip(PackedStringArray(["--skip-logo"]), "macOS"), "--skip-logo skips the logo on a normal display")
 	_expect(StudioLogo.wants_skip(PackedStringArray(), "headless"), "a headless run skips the logo")
@@ -56,12 +58,13 @@ func _check_launch_skip() -> void:
 	await _leave_title()
 
 
+## The logo's beats on its manual clock (seconds from the first frame), each checked at its time.
 func _check_timeline() -> void:
 	var logo: StudioLogo = _add_logo(false)
 	logo.manual_clock = true
 	var top: float = logo.mascot.position.y
 	_expect(not logo.grin_mouth.visible and logo.company_name.modulate.a == 0.0 and logo.fade.color.a == 0.0 and not logo.load_bar.visible, "the first frame is the smirk alone, as on the boot splash")
-	_expect(logo.mascot.position == Vector2(408, 86) and logo.mascot.size == Vector2(144, 300), "the mascot sits where the boot splash draws it")
+	_expect(logo.mascot.position == Vector2(408, 86) and logo.mascot.size == Vector2(144, 300), "the mascot sits where the boot splash draws it (%s, %s; canvas %s)" % [logo.mascot.position, logo.mascot.size, logo.screen_shape.visible_rect])
 	_check_shader_warmup(logo)
 	logo.seek(StudioLogo.SWAP_AT - 0.01)
 	_expect(not logo.grin_mouth.visible, "the smirk holds until the swap")
@@ -126,6 +129,7 @@ func _check_shader_warmup(logo: StudioLogo) -> void:
 	_expect(blends == every_mode, "the warm-up draws every CanvasItemMaterial blend mode once")
 
 
+## With Reduced Motion saved in the settings file, the logo swaps to the grin without the hop.
 func _check_reduced_motion() -> void:
 	var text: String = "[video]\nreduced_motion=true\nvsync=false\n"
 	_expect(write_text(settings_path, text), "test file opens for writing: " + settings_path)
@@ -197,6 +201,7 @@ func _check_skip_waits_for_load() -> void:
 	await _leave_title()
 
 
+## Which native presses and stick deflections skip the logo; releases, drift and triggers never do.
 func _check_skip_inputs() -> void:
 	var logo: StudioLogo = _add_logo(false)
 	logo.hold_load = true
@@ -211,6 +216,12 @@ func _check_skip_inputs() -> void:
 	var echo: InputEventKey = key_event(KEY_ENTER, true)
 	echo.echo = true
 	var cases: Dictionary = {"a key press": [key_event(KEY_ENTER, true), true], "a touch": [touch, true], "a mouse button": [click, true], "a controller button": [pad, true], "a key release": [key_event(KEY_ENTER, false), false], "a held key's repeat": [echo, false]}
+	for axis: int in [JOY_AXIS_LEFT_X, JOY_AXIS_LEFT_Y, JOY_AXIS_RIGHT_X, JOY_AXIS_RIGHT_Y, JOY_AXIS_TRIGGER_LEFT, JOY_AXIS_TRIGGER_RIGHT]:
+		for value: float in [0.0, 0.64, 0.65, 0.66, -0.66]:
+			var motion: InputEventJoypadMotion = InputEventJoypadMotion.new()
+			motion.axis = axis
+			motion.axis_value = value
+			cases["axis%d at%.2f" % [axis, value]] = [motion, axis <= JOY_AXIS_RIGHT_Y and absf(value) > 0.65]
 	for label: String in cases.keys():
 		logo.skipping = false
 		logo.seek(0.0)
@@ -221,6 +232,21 @@ func _check_skip_inputs() -> void:
 	await _free_logo(logo)
 
 
+## Safe-area shrinking keeps the grin crop aligned with the mascot rather than leaving it full-size.
+func _check_safe_layout() -> void:
+	var logo: StudioLogo = _add_logo(false)
+	logo.manual_clock = true
+	var mouth: Rect2 = Rect2(logo.grin_mouth.position, logo.grin_mouth.size)
+	var safe: Rect2 = Rect2(74, 0, 812, 514)
+	logo.call("_layout_logo", logo.screen_shape.visible_rect, safe)
+	var factor: float = logo.mascot.size.x / 144.0
+	_expect(safe.encloses(logo.mascot.get_global_rect()) and is_equal_approx(logo.mascot.size.y / 300.0, factor), "safe-area shrinking preserves the mascot's proportions")
+	_expect(logo.grin_mouth.position.is_equal_approx(mouth.position * factor) and logo.grin_mouth.size.is_equal_approx(mouth.size * factor), "the grin crop follows the same scale as the face")
+	await _free_logo(logo)
+
+
+## Adds the studio logo scene as the current scene, reading this run's settings file.
+## [param launch_skip] is whether it honours the launch skip (a headless run would always skip).
 func _add_logo(launch_skip: bool) -> StudioLogo:
 	var logo: StudioLogo = LOGO_SCENE.instantiate() as StudioLogo
 	logo.settings_path = settings_path
@@ -245,10 +271,12 @@ func _freed(node: Node) -> Callable:
 	return func() -> bool: return ref.get_ref() == null
 
 
+## True once the current scene is the game's main scene (the title).
 func _on_title() -> bool:
 	return current_scene != null and current_scene.scene_file_path == StudioLogo.MAIN_SCENE
 
 
+## Frees the current scene and waits two process frames for it to go.
 func _leave_title() -> void:
 	if current_scene != null:
 		current_scene.queue_free()

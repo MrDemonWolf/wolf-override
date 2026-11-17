@@ -1,0 +1,37 @@
+{
+  "about": "M09 review stills and checks (brief 7.3 M09 and the M09 review). Each group is one capture.mjs run on m09-settings-handheld.html: node mockups/tools/capture.mjs m09-settings-handheld.html <devices> <outDir> --states \"<name>:<query>;...\" built from the group's states, with --full when the group says so. Keys starting with @ are capture actions (README, Capture). A --full capture holds all seven stages, one 1920 x 1080 Ally screen each (with clean=1 a stage is one viewport tall), so it can be cut per stage. A viewport capture shows stage 1 (CONTROLS), the frame the pad presses act on; each press state waits 400 ms at the end so the focus-out fade has finished before the still.",
+  "groups": {
+    "stages": {
+      "devices": "ally",
+      "full": true,
+      "states": {
+        "pad": "input=pad",
+        "touch": "input=touch",
+        "reduced": "input=pad&motion=reduced",
+        "portrait": "input=pad&speaker=portrait",
+        "text200": "input=pad&text=200"
+      }
+    },
+    "presses": {
+      "devices": "ally",
+      "full": false,
+      "states": {
+        "pad-down8": "input=pad&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@wait=400",
+        "pad-rb": "input=pad&@pad=RB&@wait=400",
+        "pad-a-prompts": "input=pad&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=DPadDown&@pad=A&@wait=400",
+        "tap-tab": "input=pad&@tap=[data-m09-state=controls] .wo-tab[data-wo-tab=audio]&@wait=400"
+      }
+    }
+  },
+  "checks": [
+    "Rows are 48 canvas px (96 px on the capture).",
+    "Smallest text on the 1920 x 1080 capture is 18 px or more.",
+    "One highlight per frame after every D-pad press; no ring while the input is touch.",
+    "LB and RB change the tab and its rows together.",
+    "No keyboard or mouse glyph while the input is pad.",
+    "Every label sits on one line.",
+    "After 8 D-pad presses the focused row is inside the visible body (needs wo.js follow-focus).",
+    "Every FRAME LIMIT choice shows whole, clear of the fade (needs the shared list layer).",
+    "The five tabs fit the strip at TEXT SIZE 125% (needs the shared handheld tab size)."
+  ]
+}
