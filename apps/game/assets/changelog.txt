@@ -323,6 +323,7 @@ Changes merged after 0.15.0. They become the next version when it is cut.
 - Removed four unused game definitions and moved three copied test helpers into the shared suite kit. Headless suites only; no behaviour change.
 - Added doc comments to game, test and parity helpers and corrected stale references. Comments only.
 - The landing and press-kit pages share their list, text-link and chip styles from one file; unused exports removed.
+- The settings, junction and chapter tests check the short station actions and the separate key glyph instead of the old long hint sentences.
 
 -- How it was checked --
 - Checked: headless test suites, the docs checks and build, rendered stills of the title screen, and headless browser screenshots of the credits, legal and landing pages, and an axe scan of the landing page; headless browser screenshots of the guide home, the changelog and the open guide menu at phone, tablet and desktop sizes, and an axe scan of guide pages; the README's links checked against the built site and its commands against package.json; headless browser screenshots of the rewritten player pages, their facts checked against the game's code; headless browser screenshots of the new and rewritten user pages, the privacy claims checked against the game's code; headless browser screenshots of the developer pages, with honesty-note counts kept and their commands run or marked not run; headless browser screenshots of the docs style guide, Developer home and Contributing; not played by hand.

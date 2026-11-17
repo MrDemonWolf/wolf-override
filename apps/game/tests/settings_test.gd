@@ -199,7 +199,16 @@ func _run() -> void:
 	# Past the tutorial prompt, which is the one prompt on the first frames, the hint bar shows.
 	reloaded.set("tutorial_step", 2)
 	reloaded.call("_refresh_ui")
-	_expect((reloaded.get_node("CanvasLayer/ContextHint/Text") as Label).text.begins_with("Q:"), "interaction hint follows remapped key")
+	# The station action and its binding are separate labels: Text carries the short action, Glyph
+	# the key that fires it, so the remap has to show in Glyph and the key itself has to be USE.
+	var hint_row: Control = reloaded.get_node("CanvasLayer/ContextHint") as Control
+	var hint_glyph: Label = hint_row.get_node("Glyph") as Label
+	var hint_text: String = (hint_row.get_node("Text") as Label).text
+	var remapped_key: InputEventKey = InputEventKey.new()
+	remapped_key.keycode = KEY_Q
+	remapped_key.physical_keycode = KEY_Q
+	remapped_key.pressed = true
+	_expect(hint_row.visible and hint_glyph.visible and hint_glyph.text == "Q" and hint_glyph.accessibility_name == restored.describe_prompts("Q") and hint_text == str(reloaded.call("_context_hint")) and not hint_text.is_empty() and not hint_text.contains("Q") and InputMap.event_is_action(remapped_key, &"interact"), "interaction hint follows remapped key (glyph %s, action %s)" % [hint_glyph.text, hint_text])
 	restored.reset_controls()
 	for bus: String in GameSettings.BUSES:
 		restored._apply_volume(bus, 100.0)

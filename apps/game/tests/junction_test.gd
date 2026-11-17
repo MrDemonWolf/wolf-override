@@ -301,7 +301,9 @@ func _check_scene() -> void:
 	_expect(await walk_to(human, 200.0), "the engineer walks back to the breaker")
 	await _check_vent_edges(game, human, wolf, room, line, a_bytes)
 	_expect(await walk_to(human, 200.0), "the engineer is back at the breaker after the vent checks")
-	_expect(str(game.call("_context_hint")).contains("arm the overload breaker"), "the breaker offers USE")
+	# The dead-valve answer is still on screen here, so the hint row itself is hidden; the action it
+	# will show is checked, and the tap below proves USE arms the line.
+	_expect(str(game.call("_context_hint")) == "Arm breaker", "the breaker offers USE")
 	await tap(&"interact")
 	if not _require(line.state == &"building" and game.call("_objective") == "CRANK THE VALVE", "USE at the breaker arms the line"):
 		return

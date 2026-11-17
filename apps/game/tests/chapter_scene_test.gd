@@ -207,7 +207,7 @@ func _run() -> void:
 	_require(game.get("status_line") == "WOLF: Copied." and hint_text.text == "Save failed. Use a station to try again.", "save failure shows in the system hint, not in WOLF's line")
 	human.position.x = 830.0
 	game.call("_refresh_ui")
-	_require(hint_text.text.ends_with("secure the first copy in the container."), "moving to another station brings back its interaction hint after a save failure")
+	_require(hint_text.text == "Secure copy", "moving to another station brings back its interaction hint after a save failure")
 	human.position.x = 190.0
 	game.call("_save_progress")
 	game.set("save_path", path)
