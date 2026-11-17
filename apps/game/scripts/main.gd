@@ -32,8 +32,6 @@ const CHANGELOG_ENGLISH_NOTE: String = "These development updates are written in
 const AI_DISCLOSURE: String = "WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited."
 ## The credits heading over [constant AI_DISCLOSURE], in the scene's credits heading style.
 const AI_DISCLOSURE_HEADING: String = "AI DISCLOSURE"
-## How fast a held up/down input scrolls the changelog, in pixels per second.
-const CHANGELOG_SCROLL_SPEED: float = 260.0
 ## Where WOLF stands to hold the live relay contact: on the relay's left, facing it, his painted snout
 ## (M0Actor.WOLF_SNOUT) 4 px short of the relay's painted left edge (x 569), where it was before he was
 ## drawn at a real wolf's size (x 509 then), so he is never drawn inside the machine; the engineer has
@@ -1062,6 +1060,7 @@ func _ready() -> void:
 	_install_inputs()
 	_setup_settings()
 	menu_repeat.context = _menu_repeat_context
+	menu_repeat.scroll_context = _menu_scroll_target
 	add_child(menu_repeat)
 	_setup_impact()
 	var pads: Array[int] = Input.get_connected_joypads()
@@ -1489,7 +1488,7 @@ func _process(delta: float) -> void:
 			credits_body.get_v_scroll_bar().value += delta * 18.0
 		elif changelog_screen.visible:
 			# The changelog never scrolls on its own; held up/down (keys, D-pad or stick) reads it at a steady pace.
-			changelog_body.get_v_scroll_bar().value += Input.get_axis(&"ui_up", &"ui_down") * delta * CHANGELOG_SCROLL_SPEED
+			changelog_body.get_v_scroll_bar().value += Input.get_axis(&"ui_up", &"ui_down") * delta * MenuRepeat.SCROLL_SPEED
 		return
 	if intro_active:
 		opening.tick()
@@ -2622,6 +2621,16 @@ func _menu_repeat_context() -> Control:
 	if title_open and not credits_screen.visible and not changelog_screen.visible:
 		return title_screen
 	return null
+
+
+## The long page the right stick and triggers scroll now: the open credits or changelog text, else the
+## list inside the active menu ([method _menu_repeat_context]); null in play and during a rebind.
+func _menu_scroll_target() -> Control:
+	if title_open and credits_screen.visible:
+		return credits_body
+	if title_open and changelog_screen.visible:
+		return changelog_body
+	return MenuRepeat.scroll_under(_menu_repeat_context())
 
 
 ## The menu control a keyboard or controller press should land on when nothing has focus.

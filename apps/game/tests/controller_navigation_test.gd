@@ -20,10 +20,7 @@ func _run() -> void:
 		root.gui_focus_changed.connect(observe)
 		var press: InputEvent = controller_button(JOY_BUTTON_DPAD_DOWN, true)
 		if stick:
-			var motion: InputEventJoypadMotion = InputEventJoypadMotion.new()
-			motion.axis = JOY_AXIS_LEFT_Y
-			motion.axis_value = 1.0
-			press = motion
+			press = _axis(JOY_AXIS_LEFT_Y, 1.0)
 		Input.parse_input_event(press)
 		await wait_real_seconds(1.0)
 		var release: InputEvent = press.duplicate()
@@ -40,6 +37,7 @@ func _run() -> void:
 		_expect(menu.capture_action.is_empty(), "navigation never starts a rebind")
 		root.gui_focus_changed.disconnect(observe)
 	await _check_interruptions(game)
+	await _check_scrolling(game)
 	await end_game(game)
 	finish("Controller navigation checks passed")
 
@@ -74,3 +72,48 @@ func _check_interruptions(game: Main) -> void:
 		_expect(root.gui_get_focus_owner() == focused, "%s recovery requires a fresh press" % boundary)
 		Input.parse_input_event(controller_button(JOY_BUTTON_DPAD_DOWN, false))
 		await settle(2)
+
+
+## The right stick scrolls the open Settings page steadily and each trigger pull moves it one page,
+## through native pad events; focus and bindings stay as they were.
+func _check_scrolling(game: Main) -> void:
+	var menu: GameSettings = game.settings_menu
+	menu.select_tab(2)
+	await settle(4)
+	(menu.binding_buttons["move_left_keyboard"] as Button).grab_focus()
+	await settle(2)
+	var page: ScrollContainer = menu.pages[2] as ScrollContainer
+	var focused: Control = root.gui_get_focus_owner()
+	var longest: int = int(page.get_v_scroll_bar().max_value - page.get_v_scroll_bar().page)
+	_expect(game.call("_menu_scroll_target") == page and longest > 0, "the Controls page is the long list a pad scrolls (%d px to scroll)" % longest)
+	page.scroll_vertical = 0
+	Input.parse_input_event(_axis(JOY_AXIS_RIGHT_Y, 1.0))
+	await wait_real_seconds(0.4)
+	var scrolled: int = page.scroll_vertical
+	_expect(scrolled > 0 and scrolled <= ceili(MenuRepeat.SCROLL_SPEED * 0.6) and root.gui_get_focus_owner() == focused, "holding the right stick down scrolls the page at the shared speed without moving focus (%d px)" % scrolled)
+	Input.parse_input_event(_axis(JOY_AXIS_RIGHT_Y, 0.0))
+	await settle(2)
+	scrolled = page.scroll_vertical
+	await wait_real_seconds(0.2)
+	_expect(page.scroll_vertical == scrolled, "centring the stick stops the scroll")
+	page.scroll_vertical = 0
+	var step: int = mini(roundi(page.size.y * MenuRepeat.PAGE_FRACTION), longest)
+	Input.parse_input_event(_axis(JOY_AXIS_TRIGGER_RIGHT, 1.0))
+	await settle(2)
+	_expect(page.scroll_vertical == step, "one RT pull moves one page down (%d of %d px)" % [page.scroll_vertical, step])
+	await wait_real_seconds(0.3)
+	_expect(page.scroll_vertical == step, "a held trigger pages once")
+	Input.parse_input_event(_axis(JOY_AXIS_TRIGGER_RIGHT, 0.0))
+	Input.parse_input_event(_axis(JOY_AXIS_TRIGGER_LEFT, 1.0))
+	await settle(2)
+	Input.parse_input_event(_axis(JOY_AXIS_TRIGGER_LEFT, 0.0))
+	await settle(2)
+	_expect(page.scroll_vertical == 0 and root.gui_get_focus_owner() == focused and menu.capture_action.is_empty(), "LT moves the page back up; focus and bindings are untouched")
+
+
+## A native pad axis event for [param axis] at [param value] (-1 to 1; triggers 0 to 1) on device 0.
+func _axis(axis: JoyAxis, value: float) -> InputEventJoypadMotion:
+	var motion: InputEventJoypadMotion = InputEventJoypadMotion.new()
+	motion.axis = axis
+	motion.axis_value = value
+	return motion
