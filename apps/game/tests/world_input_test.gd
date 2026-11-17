@@ -56,8 +56,61 @@ func _run() -> void:
 	pointer.handle_unhandled(up)
 	await frames(3)
 	_expect(not game.hold_use.holding and game.hold_use.ticks == kept, "release stops the crank and preserves completed ticks")
+	await _check_walk_prompt(game)
 	await end_game(game)
 	finish("World input checks passed")
+
+
+## Hovering a station out of reach shows "Walk here" on it with no key glyph; the click queues the
+## existing pointer walk, and the pill returns to the station's own action once the engineer is in reach.
+func _check_walk_prompt(game: Main) -> void:
+	var pointer: WorldInput = game.world_input
+	game.tutorial_step = 2
+	game.name_card_remaining = 0.0
+	game.call("_drop_box_queue")
+	game.status_line = ""
+	# The purge display always offers Read display, whatever the route so far; start out of its reach.
+	game.debug_place(Main.PURGE_DISPLAY_X + 160.0, 580.0)
+	game.call("_update_gameplay_camera")
+	game.intro_camera.reset_smoothing()
+	await frames(3)
+	var display: Tappable
+	for target: Tappable in pointer.targets:
+		if target.id == &"purge_display":
+			display = target
+	var art: Sprite2D = display.regions[0] as Sprite2D
+	var hover: InputEventMouseMotion = InputEventMouseMotion.new()
+	hover.position = art.get_global_transform_with_canvas() * art.get_rect().get_center()
+	game.input_mode.pointer_focus = true
+	pointer.handle_unhandled(hover)
+	game.call("_refresh_ui")
+	_expect(game.screen_shape.safe_rect.has_point(hover.position) and game.interaction_target_at(game.human.position.x) != &"purge_display", "the hovered display is on screen and out of reach")
+	_expect(pointer.walk_target() == display and game.station_prompt_walk and game.station_prompt_target == display and game.context_hint.visible and game.context_hint_text.text == "Walk here" and not game.context_hint_glyph.visible and not game.context_hint_hold.visible, "hovering a station out of reach shows Walk here without a key glyph (%s)" % game.context_hint_text.text)
+	_expect(game.screen_shape.safe_rect.encloses(game.context_hint.get_global_rect()), "the Walk here pill stays inside the safe area")
+	var click: InputEventMouseButton = InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.position = game.context_hint.get_global_rect().get_center()
+	_expect(pointer.call("_hit", click.position, false) != null and (pointer.call("_hit", click.position, false) as Tappable).kind != Tappable.Kind.USE or pointer.call("_hit", click.position, false) == null, "the Walk here pill is a caption, never a USE button")
+	click.position = hover.position
+	click.pressed = true
+	pointer.handle_unhandled(click)
+	click = click.duplicate() as InputEventMouseButton
+	click.pressed = false
+	pointer.observe(click)
+	pointer.handle_unhandled(click)
+	_expect(pointer.pending == display and not is_inf(game.human.pointer_target_x), "clicking the hovered station queues the existing walk")
+	pointer.cancel_walk()
+	game.debug_place(game.pointer_use_x(&"purge_display"), 58.0)
+	game.call("_update_gameplay_camera")
+	game.intro_camera.reset_smoothing()
+	await frames(3)
+	hover.position = art.get_global_transform_with_canvas() * art.get_rect().get_center()
+	pointer.handle_unhandled(hover)
+	game.call("_refresh_ui")
+	_expect(pointer.walk_target() == null and not game.station_prompt_walk and game.station_prompt_target == display and game.context_hint_glyph.visible, "in reach, the pill is the station's own action with its key again (%s)" % game.context_hint_text.text)
+	game.input_mode.pointer_focus = false
+	pointer.cancel()
+	game.call("_refresh_ui")
 
 
 ## A translated/scaled plate keeps the same live canvas bounds for its hit target and HUD avoidance.

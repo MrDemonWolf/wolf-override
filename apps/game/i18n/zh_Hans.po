@@ -3679,3 +3679,8 @@ msgstr "释放出口门栓"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "将储罐投到标记上"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "走到这里"

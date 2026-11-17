@@ -184,6 +184,15 @@ func prompt_target() -> Tappable:
 	return null
 
 
+## The station under the mouse that a click would walk to: hovered, usable now and not yet in reach.
+## Null on touch and controller (no hover) and for a station already in reach, which [method prompt_target]
+## owns. Presentation only: the click itself goes through handle_unhandled's existing queued walk.
+func walk_target() -> Tappable:
+	if hovered == null or hovered.kind != Tappable.Kind.WORLD or not game.input_mode.pointer_focus:
+		return null
+	return hovered if _available(hovered) and not _reached(hovered) else null
+
+
 ## Drawn station labels are shared placement obstacles, including the separately owned COOLANT FAULT cue.
 func prompt_obstacles() -> Array[Rect2]:
 	var obstacles: Array[Rect2] = []
@@ -261,6 +270,10 @@ func _available(target: Tappable, for_prompt: bool = false) -> bool:
 	var controls: bool = _can_walk()
 	if for_prompt and _can_read() and not game.call("_conversation_active") and not target.hold_station.is_empty():
 		controls = controls or holding(target.hold_station)
+	# While the pill reads "Walk here" it is a caption, not a USE button: the pointer passes through to
+	# the station under it, so the pill can never flip the hover it is describing.
+	if target.kind == Tappable.Kind.USE and game.station_prompt_walk:
+		return false
 	return (target.chapters.is_empty() or game.state.chapter_id in target.chapters) and (not target.enabled.is_valid() or target.enabled.call()) and (target.kind != Tappable.Kind.WORLD or controls)
 
 

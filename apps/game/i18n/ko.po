@@ -3676,3 +3676,8 @@ msgstr "출구 잠금 해제"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "표시 위에 탱크 투하"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "여기로 걷기"

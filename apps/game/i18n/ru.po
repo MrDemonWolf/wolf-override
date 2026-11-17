@@ -3736,3 +3736,8 @@ msgstr "Снять засов выхода"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "Сбросить бак на отметку"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "Идти сюда"

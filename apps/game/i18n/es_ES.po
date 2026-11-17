@@ -3760,3 +3760,8 @@ msgstr "Soltar cerrojo de salida"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "Soltar tanque sobre la marca"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "Caminar hasta aquí"

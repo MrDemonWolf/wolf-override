@@ -3737,3 +3737,8 @@ msgstr "Zwolnij rygiel wyjścia"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "Zrzuć zbiornik na znak"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "Idź tutaj"

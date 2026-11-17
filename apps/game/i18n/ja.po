@@ -3676,3 +3676,8 @@ msgstr "出口のボルトを外す"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "印の上にタンクを落とす"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "ここへ歩く"

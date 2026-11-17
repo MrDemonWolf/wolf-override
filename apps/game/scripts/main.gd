@@ -622,6 +622,9 @@ const JUNCTION_RESTORE_A_LINE: String = JUNCTION_RESTORE_A_WORDS + "\n" + WOLF_D
 @onready var context_hint: Panel = $CanvasLayer/ContextHint
 ## Current ordinary action anchor; warnings and player-paced reading keep their independent placement.
 var station_prompt_target: Tappable
+## True while the pill is the mouse's "Walk here" over a station out of reach: it then has no key glyph
+## or HOLD cue, because a click (not USE) is what walks there.
+var station_prompt_walk: bool = false
 @onready var context_hint_text: Label = $CanvasLayer/ContextHint/Text
 @onready var context_hint_glyph: Label = $CanvasLayer/ContextHint/Glyph
 @onready var context_hint_hold: Label = $CanvasLayer/ContextHint/Hold
@@ -5347,6 +5350,7 @@ func _wolf_follow_min_x() -> float:
 ## Refreshes HUD visibility and labels; stopped conversations use the dialogue itself to advance.
 func _refresh_ui() -> void:
 	station_prompt_target = null
+	station_prompt_walk = false
 	_hud_drawn = true
 	var touch_layout: bool = input_mode.touch_layout()
 	impact.rumble_enabled = controller_active
@@ -5446,6 +5450,13 @@ func _refresh_ui() -> void:
 	var hint: String = save_error if not save_error.is_empty() else (I18n.KEY.tr(CHECKPOINT_TOAST) if checkpoint_toast_remaining > 0.0 and not fail_active else context)
 	# Translated, and a key prompt's key filled with the input in use (_key_names), after tr().
 	hint = HudText.localise(hint, _key_names(touch_layout), touch_layout)
+	# Hovering a station out of reach replaces a routine hint with "Walk here" on that station. A save
+	# error, the checkpoint toast and urgent hazard lines keep the row.
+	var walk_target: Tappable = world_input.walk_target()
+	if walk_target != null and save_error.is_empty() and checkpoint_toast_remaining <= 0.0 and not _urgent_context_hint() and walk_target.prompt_rect().has_area():
+		station_prompt_target = walk_target
+		station_prompt_walk = true
+		hint = I18n.fill(I18n.KEY.tr("Walk here"), [])
 	if _retry_ready():
 		# The knockdown card's one prompt once it takes RETRY (Q17); before that only a save error shows.
 		hint = tr(RETRY_TOUCH_PROMPT) if touch_layout else I18n.fill(I18n.KEY.tr(RETRY_PROMPT), [settings_menu.prompt(&"interact", controller_active)])
@@ -5504,10 +5515,10 @@ func _set_dialogue(hint: String) -> void:
 		tutorial_prompt.hide()
 	context_hint_text.text = hint
 	var station_action: bool = station_prompt_target != null and context_hint.visible
-	context_hint_glyph.visible = station_action and not input_mode.touch_layout()
+	context_hint_glyph.visible = station_action and not station_prompt_walk and not input_mode.touch_layout()
 	context_hint_glyph.text = settings_menu.prompt(&"interact", controller_active) if context_hint_glyph.visible else ""
 	context_hint_glyph.accessibility_name = settings_menu.describe_prompts(context_hint_glyph.text)
-	context_hint_hold.visible = station_action and not _hold_station().is_empty() and not hold_toggle
+	context_hint_hold.visible = station_action and not station_prompt_walk and not _hold_station().is_empty() and not hold_toggle
 	context_hint_hold.text = I18n.fill(I18n.KEY.tr("HOLD %s"), [""]).strip_edges() if context_hint_hold.visible else ""
 	if station_action and input_mode.touch_layout():
 		touch_use.hide()

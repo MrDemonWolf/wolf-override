@@ -3746,3 +3746,8 @@ msgstr "Soltar ferrolho da saída"
 #: scripts/main.gd:6342
 msgid "Drop tank on mark"
 msgstr "Soltar tanque sobre a marca"
+
+# machine-translated by Claude (Anthropic), unreviewed
+#: scripts/main.gd:5459
+msgid "Walk here"
+msgstr "Andar até aqui"
