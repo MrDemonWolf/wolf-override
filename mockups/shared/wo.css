@@ -648,6 +648,11 @@ html[data-motion="reduced"] [data-wo-overlay].is-closing :is(.wo-panel, .wo-toas
 .wo-resume-room { font-family: var(--wo-type-h2-face); font-weight: var(--wo-type-h2-weight); font-variation-settings: "wght" var(--wo-type-h2-weight); font-size: var(--wo-fs-h2); line-height: normal; color: var(--wo-Button-font_focus_color); }
 .wo-resume-goal { font-size: var(--wo-fs-body); color: var(--wo-today-text-hint); }
 
+/* Objective review: keep the existing readable backing; remove the repeated location/heading.
+   Only M05 uses this proposal, so transition/location cards retain their existing presentation. */
+.wo-objective { max-width: 100%; gap: var(--wo-density-gap); }
+.wo-objective .wo-resume-goal { font-size: var(--wo-fs-body); color: var(--wo-Button-font_focus_color); }
+
 /* Controller disconnected (4.5): a card over the paused game naming the way back. */
 .wo-toast {
   position: relative;
