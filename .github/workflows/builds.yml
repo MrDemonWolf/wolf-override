@@ -85,7 +85,7 @@ jobs:
           cat >> "$GITHUB_STEP_SUMMARY" <<EOF
           ## Test builds for commit \`$SHORT_SHA\`
 
-          Unsigned **debug** builds with the debug tools on, for testing. They are not releases and nobody has played them by hand as part of this run. They expire after **14 days**. Sign in to GitHub to download; because the repository is public, anyone signed in can.
+          Unsigned **debug** builds of the current Godot project, for testing. They are not releases and nobody has played them by hand as part of this run. They expire after **14 days**. Sign in to GitHub to download; because the repository is public, anyone signed in can.
 
           | Platform | Download | Size |
           | --- | --- | --- |
@@ -96,7 +96,7 @@ jobs:
 
           **Windows:** right-click the zip, choose **Extract All**, then run \`WOLF-OVERRIDE.exe\`. At "Windows protected your PC", click **More info**, then **Run anyway**. \`WOLF-OVERRIDE.console.exe\` runs the same build with its log in a console window. If Smart App Control is on, Windows blocks unsigned builds and there is no way to allow this one.
 
-          Licence notices are in the \`licenses\` folder in each zip. Full steps: [Install a test build](https://wolfoverride.mrdemonwolf.dev/docs/test-builds/).
+          Licence notices are in the \`licenses\` folder in each zip. Project status: [Get the game](https://wolfoverride.mrdemonwolf.dev/docs/get-game/).
           EOF
       - name: Preserve export logs
         if: failure() || cancelled()

@@ -1,7 +1,6 @@
 # shellcheck shell=bash
 # Shared helpers for the scripts that drive the pinned Godot binary headlessly.
-# Source this file from bash (scripts/check-game.sh, export-game.sh, get-godot.sh, get-export-templates.sh,
-# i18n/extract_pot.sh); do not run it.
+# Source this file from bash (scripts/check-game.sh, export-game.sh, get-godot.sh, get-export-templates.sh); do not run it.
 
 # isolate_godot_home DIR: point Godot's user and editor data at DIR, so a run never touches real saves,
 # editor settings or export templates. Godot resolves them from HOME on macOS and XDG_* on Linux.
@@ -32,46 +31,14 @@ bounded() {
 # Lines Godot prints for errors, script errors and parse errors.
 godot_error_lines='^ERROR:|SCRIPT ERROR|Parse Error'
 
-# A fresh checkout's first import loads the project theme before its two variable fonts are imported,
-# which logs these sixteen errors and nothing else. They are allowed in that pass only.
-first_import_known_errors="$(cat <<'EOF'
-^ERROR: Cannot open file 'res://\.godot/imported/(Roboto|Montserrat)-Variable\.ttf-[0-9a-f]+\.fontdata'\.$
-^ERROR: Failed loading resource: res://\.godot/imported/(Roboto|Montserrat)-Variable\.ttf-[0-9a-f]+\.fontdata\.$
-^ERROR: Failed loading resource: res://assets/fonts/(Roboto|Montserrat)-Variable\.ttf\.$
-^ERROR: res://assets/fonts/(Roboto-Regular|Montserrat-Semibold|game_theme)\.tres:[0-9]+ - Parse Error: \[ext_resource\] referenced non-existent resource at: res://assets/fonts/(Roboto-Variable\.ttf|Montserrat-Variable\.ttf|Roboto-Regular\.tres)\.$
-^ERROR: Failed loading resource: res://assets/fonts/(Roboto-Regular|Montserrat-Semibold|game_theme)\.tres\.$
-^ERROR: Error loading custom project theme 'res://assets/fonts/game_theme\.tres'$
-EOF
-)"
-
-# import_game GODOT LOG_DIR SECONDS: import apps/game twice from the repository root. The first pass may
-# only log the known font errors above; the second must log no error at all. Either pass failing to
-# finish in SECONDS, or crashing, fails the import.
+# Import apps/game once from the repository root. Print the Godot log on failure
+# so diagnostics survive automatic cleanup of the isolated user directory.
 import_game() {
-  local godot="$1" logs="$2" limit="$3" rc=0 unexpected
-  bounded "$limit" "$godot" --headless --path apps/game --import > "$logs/import-first.log" 2>&1 || rc=$?
-  if [ "$rc" -eq 124 ]; then
-    echo "The first import did not finish within ${limit}s (see $logs/import-first.log)" >&2
-    return 1
-  fi
-  if [ "$rc" -ge 128 ]; then
-    echo "The first import crashed with status $rc (see $logs/import-first.log)" >&2
-    return 1
-  fi
-  unexpected="$(grep -E "$godot_error_lines" "$logs/import-first.log" | grep -vE "$first_import_known_errors" || true)"
-  if [ -n "$unexpected" ]; then
-    echo "The first import reported unexpected errors (see $logs/import-first.log):" >&2
-    echo "$unexpected" >&2
-    return 1
-  fi
-  rc=0
-  bounded "$limit" "$godot" --headless --path apps/game --import > "$logs/import.log" 2>&1 || rc=$?
-  if [ "$rc" -eq 124 ]; then
-    echo "The second import did not finish within ${limit}s (see $logs/import.log)" >&2
-    return 1
-  fi
-  if [ "$rc" -ne 0 ] || grep -qE "$godot_error_lines" "$logs/import.log"; then
-    echo "The second import failed or reported errors (see $logs/import.log)" >&2
+  local godot="$1" logs="$2" limit="$3"
+  if ! bounded "$limit" "$godot" --headless --path apps/game --import > "$logs/import.log" 2>&1 ||
+     grep -qE "$godot_error_lines" "$logs/import.log"; then
+    cat "$logs/import.log" >&2
+    echo "Godot import failed. Check the project resources." >&2
     return 1
   fi
 }

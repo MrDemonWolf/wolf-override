@@ -1,6 +1,6 @@
 # Legal and installation copy — private working draft
 
-Drafted September 26, 2026. **Do not publish or present this as approved terms.** Review against the actual release binary, website build, stores, assets, target regions and an owner-approved contact. This is a product checklist and draft copy, not legal advice.
+Drafted September 26, 2026 for the previous prototype. **Do not publish or present this as approved terms.** Review against the actual release binary, website build, stores, assets, target regions and an owner-approved contact. This is a product checklist and draft copy, not legal advice.
 
 ## Observed M0 behavior and limits
 

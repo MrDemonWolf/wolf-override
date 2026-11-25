@@ -13,54 +13,16 @@ import { repoUrl } from '@/lib/seo';
 /** Returns `href` with `linkBase` in front when it is a landing-section anchor; other links are unchanged. */
 export const withBase = (href: string, linkBase: string) => (href.startsWith('#') ? `${linkBase}${href}` : href);
 
-/** The header's main navigation: three landing sections and the guide. */
+/** Routes shared by the header and compact phone navigation. */
 export const mainNavLinks = [
-  ['#story', 'Story'],
-  ['#gameplay', 'Gameplay'],
-  ['#downloads', 'Get the build'],
-  ['/docs/', 'Game guide'],
+  ['/docs/', 'Project guide'],
+  ['/docs/changelog/', 'History'],
+  [designSystemPath, 'Press kit'],
 ] as const;
 
-/** The footer's link groups: a visible title, the nav landmark's accessible name and its links. */
+/** Credit, licensing and source links shared by the landing and press pages. */
 export const footerGroups = [
-  {
-    title: 'Explore',
-    label: 'Explore the game',
-    links: [
-      ['#story', 'Story'],
-      ['#gameplay', 'Gameplay'],
-      ['#downloads', 'Get the build'],
-    ],
-  },
-  {
-    title: 'Player guide',
-    label: 'Player guide',
-    links: [
-      ['/docs/controls/first-steps/', 'First steps'],
-      ['/docs/', 'All game docs'],
-      ['/docs/changelog/', 'Changelog'],
-    ],
-  },
-  {
-    title: 'Project',
-    label: 'Project information',
-    links: [
-      ['/docs/development/story/', 'Development story'],
-      [designSystemPath, 'Press kit & brand'],
-      ['/docs/credits/', 'Credits & references'],
-      ['/docs/legal/', 'Legal & licensing'],
-      ['/docs/privacy/', 'Privacy'],
-      ['/docs/support/', 'Support'],
-    ],
-  },
-  {
-    title: 'Developers',
-    label: 'Developer guide',
-    links: [
-      ['/docs/development/', 'Developer home'],
-      ['/docs/development/setup/', 'Setup'],
-      ['/docs/development/testing/', 'Testing & CI'],
-      [repoUrl, 'Source on GitHub'],
-    ],
-  },
+  { title: 'Project', label: 'Project information', links: mainNavLinks },
+  { title: 'Source', label: 'Project source', links: [[repoUrl, 'Source on GitHub'], ['/docs/development/testing/', 'Development checks']] },
+  { title: 'Attribution', label: 'Attribution and rights', links: [['/docs/credits/', 'Credits'], ['/docs/legal/', 'Licensing'], ['/docs/privacy/', 'Privacy']] },
 ] as const;

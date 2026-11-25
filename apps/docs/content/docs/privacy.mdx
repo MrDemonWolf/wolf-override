@@ -5,88 +5,11 @@ description: What the WOLF OVERRIDE source game and this website store on your d
 
 **What this page is for:** what the game and this website keep on your device, what leaves it, and how to delete it.
 
-- **No account, sign-in, online service or telemetry** (usage data sent back to the developer).
-- **The game sends nothing.** It makes no network requests.
-- **The website stores one setting:** your light or dark theme, and only if you change it.
-- **Checked against the code on October 18, 2026.** This page describes the current source game and test builds. It is not legal advice.
-- **Language storage rechecked on October 26, 2026:** choosing a language saves it locally.
+## Current game project
 
-## The game
+The empty scene has no gameplay scripts, account, telemetry, save reader or save writer. The engine may write its own local files. The reset leaves earlier player data on your device.
 
-### What it stores
-
-The game writes these to its own folder on your device:
-
-| File | What is in it | When |
-| --- | --- | --- |
-| `m0-save.json` | Your checkpoint (details below) | From the first SAFE POINT |
-| `settings.cfg` | Your settings (details below) | When you change a setting or unlock the debug tools |
-| `debug-captures/` | Bug captures: a screenshot and a data file each | Only when you press **F12** or choose **BUG CAPTURE** |
-
-#### The checkpoint (`m0-save.json`)
-
-- The current room and puzzle state.
-- The engineer's and WOLF's positions.
-- Which of the three preset engineer names is in use.
-- The reply WOLF remembers from the corridor choice.
-- **One checkpoint only.** Each save replaces it. A save is written to `m0-save.json.tmp` first, then renamed.
-
-#### Your settings (`settings.cfg`)
-
-- **Video:** FPS limit, window size, fullscreen, V-sync, MSAA (edge smoothing), Reduced Motion, text size.
-- **Audio:** the slider levels.
-- **Controls:** controller deadzone, Toggle Holds and your key bindings.
-- **Debug unlock:** a `[debug] unlocked` line, only after you unlock the debug tools with the title-screen code. Locking them again removes it.
-- **Language:** your choice in Settings, saved under `[general] language`.
-
-#### Bug captures (`debug-captures/`) [#bug-captures]
-
-- **Made only when you ask,** with **F12** or the debug menu. Each is named by date and time.
-- **The screenshot** shows the game window.
-- **The data file** holds the game's state at that moment: room, positions, choices, the on-screen text, the input type (keyboard, controller or touch), performance figures, whether cheats were used, and the save's status.
-- **It also records** the date and time, the game's version, the Godot version, the system name (such as macOS or Windows), the display system and the window size.
-- **It does not record** your user name, your account or anything you typed.
-- **It stays on your device** unless you attach it to a bug report yourself.
-
-#### What the Godot engine adds
-
-The game runs on the Godot engine, which also writes to the same folder on desktop:
-
-- **`logs/`:** `godot.log` and up to four older copies. They record the engine version, the graphics driver and GPU model, and any warnings.
-- **`shader_cache/`:** compiled graphics shaders, so later starts are faster.
-- **Neither leaves your device.**
-
-#### What it reads and does not read
-
-- **Your system language:** Godot reads it at startup to choose an offered language when you have no saved choice. It is not sent anywhere. Availability: [Platforms and languages](/docs/platforms/#languages).
-- **No text entry.** The engineer's name is picked from a fixed list.
-- **Not read:** your account name, location or clipboard.
-- **GPU model:** only the engine's log records it. The game never shows it.
-
-### Where it lives and how to delete it
-
-1. Find the folder for your system on [Saving and retrying](/docs/controls/saves/#where-saves-live).
-2. Delete what you want gone:
-   - `m0-save.json`: your checkpoint. Continue then reads **No checkpoint yet**.
-   - `settings.cfg`: your settings, including the debug unlock. Settings return to their defaults.
-   - `debug-captures/`: your bug captures.
-   - The whole folder: all of the above, plus the engine's logs and shader cache. The engine makes a fresh log and cache next time.
-
-- **Test builds share this folder** with the source game.
-- **Tests don't touch it.** `bun run game:check` uses a temporary folder.
-
-<Callout type="warn" title="No undo">
-  Deleting the checkpoint or the folder deletes your progress for good.
-</Callout>
-
-### What it sends
-
-**Nothing.** No crash reports, update checks, analytics or accounts.
-
-- **One outward action:** the **Changelog** screen's online button asks your system to open [the changelog on this website](/docs/changelog/) in your browser. The website section below then applies.
-- **The in-game changelog text** is bundled with the game.
-- **The Credits screen** is shown in the game and opens nothing.
-- **The Godot editor** you use to run the source has its own settings and behaviour, documented by the Godot project. They are not part of this game.
+The [previous privacy guide](https://github.com/MrDemonWolf/wolf-override/tree/b4d15656/apps/docs/content/docs/privacy.mdx) describes the retired prototype's checkpoints, preferences, captures and storage locations.
 
 ## This website
 
@@ -96,7 +19,7 @@ The game runs on the Godot engine, which also writes to the same folder on deskt
 - **Search** runs in your browser. It downloads the site's search index from this site; what you type is not sent anywhere.
 - **No cookies,** no account, contact form, newsletter or comments.
 - **The landing page stores nothing.**
-- **No platform sniffing.** The site does not read which system your browser runs on; the landing page lists every planned platform for everyone.
+- **No platform sniffing.** The site does not read which system your browser runs on.
 
 To remove the stored choice, clear the site data for `wolfoverride.mrdemonwolf.dev` in your browser.
 
@@ -115,7 +38,7 @@ To remove the stored choice, clear the site data for `wolfoverride.mrdemonwolf.d
 
 ## Questions
 
-- **Questions or bugs:** see [Support and bug reports](/docs/support/).
+- **Questions or bugs:** see [Support and bug reports](https://github.com/MrDemonWolf/wolf-override/issues).
 - **Security problems:** follow [SECURITY.md](https://github.com/MrDemonWolf/wolf-override/blob/main/SECURITY.md), not a public issue.
 - **Changes to this page** appear in [the changelog](/docs/changelog/).
 - **Licences and asset rights:** see [Legal and licensing](/docs/legal/).

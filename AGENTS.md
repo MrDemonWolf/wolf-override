@@ -2,6 +2,8 @@
 
 The game is called WOLF OVERRIDE, two words with no slashes, by Nathanial's decision (October 17, 2026). Write that name in code, game text, art, the website, docs and Notion; the old "WOLF//OVERRIDE" stays only as an alternative name for listings such as IGDB or inside quotes of history. The repository name `wolf-override`, the domain, URLs and file names do not change.
 
+For the November 25 story reset, start with [the current handoff](docs/next-session.md). The current Godot project is a bare foundation. Use the previous prototype as a reference when Nathanial chooses material to carry forward.
+
 Each area has its own short `AGENTS.md` with the rules that apply only there. Read the one for the folder you work in, after this file:
 
 | Folder | Guide |
@@ -15,7 +17,7 @@ This repository has no `CLAUDE.md` or other tool-specific instruction file; ever
 
 Read [AGENT.md](AGENT.md) before game, site or README work. It is the shared, public guide for playable quality, credits, asset provenance and honest test claims. Write or change a page in `apps/docs` by the [docs style guide](apps/docs/content/docs/development/style-guide.mdx): one "What this page is for" line, one idea per bullet, numbered steps, short sections, plain words, one home per fact, spoiler-free, story wording untouched.
 
-Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` before story or gameplay changes; the current story canon is the section "Story canon (October 26, 2026)" in `docs/decisions.md`; research, design notes, reviews and plans go to Notion through Codex, with the repo keeping rules, decisions, the manifest, credits and [docs/NOTES.md](docs/NOTES.md). They hold provisional story and design decisions and are tracked in this repository by Nathanial's decision (October 11, 2026), so they are public. Keep spoiler-heavy material out of the website, in-game text and build output. The latest explicit user decision wins.
+Read `PRIVATE_AGENTS.md`, `PROJECT_CONTEXT.md` and `docs/next-session.md` before story or gameplay changes; the November 25 reset decision in `docs/decisions.md` defines the current scope and the October canon records the previous approved story; research, design notes, reviews and plans go to Notion through Codex, with the repo keeping rules, decisions, the manifest, credits and [docs/NOTES.md](docs/NOTES.md). They hold provisional story and design decisions and are tracked in this repository by Nathanial's decision (October 11, 2026), so they are public. Keep spoiler-heavy material out of the website, in-game text and build output. The latest explicit user decision wins.
 
 Inspect Git status and task-relevant source before editing. Work in small, playable steps using the pinned Godot project at `apps/game`; keep the public site at `apps/docs`. WOLF is an independent companion, the engineer is the sole playable character, and essential progress needs an engineer-only fallback. Keep the original game and story credit with Nathanial Henniges.
 

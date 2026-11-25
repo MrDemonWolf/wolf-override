@@ -19,7 +19,7 @@ export async function GET() {
     .replace(/\]\(\/docs([^)]*)\)/g, (_, path: string) => `](${siteUrl}/docs${path}/)`);
   const body =
     `# WOLF OVERRIDE\n\n> ${siteDescription}\n\n` +
-    `Spoiler-light player guide; walkthrough pages label their spoilers. Every page in full, as Markdown: ${siteUrl}/llms-full.txt\n\n` +
+    `Project guide, development history and credits. Every page in full, as Markdown: ${siteUrl}/llms-full.txt\n\n` +
     `## Game guide\n${tree}\n\n` +
     `## Optional\n\n- [Press kit and brand guide](${siteUrl}${designSystemPath}): logos, colours, fonts, approved copy and a press kit download\n- [Source code](${repoUrl}): the Godot project and this website (GPL-3.0-or-later code; art and branding have their own terms)\n`;
   return new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });

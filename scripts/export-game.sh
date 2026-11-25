@@ -31,7 +31,7 @@ godot_home="${GODOT_HOME:-$work/godot-home}"
 verify_export_templates "$(godot_template_dir "$godot_home")"
 isolate_godot_home "$godot_home"
 
-# Licence notices shipped beside each build: Godot's own (pinned to the 4.7.2 tag) and the two OFL texts.
+# Licence notices shipped beside each build: Godot engine and third-party notices pinned to 4.7.2.
 notices="$work/notices"
 mkdir -p "$notices"
 curl --fail --location --retry 3 --silent --show-error \
@@ -43,7 +43,6 @@ b0435e3b3e4e55238f05f4b306f30524a1b2e20147810d436eaa554fa6855c80  GODOT_LICENSE.
 cb1980c88089573bcacd7221d777c689bb8bbd778799f24c27fca0fe5f774d6d  GODOT_COPYRIGHT.txt
 SUMS
 )
-cp apps/game/assets/fonts/Roboto-OFL.txt apps/game/assets/fonts/Montserrat-OFL.txt "$notices/"
 
 import_game "$godot" "$logs" "$limit"
 

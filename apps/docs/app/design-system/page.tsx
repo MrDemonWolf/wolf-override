@@ -5,12 +5,6 @@ import Link from 'next/link';
 import SiteHeader from '../site-header';
 import SiteFooter from '../site-footer';
 import { bulletList, card, chipLink, inlineLink, landingRoot, landingWidth, sectionCopy, textLink } from '../landing-classes';
-import recordsCapture from '../images/records-access-doors-capture.png';
-import recordsCapture480 from '../images/records-access-doors-capture-480.webp';
-import junctionCapture from '../images/service-junction-doors-capture.png';
-import junctionCapture480 from '../images/service-junction-doors-capture-480.webp';
-import titleCapture from '../images/title-screen-capture.png';
-import titleCapture480 from '../images/title-screen-capture-480.webp';
 import { contrastRatio, resolveBrandColors } from '@/lib/brand-colors';
 import {
   aiDisclosure,
@@ -21,16 +15,12 @@ import {
   gameName,
   logoColourways,
   logoLightCyan,
-  longDescription,
   pressContact,
   pressFiles,
   pressKitPath,
   pressLinks,
   pressTextFiles,
-  shortDescription,
   studioDescription,
-  tagline,
-  type PressFile,
 } from '@/lib/press-kit';
 import { pageMetadata, repoUrl } from '@/lib/seo';
 
@@ -43,7 +33,7 @@ import { pageMetadata, repoUrl } from '@/lib/seo';
 
 export const metadata = pageMetadata(
   'Press kit and brand guide',
-  'Logos, colours, fonts, approved copy and one press kit download for WOLF OVERRIDE, the sci-fi horror game by MrDemonWolf, Inc., and how to use them.',
+  'Logos, colours, fonts, approved copy and one press kit download for WOLF OVERRIDE, the game project by MrDemonWolf, Inc., and how to use them.',
   designSystemPath,
 );
 
@@ -60,22 +50,6 @@ const sections = [
 
 type SectionId = (typeof sections)[number][0];
 
-// Files under app/images are served at hashed paths, known only through their imports.
-const importedHref: Record<string, string> = {
-  'app/images/records-access-doors-capture.png': recordsCapture.src,
-  'app/images/service-junction-doors-capture.png': junctionCapture.src,
-  'app/images/title-screen-capture.png': titleCapture.src,
-};
-
-/** The URL a single file downloads from: its public/ path, an explicit href, or its import's hashed path. */
-function hrefFor(file: PressFile): string {
-  if (file.href) return file.href;
-  if (file.source.startsWith('public/')) return file.source.slice('public'.length);
-  const href = importedHref[file.source];
-  if (!href) throw new Error(`No download URL for ${file.source}: add its import to importedHref`);
-  return href;
-}
-
 /**
  * A file's size on disk in KB or MB, read when the site is built (paths are relative to apps/docs).
  * For a single download, pass the file the link serves: for an `href` file that is its public/ copy,
@@ -86,19 +60,10 @@ function sizeOf(source: string): string {
   return bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
 
-/** The screenshots the Imagery section previews (their full PNGs are in the kit). */
-const screenshots = [
-  { image: recordsCapture480, title: 'Records Access', alt: 'Gameplay frame in Records Access: the engineer at a red console beside a shut steel door, with WOLF nearby.' },
-  { image: junctionCapture480, title: 'Service Junction', alt: 'Gameplay frame in the Service Junction: the engineer at a yellow valve wheel under a row of station plates, with WOLF at the left.' },
-  { image: titleCapture480, title: 'Title screen', alt: 'The title screen: the key art with the WOLF OVERRIDE name and the menu on the right.' },
-];
-
 // The file list's groups, by the zip folder each file sits in.
 const fileGroups = [
   ['logo/svg/', 'Logo and wolf mark, SVG (any size)'],
   ['logo/png/', 'Logo and wolf mark, PNG'],
-  ['screenshots/', 'Screenshots'],
-  ['art/', 'Key art and cover'],
 ] as const;
 
 // The three logo layouts, shown in every colourway on the ground each is made for.
@@ -195,12 +160,12 @@ export default function DesignSystemPage() {
             {gameName.name} design system
           </h1>
           <ul className={`${bulletList} mb-8 max-w-[62ch] text-lead`}>
-            <li><strong className="text-text">What this is:</strong> how to show the game: its name, logo, colours, fonts and pictures.</li>
+            <li><strong className="text-text">What this is:</strong> how to show the game: its name, logo, colours, fonts and credits.</li>
             <li><strong className="text-text">Who it is for:</strong> press, streamers, creators and anyone making something about the game.</li>
             <li><strong className="text-text">The short rule:</strong> use the files as they are, and credit &ldquo;{creditLine}&rdquo;.</li>
           </ul>
           <DownloadButton />
-          <p className="mt-3 text-caption text-muted">Logos, wolf mark, screenshots, key art, cover, facts and approved copy in one file.</p>
+          <p className="mt-3 text-caption text-muted">Logo files, the wolf mark, project facts and credits.</p>
           <nav aria-label="On this page" className="mt-10 flex flex-wrap gap-2">
             {sections.map(([id, title]) => (
               <a key={id} href={`#${id}`} className={chipLink}>
@@ -232,9 +197,6 @@ export default function DesignSystemPage() {
           <h3 className={subHeading}>Approved copy</h3>
           <p className={sectionCopy}>Paste these as they are. They are approved, spoiler-free and fit common listing limits.</p>
           <div className="grid gap-4">
-            <CopyBlock label="Tagline" paragraphs={[tagline]} />
-            <CopyBlock label="Short description" paragraphs={[shortDescription]} />
-            <CopyBlock label="Long description" paragraphs={longDescription} />
             <CopyBlock label="About the studio" paragraphs={[studioDescription]} />
             <CopyBlock label="Credit line" paragraphs={[creditLine, creatorCredit]} />
           </div>
@@ -282,7 +244,7 @@ export default function DesignSystemPage() {
             <DontTile label="Rotate or tilt it.">
               <img src={logoSrc('stacked', 'for-dark-bg')} alt="" className="h-20 w-auto -rotate-12" />
             </DontTile>
-            <DontTile label="Put the colour version on busy art." ground="bg-[url(/title-corridor-key-art-provisional-640.webp)] bg-cover bg-[position:30%_45%]">
+            <DontTile label="Put the colour version on busy art." ground="bg-linear-to-r from-blue-800 via-amber-500 to-red-600">
               <img src={logoSrc('stacked', 'for-light-bg')} alt="" className="h-20 w-auto" />
             </DontTile>
             <DontTile label="Redraw the mark or retype the name in another font.">
@@ -332,13 +294,13 @@ export default function DesignSystemPage() {
           <div className="grid grid-cols-2 gap-6 phone:grid-cols-1">
             <div className={`${card} p-6`}>
               <p className="hud-label mb-3 text-muted">Headings · Montserrat Bold</p>
-              <p className="mb-3 font-heading text-[2.2rem] leading-[1.1] font-bold tracking-[-.03em]">{tagline}</p>
+              <p className="mb-3 font-heading text-[2.2rem] leading-[1.1] font-bold tracking-[-.03em]">{gameName.name}</p>
               <p className="leading-[1.6] text-muted">Bold (700) for headings, Semibold (600) for small labels in capitals. The logo uses its own outlines; don&apos;t retype it.</p>
               <a className={inlineLink} href="https://fonts.google.com/specimen/Montserrat">Get Montserrat <span aria-hidden="true">↗</span></a>
             </div>
             <div className={`${card} p-6`}>
               <p className="hud-label mb-3 text-muted">Text · Roboto Regular</p>
-              <p className="mb-3 text-[1.05rem] leading-[1.7]">{shortDescription}</p>
+              <p className="mb-3 text-[1.05rem] leading-[1.7]">{creatorCredit}</p>
               <p className="leading-[1.6] text-muted">Regular (400) for body text, Bold (700) for emphasis. Line height about 1.6 to 1.8.</p>
               <a className={inlineLink} href="https://fonts.google.com/specimen/Roboto">Get Roboto <span aria-hidden="true">↗</span></a>
             </div>
@@ -349,31 +311,8 @@ export default function DesignSystemPage() {
           </p>
         </Section>
 
-        <Section id="imagery" index={5} title="Imagery" tldr="Use the key art and screenshots as they are, credit them, and say the art is provisional.">
-          <div className="grid grid-cols-2 gap-6 phone:grid-cols-1">
-            <figure className={`${card} min-w-0 overflow-hidden`}>
-              <img src="/title-corridor-key-art-provisional-1024.webp" alt="Provisional key art: an engineer in a red hoodie stands beside the robotic wolf WOLF in a blue-lit research corridor." width="1672" height="941" className="w-full" loading="lazy" decoding="async" />
-              <figcaption className="px-5 py-4 text-caption text-muted"><strong className="text-text">Key art</strong> · Provisional · Not a gameplay capture</figcaption>
-            </figure>
-            {screenshots.map(({ image, title, alt }) => (
-              <figure key={title} className={`${card} min-w-0 overflow-hidden`}>
-                <img src={image.src} alt={alt} width={image.width} height={image.height} className="w-full" loading="lazy" decoding="async" />
-                <figcaption className="px-5 py-4 text-caption text-muted"><strong className="text-text">{title}</strong> · Source build capture, October 2026 · Provisional art and UI</figcaption>
-              </figure>
-            ))}
-          </div>
-          <h3 className={subHeading}>How to credit</h3>
-          <ul className={`${bulletList} max-w-[62ch]`}>
-            <li>Under a picture: <strong className="text-text">&ldquo;{creditLine}&rdquo;</strong>.</li>
-            <li>For the key art, add <strong className="text-text">&ldquo;provisional art&rdquo;</strong>. It is not a gameplay screenshot.</li>
-            <li>Don&apos;t edit what a picture shows or present it as final. Resizing and cropping for layout are fine.</li>
-          </ul>
-          <h3 className={subHeading}>About the art</h3>
-          <ul className={`${bulletList} max-w-[62ch]`}>
-            <li><strong className="text-text">All current art is provisional</strong> and may change before release.</li>
-            <li><strong className="text-text">Made with AI assistance:</strong> the key art and the game&apos;s art were made with AI image tools, then reviewed and approved by Nathanial Henniges. The wolf mark started as an AI concept (ChatGPT Create) and was redrawn by the project as SVG; the logo sets the name in Montserrat letter shapes beside it.</li>
-            <li>Details for every file: <Link className={textLink} href="/docs/credits/#provisional-art">Credits</Link> and the <a className={textLink} href={`${repoUrl}/blob/main/apps/game/assets/manifest.json`}>asset register</a>.</li>
-          </ul>
+        <Section id="imagery" index={5} title="Image credits" tldr="Credit the studio when you use its mark.">
+          <p className={sectionCopy}>{creditLine}</p>
           <h3 className={subHeading}>AI disclosure</h3>
           {/* The approved text (lib/press-kit.ts aiDisclosure); press may quote it as it is, as stores will. */}
           <p className={sectionCopy}>{aiDisclosure}</p>
@@ -397,9 +336,9 @@ export default function DesignSystemPage() {
                 <ul className="flex flex-col gap-1">
                   {pressFiles.filter((file) => file.zipPath.startsWith(folder)).map((file) => (
                     <li key={file.zipPath}>
-                      <a href={hrefFor(file)} download className="flex min-h-11 items-center justify-between gap-3 leading-[1.4] text-muted hover-always:text-accent">
+                      <a href={file.source.slice('public'.length)} download className="flex min-h-11 items-center justify-between gap-3 leading-[1.4] text-muted hover-always:text-accent">
                         <span>{file.title}</span>
-                        <span className="flex-none text-caption">{sizeOf(file.href ? `public${file.href}` : file.source)}</span>
+                        <span className="flex-none text-caption">{sizeOf(file.source)}</span>
                       </a>
                     </li>
                   ))}

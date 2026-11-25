@@ -13,7 +13,7 @@ const footerLink = 'inline-flex min-h-11 items-center text-muted';
  */
 export default function SiteFooter({ linkBase = '' }: { linkBase?: string }) {
   return (
-    <footer className={`${landingWidth} grid grid-cols-[minmax(15rem,1.7fr)_repeat(4,minmax(8rem,1fr))] gap-x-8 gap-y-10 border-t border-t-line pt-14 pb-6 phone:grid-cols-2 phone:gap-x-5 phone:gap-y-8 tablet:grid-cols-4 tablet:gap-x-[1.4rem] tablet:gap-y-8`}>
+    <footer className={`${landingWidth} grid grid-cols-[minmax(15rem,1.7fr)_repeat(3,minmax(8rem,1fr))] gap-x-8 gap-y-10 border-t border-t-line pt-14 pb-6 phone:grid-cols-2 phone:gap-x-5 phone:gap-y-8 tablet:grid-cols-4 tablet:gap-x-[1.4rem] tablet:gap-y-8`}>
       <div className="menu:col-span-full">
         <BrandLockup />
         <p className="mt-4 max-w-[34ch] text-[.85rem] leading-[1.75] text-muted">Original concept, core story &amp; creative vision: Nathanial Henniges.<br />Developed by MrDemonWolf, Inc. with AI assistance.</p>
@@ -35,7 +35,7 @@ export default function SiteFooter({ linkBase = '' }: { linkBase?: string }) {
       ))}
       <div className="col-span-full flex justify-between gap-4 border-t border-t-line pt-5 text-[.78rem] text-muted phone:flex-col">
         <SiteCopyright />
-        <span>Working title · Provisional art · No public release date</span>
+        <span>In development · No public release date</span>
       </div>
     </footer>
   );

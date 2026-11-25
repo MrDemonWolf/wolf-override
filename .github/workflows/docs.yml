@@ -2,17 +2,13 @@ name: Deploy Docs
 
 on:
   # Pull requests always run (the build check is required). Pushes to main deploy only when the site's
-  # inputs change: the site itself, its checks, and the game files the build reads. Keep the game files
-  # in step with apps/docs/lib/version.ts (project.godot's version), lib/press-kit.ts (the key art under
-  # apps/game/assets) and lib/press-kit.test.ts (main.gd's credit line).
+  # inputs change: the site, its checks, or project.godot, which supplies the version.
   pull_request:
   push:
     branches: [main]
     paths:
       - 'apps/docs/**'
       - 'apps/game/project.godot'
-      - 'apps/game/scripts/main.gd'
-      - 'apps/game/assets/title-corridor-key-art-provisional.png'
       - 'scripts/check-docs-*.sh'
       - 'scripts/check-docs-*.py'
       - '.github/workflows/docs.yml'

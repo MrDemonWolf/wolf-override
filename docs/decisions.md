@@ -1,10 +1,12 @@
 # Decision log
 
-**Design authority, not an implementation tracker.** The story canon of October 26, 2026 comes first; the Revision 4 table (September 25, 2026; solo-protagonist update September 28, 2026) and the dated October sections follow as the log, each old story row marked kept, revised or retired.
+## Story reset (November 25, 2026)
+
+Nathanial approved retiring the playable prototype and keeping a bare, bootable Godot project. Preserve the name, original authorship, credits, licenses and asset provenance. Start the next Claude or Codex session with the [story handoff](next-session.md). The previous prototype and its approved story are reference material for that discussion.
 
 ## Story canon (October 26, 2026)
 
-The one current statement of the WOLF OVERRIDE story. Nathanial handed it over on 2026-10-26; it supersedes every older draft that conflicts with it, and the latest explicit decision from Nathanial wins. Nathanial Henniges originated the game and its core story.
+The approved story for the previous WOLF OVERRIDE prototype. Nathanial handed it over on 2026-10-26; it supersedes every older draft that conflicts with it, and the latest explicit decision from Nathanial wins. Nathanial Henniges originated the game and its core story.
 
 - **Status words:** APPROVED (Nathanial's words, or an earlier approval that still holds), DRAFTED (Claude's connective tissue or line wording, waiting for his read), PROPOSED (Nathanial's own idea, marked by him as a maybe; not locked), IMPLEMENTED (in the game on a branch or main), OPEN (not decided).
 - **Spoilers:** this section is spoiler-heavy. Nathanial's October 30 implementation request permits approved later discoveries in their authored Chapter 1 gameplay scene. Keep them out of the opening, website, README and unrelated build output. Public text may say that WOLF hears an order to kill a witness and refuses.
