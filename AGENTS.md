@@ -2,6 +2,8 @@
 
 The game is called WOLF OVERRIDE, two words with no slashes, by Nathanial's decision (October 17, 2026). Write that name in code, game text, art, the website, docs and Notion; the old "WOLF//OVERRIDE" stays only as an alternative name for listings such as IGDB or inside quotes of history. The repository name `wolf-override`, the domain, URLs and file names do not change.
 
+For the November 25 story reset, start with [the current handoff](docs/next-session.md). Earlier story and chapter instructions document the previous prototype while Nathanial decides what to carry forward.
+
 Each area has its own short `AGENTS.md` with the rules that apply only there. Read the one for the folder you work in, after this file:
 
 | Folder | Guide |

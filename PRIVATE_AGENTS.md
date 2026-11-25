@@ -1,4 +1,6 @@
 # Agent instructions
+Start the November 25 story reset at [the current handoff](docs/next-session.md). The October instructions below describe the previous prototype.
+
 Read AGENT.md for the shared game-quality guide, then PROJECT_CONTEXT.md, docs/decisions.md and docs/next-session.md, then task-relevant files. Inspect the actual repository and git status; preserve user changes. Latest explicit decisions win. Names and the W.O.L.F. acronym expansion are not locked; the number and shape of the endings are open (ST-07).
 
 For each gameplay slice, make the goal, interaction, visible response and consequence clear. Show WOLF's independent choices through authored action as well as text. Play the affected route in one normal Godot window with a separate test save before claiming its feel, pacing or readability is validated; headless checks and rendered stills are separate evidence. Keep the public AGENT.md spoiler-safe and update it when shared production rules change.

@@ -1,5 +1,7 @@
 # Project context
 
+For current work, read [the November 25 story-reset handoff](docs/next-session.md). This file records the earlier creative decisions for reference.
+
 Revision 5 • October 26, 2026; Chapter 1 scope updated October 30, 2026
 
 ## Authority
