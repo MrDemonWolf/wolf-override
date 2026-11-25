@@ -169,7 +169,7 @@ while IFS= read -r guide; do
 done < <(find "$out/docs" -name index.html | sort)
 
 # The press kit zip is git-ignored and built by apps/docs/scripts/build-press-kit.ts as part of the
-# docs build, so the export must contain it or the design-system page's download link is dead.
+# docs build, so the export must contain it or its brand download link works.
 if [ ! -s "$out/press/wolf-override-press-kit.zip" ]; then
   echo "FAIL  press/wolf-override-press-kit.zip is missing from the export (the docs build script makes it)" >&2
   status=1

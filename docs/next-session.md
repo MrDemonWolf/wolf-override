@@ -17,12 +17,12 @@ Use one scene to explore his answer. Give the engineer one thing to do, give WOL
 | October 26 canon and October 30 refinements | Consult the [decision log](decisions.md) when Nathanial asks what he previously chose. The implemented dialogue and rooms belong to the previous prototype. |
 | Play observations | Start with [B11 and B13](playtest-bugs-2026-11.md) and [Nathanial's play notebook](https://app.notion.com/p/410d61481c7b819b9ed4c3364ef3fc5b). An old status or a passing test needs checking against the relevant build. |
 
-## Proposed cleanup for Nathanial to review
+## Current foundation
 
-- Retire the opening dock, corridor, Records Access, Service Junction and maintenance annex from the active game. Include their dialogue, prompts, room art, scripted encounters and chapter-specific tests and captures.
-- Decide whether the title, studio splash, menu art and settings screens deserve to come forward. Accessibility needs such as readable text, player-paced dialogue and usable controls apply to any replacement. Their current implementation can be evaluated separately.
-- Keep the pinned Godot project and build tools. Inspect common input, settings, translation and save code individually. The studio splash loads the chapter scene, and the shared test helper preloads it too. Site press-kit code and tests depend on game art and credit text. Update these consumers, public walkthroughs, changelog and export checks alongside any actual removal.
-- Keep existing saves intact. A replacement can use a separate save filename. Review retired material at the baseline commit instead of shipping an archive inside the game.
+- Nathanial chose a bare Godot project. It opens a single empty scene at `apps/game/scenes/main.tscn`. The previous chapter, art, dialogue, title, settings, and gameplay tools are in the prototype baseline below.
+- The repository keeps the name, Nathanial's authorship, credits, license, full asset register and matching engine pin. Review individual prototype files at the baseline if a later scene needs a particular idea or implementation.
+- The empty scene has no save code. Use a separate save filename for the next playable build when it needs one.
+- Run `scripts/check-game.sh` to verify setup and startup. Run the public docs checks when editing the site.
 
 ## Lessons for the next playable scene
 
@@ -38,4 +38,6 @@ Astra reviewed the runtime dependencies, repo records and connected Notion hiera
 
 Find the project log in [Notion](https://app.notion.com/p/3e6d61481c7b810d956eef52c00f76ec) and the original design sources in the [notes index](NOTES.md). Older briefs, alternate story outlines and UI implementation queues are reference material. The rewrite has no approved replacement plot yet.
 
-Current cleanup state: handoff prepared on the review branch `docs/story-reset-handoff`. Runtime removals await Nathanial’s choice of what survives. Main still contains the playable prototype at the review baseline.
+The reset passed headless Godot 4.7.2 import and startup, macOS and Windows debug packaging, plus the public site's type checks, tests and static export. Headless browser checks covered the landing page, project guide and press page at phone and desktop widths. Native execution, iOS and hands-on play still need their own checks when there is a playable scene.
+
+The reset is in [PR #155](https://github.com/MrDemonWolf/wolf-override/pull/155). Open this handoff on the review branch while the PR is pending.

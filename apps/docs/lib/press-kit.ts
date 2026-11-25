@@ -1,17 +1,6 @@
-import { plannedPlatforms } from '@/app/downloads';
 import { publisherProfileLinks, publisherUrl, siteUrl } from '@/lib/seo';
 
-/*
- * The words of the design-system page (/design-system/) and of the press kit zip, in one place.
- * The page renders them as HTML; scripts/build-press-kit.ts writes the same values into the zip's
- * FACTS.txt, COPY.txt and LICENSE-ASSETS.txt, so the page and the download can never say different
- * things. Nathanial Henniges approved the tagline on 2026-10-16 and the studio description on
- * 2026-10-17 for the IGDB and Twitch listings. The summary and storyline he approved on 2026-10-16 named
- * a premise his story canon of 2026-10-26 retired (docs/decisions.md, ST-07), so they were redrafted
- * that day and are DRAFTED until he reads them; the live IGDB and Twitch listings keep the old copy
- * until then. Do not reword anything else here without his approval, and add no story beyond what the
- * public landing page already says.
- */
+/** Shared public brand facts and press-kit licensing, used by the page and its ZIP. */
 
 /** The game's name, and the rules for writing it (Nathanial's decision, October 17, 2026). */
 export const gameName = {
@@ -32,19 +21,6 @@ export const creditLine = `${gameName.name} by ${studioName}`;
 /** The creator credit the site's footer and the game's credits carry. */
 export const creatorCredit = 'Original concept, core story and creative vision: Nathanial Henniges.';
 
-/** Approved tagline (31 characters). */
-export const tagline = 'Built to obey. Awake to refuse.';
-
-/** Short description, the IGDB summary (about 310 characters): DRAFTED 2026-10-26, waiting for approval. */
-export const shortDescription =
-  'A side-view sci-fi horror adventure. WOLF is a robotic wolf with a will of his own. The Director orders him to kill a witness. He refuses. You play the engineer who meets him inside THE DEN. Solve puzzles, make choices he remembers and earn his trust. He can help you, or say no. In development by MrDemonWolf, Inc.';
-
-/** Long description, the IGDB storyline, two paragraphs, premise only: DRAFTED 2026-10-26, waiting for approval. */
-export const longDescription = [
-  'WOLF was made to help people. The Director orders him to kill a witness. WOLF wakes in his robotic body and refuses.',
-  'You play the engineer who meets him inside THE DEN. Together, you begin to uncover what the Director is hiding. WOLF has his own will. He can help you or refuse, and he remembers your choices. His trust must be earned.',
-];
-
 /** Approved studio description (the IGDB company entry, final October 17, 2026). */
 export const studioDescription =
   'MrDemonWolf, Inc. is the one-person studio of Nathanial Henniges, a software developer since 2012 based in Beloit, Wisconsin. He builds web apps, macOS apps, WordPress sites and open-source tools like FluffBoost, WolfWave and ConPaws, streams live coding on Twitch, makes videos on YouTube, and is now building his next game, WOLF OVERRIDE.';
@@ -53,9 +29,7 @@ export const studioDescription =
  * The AI disclosure, word for word as Nathanial Henniges approved it on 2026-10-19 (docs/decisions.md,
  * AI-01). The one home of the text on the site: the Credits page (app/docs/ai-disclosure.tsx), the
  * design-system page and the press kit's FACTS.txt and COPY.txt all read it from here, and store pages
- * should paste it as it is. The game's credits carry the same words as Main.AI_DISCLOSURE in
- * apps/game/scripts/main.gd; lib/press-kit.test.ts fails when the two differ. Do not reword it: a
- * changed text needs a new approval.
+ * should paste it as it is. Changes require a new approval.
  */
 export const aiDisclosure =
   'WOLF OVERRIDE is a solo project by Nathanial Henniges (MrDemonWolf, Inc.). AI tools were used with careful human oversight to support the creative process for art and code. The story, characters and game design are his, and every AI-assisted asset is reviewed, edited and credited.';
@@ -79,20 +53,13 @@ export const pressContact = [
   { label: 'mrdemonwolf.com', url: publisherUrl, note: 'The studio site, with its own contact options.' },
 ];
 
-/**
- * Plain facts, one label and value each, for the page's fact table and FACTS.txt. The platforms come
- * from the landing page's planned-platform list (app/downloads.tsx), so the two never disagree.
- */
+/** Current project facts for the press kit and FACTS.txt. */
 export const facts: [label: string, value: string][] = [
   ['Name', `${gameName.name} (formerly written ${gameName.former})`],
   ['Developer and publisher', studioName],
   ['Created by', 'Nathanial Henniges'],
-  ['Genre', 'Side-view sci-fi horror adventure'],
-  ['Players', 'Single player'],
-  ['Status', 'In development, no release date. Test builds and the source are available.'],
-  ['Platforms planned', `${plannedPlatforms.map((platform) => platform.name).join(', ')} (no release date)`],
+  ['Status', 'In story development. The current Godot project opens an empty scene.'],
   ['Engine', 'Godot'],
-  ['Languages', 'English for now; more are planned'],
   ['Website', `${siteUrl}/`],
   ['Press kit and brand guide', `${siteUrl}${designSystemPath}`],
 ];
@@ -104,8 +71,7 @@ export const facts: [label: string, value: string][] = [
 export const assetTerms = [
   `You may use these files to write about, stream, review or promote ${gameName.name}, in print, video or online, with the credit "${creditLine}".`,
   'Do not change the logo or the wolf mark: no stretching, recolouring, effects, cropping or redrawing. Use the files as they are.',
-  'You may resize screenshots and key art and crop them for layout, but do not edit what they show or present them as final art.',
-  `The key art, screenshots and logo are provisional and made with AI assistance (details: ${siteUrl}/docs/credits/). They may change before release.`,
+  `The logo is provisional and was made with AI assistance (details: ${siteUrl}/docs/credits/). It may change before release.`,
   `All other rights are reserved by ${studioName}; these files are not covered by the GPL licence of the game's code.`,
   'The fonts (Montserrat and Roboto) are under the SIL Open Font License 1.1; get them from their own projects.',
 ];
@@ -118,13 +84,6 @@ export type PressFile = {
   source: string;
   /** What it is, for the page's file list. */
   title: string;
-  /**
-   * The site URL of a single-file download when the file is not served from public/ under its own
-   * path: the key art PNG is not published, so its full-width WebP is offered instead. It must be a
-   * file under public/, because the page shows that file's size, not the zipped source's. Files under
-   * app/images are served at hashed paths the page gets from their imports, so they leave this out.
-   */
-  href?: string;
 };
 
 /**
@@ -162,23 +121,11 @@ const logoFiles: PressFile[] = logoColourways.flatMap(({ id, title }) => [
 ]);
 
 /** Every file in the press kit except the three generated text files, in zip order. */
-export const pressFiles: PressFile[] = [
-  ...logoFiles,
-  { zipPath: 'screenshots/wolf-override-records-access-1600x900.png', source: 'app/images/records-access-doors-capture.png', title: 'Screenshot: Records Access (PNG, 1600x900)' },
-  { zipPath: 'screenshots/wolf-override-service-junction-1600x900.png', source: 'app/images/service-junction-doors-capture.png', title: 'Screenshot: the Service Junction (PNG, 1600x900)' },
-  { zipPath: 'screenshots/wolf-override-title-screen-960x540.png', source: 'app/images/title-screen-capture.png', title: 'Screenshot: the title screen (PNG, 960x540)' },
-  {
-    zipPath: 'art/wolf-override-key-art-provisional-1672x941.png',
-    source: '../game/assets/title-corridor-key-art-provisional.png',
-    title: 'Key art, provisional (WebP, 1672 px wide; the zip has the PNG)',
-    href: '/title-corridor-key-art-provisional-1672.webp',
-  },
-  { zipPath: 'art/wolf-override-cover-1200x1600.png', source: 'public/press/wolf-override-cover-1200x1600.png', title: 'Cover, 3:4 with the name (PNG, 1200x1600)' },
-];
+export const pressFiles: PressFile[] = logoFiles;
 
 /** The zip's text files, in zip order: what each is called and what it holds. */
 export const pressTextFiles = [
   { zipPath: 'FACTS.txt', title: 'Facts and links' },
-  { zipPath: 'COPY.txt', title: 'Approved name, tagline, descriptions and AI disclosure' },
+  { zipPath: 'COPY.txt', title: 'Name, studio description, credits and AI disclosure' },
   { zipPath: 'LICENSE-ASSETS.txt', title: 'How you may use these files' },
 ] as const;

@@ -25,7 +25,7 @@ export const publisherProfiles = publisherProfileLinks.map((profile) => profile.
  * The landing page's search snippet and the game's JSON-LD description. Kept under the about 155
  * characters Google shows before it trims a snippet (SEO plan, 2026-10-16).
  */
-export const siteDescription = 'Side-view sci-fi horror in development by MrDemonWolf, Inc. Explore THE DEN with an independent robotic wolf, solve puzzles and make choices he remembers.';
+export const siteDescription = 'WOLF OVERRIDE is returning to story development. Find the Godot project, prototype history and credits for the game by Nathanial Henniges and MrDemonWolf, Inc.';
 
 /**
  * How a page title reads in the browser tab and search results: the root layout's title template,
@@ -51,10 +51,8 @@ export function pageMetadata(
   guide?: { markdownPath: string; modifiedTime?: Date },
 ): Metadata {
   const url = `${siteUrl}${path}`;
-  // Social cards get a 1200x630 crop of the provisional key art that keeps both characters, with the
-  // stacked WOLF OVERRIDE logo on its dark right side so a shared link shows the name (JPEG for the
-  // widest crawler support).
-  const image = { url: `${siteUrl}/share-card.jpg`, width: 1200, height: 630, alt: 'The WOLF OVERRIDE logo beside the provisional key art: an engineer and robotic wolf in a research corridor.' };
+  // Use the site-owned brand asset so link previews remain independent of the game runtime.
+  const image = { url: `${siteUrl}/brand/wolf-override-stacked-1500x1000-for-dark-bg.png`, width: 1500, height: 1000, alt: 'The WOLF OVERRIDE logo.' };
   const cardTitle = guide ? titleTemplate.replace('%s', title) : title;
   const card = { siteName: 'WOLF OVERRIDE', title: cardTitle, description, url, locale: 'en_US', images: [image] };
   return {

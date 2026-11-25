@@ -1,6 +1,6 @@
 # Playtest bugs, November 2026
 
-**What this file is for:** the working list of bugs Nathanial found playing the November 6, 2026 builds (Mac app from main `1b9287a`, the same build on his iPhone 14 Pro Max), with the cause as far as it is known and the planned fix. It is temporary: delete it when every bug below is closed. Nathanial's own play notes live in Notion ([Nathanial's play notes](https://app.notion.com/p/410d61481c7b819b9ed4c3364ef3fc5b)); this file is the developer side.
+**What this file is for:** the working list of bugs Nathanial found playing the November 6, 2026 builds (Mac app from main `1b9287a`, the same build on his iPhone 14 Pro Max), with the cause as far as it is known and the planned fix. The November 25 reset retired this implementation queue. Use the observations when planning and playing the next scene. Nathanial's own play notes live in Notion ([Nathanial's play notes](https://app.notion.com/p/410d61481c7b819b9ed4c3364ef3fc5b)); this file is the developer side.
 
 Status words: **Open** (not started), **Cause found** (reproduced and understood), **Fixing** (branch open), **Fixed** (merged, waiting for Nathanial to confirm in play), **Closed** (confirmed by hand).
 

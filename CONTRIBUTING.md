@@ -1,10 +1,9 @@
 # Contributing to WOLF OVERRIDE
 
-Thanks for your interest. WOLF OVERRIDE is an early, source-only game by
+Thanks for your interest. WOLF OVERRIDE is a game project in story development by
 Nathanial Henniges, developed by MrDemonWolf, Inc. with AI assistance
 under his direction and review. Contributions are welcome when they keep
-the game playable, honest about what has been checked, and free of
-private story material. [AGENT.md](AGENT.md) is the shared quality guide
+the project bootable and describe what has been checked. Keep private story material out of public build output. [AGENT.md](AGENT.md) is the shared quality guide
 for people and coding agents; read it before gameplay, site or README
 work.
 
@@ -34,34 +33,24 @@ Run the game checks and the docs checks from the repository root before
 opening a pull request:
 
 ```bash
-bun run game:check   # changelog export check, Godot import, headless suites
+bun run game:check   # changelog export check, Godot import and headless startup
 bun run check:copies # no new copied code since origin/main
 bun run docs:check   # MDX and Next types, then TypeScript
 bun run docs:test    # docs unit tests
 bun run docs:build   # static export plus the export checks
 ```
 
-`bun run game:check` uses a temporary user data folder, so your own saves
-are untouched. The headless suites prove logic, not feel: if your change
-affects movement, pacing, readability or WOLF's behaviour, also play the
-affected route in a normal game window and say in the pull request what
-you played and what remains unplayed. Do not describe a game-feel change
-as validated until the route has been played.
+`bun run game:check` starts Godot headlessly with isolated user data.
+For future changes affecting movement, pacing, readability or WOLF's
+behaviour, record headless results and ask Nathanial to play the affected
+route with a separate test save.
 
 Don't copy code. When two places need the same logic, move it into one
-shared file that both use and delete the copy. The
-[copied-code check](https://wolfoverride.mrdemonwolf.dev/docs/development/testing/#copied-code-check)
-section of the testing page explains what `bun run check:copies` looks
-for, what it cannot catch, and what to do when it fails.
+shared file that both use and delete the copy. Run `bun run check:copies` to catch new duplicated code.
 
-The [setup](https://wolfoverride.mrdemonwolf.dev/docs/development/setup/),
-[testing](https://wolfoverride.mrdemonwolf.dev/docs/development/testing/)
-and [project rules](https://wolfoverride.mrdemonwolf.dev/docs/development/rules/)
-pages describe the commands, their limits and the rules in more detail.
-The [contributing](https://wolfoverride.mrdemonwolf.dev/docs/development/contributing/)
-page has the steps from issue to pull request, and the
-[docs style guide](https://wolfoverride.mrdemonwolf.dev/docs/development/style-guide/)
-says how to write a guide page.
+The [testing guide](https://wolfoverride.mrdemonwolf.dev/docs/development/testing/)
+documents verification. Follow the [docs style guide](apps/docs/content/docs/development/style-guide.mdx)
+when editing a public page.
 
 ## Branches and pull requests
 
@@ -69,8 +58,7 @@ says how to write a guide page.
   protected by a repository ruleset: it cannot be deleted or force-pushed,
   and the `godot` check (Game checks workflow) and the `build` check
   (Deploy Docs workflow) must pass before a change lands.
-- Keep the Godot pin, the stable event IDs, the existing asset sources and
-  the engineer-only viewpoint intact.
+- Keep the Godot pin, the existing asset records and the engineer-only viewpoint intact.
 - When a change touches the game, the site or the tools, add one-line
   bullets to `apps/docs/content/docs/changelog.mdx` under
   **Next version (in development)**, in the right group (Gameplay, Art,

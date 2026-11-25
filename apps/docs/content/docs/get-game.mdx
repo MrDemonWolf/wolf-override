@@ -1,89 +1,14 @@
 ---
-title: Get the game
-description: How to get WOLF OVERRIDE today, as a test build or as the source game in Godot 4.7.2, step by step.
+title: Get the source
+description: "Where to find the current Godot project and the earlier source prototype of WOLF OVERRIDE, with its original guides and controls."
 ---
 
-**What this page is for:** the one place with the steps to get the game and run it.
+**What this page is for:** where to find each version of the project.
 
-<Callout title="No release yet">
-  There is no installer, store release or release date. What you can get today is a development snapshot.
-</Callout>
+## Current project
 
-## Pick a way to play
+The [source repository](https://github.com/MrDemonWolf/wolf-override) contains the Godot project under `apps/game`. It opens an empty scene. There is no current playable chapter or release date.
 
-| Way | You need | Systems | Steps |
-| --- | --- | --- | --- |
-| **Test build** | A GitHub account | macOS, Windows | [Install a test build](/docs/test-builds/) |
-| **Source game** | Godot 4.7.2 (free) | Windows, macOS, Linux | [Below](#run-the-source-game) |
+## Previous prototype
 
-- **Test build:** ready to run, made from each change, kept for 14 days. Unsigned and debug only.
-- **Source game:** the project files, opened in the Godot game engine.
-- **Other systems:** see [Platforms and languages](/docs/platforms/).
-- **Privacy:** the game sends nothing and needs no account to play. See [Privacy](/docs/privacy/).
-
-<LinkCards
-  label="Download the source game"
-  variant="actions"
-  links={[
-    { href: 'https://github.com/MrDemonWolf/wolf-override/archive/refs/heads/main.zip', title: 'Download source ZIP', description: 'Latest main branch snapshot · not an installer' },
-    { href: '/docs/test-builds/', title: 'Install a test build', description: 'macOS and Windows · no Godot needed' },
-  ]}
-/>
-
-## Run the source game
-
-1. Install the standard build of [Godot 4.7.2](https://godotengine.org/download/archive/) for your system.
-2. Download the [source ZIP](https://github.com/MrDemonWolf/wolf-override/archive/refs/heads/main.zip) and extract it.
-3. Open Godot. In the Project Manager, choose **Import**.
-4. Select `apps/game/project.godot` inside the extracted folder.
-5. Open the imported project.
-6. Press **F5** to run the game.
-
-- **Use exactly 4.7.2.** The project is pinned to that Godot version.
-- **Your saves** go to the folder listed on [Saving and retrying](/docs/controls/saves/#where-saves-live).
-
-<Details>
-<Summary>Use Git and the command line instead</Summary>
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/MrDemonWolf/wolf-override.git
-   cd wolf-override
-   ```
-
-2. Import the project once (this opens the Godot editor):
-
-   ```sh
-   godot --path apps/game --editor
-   ```
-
-3. After that, start the game directly:
-
-   ```sh
-   godot --path apps/game
-   ```
-
-- **Developers:** [Set up the project](/docs/development/setup/) covers Bun, the checks and the website.
-
-</Details>
-
-## What you can play
-
-- **Current route:** a maintenance corridor, Records Access, the Service Junction and a maintenance annex.
-- **Provisional art and sound.** Nothing is final.
-- **Not played by hand yet:** no complete route has been played through by hand, so how it feels is unproven.
-- **Next steps:** [First steps](/docs/controls/first-steps/), then [Controls](/docs/controls/input/).
-- **Stuck?** The [walkthrough](/docs/walkthrough/) has puzzle solutions (spoilers).
-
-## What the source download includes
-
-- **Included:** the repository source, project files and provisional assets.
-- **Not included:** an installer or a phone or tablet app.
-- **Code licence:** GPL-3.0-or-later for code and documentation.
-- **Art is different:** artwork has its own rights status. Read [Legal](/docs/legal/) and [Credits](/docs/credits/) before you reuse anything.
-
-## When a release comes
-
-- **This page** and the [changelog](/docs/changelog/) will name its version and platforms.
-- **Until then,** [Current status](/docs/development/status/) says what is playable and what is still in progress.
+The [November 25 baseline](https://github.com/MrDemonWolf/wolf-override/tree/b4d15656) preserves the retired prototype. Its [player guides](https://github.com/MrDemonWolf/wolf-override/tree/b4d15656/apps/docs/content/docs) describe the controls and rooms for that revision.

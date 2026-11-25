@@ -1,26 +1,13 @@
 {
-  "title": "Game guide",
+  "title": "Project guide",
   "pages": [
     "index",
-    "---Play---",
-    "...controls",
-    "accessibility",
-    "walkthrough",
-    "faq",
-    "---Get the game---",
     "get-game",
-    "test-builds",
-    "platforms",
     "changelog",
-    "support",
-    "---About the project---",
-    "about",
-    "development/story",
-    "[Press kit and brand](/design-system/)",
     "credits",
     "legal",
     "privacy",
-    "---Develop---",
-    "...development"
+    "...development",
+    "[Press kit and brand](/design-system/)"
   ]
 }

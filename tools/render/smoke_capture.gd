@@ -1,23 +1,28 @@
 extends SceneTree
-## Smoke test for the render container: opens the game's main scene, lets it run for a few
-## seconds and saves the frame to /work/out/smoke.png, then quits.
-##   mkdir -p /tmp/smoke-driver && cp tools/render/smoke_capture.gd /tmp/smoke-driver/
-##   tools/render/render.sh --driver /tmp/smoke-driver apps/game OUT -- --resolution 1280x720 --script res://review_capture/smoke_capture.gd
+## Capture the configured startup scene to /work/out/smoke.png in the container.
+## See README.md for the render.sh command and host output directory.
 
-const FRAMES: int = 150
+## Wait three frames so the scene enters the tree and draws before capture.
+const SETTLE_FRAMES: int = 3
 var _frame: int = 0
 
 
+## Load the same scene as a normal game launch.
 func _initialize() -> void:
-	var main: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
-	root.add_child(main)
+	var scene: String = ProjectSettings.get_setting("application/run/main_scene")
+	if change_scene_to_file(scene) != OK:
+		push_error("Could not open startup scene: " + scene)
+		quit(1)
 
 
+## Save the rendered viewport after startup. Report missing pixels or write failure.
 func _process(_delta: float) -> bool:
 	_frame += 1
-	if _frame == FRAMES:
+	if _frame == SETTLE_FRAMES:
 		var image: Image = root.get_texture().get_image()
-		image.save_png("/work/out/smoke.png")
-		print("smoke capture saved: %dx%d" % [image.get_width(), image.get_height()])
-		return true
+		if image == null or image.save_png("/work/out/smoke.png") != OK:
+			push_error("Could not write /work/out/smoke.png")
+			quit(1)
+		else:
+			quit()
 	return false

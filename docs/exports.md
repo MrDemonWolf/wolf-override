@@ -1,4 +1,6 @@
 # Export plan and validation — Revision 4
+
+This historical plan describes the previous prototype. See the [reset handoff](next-session.md) for current checks.
 No target was exported or device-tested. Godot 4.7.2 is installed and M0 launched on Mac, but no export templates or current platform SDK requirements were verified. Check official matching-version requirements before export work.
 
 | Target | Setup requirement to document | Evidence still required |
@@ -9,7 +11,7 @@ No target was exported or device-tested. Godot 4.7.2 is installed and M0 launche
 | iPad | Apple export setup plus tablet layout | Actual iPad UI/input/resume/save testing. |
 | Android | SDK/JDK/packages required by actual engine pin; export/signing steps | Export separately from real-device input/resume/save/TTS fallback. |
 
-Languages in the Mac and Windows exports (the `.lproj` folders, the catalogs in the pack, the store language lists) are recorded once, on the website's [Localization page, Exports](../apps/docs/content/docs/development/localization.mdx#exports).
+Languages in the Mac and Windows exports (the `.lproj` folders, the catalogs in the pack, the store language lists) are recorded once, on the website's [prototype localization guide](https://github.com/MrDemonWolf/wolf-override/blob/b4d15656eb6313c81623cf7ecd04aed91dd658ba/apps/docs/content/docs/development/localization.mdx#exports).
 
 Mac first; validate other targets early after M0. Targets do not imply simultaneous release. Record date, engine/templates, OS/device, build identifier and each observed result. Headless checks, export success, graphical play and actual-device validation are different evidence.
 
@@ -21,7 +23,7 @@ Lay out controls and dialogue responsively around each device's safe area, then 
 
 ## Icon preparation (deferred)
 
-Use one editable 1024-square design with separate background and transparent wolf artwork. Keep an opaque, flattened square PNG for conventional icons. The existing [provisional SVG mark](../apps/game/assets/logo-mark.svg) is source material, and each derived asset needs an entry in the populated [asset register](../apps/game/assets/manifest.json); its brand-rights review remains open.
+Use one editable 1024-square design with separate background and transparent wolf artwork. Keep an opaque, flattened square PNG for conventional icons. The existing [provisional SVG mark](https://github.com/MrDemonWolf/wolf-override/blob/b4d15656eb6313c81623cf7ecd04aed91dd658ba/apps/game/assets/logo-mark.svg) is source material, and each derived asset needs an entry in the populated [asset register](../apps/game/assets/manifest.json); its brand-rights review remains open.
 
 - **Mac and iOS:** Apple's [Icon Composer](https://developer.apple.com/icon-composer/) imports SVG or PNG layers and saves a layered `.icon`; it requires macOS 26.4 or later. Godot 4.7 has a macOS [`application/liquid_glass_icon`](https://docs.godotengine.org/en/4.7/classes/class_editorexportplatformmacos.html) field, usable when exporting from macOS with Xcode 26+, plus a conventional `application/icon` fallback for older macOS. Godot's [iOS exporter](https://docs.godotengine.org/en/4.7/classes/class_editorexportplatformios.html) exposes image icon slots but no `.icon` field. Later, add the Composer file to the exported Xcode project using [Apple's instructions](https://developer.apple.com/documentation/xcode/creating-your-app-icon-using-icon-composer), and verify a repeatable setup after Godot re-exports.
 - **Windows:** Use the opaque square PNG in the export preset; [Godot converts PNG, WebP or SVG to ICO](https://docs.godotengine.org/en/4.7/tutorials/export/changing_application_icon_for_windows.html) for the executable. A separate `.ico` is needed if setting `application/config/windows_native_icon` for the running taskbar icon.

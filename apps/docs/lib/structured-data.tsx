@@ -1,6 +1,5 @@
 import type { BreadcrumbItem } from 'fumadocs-core/breadcrumb';
 import { getBreadcrumbItems } from 'fumadocs-core/breadcrumb';
-import { plannedPlatforms } from '@/app/downloads';
 import { publisherProfiles, publisherUrl, repoUrl, siteDescription, siteUrl } from '@/lib/seo';
 import { source } from '@/lib/source';
 
@@ -62,10 +61,7 @@ export function homeStructuredData(): JsonLdObject {
         alternateName: ['WOLF//OVERRIDE', 'Wolf Override'],
         description: siteDescription,
         url: `${siteUrl}/`,
-        image: `${siteUrl}/share-card.jpg`,
-        genre: ['Horror', 'Science fiction', 'Adventure'],
-        // The landing page's planned platforms, so the two never disagree.
-        gamePlatform: plannedPlatforms.map((platform) => platform.name),
+        image: `${siteUrl}/brand/wolf-override-stacked-1500x1000-for-dark-bg.png`,
         inLanguage: 'en',
         author: { '@id': ids.author },
         creator: { '@id': ids.author },

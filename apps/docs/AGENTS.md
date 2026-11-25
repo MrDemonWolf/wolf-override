@@ -15,7 +15,7 @@
 | Landing page and shared layout | `app/` |
 | Shared helpers (SEO, press kit, version, colours) | `lib/` |
 | Colours, fonts and spacing | `@theme` tokens in `app/global.css` |
-| Changelog | `content/docs/changelog.mdx` (the game reads a copy; see the root file) |
+| Changelog | `content/docs/changelog.mdx` (build checks verify the plain-text copy; see the root file) |
 
 ## Rules
 

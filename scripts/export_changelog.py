@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export the public changelog as plain text for the in-game CHANGELOG screen.
+"""Export the public changelog as plain text for game build tooling.
 
 Source: apps/docs/content/docs/changelog.mdx (the single source of truth).
 Target: apps/game/assets/changelog.txt (committed; scripts/check-game.sh fails when it drifts).
@@ -17,8 +17,7 @@ Rules (deterministic, standard library only):
 - Blank lines separate headings and paragraphs; consecutive bullets stay together.
 - MDX import lines and JSX tags are not prose and are skipped.
 - Everything inside a <Details> (or HTML <details>) block is skipped: the website keeps the long
-  notes there and the game shows only the short lines above them (the in-game screen links to
-  the website).
+  notes there and the plain-text copy includes the short lines above them.
 
 Version guard (fails the export, and so scripts/check-game.sh, with exit code 1):
 - Cut versions are headings "## 0.N.0 - Month D, YYYY", newest first, each lower than the one

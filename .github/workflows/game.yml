@@ -17,7 +17,6 @@ concurrency:
 jobs:
   godot:
     runs-on: ubuntu-24.04
-    # The steps besides the suites take about a minute (run 40141935412); 20 leaves the check step its 15.
     timeout-minutes: 20
     defaults:
       run:
@@ -40,30 +39,10 @@ jobs:
       - name: Get pinned Godot 4.7.2
         run: scripts/get-godot.sh "$RUNNER_TEMP/godot"
       - name: Import and run headless checks
-        id: check
-        # Measured: 404 s of suites before the text-box split and longest-first order (run 39370708132),
-        # 235 s after (run 40141935412, the job 4 min 27 s). 15 minutes leaves room for the full-slice
-        # route suite still to come.
         timeout-minutes: 15
         env:
           CHECK_LOG_DIR: ${{ runner.temp }}/wolf-check-logs
         run: scripts/check-game.sh
-      # The committed translation template must be what Godot's own generator makes from this commit, so
-      # a text change cannot reach main without its msgids (scripts/i18n/extract_pot.sh; localization PR L2).
-      # It reuses the import check-game.sh just made and only starts the editor headless (a few seconds).
-      # It runs even when a suite failed, so one run reports both problems, but only after a clean import
-      # (check-game.sh's `imported` output): a broken import would only add a second, misleading failure.
-      # extract_pot.sh bounds the editor at 180 s, inside this step's 5 minutes, so a hung editor shows
-      # the script's own message instead of a cancelled step.
-      - name: Translation template is fresh
-        if: (success() || failure()) && steps.check.outputs.imported == 'true'
-        timeout-minutes: 5
-        run: |
-          scripts/i18n/extract_pot.sh . "$RUNNER_TEMP/i18n/messages.pot" "$RUNNER_TEMP/wolf-check-logs/i18n-pot"
-          if ! diff -u i18n/messages.pot "$RUNNER_TEMP/i18n/messages.pot"; then
-            echo "i18n/messages.pot is out of date: run scripts/i18n/extract_pot.sh . i18n/messages.pot <log dir> and commit the result" >&2
-            exit 1
-          fi
       - name: Preserve failed check logs
         if: failure() || cancelled()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -73,11 +52,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  # The checks that need no Godot: the tools' own self-tests, shellcheck, and the translation gates
-  # (scripts/i18n/i18n_tool.py; localization PR L2). A minute or two, so a broken tool shows up before
-  # the long godot job ends. Every step fails the job on a non-zero exit. It was the `i18n` job until
-  # CI audit finding CI-5 gave it the self-tests too; required checks name jobs, so `tools` is the
-  # name to require.
   tools:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -100,49 +74,3 @@ jobs:
       # stand-in docker: no container or Godot, a second or two. It runs validate_names.sh --self-test too.
       - name: render.sh self-test
         run: tools/render/self_test.sh
-      # compare.py calls ImageMagick 7's `magick`; Ubuntu 24.04 packages only ImageMagick 6 (`convert`).
-      # So the pinned 7.1.2-31 AppImage is fetched and checked against its SHA-256 when `magick` is
-      # missing. APPIMAGE_EXTRACT_AND_RUN runs it without FUSE, which the runner lacks.
-      - name: Get ImageMagick 7
-        run: |
-          if ! command -v magick >/dev/null; then
-            mkdir -p "$RUNNER_TEMP/magick/bin"
-            curl --fail --location --retry 3 --silent --show-error \
-              https://github.com/ImageMagick/ImageMagick/releases/download/7.1.2-31/ImageMagick-7.1.2-31-gcc-x86_64.AppImage \
-              -o "$RUNNER_TEMP/magick/bin/magick"
-            printf '%s  %s\n' b22dee096a68e7eb6771a6f98c16490ea78d399ffa27f34ca2ec4f02e707fd9c "$RUNNER_TEMP/magick/bin/magick" | sha256sum --check
-            chmod +x "$RUNNER_TEMP/magick/bin/magick"
-            echo "APPIMAGE_EXTRACT_AND_RUN=1" >> "$GITHUB_ENV"
-            echo "$RUNNER_TEMP/magick/bin" >> "$GITHUB_PATH"
-          fi
-      - name: Parity compare catches its planted changes
-        run: |
-          magick -version | head -1
-          python3 -I -B scripts/parity/compare.py --self-test
-      # gettext is usually on the runner image already. When it is not, the install is tried first
-      # without `apt-get update` (which fetches every package list and is the slow, flaky part), then
-      # with it, three times in all with a pause between, because the Ubuntu mirrors fail now and then.
-      - name: Get gettext (msgfmt)
-        run: |
-          if ! command -v msgfmt >/dev/null; then
-            for attempt in 1 2 3; do
-              if sudo apt-get install -y -q --no-install-recommends gettext \
-                || { sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends gettext; }; then
-                break
-              fi
-              if [ "$attempt" -eq 3 ]; then
-                echo "Could not install gettext after 3 tries" >&2
-                exit 1
-              fi
-              sleep $((attempt * 15))
-            done
-          fi
-          msgfmt --version | head -1
-      - name: Gates catch their planted errors
-        run: python3 -I -B scripts/i18n/i18n_tool.py selftest "$RUNNER_TEMP/i18n-selftest.json"
-      - name: Glossary and style guides are sound
-        run: python3 -I -B scripts/i18n/i18n_tool.py glossary
-      - name: Every scene and script is in the POT file list
-        run: python3 -I -B scripts/i18n/i18n_tool.py potfiles apps/game --check
-      - name: Translations pass every gate
-        run: python3 -I -B scripts/i18n/i18n_tool.py check i18n/messages.pot apps/game/i18n "$RUNNER_TEMP/i18n-check.json"
